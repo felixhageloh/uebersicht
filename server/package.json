@@ -1,0 +1,30 @@
+{
+  "name": "uebersicht-server",
+  "version": "0.0.0",
+  "description": "",
+  "main": "server.coffee",
+  "scripts": {
+    "test": "node_modules/jasmine-node/bin/jasmine-node --coffee --captureExceptions --forceexit spec/backend",
+    "start": "coffee server.coffee"
+  },
+  "author": "Felix Hageloh",
+  "license": "All rights reserved",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-browserify": "~1.2.12",
+    "coffeeify": "~0.5.2",
+    "grunt-contrib-jasmine": "~0.5.3",
+    "jasmine-node": "~1.11.0",
+    "mockery": "~1.4.0",
+    "nib": "~1.0.2"
+  },
+  "dependencies": {
+    "connect": "~2.9.0",
+    "chokidar": "~0.8.1",
+    "coffee-script": "~1.7.1",
+    "tosource": "~0.1.1",
+    "stylus": "~0.42.2",
+    "minimist": "0.0.8"
+  }
+}
