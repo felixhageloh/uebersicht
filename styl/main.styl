@@ -1,0 +1,85 @@
+@import 'nib'
+@import 'slick.css'
+@import 'lightbox.css'
+@import 'highlight.css'
+
+global-reset()
+
+@font-face
+  font-family Ubuntu
+  font-style light
+  src url(fonts/Ubuntu-L.ttf)
+
+html, body
+  background: #fff
+  color: #152033
+  font-family: Ubuntu
+  font-weight: 200
+  line-height: 1.4
+
+header, main
+  width: 500px
+  margin: 0 auto
+
+header
+  display: block
+  image: "/images/logo.png" 200px 96px
+  background-repeat: no-repeat
+  background-position: center 30px
+
+  h2
+    padding-top: 160px
+    font-style: italic
+
+
+
+main
+  padding: 20px
+
+  h1
+    font-weight: 300
+    font-size: 24px
+    margin: 40px 0 10px
+    text-align: center
+
+  pre
+    margin: 20px 0
+    font-family: Ubuntu Mono
+    border: 1px solid #eee
+
+.download
+  margin: 20px
+  text-align: center
+
+  a, a:link, a:visited
+    color:  #152033
+    font-size: 16px
+    text-decoration: none
+    padding: 10px 20px
+    display: inline-block
+    background: #ac7a7b
+    color: #fff
+    border-radius: 2px
+    margin-right: 10px
+
+    span
+      font-size: 10px
+
+    &:hover
+      background: #810034
+
+  a.app
+    background: #c29785
+
+    &:hover
+      background: #bc6444
+
+.screenshots
+  width: 400px
+  margin: 0 auto
+
+  img
+    width: 100%
+    box-sizing: border-box
+    border: 10px solid #fff
+
