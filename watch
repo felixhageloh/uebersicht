@@ -1,0 +1,2 @@
+#!/bin/bash
+stylus -c --include-css -I node_modules/ -w styl/main.styl -o .

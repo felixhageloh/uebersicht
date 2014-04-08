@@ -3,39 +3,44 @@
 <head>
   <title>Übersicht</title>
   <link rel="stylesheet" type="text/css" href="main.css">
+  <!--[if lt IE 9]>
+    <script>
+      document.createElement('header');
+      document.createElement('nav');
+      document.createElement('section');
+      document.createElement('article');
+      document.createElement('main');
+      document.createElement('footer');
+    </script>
+  <![endif]-->
 </head>
 <body>
   <header>
     <h2>
       Keep an eye on what is happening on your machine and in the World.
     </h2>
+    <a href='https://github.com/felixhageloh/uebersicht' class='github'>View on GitHub</a>
   </header>
 
   <main>
+  <div class='wrapper light'>
     <section class='download'>
       <a href='' class='app'>Download <span>(OS X 10.9)</span></a>
-      <a href='https://github.com/felixhageloh/uebersicht' class='github'>View on github</a>
+      <a href='https://github.com/felixhageloh/uebersicht' class='github'>Get Widgets</a>
     </section>
 
     <section class='description'>
       <h1>At a Glance</h1>
-      <p>Übersicht lets you run system commands and display their output on your desktop in little containers, called wigets. Leveraging the full power of HTML, a typical widget looks like this:</p>
+      <p>Übersicht lets you run system commands and display their output on your desktop in little containers, called wigets. Widgets are written using <strong>HTML5</strong>, which means they</p>
 
-<pre><code>  command: "echo Hello World!"
+      <ul>
+        <li>are easy to write and customize</li>
+        <li>can show data in tables, charts, graphs ... you name it</li>
+        <li>can react to different screen sizes</li>
+      </ul>
 
-  render: (output) ->
-    "&lt;h1&gt;#{output}&lt;/h1&gt;"
+      <p>The following screenshots give you a glimpse of Übersicht in action:</p>
 
-  style: """
-    left: 20px
-    top: 20px
-    color: #fff
-  """
-</code></pre>
-    </section>
-
-    <section class='in-action'>
-      <h1>Übersicht in action</h1>
       <div class="screenshots">
         <div>
           <a href="images/screenshots/1.png" data-lightbox="image-1">
@@ -53,7 +58,28 @@
           </a>
         </div>
       </div>
-    <section>
+    </section>
+
+    <section class='developers'>
+      <h1>Rolling your own</h1>
+      <p>Widgets are written in CoffeeScript or plain JavaScript. A minimal widget, written in CoffeeScript looks like this:</p>
+
+<pre><code>  command: "echo Hello World!"
+
+  render: (output) ->
+    "&lt;h1&gt;#{output}&lt;/h1&gt;"
+
+  style: """
+    left: 20px
+    top: 20px
+    color: #fff
+  """
+</code></pre>
+
+    <p>For the full documentation, please visit the <a href='https://github.com/felixhageloh/uebersicht' >GitHub page</a></p>
+    </section>
+    <div id="disqus_thread"></div>
+  </div>
   </main>
 </body>
 
@@ -64,12 +90,28 @@
 <script>
 
   $(document).ready( function() {
-    hljs.initHighlightingOnLoad();
-
     $('.screenshots').slick({
       slidesToShow: 3,
       slidesToScroll: 3
     });
+
+    hljs.initHighlightingOnLoad();
   });
 </script>
+
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'uebersicht'
+      , disqus_title     = 'Übersicht';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </html>

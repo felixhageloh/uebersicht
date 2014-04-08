@@ -10,6 +10,17 @@ global-reset()
   font-style light
   src url(fonts/Ubuntu-L.ttf)
 
+@font-face
+  font-family Ubuntu
+  font-style light
+  font-style italic, oblique
+  src url(fonts/Ubuntu-LI.ttf)
+
+@font-face
+  font-family Ubuntu Mono
+  src url(fonts/UbuntuMono-R.ttf)
+
+
 html, body
   background: #fff
   color: #152033
@@ -17,7 +28,8 @@ html, body
   font-weight: 200
   line-height: 1.4
 
-header, main
+
+header, section
   width: 500px
   margin: 0 auto
 
@@ -31,24 +43,53 @@ header
     padding-top: 160px
     font-style: italic
 
+  a.github
+    bg-color = #ac7a7b
+    position: absolute
+    top: 40px
+    right: -40px
+    padding: 4px 50px
+    background: bg-color
+    transform: rotate(45deg)
+    font-size: 13px
+    border-bottom: 1px solid darken(bg-color, 20%)
+    border-top: 1px solid darken(bg-color, 20%)
+
+    &:link, &:visited
+      color: #fff
+      text-decoration: none
+
+    &:hover
+      background: #810034
 
 
 main
-  padding: 20px
+  section
+    margin-top: 24px
+    display: block
 
   h1
+    border-top: 1px solid #e0e0e0
     font-weight: 300
     font-size: 24px
-    margin: 40px 0 10px
-    text-align: center
+    padding: 24px 0 8px
+    //text-align: center
+    font-style: italic
 
   pre
     margin: 20px 0
     font-family: Ubuntu Mono
     border: 1px solid #eee
 
+  ul
+    padding: 4px 0 8px 0
+
+  li
+    margin: 8px 0
+    border-left: 8px solid #ddd
+    padding-left: 8px
+
 .download
-  margin: 20px
   text-align: center
 
   a, a:link, a:visited
@@ -75,11 +116,15 @@ main
       background: #bc6444
 
 .screenshots
-  width: 400px
-  margin: 0 auto
+  width: 300px
+  margin: 16px auto 0
 
   img
     width: 100%
     box-sizing: border-box
     border: 10px solid #fff
+
+#disqus_thread
+  width: 500px
+  margin: 100px auto 20px auto
 
