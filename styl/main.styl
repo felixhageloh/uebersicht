@@ -109,9 +109,13 @@ main
   margin: 16px auto 0
 
   img
-    width: 100%
+    max-width: 100%
     box-sizing: border-box
     border: 10px solid #fff
+    display: none
+
+  &.ready img
+    display: block
 
 #disqus_thread
   width: 500px
