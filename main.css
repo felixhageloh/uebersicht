@@ -3,7 +3,7 @@
 
 .slick-list { position: relative; overflow: hidden; display: block; margin: 0; padding: 0; }
 .slick-list:focus { outline: none; }
-.slick-loading .slick-list { background: white url(./ajax-loader.gif) center center no-repeat; }
+.slick-loading .slick-list { background: white url(images/loading.gif) center center no-repeat; }
 .slick-list.dragging { cursor: pointer; cursor: hand; }
 
 .slick-slider .slick-list, .slick-track, .slick-slide, .slick-slide img { -webkit-transform: translate3d(0, 0, 0); -moz-transform: translate3d(0, 0, 0); -ms-transform: translate3d(0, 0, 0); -o-transform: translate3d(0, 0, 0); transform: translate3d(0, 0, 0); }
@@ -15,7 +15,7 @@
 
 .slick-slide { float: left; height: 100%; min-height: 1px; display: none; }
 .slick-slide img { display: block; }
-.slick-slide.loading { background: url(./ajax-loader.gif) center center no-repeat; position: relative; }
+.slick-slide.loading { background: url(images/loading.gif) center center no-repeat; position: relative; }
 .slick-slide.dragging img { pointer-events: none; }
 .slick-initialized .slick-slide { display: block; }
 .slick-loading .slick-slide { visibility: hidden; }
@@ -208,6 +208,7 @@ body:after {
 .lb-data {
   padding: 0 4px;
   color: #ccc;
+  position: relative;
 }
 
 .lb-data .lb-details {
@@ -232,11 +233,10 @@ body:after {
 }
 
 .lb-data .lb-close {
-  display: block;
-  float: right;
-  width: 30px;
-  height: 30px;
-  background: url(images/close.png) top right no-repeat;
+  position: absolute;
+  right: 0;
+  width: 0;
+  height: 0;
   text-align: right;
   outline: none;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
@@ -245,6 +245,16 @@ body:after {
   -moz-transition: opacity 0.2s;
   -o-transition: opacity 0.2s;
   transition: opacity 0.2s;
+  overflow: visible;
+}
+
+.lb-data .lb-close:before {
+  content: 'close';
+  color: #fff;
+  position: absolute;
+  right: 0;
+  top: 10px;
+  font-size: 20px;
 }
 
 .lb-data .lb-close:hover {
@@ -348,28 +358,31 @@ ol,ul{list-style:none}
 table{border-collapse:separate;border-spacing:0;vertical-align:middle}
 caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}
 a img{border:none}
-@font-face{font-family:Ubuntu;font-style:light;src:url("fonts/Ubuntu-L.ttf")}
-@font-face{font-family:Ubuntu;font-style:light;font-style:italic,oblique;src:url("fonts/Ubuntu-LI.ttf")}
+@font-face{font-family:Ubuntu;font-weight:light;font-style:italic,oblique;src:url("fonts/Ubuntu-LI.ttf")}
+@font-face{font-family:Ubuntu;font-weight:light;font-style:normal;src:url("fonts/Ubuntu-L.ttf")}
 @font-face{font-family:Ubuntu Mono;src:url("fonts/UbuntuMono-R.ttf")}
-html,body{background:#fff;color:#152033;font-family:Ubuntu;font-weight:200;line-height:1.4}
+html,body{background:#fff;color:#152033;font-family:Ubuntu,Helvetica Neue,Arial,Sans;font-style:normal;font-weight:200;line-height:1.4}
 header,section{width:500px;margin:0 auto}
+a,a:link,a:visited{color:#86585a;}
+a:hover,a:link:hover,a:visited:hover{color:#852a2f}
 header{display:block;background-image:url("/images/logo.png");background-repeat:no-repeat;background-position:center 30px;}
 @media all and (-webkit-min-device-pixel-ratio:1.5),(min--moz-device-pixel-ratio:1.5),(-o-min-device-pixel-ratio:1.5/1),(min-device-pixel-ratio:1.5),(min-resolution:138dpi),(min-resolution:1.5dppx){header{background-image:url("/images/logo@2x.png");-webkit-background-size:200px 96px;-moz-background-size:200px 96px;background-size:200px 96px}
-}header h2{padding-top:160px;font-style:italic}
-header a.github{position:absolute;top:40px;right:-40px;padding:4px 50px;background:#ac7a7b;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg);font-size:13px;border-bottom:1px solid #915a5b;border-top:1px solid #915a5b;}
-header a.github:link,header a.github:visited{color:#fff;text-decoration:none}
-header a.github:hover{background:#810034}
+}header h2{padding-top:160px;font-style:italic;text-align:center}
 main section{margin-top:24px;display:block}
 main h1{border-top:1px solid #e0e0e0;font-weight:300;font-size:24px;padding:24px 0 8px;font-style:italic}
 main pre{margin:20px 0;font-family:Ubuntu Mono;border:1px solid #eee}
 main ul{padding:4px 0 8px 0}
 main li{margin:8px 0;border-left:8px solid #ddd;padding-left:8px}
-.download{text-align:center;}
-.download a,.download a:link,.download a:visited{color:#152033;font-size:16px;text-decoration:none;padding:10px 20px;display:inline-block;background:#ac7a7b;color:#fff;-webkit-border-radius:2px;border-radius:2px;margin-right:10px;}
+.download{text-align:center;font-size:0;}
+.download a,.download a:link,.download a:visited{font-size:16px;text-decoration:none;padding:10px 20px;display:inline-block;background-color:#ac7a7b;color:#fff;-webkit-border-radius:2px;border-radius:2px;margin-right:10px;}
 .download a span,.download a:link span,.download a:visited span{font-size:10px}
-.download a:hover,.download a:link:hover,.download a:visited:hover{background:#810034}
-.download a.app{background:#c29785;}
-.download a.app:hover{background:#bc6444}
-.screenshots{width:300px;margin:16px auto 0;}
+.download a:hover,.download a:link:hover,.download a:visited:hover{background-color:#810034}
+.download a.app{background-color:#c29785;}
+.download a.app:hover{background-color:#bc6444}
+.screenshots{width:100%;max-width:300px;margin:16px auto 0;}
 .screenshots img{width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:10px solid #fff}
-#disqus_thread{width:500px;margin:100px auto 20px auto}
+#disqus_thread{width:500px;margin:40px auto 20px auto;padding-top:40px;border-top:1px solid #e0e0e0}
+@media only screen and (max-width: 500px){body,html{width:100%}
+header,section,#disqus_thread{width:100%;padding-left:16px;padding-right:16px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+.download a{margin:10px 0 0 0;width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+}

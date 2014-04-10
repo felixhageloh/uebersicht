@@ -3,6 +3,8 @@
 <head>
   <title>Übersicht</title>
   <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!--[if lt IE 9]>
     <script>
       document.createElement('header');
@@ -19,19 +21,22 @@
     <h2>
       Keep an eye on what is happening on your machine and in the World.
     </h2>
-    <a href='https://github.com/felixhageloh/uebersicht' class='github'>View on GitHub</a>
   </header>
 
   <main>
-  <div class='wrapper light'>
-    <section class='download'>
-      <a href='' class='app'>Download <span>(OS X 10.9)</span></a>
-      <a href='https://github.com/felixhageloh/uebersicht' class='github'>Get Widgets</a>
+    <section class="download">
+      <a href="Übersicht.app.zip"
+         title="Dowload App for Mac OS X 10.9"
+         class="app">Download <span>(OS X 10.9)</span></a>
+
+      <a href="https://github.com/felixhageloh/uebersicht-widgets"
+         title="Get Widgets"
+         class="widgets">Get Widgets</a>
     </section>
 
     <section class='description'>
       <h1>At a Glance</h1>
-      <p>Übersicht lets you run system commands and display their output on your desktop in little containers, called wigets. Widgets are written using <strong>HTML5</strong>, which means they</p>
+      <p>Übersicht lets you run system commands and display their output on your desktop in little containers, called widgets. Widgets are written using <strong>HTML5</strong>, which means they</p>
 
       <ul>
         <li>are easy to write and customize</li>
@@ -66,6 +71,8 @@
 
 <pre><code>  command: "echo Hello World!"
 
+  refreshFrequency: 5000 # ms
+
   render: (output) ->
     "&lt;h1&gt;#{output}&lt;/h1&gt;"
 
@@ -76,10 +83,9 @@
   """
 </code></pre>
 
-    <p>For the full documentation, please visit the <a href='https://github.com/felixhageloh/uebersicht' >GitHub page</a></p>
+    <p class='github'>For the full documentation, please visit the <a href='https://github.com/felixhageloh/uebersicht' >GitHub page</a></p>
     </section>
     <div id="disqus_thread"></div>
-  </div>
   </main>
 </body>
 

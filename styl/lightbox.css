@@ -164,6 +164,7 @@ body:after {
 .lb-data {
   padding: 0 4px;
   color: #ccc;
+  position: relative;
 }
 
 .lb-data .lb-details {
@@ -188,11 +189,10 @@ body:after {
 }
 
 .lb-data .lb-close {
-  display: block;
-  float: right;
-  width: 30px;
-  height: 30px;
-  background: url(images/close.png) top right no-repeat;
+  position: absolute;
+  right: 0;
+  width: 0;
+  height: 0;
   text-align: right;
   outline: none;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
@@ -201,6 +201,16 @@ body:after {
   -moz-transition: opacity 0.2s;
   -o-transition: opacity 0.2s;
   transition: opacity 0.2s;
+  overflow: visible;
+}
+
+.lb-data .lb-close:before {
+  content: 'close';
+  color: #fff;
+  position: absolute;
+  right: 0;
+  top: 10px;
+  font-size: 20px;
 }
 
 .lb-data .lb-close:hover {
