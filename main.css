@@ -379,9 +379,9 @@ main li{margin:8px 0;border-left:8px solid #ddd;padding-left:8px}
 .download a:hover,.download a:link:hover,.download a:visited:hover{background-color:#810034}
 .download a.app{background-color:#c29785;}
 .download a.app:hover{background-color:#bc6444}
-.screenshots{width:100%;margin:16px auto 0;}
-.screenshots img{max-width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:10px solid #fff;display:none}
-.screenshots.ready img{display:block}
+.screenshots{width:90%;margin:16px auto 0;font-size:0;white-space:nowrap;padding:0;}
+.screenshots li{width:25%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:10px solid #fff;display:inline-block;margin:0;}
+.screenshots li img{width:100%}
 #disqus_thread{width:500px;margin:40px auto 20px auto;padding-top:40px;border-top:1px solid #e0e0e0}
 @media only screen and (max-width: 500px){body,html{width:100%}
 header,section,#disqus_thread{width:100%;padding-left:16px;padding-right:16px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}

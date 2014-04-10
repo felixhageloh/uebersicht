@@ -46,28 +46,28 @@
 
       <p>The following screenshots give you a glimpse of Übersicht in action:</p>
 
-      <div class="screenshots">
-        <div>
+      <ul class="screenshots">
+        <li>
           <a href="images/screenshots/1.jpg" data-lightbox="image-1">
             <img src="images/screenshots/1_small.jpg">
           </a>
-        </div>
-        <div>
+        </li>
+        <li>
           <a href="images/screenshots/2.jpg" data-lightbox="image-2">
             <img src="images/screenshots/2_small.jpg">
           </a>
-        </div>
-        <div>
+        </li>
+        <li>
           <a href="images/screenshots/3.jpg" data-lightbox="image-3">
             <img src="images/screenshots/3_small.jpg">
           </a>
-        </div>
-        <div>
+        </li>
+        <li>
           <a href="images/screenshots/4.jpg" data-lightbox="image-4">
             <img src="images/screenshots/4_small.jpg">
           </a>
-        </div>
-      </div>
+        </li>
+      </ul>
     </section>
 
     <section class='developers'>
@@ -95,20 +95,12 @@
 </body>
 
 <script src='js/jquery.js' type="text/javascript"></script>
-<script type="text/javascript" src="js/slick.min.js"></script>
 <script type="text/javascript" src="js/lightbox.min.js"></script>
 <script type="text/javascript" src="js/highlight.pack.js"></script>
 <script>
 
   $(document).ready( function() {
-    $('.screenshots').slick({
-      slidesToShow: 4,
-      slidesToScroll: 4
-    });
-
     hljs.initHighlightingOnLoad();
-
-    setTimeout(function () { $('.screenshots').addClass('ready') })
   });
 </script>
 

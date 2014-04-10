@@ -105,17 +105,21 @@ main
       background-color: #bc6444
 
 .screenshots
-  width: 100%
+  width: 90%
   margin: 16px auto 0
+  font-size: 0
+  whitespace: nowrap
+  padding: 0
 
-  img
-    max-width: 100%
+  li
+    width: 25%
     box-sizing: border-box
     border: 10px solid #fff
-    display: none
+    display: inline-block
+    margin:0
 
-  &.ready img
-    display: block
+    img
+      width: 100%
 
 #disqus_thread
   width: 500px
