@@ -314,7 +314,7 @@ ol,ul{list-style:none}
 table{border-collapse:separate;border-spacing:0;vertical-align:middle}
 caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}
 a img{border:none}
-html,body{background:#fff;color:#152033;font-family:Ubuntu,Helvetica Neue,Arial,Sans;font-style:normal;font-weight:200;line-height:1.4}
+html,body{background:#fff;color:#152033;font-family:Ubuntu,Helvetica Neue,Arial,Sans;font-style:normal;font-weight:300;line-height:1.4}
 header,section{width:500px;margin:0 auto}
 a,a:link,a:visited{color:#86585a;}
 a:hover,a:link:hover,a:visited:hover{color:#852a2f}
