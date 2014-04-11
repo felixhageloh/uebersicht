@@ -314,6 +314,8 @@ ol,ul{list-style:none}
 table{border-collapse:separate;border-spacing:0;vertical-align:middle}
 caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}
 a img{border:none}
+@import url("http://fonts.googleapis.com/css?family=Ubuntu:300,300italic");
+@import url("http://fonts.googleapis.com/css?family=Ubuntu+Mono");
 html,body{background:#fff;color:#152033;font-family:Ubuntu,Helvetica Neue,Arial,Sans;font-style:normal;font-weight:200;line-height:1.4}
 header,section{width:500px;margin:0 auto}
 a,a:link,a:visited{color:#86585a;}
@@ -323,7 +325,7 @@ header{display:block;background-image:url("images/logo.png");background-repeat:n
 }header h2{padding-top:160px;font-style:italic;text-align:center}
 main section{margin-top:24px;display:block}
 main h1{border-top:1px solid #e0e0e0;font-weight:300;font-size:24px;padding:24px 0 8px;font-style:italic}
-main pre{margin:20px 0;font-family:Ubuntu Mono;border:1px solid #eee}
+main pre{margin:20px 0;font-family:Ubuntu Mono,Menlo,Currier New,Mono;border:1px solid #eee}
 main ul{padding:4px 0 8px 0}
 main li{margin:8px 0;border-left:8px solid #ddd;padding-left:8px}
 .download{text-align:center;font-size:0;}
