@@ -7,30 +7,61 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "UBAppDelegate.h"
 
-@interface U_bersichtTests : XCTestCase
-
+@interface ÜbersichtTests : XCTestCase
 @end
 
-@implementation U_bersichtTests
+@implementation ÜbersichtTests {
+    UBAppDelegate* deletgate;
+}
 
 - (void)setUp
 {
     [super setUp];
-    
-    // Set-up code here.
+    deletgate = [[NSApplication sharedApplication] delegate];
 }
 
 - (void)tearDown
 {
-    // Tear-down code here.
-    
     [super tearDown];
 }
 
-- (void)testExample
+- (void)testMainViewIsFullscreen
 {
-    XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+    XCTAssertNotNil(deletgate.mainView);
+    
+    // view should occupy the entire screen minus the menubar
+    NSRect viewFrame         = [deletgate.mainView frame];
+    NSRect screenFrame       = [[NSScreen mainScreen] frame];
+    screenFrame.size.height -= [[NSApp mainMenu] menuBarHeight];
+    XCTAssertEqual(viewFrame, screenFrame);
+}
+
+- (void)testServerTask
+{
+    NSTask* serverTask = [deletgate valueForKey:@"widgetServer"];
+    XCTAssertNotNil(serverTask);
+    XCTAssert([serverTask isRunning]);
+}
+
+- (void)testMenuItem
+{
+    NSStatusItem* statusBarItem = [deletgate valueForKey:@"statusBarItem"];
+    XCTAssertNotNil(deletgate.statusBarMenu);
+    XCTAssertNotNil(statusBarItem);
+    XCTAssertEqual([statusBarItem menu], deletgate.statusBarMenu);
+}
+
+- (void)testMainMenu
+{
+    NSMenu* mainMenu = deletgate.statusBarMenu;
+    
+    XCTAssertEqual([[mainMenu itemAtIndex:2] action], @selector(openWidgetDir:));
+    XCTAssert([deletgate respondsToSelector:@selector(openWidgetDir:)]);
+    
+    XCTAssertEqual([[mainMenu itemAtIndex:3] action], @selector(showDebugConsole:));
+    XCTAssert([deletgate respondsToSelector:@selector(showDebugConsole:)]);
 }
 
 @end

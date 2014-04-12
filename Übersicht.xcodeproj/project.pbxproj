@@ -16,7 +16,7 @@
 		DC43AD9F17EC2D9500241CC2 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD9E17EC2D9500241CC2 /* XCTest.framework */; };
 		DC43ADA017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
 		DC43ADA817EC2D9500241CC2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC43ADA617EC2D9500241CC2 /* InfoPlist.strings */; };
-		DC43ADAA17EC2D9500241CC2 /* U_bersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* U_bersichtTests.m */; };
+		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
 		DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADB417EC31EB00241CC2 /* UBWindow.m */; };
 		DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43ADB617EC38D300241CC2 /* WebKit.framework */; };
 		DC4F43F3189E90DD00937925 /* status-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F1189E90DD00937925 /* status-icon.png */; };
@@ -60,7 +60,7 @@
 		DC43AD9E17EC2D9500241CC2 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		DC43ADA517EC2D9500241CC2 /* ÜbersichtTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ÜbersichtTests-Info.plist"; sourceTree = "<group>"; };
 		DC43ADA717EC2D9500241CC2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DC43ADA917EC2D9500241CC2 /* U_bersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = U_bersichtTests.m; sourceTree = "<group>"; };
+		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
 		DC43ADB317EC31EB00241CC2 /* UBWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindow.h; sourceTree = "<group>"; };
 		DC43ADB417EC31EB00241CC2 /* UBWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWindow.m; sourceTree = "<group>"; };
 		DC43ADB617EC38D300241CC2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -180,7 +180,7 @@
 		DC43ADA317EC2D9500241CC2 /* ÜbersichtTests */ = {
 			isa = PBXGroup;
 			children = (
-				DC43ADA917EC2D9500241CC2 /* U_bersichtTests.m */,
+				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
 				DC43ADA417EC2D9500241CC2 /* Supporting Files */,
 			);
 			path = "ÜbersichtTests";
@@ -332,7 +332,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC43ADAA17EC2D9500241CC2 /* U_bersichtTests.m in Sources */,
+				DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
