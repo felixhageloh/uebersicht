@@ -6,14 +6,13 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
 
-        <!-- Now here's an example of a version with a weird internal version number (like an SVN revision) but a human-readable external one. -->
         <item>
             <title>Version 0.1</title>
             <sparkle:releaseNotesLink>
-              http://tracesof.net/uebersicht/release/0.1.html
+              http://tracesof.net/uebersicht/releases/0.1.html
             </sparkle:releaseNotesLink>
-            <pubDate>Wed, 25 Dec 2005 12:20:11 +0000</pubDate>
-            <enclosure url="https://github.com/felixhageloh/uebersicht/raw/gh-pages/Uebersicht-0.1.app.zip" s
+            <pubDate>Mon, Apr 14 2014 19:48:44 GMT+0200</pubDate>
+            <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.1.app.zip" s
                       parkle:shortVersionString="0.1"
                       length="1472349"
                       type="application/octet-stream" />
