@@ -8,7 +8,7 @@
     "start": "coffee server.coffee"
   },
   "author": "Felix Hageloh",
-  "license": "All rights reserved",
+  "license": "GPL v3 <http://www.gnu.org/licenses/>",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-watch": "~0.5.3",

@@ -3,7 +3,7 @@
 //  ÜbersichtTests
 //
 //  Created by Felix Hageloh on 20/9/13.
-//  Copyright (c) 2013 tracesOf. All rights reserved.
+//  Copyright (c) 2013 Felix Hageloh. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>

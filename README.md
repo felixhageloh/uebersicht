@@ -100,3 +100,8 @@ While developing you can use
 
 To continuously watch, compile and run specs.
 
+# Legal
+
+The source for Übersicht is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+© 2014 Felix Hageloh
