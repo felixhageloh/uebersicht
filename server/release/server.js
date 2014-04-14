@@ -1432,7 +1432,7 @@ module.exports = function(directoryPath) {
       }
       return _results;
     })();
-    return fileParts.join('-').replace('.', '-');
+    return fileParts.join('-').replace(/\./g, '-');
   };
   isWidgetPath = function(filePath) {
     var _ref;

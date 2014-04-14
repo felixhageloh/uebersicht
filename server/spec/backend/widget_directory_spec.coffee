@@ -39,10 +39,10 @@ describe 'widget directory', ->
     expect(widgetDir.widgets()['widget-2-coffee']).toBeDefined()
     expect(widgetDir.widgets()['widget-2-coffee'].id).toEqual 'widget-2-coffee'
 
-    chokidarMock.trigger 'add', testWidgetDir+'/some-dir/widget-1.coffee'
+    chokidarMock.trigger 'add', testWidgetDir+'/some-dir.widget/index-1.coffee'
     expect(Object.keys(widgetDir.widgets()).length).toBe 3
-    expect(widgetDir.widgets()['some-dir-widget-1-coffee']).toBeDefined()
-    expect(widgetDir.widgets()['some-dir-widget-1-coffee'].id).toEqual 'some-dir-widget-1-coffee'
+    expect(widgetDir.widgets()['some-dir-widget-index-1-coffee']).toBeDefined()
+    expect(widgetDir.widgets()['some-dir-widget-index-1-coffee'].id).toEqual 'some-dir-widget-index-1-coffee'
     expect(widgetDir.widgets()['widget-1-coffee']).toBeDefined()
     expect(widgetDir.widgets()['widget-1-coffee'].id).toEqual 'widget-1-coffee'
 

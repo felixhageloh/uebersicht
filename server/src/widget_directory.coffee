@@ -62,7 +62,7 @@ module.exports = (directoryPath) ->
     fileParts = filePath.replace(directoryPath, '').split(/\/+/)
     fileParts = (part for part in fileParts when part)
 
-    fileParts.join('-').replace('.', '-')
+    fileParts.join('-').replace(/\./g, '-')
 
   isWidgetPath = (filePath) ->
     filePath.match(/\.coffee$/) ? filePath.match(/\.js$/)
