@@ -31,6 +31,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
-	<string>http://tracesof/ubersicht/updates.xml.rss</string>
+	<string>http://tracesof.net/uebersicht/updates.xml.rss</string>
 </dict>
 </plist>
