@@ -667,12 +667,19 @@
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
+        <customObject id="Y8H-N0-yva" customClass="SUUpdater"/>
         <menu id="MVS-hI-V8a" userLabel="Status Bar Menu">
             <items>
                 <menuItem title="About Übersicht" id="YQt-G2-uKH">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="orderFrontStandardAboutPanel:" target="-2" id="VpR-KV-QA6"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Check for Updates" id="ssJ-cC-6aL">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="checkForUpdates:" target="Y8H-N0-yva" id="qoy-Sj-8OL"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="LqA-wK-nbB"/>

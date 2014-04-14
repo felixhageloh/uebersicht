@@ -23,6 +23,8 @@
 		DC4F43F4189E90DD00937925 /* status-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F2189E90DD00937925 /* status-icon@2x.png */; };
 		DC4FC28118EAB1CA00B7FD79 /* übersicht-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4FC28018EAB1CA00B7FD79 /* übersicht-logo.png */; };
 		DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */; };
+		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
+		DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* getting-started.coffee */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
 		DCECA1C81893F23200C0CA32 /* server.js in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C61893F23200C0CA32 /* server.js */; };
@@ -40,6 +42,19 @@
 			remoteInfo = "Übersicht";
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DC5D25BE18FC4823000078C4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		DC43AD7C17EC2D9500241CC2 /* Übersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Übersicht.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,6 +85,7 @@
 		DC57ED2A18DB4EC900A24FDD /* UBPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBPreferencesController.h; sourceTree = "<group>"; };
 		DC57ED2B18DB4EC900A24FDD /* UBPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBPreferencesController.m; sourceTree = "<group>"; };
 		DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UBPreferencesController.xib; sourceTree = "<group>"; };
+		DC5D25BB18FC46E0000078C4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		DC99A7C418DC41A600E61222 /* Übersicht.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Übersicht.entitlements"; sourceTree = "<group>"; };
 		DCAAAF9518DF0B050097677F /* getting-started.coffee */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "getting-started.coffee"; sourceTree = "<group>"; };
 		DCE2453D18ED864800C9FAE3 /* WebInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebInspector.h; sourceTree = "<group>"; };
@@ -84,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */,
 				DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */,
 				DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */,
 			);
@@ -124,6 +141,7 @@
 		DC43AD7E17EC2D9500241CC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DC5D25BB18FC46E0000078C4 /* Sparkle.framework */,
 				DC43ADB617EC38D300241CC2 /* WebKit.framework */,
 				DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */,
 				DC43AD9E17EC2D9500241CC2 /* XCTest.framework */,
@@ -216,6 +234,7 @@
 				DC43AD7817EC2D9500241CC2 /* Sources */,
 				DC43AD7917EC2D9500241CC2 /* Frameworks */,
 				DC43AD7A17EC2D9500241CC2 /* Resources */,
+				DC5D25BE18FC4823000078C4 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -459,9 +478,16 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/felix/Workspace/Übersicht",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Sparkle-dysttxvfjbdfladnuxcckslvlxue/Build/Products/Debug",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Übersicht/Übersicht-Prefix.pch";
 				INFOPLIST_FILE = "Übersicht/Übersicht-Info.plist";
+				OTHER_CODE_SIGN_FLAGS = "--deep";
+				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "--deep";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -475,9 +501,16 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/felix/Workspace/Übersicht",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Sparkle-dysttxvfjbdfladnuxcckslvlxue/Build/Products/Debug",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Übersicht/Übersicht-Prefix.pch";
 				INFOPLIST_FILE = "Übersicht/Übersicht-Info.plist";
+				OTHER_CODE_SIGN_FLAGS = deep;
+				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "--deep";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
