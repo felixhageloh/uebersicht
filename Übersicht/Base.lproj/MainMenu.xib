@@ -650,7 +650,7 @@
             <windowStyleMask key="styleMask" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="361" y="443" width="217" height="179"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <view key="contentView" canDrawConcurrently="YES" id="372" customClass="WebView">
                 <rect key="frame" x="0.0" y="0.0" width="217" height="179"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -676,7 +676,7 @@
                         <action selector="orderFrontStandardAboutPanel:" target="-2" id="VpR-KV-QA6"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Check for Updates" id="ssJ-cC-6aL">
+                <menuItem title="Check for Updates..." id="ssJ-cC-6aL">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="checkForUpdates:" target="Y8H-N0-yva" id="qoy-Sj-8OL"/>
