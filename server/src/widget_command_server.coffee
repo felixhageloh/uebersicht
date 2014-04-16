@@ -8,9 +8,9 @@ module.exports = (widgetDir) -> (req, res, next) ->
   return next() unless widget?
 
   widget.exec cwd: widgetDir.path, (err, data, stderr) ->
-    if err
+    if err or stderr
       res.writeHead 500
-      res.end(err.message)
+      res.end(stderr or err.message)
     else
       res.writeHead 200
       res.end(data)

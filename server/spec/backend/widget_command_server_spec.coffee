@@ -9,7 +9,9 @@ describe 'widget command server', ->
     mathew:
       exec: (opts, callback) -> callback(null, 'command output')
     john:
-      exec: (opts, callback) -> callback(message: 'command error')
+      exec: (opts, callback) -> callback(message: 'command error', '', '')
+    billy:
+      exec: (opts, callback) -> callback(null, '', 'std error')
 
   fakeWidgetDir =
     get: (id) ->
@@ -43,6 +45,17 @@ describe 'widget command server', ->
         response.setEncoding('utf8')
         response.on 'data', (responseText) ->
           expect(responseText).toEqual 'command error'
+          done()
+
+      setTimeout server.push, 100
+
+    it 'should pass on stderr', (done) ->
+      http.get "http://localhost:8887/widgets/billy", (response) ->
+        expect(response.statusCode).toBe(500)
+
+        response.setEncoding('utf8')
+        response.on 'data', (responseText) ->
+          expect(responseText).toEqual 'std error'
           done()
 
       setTimeout server.push, 100

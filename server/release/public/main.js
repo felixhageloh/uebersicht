@@ -339,9 +339,9 @@ module.exports = function(widgetDir) {
     return widget.exec({
       cwd: widgetDir.path
     }, function(err, data, stderr) {
-      if (err) {
+      if (err || stderr) {
         res.writeHead(500);
-        return res.end(err.message);
+        return res.end(stderr || err.message);
       } else {
         res.writeHead(200);
         return res.end(data);
