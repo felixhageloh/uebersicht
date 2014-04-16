@@ -12,6 +12,19 @@
             </sparkle:releaseNotesLink>
             <pubDate>Mon, Apr 14 2014 20:15:00 +0200</pubDate>
             <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.1.app.zip"
+                       sparkle:version="3"
+                       sparkle:shortVersionString="0.1"
+                       length="17168"
+                       type="application/octet-stream" />
+        </item>
+
+        <item>
+            <title>Version 0.1</title>
+            <sparkle:releaseNotesLink>
+              http://tracesof.net/uebersicht/releases/0.1.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Mon, Apr 14 2014 20:15:00 +0200</pubDate>
+            <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.1.app.zip"
                        sparkle:version="2"
                        sparkle:shortVersionString="0.1"
                        length="17376"
