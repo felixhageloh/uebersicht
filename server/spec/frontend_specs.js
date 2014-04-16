@@ -291,7 +291,7 @@ describe('widget', function() {
       return expect(update).toHaveBeenCalledWith('stuff', $(domEl).find('.widget')[0]);
     });
   });
-  return describe('when started', function() {
+  describe('when started', function() {
     var render;
     render = null;
     beforeEach(function() {
@@ -328,6 +328,82 @@ describe('widget', function() {
       }, 250);
     });
   });
+  return describe('error handling', function() {
+    it('should catch and show exceptions inside render', function() {
+      widget = Widget({
+        command: '',
+        id: 'foo',
+        render: function() {
+          throw new Error('something went sorry');
+        }
+      });
+      domEl = widget.create();
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'baz'
+      ]);
+      widget.start();
+      server.respond();
+      return expect($(domEl).find('.widget').text()).toEqual('something went sorry');
+    });
+    it('should catch and show exceptions inside update', function() {
+      widget = Widget({
+        command: '',
+        id: 'foo',
+        update: function() {
+          throw new Error('up');
+        }
+      });
+      domEl = widget.create();
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'baz'
+      ]);
+      widget.start();
+      server.respond();
+      return expect($(domEl).find('.widget').text()).toEqual('up');
+    });
+    it('should not call update when render fails', function() {
+      var update;
+      update = jasmine.createSpy('update');
+      widget = Widget({
+        command: '',
+        id: 'foo',
+        render: function() {
+          throw new Error('oops');
+        },
+        update: update
+      });
+      domEl = widget.create();
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'baz'
+      ]);
+      widget.start();
+      server.respond();
+      expect($(domEl).find('.widget').text()).toEqual('oops');
+      return expect(update).not.toHaveBeenCalled();
+    });
+    return it('should render backend errors', function() {
+      widget = Widget({
+        command: '',
+        id: 'foo',
+        render: function() {}
+      });
+      domEl = widget.create();
+      server.respondWith("GET", "/widgets/foo", [
+        500, {
+          "Content-Type": "text/plain"
+        }, 'puke'
+      ]);
+      widget.start();
+      server.respond();
+      return expect($(domEl).find('.widget').text()).toEqual('puke');
+    });
+  });
 });
 
 
@@ -343,7 +419,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, init, parseStyle, refresh, render, renderOutput, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
   api = {};
   el = null;
   contentEl = null;
@@ -351,6 +427,7 @@ module.exports = function(implementation) {
   update = null;
   render = null;
   started = false;
+  rendered = false;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
     var issues, _ref, _ref1, _ref2, _ref3;
@@ -396,6 +473,7 @@ module.exports = function(implementation) {
   };
   api.stop = function() {
     started = false;
+    rendered = false;
     if (timer != null) {
       return clearTimeout(timer);
     }
@@ -409,14 +487,24 @@ module.exports = function(implementation) {
   api.serialize = function() {
     return toSource(implementation);
   };
-  renderOutput = function(output, error) {
+  redraw = function(output, error) {
+    var e;
     if (error) {
-      return contentEl.innerHTML = JSON.stringify(error);
+      return contentEl.innerHTML = error;
     }
-    if ((update != null) && contentEl.innerHTML) {
+    try {
+      return renderOutput(output);
+    } catch (_error) {
+      e = _error;
+      return contentEl.innerHTML = e.message;
+    }
+  };
+  renderOutput = function(output) {
+    if ((update != null) && rendered) {
       return update.call(implementation, output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      rendered = true;
       if (update != null) {
         return update.call(implementation, output, contentEl);
       }
@@ -424,9 +512,13 @@ module.exports = function(implementation) {
   };
   refresh = function() {
     return $.get('/widgets/' + api.id).done(function(response) {
-      return renderOutput(response);
+      if (started) {
+        return redraw(response);
+      }
     }).fail(function(response) {
-      return renderOutput(null, response);
+      if (started) {
+        return redraw(null, response.responseText);
+      }
     }).always(function() {
       if (!started) {
         return;

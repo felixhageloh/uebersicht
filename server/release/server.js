@@ -1193,7 +1193,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, init, parseStyle, refresh, render, renderOutput, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
   api = {};
   el = null;
   contentEl = null;
@@ -1201,6 +1201,7 @@ module.exports = function(implementation) {
   update = null;
   render = null;
   started = false;
+  rendered = false;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
     var issues, _ref, _ref1, _ref2, _ref3;
@@ -1246,6 +1247,7 @@ module.exports = function(implementation) {
   };
   api.stop = function() {
     started = false;
+    rendered = false;
     if (timer != null) {
       return clearTimeout(timer);
     }
@@ -1259,14 +1261,24 @@ module.exports = function(implementation) {
   api.serialize = function() {
     return toSource(implementation);
   };
-  renderOutput = function(output, error) {
+  redraw = function(output, error) {
+    var e;
     if (error) {
-      return contentEl.innerHTML = JSON.stringify(error);
+      return contentEl.innerHTML = error;
     }
-    if ((update != null) && contentEl.innerHTML) {
+    try {
+      return renderOutput(output);
+    } catch (_error) {
+      e = _error;
+      return contentEl.innerHTML = e.message;
+    }
+  };
+  renderOutput = function(output) {
+    if ((update != null) && rendered) {
       return update.call(implementation, output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      rendered = true;
       if (update != null) {
         return update.call(implementation, output, contentEl);
       }
@@ -1274,9 +1286,13 @@ module.exports = function(implementation) {
   };
   refresh = function() {
     return $.get('/widgets/' + api.id).done(function(response) {
-      return renderOutput(response);
+      if (started) {
+        return redraw(response);
+      }
     }).fail(function(response) {
-      return renderOutput(null, response);
+      if (started) {
+        return redraw(null, response.responseText);
+      }
     }).always(function() {
       if (!started) {
         return;
@@ -1326,13 +1342,14 @@ module.exports = function(widgetDir) {
     if (widget == null) {
       return next();
     }
-    res.writeHead(200);
     return widget.exec({
       cwd: widgetDir.path
-    }, function(err, data) {
+    }, function(err, data, stderr) {
       if (err) {
+        res.writeHead(500);
         return res.end(err.message);
       } else {
+        res.writeHead(200);
         return res.end(data);
       }
     });

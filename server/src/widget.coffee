@@ -11,6 +11,7 @@ module.exports = (implementation) ->
   update    = null
   render    = null
   started   = false
+  rendered  = false
 
   defaultStyle = 'top: 30px; left: 10px'
 
@@ -52,7 +53,8 @@ module.exports = (implementation) ->
     refresh()
 
   api.stop = ->
-    started = false
+    started  = false
+    rendered = false
     clearTimeout timer if timer?
 
   api.exec = (options, callback) ->
@@ -63,19 +65,25 @@ module.exports = (implementation) ->
   api.serialize = ->
     toSource implementation
 
-  renderOutput = (output, error) ->
-    return contentEl.innerHTML = JSON.stringify error if error
+  redraw = (output, error) ->
+    return contentEl.innerHTML = error if error
+    try
+      renderOutput output
+    catch e
+      contentEl.innerHTML = e.message
 
-    if update? and contentEl.innerHTML
+  renderOutput = (output) ->
+    if update? and rendered
       update.call(implementation, output, contentEl)
     else
       contentEl.innerHTML = render.call(implementation, output)
+      rendered = true
       update.call(implementation, output, contentEl) if update?
 
   refresh = ->
     $.get('/widgets/'+api.id)
-      .done((response) -> renderOutput response)
-      .fail((response) -> renderOutput null, response)
+      .done((response) -> redraw(response) if started )
+      .fail((response) -> redraw(null, response.responseText) if started)
       .always ->
         return unless started
         timer = setTimeout refresh, api.refreshFrequency

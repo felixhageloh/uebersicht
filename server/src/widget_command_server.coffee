@@ -7,7 +7,10 @@ module.exports = (widgetDir) -> (req, res, next) ->
   widget = widgetDir.get parts[1] if parts[0] == 'widgets'
   return next() unless widget?
 
-  res.writeHead 200
-
-  widget.exec cwd: widgetDir.path, (err, data) ->
-    if err then res.end(err.message) else res.end(data)
+  widget.exec cwd: widgetDir.path, (err, data, stderr) ->
+    if err
+      res.writeHead 500
+      res.end(err.message)
+    else
+      res.writeHead 200
+      res.end(data)

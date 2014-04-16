@@ -96,4 +96,52 @@ describe 'widget', ->
         setTimeout (-> done = true), 550 # now it should shtap!
       , 250
 
+  describe 'error handling', ->
 
+    it 'should catch and show exceptions inside render', ->
+      widget = Widget command: '', id: 'foo', render: -> throw new Error('something went sorry')
+      domEl  = widget.create()
+      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+
+      widget.start()
+      server.respond()
+
+      expect($(domEl).find('.widget').text()).toEqual 'something went sorry'
+
+    it 'should catch and show exceptions inside update', ->
+      widget = Widget command: '', id: 'foo', update: -> throw new Error('up')
+      domEl  = widget.create()
+      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+
+      widget.start()
+      server.respond()
+
+      expect($(domEl).find('.widget').text()).toEqual 'up'
+
+    it 'should not call update when render fails', ->
+      update = jasmine.createSpy('update')
+      widget = Widget
+        command: ''
+        id     : 'foo'
+        render : -> throw new Error('oops')
+        update : update
+
+      domEl  = widget.create()
+      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+
+      widget.start()
+      server.respond()
+
+      expect($(domEl).find('.widget').text()).toEqual 'oops'
+      expect(update).not.toHaveBeenCalled()
+
+    it 'should render backend errors', ->
+      widget = Widget command: '', id: 'foo', render: ->
+      domEl  = widget.create()
+
+      server.respondWith "GET", "/widgets/foo", [500, { "Content-Type": "text/plain" }, 'puke']
+
+      widget.start()
+      server.respond()
+
+      expect($(domEl).find('.widget').text()).toEqual 'puke'
