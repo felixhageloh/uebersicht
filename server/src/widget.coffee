@@ -66,7 +66,10 @@ module.exports = (implementation) ->
     toSource implementation
 
   redraw = (output, error) ->
-    return contentEl.innerHTML = error if error
+    if error
+      contentEl.innerHTML = error
+      return rendered = false
+
     try
       renderOutput output
     catch e
@@ -81,11 +84,13 @@ module.exports = (implementation) ->
       update.call(implementation, output, contentEl) if update?
 
   refresh = ->
+    console.debug setTimeout if window.huh
     $.get('/widgets/'+api.id)
       .done((response) -> redraw(response) if started )
       .fail((response) -> redraw(null, response.responseText) if started)
       .always ->
         return unless started
+        console.debug 'yay' if window.huh
         timer = setTimeout refresh, api.refreshFrequency
 
   parseStyle = (style) ->

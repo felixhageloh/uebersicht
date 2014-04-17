@@ -1264,7 +1264,8 @@ module.exports = function(implementation) {
   redraw = function(output, error) {
     var e;
     if (error) {
-      return contentEl.innerHTML = error;
+      contentEl.innerHTML = error;
+      return rendered = false;
     }
     try {
       return renderOutput(output);
@@ -1285,6 +1286,9 @@ module.exports = function(implementation) {
     }
   };
   refresh = function() {
+    if (window.huh) {
+      console.debug(setTimeout);
+    }
     return $.get('/widgets/' + api.id).done(function(response) {
       if (started) {
         return redraw(response);
@@ -1296,6 +1300,9 @@ module.exports = function(implementation) {
     }).always(function() {
       if (!started) {
         return;
+      }
+      if (window.huh) {
+        console.debug('yay');
       }
       return timer = setTimeout(refresh, api.refreshFrequency);
     });

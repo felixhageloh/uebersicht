@@ -306,6 +306,7 @@ describe('widget', function() {
     });
     return it('should keep updating until stop() is called', function() {
       var done;
+      jasmine.Clock.useMock();
       server.respondWith("GET", "/widgets/foo", [
         200, {
           "Content-Type": "text/plain"
@@ -314,18 +315,11 @@ describe('widget', function() {
       server.autoRespond = true;
       done = false;
       widget.start();
-      waitsFor(function() {
-        return done;
-      });
-      runs(function() {
-        return expect(render.calls.length).toBe(3);
-      });
-      return setTimeout(function() {
-        widget.stop();
-        return setTimeout((function() {
-          return done = true;
-        }), 550);
-      }, 250);
+      jasmine.Clock.tick(250);
+      expect(render.calls.length).toBe(3);
+      widget.stop();
+      jasmine.Clock.tick(1000);
+      return expect(render.calls.length).toBe(3);
     });
   });
   return describe('error handling', function() {
@@ -387,7 +381,7 @@ describe('widget', function() {
       expect($(domEl).find('.widget').text()).toEqual('oops');
       return expect(update).not.toHaveBeenCalled();
     });
-    return it('should render backend errors', function() {
+    it('should render backend errors', function() {
       widget = Widget({
         command: '',
         id: 'foo',
@@ -402,6 +396,42 @@ describe('widget', function() {
       widget.start();
       server.respond();
       return expect($(domEl).find('.widget').text()).toEqual('puke');
+    });
+    return it('should be able to recover after an error', function() {
+      jasmine.Clock.useMock();
+      widget = Widget({
+        command: '',
+        id: 'foo',
+        refreshFrequency: 100,
+        update: function(o, domEl) {
+          return domEl.innerHTML = domEl.innerHTML + '!';
+        }
+      });
+      domEl = widget.create();
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'all good'
+      ]);
+      widget.start();
+      server.respond();
+      expect($(domEl).find('.widget').text()).toEqual('all good!');
+      server.respondWith("GET", "/widgets/foo", [
+        500, {
+          "Content-Type": "text/plain"
+        }, 'oh noes'
+      ]);
+      jasmine.Clock.tick(100);
+      server.respond();
+      expect($(domEl).find('.widget').text()).toEqual('oh noes');
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'all good again'
+      ]);
+      jasmine.Clock.tick(100);
+      server.respond();
+      return expect($(domEl).find('.widget').text()).toEqual('all good again!');
     });
   });
 });
@@ -490,7 +520,8 @@ module.exports = function(implementation) {
   redraw = function(output, error) {
     var e;
     if (error) {
-      return contentEl.innerHTML = error;
+      contentEl.innerHTML = error;
+      return rendered = false;
     }
     try {
       return renderOutput(output);
@@ -511,6 +542,9 @@ module.exports = function(implementation) {
     }
   };
   refresh = function() {
+    if (window.huh) {
+      console.debug(setTimeout);
+    }
     return $.get('/widgets/' + api.id).done(function(response) {
       if (started) {
         return redraw(response);
@@ -522,6 +556,9 @@ module.exports = function(implementation) {
     }).always(function() {
       if (!started) {
         return;
+      }
+      if (window.huh) {
+        console.debug('yay');
       }
       return timer = setTimeout(refresh, api.refreshFrequency);
     });

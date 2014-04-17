@@ -82,19 +82,17 @@ describe 'widget', ->
       domEl  = widget.create()
 
     it 'should keep updating until stop() is called', ->
+      jasmine.Clock.useMock()
       server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'stuff']
       server.autoRespond = true
       done = false
 
       widget.start()
-
-      waitsFor -> done
-      runs     -> expect(render.calls.length).toBe 3
-
-      setTimeout ->
-        widget.stop() # should have been called 3 times by now
-        setTimeout (-> done = true), 550 # now it should shtap!
-      , 250
+      jasmine.Clock.tick 250
+      expect(render.calls.length).toBe 3
+      widget.stop()
+      jasmine.Clock.tick 1000
+      expect(render.calls.length).toBe 3
 
   describe 'error handling', ->
 
@@ -145,3 +143,27 @@ describe 'widget', ->
       server.respond()
 
       expect($(domEl).find('.widget').text()).toEqual 'puke'
+
+    it 'should be able to recover after an error', ->
+      jasmine.Clock.useMock()
+      widget = Widget command: '', id: 'foo', refreshFrequency: 100, update: (o, domEl) ->
+        # important for this test case: do something with the existing innerHTML
+        domEl.innerHTML = domEl.innerHTML + '!'
+      domEl  = widget.create()
+
+      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'all good']
+      widget.start()
+      server.respond()
+      expect($(domEl).find('.widget').text()).toEqual 'all good!'
+
+      server.respondWith "GET", "/widgets/foo", [500, { "Content-Type": "text/plain" }, 'oh noes']
+      jasmine.Clock.tick(100)
+      server.respond()
+      expect($(domEl).find('.widget').text()).toEqual 'oh noes'
+
+      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'all good again']
+      jasmine.Clock.tick(100)
+      server.respond()
+      expect($(domEl).find('.widget').text()).toEqual 'all good again!'
+
+
