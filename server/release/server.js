@@ -1144,7 +1144,9 @@ exports.push = function(changes) {
   }
   return timer = setTimeout(function() {
     var client, json, _i, _len;
-    console.log('pushing changes', clients.length);
+    if (clients) {
+      console.log('pushing changes');
+    }
     json = serialize(currentChanges);
     for (_i = 0, _len = clients.length; _i < _len; _i++) {
       client = clients[_i];
