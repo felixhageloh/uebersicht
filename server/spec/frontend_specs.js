@@ -33,10 +33,10 @@ getWidgets = function(callback) {
 
 getChanges = function() {
   return $.get('/widget-changes').done(function(response) {
-    setTimeout(getChanges);
     if (response) {
-      return initWidgets(eval(response));
+      initWidgets(eval(response));
     }
+    return getChanges();
   }).fail(function() {
     return setTimeout(init, 10000);
   });

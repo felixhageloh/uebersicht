@@ -21,8 +21,8 @@ getWidgets = (callback) ->
 getChanges = ->
   $.get('/widget-changes')
     .done( (response) ->
-      setTimeout getChanges
       initWidgets eval(response) if response
+      getChanges()
     )
     .fail -> setTimeout init, 10000
 

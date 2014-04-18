@@ -33,10 +33,10 @@ getWidgets = function(callback) {
 
 getChanges = function() {
   return $.get('/widget-changes').done(function(response) {
-    setTimeout(getChanges);
     if (response) {
-      return initWidgets(eval(response));
+      initWidgets(eval(response));
     }
+    return getChanges();
   }).fail(function() {
     return setTimeout(init, 10000);
   });
@@ -119,21 +119,34 @@ function legalKey(string) {
     return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
 }
 },{}],4:[function(require,module,exports){
-var clients, serialize;
-
-clients = [];
+var clients, currentChanges, serialize, timer;
 
 serialize = require('./serialize.coffee');
 
+clients = [];
+
+currentChanges = {};
+
+timer = null;
+
 exports.push = function(changes) {
-  var client, json, _i, _len;
-  console.log('pushing changes');
-  json = serialize(changes);
-  for (_i = 0, _len = clients.length; _i < _len; _i++) {
-    client = clients[_i];
-    client.response.end(json);
+  var id, val;
+  clearTimeout(timer);
+  for (id in changes) {
+    val = changes[id];
+    currentChanges[id] = val;
   }
-  return clients.length = 0;
+  return timer = setTimeout(function() {
+    var client, json, _i, _len;
+    console.log('pushing changes', clients.length);
+    json = serialize(currentChanges);
+    for (_i = 0, _len = clients.length; _i < _len; _i++) {
+      client = clients[_i];
+      client.response.end(json);
+    }
+    clients.length = 0;
+    return currentChanges = {};
+  }, 50);
 };
 
 exports.middleware = function(req, res, next) {

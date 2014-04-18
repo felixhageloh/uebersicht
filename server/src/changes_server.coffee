@@ -1,14 +1,24 @@
 # middleware to 'push' changes to the client, using long-polling.
 # Listens to /widget-changes
 
-clients   = []
 serialize = require './serialize.coffee'
 
+clients        = []
+currentChanges = {}
+timer          = null
+
 exports.push = (changes) ->
-  console.log 'pushing changes'
-  json = serialize(changes)
-  client.response.end(json) for client in clients
-  clients.length = 0
+  clearTimeout timer
+  currentChanges[id] = val for id, val of changes
+
+  # batch changes together if they occur rappidly
+  timer = setTimeout ->
+    console.log 'pushing changes', clients.length
+    json = serialize(currentChanges)
+    client.response.end(json) for client in clients
+    clients.length = 0
+    currentChanges = {}
+  , 50
 
 exports.middleware = (req, res, next) ->
   parts = req.url.replace(/^\//, '').split '/'

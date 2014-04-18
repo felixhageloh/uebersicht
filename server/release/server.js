@@ -1125,21 +1125,34 @@ try {
 
 
 },{"./src/changes_server.coffee":8,"./src/widget_command_server.coffee":11,"./src/widget_directory.coffee":12,"./src/widgets_server.coffee":14,"connect":false,"minimist":5,"path":false}],8:[function(require,module,exports){
-var clients, serialize;
-
-clients = [];
+var clients, currentChanges, serialize, timer;
 
 serialize = require('./serialize.coffee');
 
+clients = [];
+
+currentChanges = {};
+
+timer = null;
+
 exports.push = function(changes) {
-  var client, json, _i, _len;
-  console.log('pushing changes');
-  json = serialize(changes);
-  for (_i = 0, _len = clients.length; _i < _len; _i++) {
-    client = clients[_i];
-    client.response.end(json);
+  var id, val;
+  clearTimeout(timer);
+  for (id in changes) {
+    val = changes[id];
+    currentChanges[id] = val;
   }
-  return clients.length = 0;
+  return timer = setTimeout(function() {
+    var client, json, _i, _len;
+    console.log('pushing changes', clients.length);
+    json = serialize(currentChanges);
+    for (_i = 0, _len = clients.length; _i < _len; _i++) {
+      client = clients[_i];
+      client.response.end(json);
+    }
+    clients.length = 0;
+    return currentChanges = {};
+  }, 50);
 };
 
 exports.middleware = function(req, res, next) {
