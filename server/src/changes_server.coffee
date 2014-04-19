@@ -1,5 +1,6 @@
 # middleware to 'push' changes to the client, using long-polling.
 # Listens to /widget-changes
+# TODO; use websockets
 
 serialize = require './serialize.coffee'
 
@@ -11,12 +12,15 @@ exports.push = (changes) ->
   clearTimeout timer
   currentChanges[id] = val for id, val of changes
 
-  # batch changes together if they occur rappidly
+  # batch changes together if they occur rappidly. This is not
+  # 100% failsafe but will be no isse when switching to web sockets
   timer = setTimeout ->
-    console.log 'pushing changes', clients.length
-    json = serialize(currentChanges)
-    client.response.end(json) for client in clients
-    clients.length = 0
+    if clients.length > 0
+      console.log 'pushing changes'
+      json = serialize(currentChanges)
+      client.response.end(json) for client in clients
+      clients.length = 0
+
     currentChanges = {}
   , 50
 
