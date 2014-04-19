@@ -1144,15 +1144,15 @@ exports.push = function(changes) {
   }
   return timer = setTimeout(function() {
     var client, json, _i, _len;
-    if (clients) {
+    if (clients.length > 0) {
       console.log('pushing changes');
+      json = serialize(currentChanges);
+      for (_i = 0, _len = clients.length; _i < _len; _i++) {
+        client = clients[_i];
+        client.response.end(json);
+      }
+      clients.length = 0;
     }
-    json = serialize(currentChanges);
-    for (_i = 0, _len = clients.length; _i < _len; _i++) {
-      client = clients[_i];
-      client.response.end(json);
-    }
-    clients.length = 0;
     return currentChanges = {};
   }, 50);
 };
