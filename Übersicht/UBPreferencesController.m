@@ -85,7 +85,6 @@
     // TODO: see if we could use bindings for this
     [[filePicker itemAtIndex:0] setTitle: [url path]];
     [[filePicker itemAtIndex:0] setImage:iconImage];
-    [filePicker selectItemAtIndex:0];
 }
 
 - (IBAction)showFilePicker:(id)sender
@@ -99,6 +98,8 @@
         if (result == NSFileHandlingPanelOKButton) {
              [self setWidgetDir:[openPanel URLs][0]];
         }
+        
+        [filePicker selectItemAtIndex:0];
     }];
 }
 
