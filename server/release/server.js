@@ -1088,35 +1088,17 @@ function legalKey(string) {
     return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
 }
 },{}],7:[function(require,module,exports){
-var ChangesServer, WidgetCommandServer, WidgetDir, WidgetsServer, args, connect, createServer, e, parseArgs, path, port, widgetPath, _ref, _ref1, _ref2, _ref3;
-
-connect = require('connect');
-
-path = require('path');
+var UebersichtServer, args, e, parseArgs, port, widgetPath, _ref, _ref1, _ref2, _ref3;
 
 parseArgs = require('minimist');
 
-WidgetDir = require('./src/widget_directory.coffee');
-
-WidgetsServer = require('./src/widgets_server.coffee');
-
-WidgetCommandServer = require('./src/widget_command_server.coffee');
-
-ChangesServer = require('./src/changes_server.coffee');
-
-createServer = function(port, widgetPath) {
-  var server, widgetDir;
-  widgetDir = WidgetDir(widgetPath);
-  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(ChangesServer.middleware).use(connect["static"](widgetPath)).listen(port);
-  widgetDir.onChange(ChangesServer.push);
-  return console.log('server started on port', port);
-};
+UebersichtServer = require('./src/app.coffee');
 
 try {
   args = parseArgs(process.argv.slice(2));
   widgetPath = (_ref = (_ref1 = args.d) != null ? _ref1 : args.dir) != null ? _ref : './widgets';
   port = (_ref2 = (_ref3 = args.p) != null ? _ref3 : args.port) != null ? _ref2 : 41416;
-  createServer(Number(port), path.resolve(__dirname, widgetPath));
+  UebersichtServer(Number(port), widgetPath);
 } catch (_error) {
   e = _error;
   console.log(e);
@@ -1124,7 +1106,33 @@ try {
 }
 
 
-},{"./src/changes_server.coffee":8,"./src/widget_command_server.coffee":11,"./src/widget_directory.coffee":12,"./src/widgets_server.coffee":14,"connect":false,"minimist":5,"path":false}],8:[function(require,module,exports){
+},{"./src/app.coffee":8,"minimist":5}],8:[function(require,module,exports){
+var ChangesServer, WidgetCommandServer, WidgetDir, WidgetsServer, connect, path;
+
+connect = require('connect');
+
+path = require('path');
+
+WidgetDir = require('./widget_directory.coffee');
+
+WidgetsServer = require('./widgets_server.coffee');
+
+WidgetCommandServer = require('./widget_command_server.coffee');
+
+ChangesServer = require('./changes_server.coffee');
+
+module.exports = function(port, widgetPath) {
+  var server, widgetDir;
+  widgetPath = path.resolve(__dirname, widgetPath);
+  widgetDir = WidgetDir(widgetPath);
+  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(ChangesServer.middleware).use(connect["static"](widgetPath)).listen(port);
+  widgetDir.onChange(ChangesServer.push);
+  console.log('server started on port', port);
+  return server;
+};
+
+
+},{"./changes_server.coffee":9,"./widget_command_server.coffee":12,"./widget_directory.coffee":13,"./widgets_server.coffee":15,"connect":false,"path":false}],9:[function(require,module,exports){
 var clients, currentChanges, serialize, timer;
 
 serialize = require('./serialize.coffee');
@@ -1180,7 +1188,7 @@ exports.middleware = function(req, res, next) {
 };
 
 
-},{"./serialize.coffee":9}],9:[function(require,module,exports){
+},{"./serialize.coffee":10}],10:[function(require,module,exports){
 module.exports = function(someWidgets) {
   var id, serialized, widget;
   serialized = "({";
@@ -1196,7 +1204,7 @@ module.exports = function(someWidgets) {
 };
 
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
 exec = require('child_process').exec;
@@ -1353,7 +1361,7 @@ module.exports = function(implementation) {
 };
 
 
-},{"child_process":false,"nib":false,"stylus":false,"tosource":6}],11:[function(require,module,exports){
+},{"child_process":false,"nib":false,"stylus":false,"tosource":6}],12:[function(require,module,exports){
 module.exports = function(widgetDir) {
   return function(req, res, next) {
     var parts, widget;
@@ -1379,7 +1387,7 @@ module.exports = function(widgetDir) {
 };
 
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var Widget, loader, paths;
 
 Widget = require('./widget.coffee');
@@ -1481,7 +1489,7 @@ module.exports = function(directoryPath) {
 };
 
 
-},{"./widget.coffee":10,"./widget_loader.coffee":13,"chokidar":1,"path":false}],13:[function(require,module,exports){
+},{"./widget.coffee":11,"./widget_loader.coffee":14,"chokidar":1,"path":false}],14:[function(require,module,exports){
 var coffee, fs, loadWidget;
 
 fs = require('fs');
@@ -1509,7 +1517,7 @@ exports.loadWidget = loadWidget = function(filePath) {
 };
 
 
-},{"coffee-script":false,"fs":false}],14:[function(require,module,exports){
+},{"coffee-script":false,"fs":false}],15:[function(require,module,exports){
 var serialize;
 
 serialize = require('./serialize.coffee');
@@ -1526,4 +1534,4 @@ module.exports = function(widgetDir) {
 };
 
 
-},{"./serialize.coffee":9}]},{},[7,8,9,10,11,12,13,14])
+},{"./serialize.coffee":10}]},{},[7,8,9,10,11,12,13,14,15])
