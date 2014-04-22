@@ -10,7 +10,7 @@
             <sparkle:releaseNotesLink>
               http://tracesof.net/uebersicht/releases/0.1.html
             </sparkle:releaseNotesLink>
-            <pubDate>Mon, Apr 21 2014 14:00:00 +0200</pubDate>
+            <pubDate>Tue, Apr 22 2014 9:00:00 +0200</pubDate>
             <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.1.app.zip"
                        sparkle:version="5"
                        sparkle:shortVersionString="0.1"
