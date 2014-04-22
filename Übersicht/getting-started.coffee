@@ -5,32 +5,41 @@ refreshFrequency: 1000000
 render: (output) -> """
   <h1>Hi, #{output}</h1>
   <p>
-    Thanks for trying out Übersicht! Your widgets can be found in:
-    <code>~/Library/Application Support/Übersicht/widgets</code>
+    Thanks for trying out Übersicht! You can download new widgets from:
+    <strong>http://tracesof.net/uebersicht-widgets/</strong>
+    To view this example widget, choose 'Open Widgets Folder' from the status bar menu.
   </p>
 """
 
 style: """
-  left: 50%
-  top: 10%
-  width: 600px
-  margin-left: -320px
-  padding: 120px 20px 20px
+  background: rgba(#fff, 0.95) url('übersicht-logo.png') no-repeat 50% 20px
+  background-size: 176px 84px
+  border-radius: 1px
+  border: 2px solid #fff
+  box-sizing: border-box
   color: #141f33
   font-family: Helvetica Neue
-  background: rgba(#fff, 0.8) url('übersicht-logo.png') no-repeat 50% 20px
-  background-size: 176px 84px
-  border-radius: 2px
+  font-weight: 300
+  left: 50%
+  line-height: 1.5
+  margin-left: -160px
+  padding: 120px 20px 20px
+  top: 10%
+  width: 320px
+  text-align: justify
 
   h1
     font-size: 20px
+    font-weight: 300
+    margin: 16px 0 8px
 
-  code
+  strong
+    background: #ad7a7c
+    color: #fff
     display: block
-    background: #2d2d2d
-    margin: 20px 0
-    padding: 4px
-    border-radius: 2px
-    font-size: 20px
-    color: #ddd
+    font-size: 16px
+    font-style: italic
+    font-weight: 200
+    margin: 12px -20px
+    padding: 8px 20px
 """
