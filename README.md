@@ -1,6 +1,6 @@
 # Übersicht
 
-*Keep an eye on what's happening on your machine and in thew world*
+*Keep an eye on what's happening on your machine and in the world*
 
 
 ## Writing Widgets
@@ -60,14 +60,14 @@ A **function** returning a HTML string to render this widget. It gets the output
 
 would render as **Hello World!**. Usually, your `output` will be something more complicated, for example a JSON string, so you will have to parse it first.
 
-The default implementation of render just returns `output`
+The default implementation of render just returns `output`.
 
 
 ### update (output, domEl)
 
 A **function** implementing update behavior of this widget. If specified, `render` will be called once when the widget is first initialized. Afterwards, update will be called for every refresh cycle. If no update method is provided, `render` will be called instead.
 
-Since, `render` will simply replace the inner HTML of a widget every time, you can use render to do a partial update of your widgets, kick off animations etc. For example, if the output of your command returns a percentage, you could do something like:
+Since `render` will simply replace the inner HTML of a widget every time, you can use render to do a partial update of your widgets, kick off animations etc. For example, if the output of your command returns a percentage, you could do something like:
 
     # we don't care about output here
     render: (_) -> """
@@ -88,7 +88,7 @@ The node app can be run standalone using
 
     coffee server/server.coffee -d <path/to/widget/dir> -p <port>
 
-Then point your browser to `localhost:<port>`. Naturally, you will need to have NodeJS and the following dependcies installed:
+Then point your browser to `localhost:<port>`. Naturally, you will need to have NodeJS and the following dependencies installed:
 
     npm install -g coffee-script
     npm install -g grunt-cli
@@ -98,7 +98,7 @@ While developing you can use
     cd server
     grunt
 
-To continuously watch, compile and run specs.
+to continuously watch, compile and run specs.
 
 # Legal
 
