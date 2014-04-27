@@ -3,6 +3,10 @@ toSource = require('tosource')
 stylus   = require('stylus')
 nib      = require('nib')
 
+# This is a wrapper (something like a base class), around the
+# specific implementation of a widget.
+# A widgets mostly lives client side, in the DOM. However, the
+# backend also initializes widgets and runs widgets commands.
 module.exports = (implementation) ->
   api   = {}
   el        = null
@@ -31,8 +35,9 @@ module.exports = (implementation) ->
 
     api
 
+  # attaches a widget to the DOM
   api.create  = ->
-    el = document.createElement('div')
+    el        = document.createElement('div')
     contentEl = document.createElement 'div'
     contentEl.id        = api.id
     contentEl.className = 'widget'
@@ -47,6 +52,7 @@ module.exports = (implementation) ->
     el = null
     contentEl = null
 
+  # starts the widget refresh cycle
   api.start = ->
     started = true
     clearTimeout timer if timer?
@@ -57,11 +63,15 @@ module.exports = (implementation) ->
     rendered = false
     clearTimeout timer if timer?
 
+  # runs the widget command. This happens server side
   api.exec = (options, callback) ->
     exec implementation.command, options, callback
 
   api.domEl = -> el
 
+  # used by the backend to send a serialized version of the
+  # widget to the client. JSON wont't work here, because we
+  # need functions as well
   api.serialize = ->
     toSource implementation
 
@@ -84,13 +94,11 @@ module.exports = (implementation) ->
       update.call(implementation, output, contentEl) if update?
 
   refresh = ->
-    console.debug setTimeout if window.huh
     $.get('/widgets/'+api.id)
       .done((response) -> redraw(response) if started )
       .fail((response) -> redraw(null, response.responseText) if started)
       .always ->
         return unless started
-        console.debug 'yay' if window.huh
         timer = setTimeout refresh, api.refreshFrequency
 
   parseStyle = (style) ->
