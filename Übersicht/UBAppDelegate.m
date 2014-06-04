@@ -23,14 +23,11 @@
     WebInspector *inspector;
 }
 
-@synthesize mainView;
+@synthesize window;
 @synthesize statusBarMenu;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    [mainView setDrawsBackground:NO];
-    [mainView setMaintainsBackForwardList:NO];
-    
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     preferences   = [[UBPreferencesController alloc] initWithWindowNibName:@"UBPreferencesController"];
     
@@ -50,11 +47,9 @@
 {
     NSLog(@"starting server task");
     
-    [mainView setHidden:YES];
     void (^parseOutput)(NSString *) = ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [mainView setMainFrameURL:@"http://localhost:41416"];
-            [mainView setHidden:NO];
+            [window loadUrl:@"http://localhost:41416"];
         } else if ([output rangeOfString:@"error"].location != NSNotFound) {
             [self notifyUser:output withTitle:@"Error"];
         }
@@ -175,11 +170,11 @@
 - (IBAction)showDebugConsole:(id)sender
 {
     if (!inspector) {
-        inspector = [WebInspector.alloc initWithWebView:mainView];
+        inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
     
     // web inspector might be attached, so we need to be clickable
-    [mainView.window setLevel:kCGNormalWindowLevel-1];
+    [window setLevel:kCGNormalWindowLevel-1];
     [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
 
@@ -189,7 +184,7 @@
 {
     // WebInspcetor closed
     if ([@"WebInspectorWindow" isEqual:NSStringFromClass ([[notification object] class])]) {
-        [mainView.window setLevel:kCGDesktopWindowLevel];
+        [window setLevel:kCGDesktopWindowLevel];
     }
 
 }

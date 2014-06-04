@@ -17,6 +17,8 @@
 
 @implementation UBWindow
 
+@synthesize webView;
+
 - (id) initWithContentRect:(NSRect)contentRect
                  styleMask:(NSUInteger)aStyle
                    backing:(NSBackingStoreType)bufferingType
@@ -35,7 +37,6 @@
         [self setCollectionBehavior:(NSWindowCollectionBehaviorTransient |
                                      NSWindowCollectionBehaviorCanJoinAllSpaces |
                                      NSWindowCollectionBehaviorIgnoresCycle)];
-        [self makeFullscreen];
         
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
@@ -45,10 +46,26 @@
                                                  selector:@selector(makeFullscreen)
                                                      name:NSApplicationDidChangeScreenParametersNotification
                                                    object:nil];
-        
     }
     
     return self;
+}
+
+- (void) awakeFromNib
+{
+    [self initWebView];
+    [self makeFullscreen];
+}
+
+- (void)initWebView
+{
+    [webView setDrawsBackground:NO];
+    [webView setMaintainsBackForwardList:NO];
+}
+
+- (void)loadUrl:(NSString*)url
+{
+    [webView setMainFrameURL:url];
 }
 
 - (void)makeFullscreen
@@ -56,7 +73,8 @@
     NSRect fullscreen = [[NSScreen mainScreen] frame];
     
     // TODO: when app launches, this is 0 (I guess mainMenu is not init yet)
-    //int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
+    int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
+    NSLog(@"%d\n", menuBarHeight);
     
     fullscreen.size.height = fullscreen.size.height - 22;
     [self setFrame:fullscreen display:YES];
