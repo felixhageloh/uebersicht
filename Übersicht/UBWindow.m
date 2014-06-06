@@ -15,7 +15,9 @@
 
 #import "UBWindow.h"
 
-@implementation UBWindow
+@implementation UBWindow {
+    WebScriptObject *scriptObject;
+}
 
 @synthesize webView;
 
@@ -61,6 +63,7 @@
 {
     [webView setDrawsBackground:NO];
     [webView setMaintainsBackForwardList:NO];
+    [webView setFrameLoadDelegate:self];
 }
 
 - (void)loadUrl:(NSString*)url
@@ -68,17 +71,36 @@
     [webView setMainFrameURL:url];
 }
 
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
+{
+    if (frame == [frame findFrameNamed:@"_top"]) {
+        scriptObject = [sender windowScriptObject];
+        [scriptObject setValue:self forKey:@"os"];
+    }
+}
+
 - (void)makeFullscreen
 {
     NSRect fullscreen = [[NSScreen mainScreen] frame];
     
-    // TODO: when app launches, this is 0 (I guess mainMenu is not init yet)
     int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-    NSLog(@"%d\n", menuBarHeight);
     
-    fullscreen.size.height = fullscreen.size.height - 22;
+    fullscreen.size.height = fullscreen.size.height - menuBarHeight;
     [self setFrame:fullscreen display:YES];
+}
 
+- (NSString*)wallpaperUrl
+{
+    return [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] path];
+}
+
++ (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
+{
+    if (aSelector == @selector(wallpaperUrl)) {
+        return NO;
+    }
+    
+    return YES;
 }
 
 @end

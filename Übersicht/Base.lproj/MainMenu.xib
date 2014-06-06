@@ -659,13 +659,11 @@
                 </connections>
             </view>
             <connections>
-                <outlet property="mainView" destination="372" id="RjD-t3-kEF"/>
                 <outlet property="webView" destination="372" id="8XL-nP-x0w"/>
             </connections>
         </window>
         <customObject id="494" customClass="UBAppDelegate">
             <connections>
-                <outlet property="mainView" destination="372" id="yaJ-69-dOs"/>
                 <outlet property="statusBarMenu" destination="MVS-hI-V8a" id="3Z1-Cq-kzP"/>
                 <outlet property="window" destination="371" id="532"/>
             </connections>
