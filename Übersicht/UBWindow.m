@@ -48,7 +48,13 @@
                                                  selector:@selector(makeFullscreen)
                                                      name:NSApplicationDidChangeScreenParametersNotification
                                                    object:nil];
+        
+        [[NSWorkspace sharedWorkspace].notificationCenter addObserver:self
+                                                             selector:@selector(wallpaperChanged:)
+                                                                 name:NSWorkspaceActiveSpaceDidChangeNotification
+                                                               object:nil];
     }
+    
     
     return self;
 }
@@ -57,10 +63,12 @@
 {
     [self initWebView];
     [self makeFullscreen];
+    
 }
 
 - (void)initWebView
 {
+    
     [webView setDrawsBackground:NO];
     [webView setMaintainsBackForwardList:NO];
     [webView setFrameLoadDelegate:self];
@@ -89,14 +97,34 @@
     [self setFrame:fullscreen display:YES];
 }
 
-- (NSString*)wallpaperUrl
+
+
+- (NSString*)wallpaperDataUrl
 {
-    return [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] path];
+    CGImageRef cgImage = CGWindowListCreateImage([self screen].frame,
+                                                 kCGWindowListOptionOnScreenBelowWindow,
+                                                 (CGWindowID)[self windowNumber],
+                                                 kCGWindowImageDefault);
+    
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
+    NSData *imgData = [bitmapRep representationUsingType:NSPNGFileType properties:nil];
+    
+    NSString *base64 = [imgData base64EncodedStringWithOptions:0];
+    return [@"data:image/png;base64, " stringByAppendingString:base64];
 }
+
+- (void)wallpaperChanged:(id)sender
+{
+    //JSGlobalContextRef *ctx = [[webView mainFrame] globalContext];
+    //[ctx evaluateScript:@"if(os.onwallpaperchange) os.onwallpaperchange();"];
+    [webView stringByEvaluatingJavaScriptFromString:@"if(os.onwallpaperchange) os.onwallpaperchange();"];
+    NSLog(@"window update %@", [sender object]);
+}
+
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
 {
-    if (aSelector == @selector(wallpaperUrl)) {
+    if (aSelector == @selector(wallpaperDataUrl)) {
         return NO;
     }
     

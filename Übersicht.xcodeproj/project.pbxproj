@@ -16,7 +16,7 @@
 		DC43AD9F17EC2D9500241CC2 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD9E17EC2D9500241CC2 /* XCTest.framework */; };
 		DC43ADA017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
 		DC43ADA817EC2D9500241CC2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC43ADA617EC2D9500241CC2 /* InfoPlist.strings */; };
-		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
+		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
 		DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADB417EC31EB00241CC2 /* UBWindow.m */; };
 		DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43ADB617EC38D300241CC2 /* WebKit.framework */; };
 		DC4F43F3189E90DD00937925 /* status-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F1189E90DD00937925 /* status-icon.png */; };
@@ -26,6 +26,7 @@
 		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* getting-started.coffee */; };
+		DCB5D9871948802C000D5C83 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
 		DCECA1C81893F23200C0CA32 /* server.js in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C61893F23200C0CA32 /* server.js */; };
 		DCECA1CA1893F4EF00C0CA32 /* public in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C91893F4EF00C0CA32 /* public */; };
@@ -75,7 +76,7 @@
 		DC43AD9E17EC2D9500241CC2 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		DC43ADA517EC2D9500241CC2 /* ÜbersichtTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ÜbersichtTests-Info.plist"; sourceTree = "<group>"; };
 		DC43ADA717EC2D9500241CC2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
+		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
 		DC43ADB317EC31EB00241CC2 /* UBWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindow.h; sourceTree = "<group>"; };
 		DC43ADB417EC31EB00241CC2 /* UBWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWindow.m; sourceTree = "<group>"; };
 		DC43ADB617EC38D300241CC2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -88,6 +89,7 @@
 		DC5D25BB18FC46E0000078C4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		DC99A7C418DC41A600E61222 /* Übersicht.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Übersicht.entitlements"; sourceTree = "<group>"; };
 		DCAAAF9518DF0B050097677F /* getting-started.coffee */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "getting-started.coffee"; sourceTree = "<group>"; };
+		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		DCE2453D18ED864800C9FAE3 /* WebInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebInspector.h; sourceTree = "<group>"; };
 		DCECA1C51893F23200C0CA32 /* localnode */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = localnode; path = server/release/localnode; sourceTree = "<group>"; };
 		DCECA1C61893F23200C0CA32 /* server.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = server.js; path = server/release/server.js; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCB5D9871948802C000D5C83 /* JavaScriptCore.framework in Frameworks */,
 				DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */,
 				DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */,
 				DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */,
@@ -141,6 +144,7 @@
 		DC43AD7E17EC2D9500241CC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */,
 				DC5D25BB18FC46E0000078C4 /* Sparkle.framework */,
 				DC43ADB617EC38D300241CC2 /* WebKit.framework */,
 				DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */,
@@ -198,7 +202,7 @@
 		DC43ADA317EC2D9500241CC2 /* ÜbersichtTests */ = {
 			isa = PBXGroup;
 			children = (
-				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
+				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
 				DC43ADA417EC2D9500241CC2 /* Supporting Files */,
 			);
 			path = "ÜbersichtTests";
@@ -351,7 +355,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */,
+				DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
