@@ -12,7 +12,6 @@ module.exports = (implementation) ->
   el        = null
   contentEl = null
   timer     = null
-  update    = null
   render    = null
   started   = false
   rendered  = false
@@ -31,13 +30,11 @@ module.exports = (implementation) ->
       delete implementation.style
 
     render = implementation.render ? (output) -> output
-    update = implementation.update
-
     api
 
-  # attaches a widget to the DOM
+  # renders and returns the widget's dom element
   api.create  = ->
-    el        = document.createElement('div')
+    el        = document.createElement 'div'
     contentEl = document.createElement 'div'
     contentEl.id        = api.id
     contentEl.className = 'widget'
@@ -86,12 +83,13 @@ module.exports = (implementation) ->
       contentEl.innerHTML = e.message
 
   renderOutput = (output) ->
-    if update? and rendered
-      update.call(implementation, output, contentEl)
+    if implementation.update? and rendered
+      implementation.update(output, contentEl)
     else
       contentEl.innerHTML = render.call(implementation, output)
+      implementation.afterRender?(contentEl)
       rendered = true
-      update.call(implementation, output, contentEl) if update?
+      implementation.update(output, contentEl) if implementation.update?
 
   refresh = ->
     $.get('/widgets/'+api.id)

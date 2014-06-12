@@ -268,6 +268,43 @@ describe('widget', function() {
       return expect($(domEl).find('.widget').text()).toEqual('rendered: baz');
     });
   });
+  describe('with an after-render hook', function() {
+    var afterRender;
+    afterRender = null;
+    beforeEach(function() {
+      afterRender = jasmine.createSpy('after render');
+      widget = Widget({
+        command: '',
+        id: 'foo',
+        render: (function() {}),
+        afterRender: afterRender,
+        refreshFrequency: 100
+      });
+      return domEl = widget.create();
+    });
+    it('calls the after-render hook ', function() {
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'baz'
+      ]);
+      widget.start();
+      server.respond();
+      return expect(afterRender).toHaveBeenCalledWith($(domEl).find('.widget')[0]);
+    });
+    return it('calls the after-render hook after every render', function() {
+      jasmine.Clock.useMock();
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'stuff'
+      ]);
+      server.autoRespond = true;
+      widget.start();
+      jasmine.Clock.tick(250);
+      return expect(afterRender.calls.length).toBe(3);
+    });
+  });
   describe('with an update method', function() {
     var update;
     update = null;
@@ -306,7 +343,6 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     return it('should keep updating until stop() is called', function() {
-      var done;
       jasmine.Clock.useMock();
       server.respondWith("GET", "/widgets/foo", [
         200, {
@@ -314,7 +350,6 @@ describe('widget', function() {
         }, 'stuff'
       ]);
       server.autoRespond = true;
-      done = false;
       widget.start();
       jasmine.Clock.tick(250);
       expect(render.calls.length).toBe(3);
@@ -439,7 +474,7 @@ describe('widget', function() {
 
 
 },{"../../src/widget.coffee":7}],6:[function(require,module,exports){
-var callbacks, getWallpaper, loadWallpaper, renderBgSlice, renderSlices, slices, wallpaper;
+var callbacks, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices, slices, wallpaper;
 
 slices = [];
 
@@ -448,9 +483,8 @@ wallpaper = null;
 callbacks = [];
 
 window.addEventListener('onwallpaperchange', function() {
-  console.debug('yaya');
   return loadWallpaper(function() {
-    return renderSlices();
+    return renderWallpaperSlices();
   });
 });
 
@@ -461,7 +495,7 @@ exports.makeBgSlice = function(canvas) {
   }
   slices.push(canvas);
   return getWallpaper(function() {
-    return renderBgSlice(canvas);
+    return renderWallpaperSlice(canvas);
   });
 };
 
@@ -491,17 +525,17 @@ loadWallpaper = function(callback) {
   return wp.src = os.wallpaperDataUrl();
 };
 
-renderSlices = function() {
+renderWallpaperSlices = function() {
   var canvas, _i, _len, _results;
   _results = [];
   for (_i = 0, _len = slices.length; _i < _len; _i++) {
     canvas = slices[_i];
-    _results.push(renderBgSlice(canvas));
+    _results.push(renderWallpaperSlice(canvas));
   }
   return _results;
 };
 
-renderBgSlice = function(canvas) {
+renderWallpaperSlice = function(canvas) {
   var ctx, height, left, rect, top, width;
   canvas.width = $(canvas).width();
   canvas.height = $(canvas).height();
@@ -527,12 +561,11 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   contentEl = null;
   timer = null;
-  update = null;
   render = null;
   started = false;
   rendered = false;
@@ -551,7 +584,6 @@ module.exports = function(implementation) {
     render = (_ref3 = implementation.render) != null ? _ref3 : function(output) {
       return output;
     };
-    update = implementation.update;
     return api;
   };
   api.create = function() {
@@ -609,13 +641,16 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((update != null) && rendered) {
-      return update.call(implementation, output, contentEl);
+    if ((implementation.update != null) && rendered) {
+      return implementation.update(output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      if (typeof implementation.afterRender === "function") {
+        implementation.afterRender(contentEl);
+      }
       rendered = true;
-      if (update != null) {
-        return update.call(implementation, output, contentEl);
+      if (implementation.update != null) {
+        return implementation.update(output, contentEl);
       }
     }
   };

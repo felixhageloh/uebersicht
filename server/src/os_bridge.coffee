@@ -3,16 +3,14 @@ wallpaper = null
 callbacks = []
 
 window.addEventListener 'onwallpaperchange', ->
-  console.debug 'yaya'
-  loadWallpaper -> renderSlices()
+  loadWallpaper -> renderWallpaperSlices()
 
 exports.makeBgSlice = (canvas) ->
   canvas = $(canvas)[0]
   throw new Error('no canvas element provided') unless canvas?.getContext
 
   slices.push canvas
-  getWallpaper ->
-    renderBgSlice canvas
+  getWallpaper -> renderWallpaperSlice canvas
 
 getWallpaper = (callback) ->
   return callback(wallpaper) if wallpaper?
@@ -29,10 +27,10 @@ loadWallpaper = (callback) ->
 
   wp.src = os.wallpaperDataUrl()
 
-renderSlices = ->
-  renderBgSlice(canvas) for canvas in slices
+renderWallpaperSlices = ->
+  renderWallpaperSlice(canvas) for canvas in slices
 
-renderBgSlice = (canvas) ->
+renderWallpaperSlice = (canvas) ->
   canvas.width  = $(canvas).width()
   canvas.height = $(canvas).height()
 
