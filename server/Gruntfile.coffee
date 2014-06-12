@@ -16,6 +16,7 @@ module.exports = (grunt) ->
         options:
           #debug: true
           external: ['fs', 'path', 'child_process', 'connect', 'coffee-script', 'stylus', 'nib', 'fsevents']
+          ignore: ['<%=config.srcDir%>/os_bridge.coffee']
           transform: ['coffeeify']
           detectGlobals: false
       client:

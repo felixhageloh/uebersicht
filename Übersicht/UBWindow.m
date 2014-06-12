@@ -15,9 +15,7 @@
 
 #import "UBWindow.h"
 
-@implementation UBWindow {
-    WebScriptObject *scriptObject;
-}
+@implementation UBWindow
 
 @synthesize webView;
 
@@ -82,8 +80,7 @@
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     if (frame == [frame findFrameNamed:@"_top"]) {
-        scriptObject = [sender windowScriptObject];
-        [scriptObject setValue:self forKey:@"os"];
+        [[webView windowScriptObject] setValue:self forKey:@"os"];
     }
 }
 
@@ -115,10 +112,7 @@
 
 - (void)wallpaperChanged:(id)sender
 {
-    //JSGlobalContextRef *ctx = [[webView mainFrame] globalContext];
-    //[ctx evaluateScript:@"if(os.onwallpaperchange) os.onwallpaperchange();"];
-    [webView stringByEvaluatingJavaScriptFromString:@"if(os.onwallpaperchange) os.onwallpaperchange();"];
-    NSLog(@"window update %@", [sender object]);
+    [[webView windowScriptObject] evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"];
 }
 
 

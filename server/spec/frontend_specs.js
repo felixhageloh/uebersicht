@@ -8,6 +8,7 @@ widgets = {};
 contentEl = null;
 
 init = function() {
+  window.uebersicht = require('./src/os_bridge.coffee');
   widgets = {};
   contentEl = document.getElementsByClassName('content')[0];
   contentEl.innerHTML = '';
@@ -69,7 +70,7 @@ initWidget = function(widget) {
 window.onload = init;
 
 
-},{"./src/widget.coffee":6}],2:[function(require,module,exports){
+},{"./src/os_bridge.coffee":6,"./src/widget.coffee":7}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 /* toSource by Marcello Bastea-Forte - zlib license */
@@ -437,7 +438,84 @@ describe('widget', function() {
 });
 
 
-},{"../../src/widget.coffee":6}],6:[function(require,module,exports){
+},{"../../src/widget.coffee":7}],6:[function(require,module,exports){
+var callbacks, getWallpaper, loadWallpaper, renderBgSlice, renderSlices, slices, wallpaper;
+
+slices = [];
+
+wallpaper = null;
+
+callbacks = [];
+
+window.addEventListener('onwallpaperchange', function() {
+  console.debug('yaya');
+  return loadWallpaper(function() {
+    return renderSlices();
+  });
+});
+
+exports.makeBgSlice = function(canvas) {
+  canvas = $(canvas)[0];
+  if (!(canvas != null ? canvas.getContext : void 0)) {
+    throw new Error('no canvas element provided');
+  }
+  slices.push(canvas);
+  return getWallpaper(function() {
+    return renderBgSlice(canvas);
+  });
+};
+
+getWallpaper = function(callback) {
+  if (wallpaper != null) {
+    return callback(wallpaper);
+  }
+  callbacks.push(callback);
+  return loadWallpaper(function(wp) {
+    var cb, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
+      cb = callbacks[_i];
+      _results.push(cb(wp));
+    }
+    return _results;
+  });
+};
+
+loadWallpaper = function(callback) {
+  var wp;
+  wp = new Image();
+  wp.onload = function() {
+    wallpaper = wp;
+    return callback(wp);
+  };
+  return wp.src = os.wallpaperDataUrl();
+};
+
+renderSlices = function() {
+  var canvas, _i, _len, _results;
+  _results = [];
+  for (_i = 0, _len = slices.length; _i < _len; _i++) {
+    canvas = slices[_i];
+    _results.push(renderBgSlice(canvas));
+  }
+  return _results;
+};
+
+renderBgSlice = function(canvas) {
+  var ctx, height, left, rect, top, width;
+  canvas.width = $(canvas).width();
+  canvas.height = $(canvas).height();
+  ctx = canvas.getContext('2d');
+  rect = canvas.getBoundingClientRect();
+  left = Math.max(rect.left, 0);
+  top = Math.max(rect.top + 22, 0);
+  width = Math.min(canvas.width, wallpaper.width - left);
+  height = Math.min(canvas.height, wallpaper.height - top);
+  return ctx.drawImage(wallpaper, Math.round(left), Math.round(top), Math.round(width), Math.round(height), 0, 0, canvas.width, canvas.height);
+};
+
+
+},{}],7:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
 exec = require('child_process').exec;
