@@ -15,7 +15,10 @@
 
 #import "UBWindow.h"
 
-@implementation UBWindow
+@implementation UBWindow {
+    NSURL *prevWallpaperUrl;
+    NSDictionary *prevWallpaperOptions;
+}
 
 @synthesize webView;
 
@@ -48,7 +51,7 @@
                                                    object:nil];
         
         [[NSWorkspace sharedWorkspace].notificationCenter addObserver:self
-                                                             selector:@selector(wallpaperChanged:)
+                                                             selector:@selector(onWorkspaceChange:)
                                                                  name:NSWorkspaceActiveSpaceDidChangeNotification
                                                                object:nil];
     }
@@ -61,7 +64,8 @@
 {
     [self initWebView];
     [self makeFullscreen];
-    
+    prevWallpaperUrl = [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] absoluteURL];
+    prevWallpaperOptions =  [[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:[self screen]];
 }
 
 - (void)initWebView
@@ -86,7 +90,7 @@
 
 - (void)makeFullscreen
 {
-    NSRect fullscreen = [[NSScreen mainScreen] frame];
+    NSRect fullscreen = [[self screen] frame];
     
     int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
     
@@ -107,10 +111,25 @@
     NSData *imgData = [bitmapRep representationUsingType:NSPNGFileType properties:nil];
     
     NSString *base64 = [imgData base64EncodedStringWithOptions:0];
+    
+    CGImageRelease(cgImage);
     return [@"data:image/png;base64, " stringByAppendingString:base64];
 }
 
-- (void)wallpaperChanged:(id)sender
+- (void)onWorkspaceChange:(id)sender
+{
+    NSURL *currWallpaperUrl  = [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] absoluteURL];
+    NSDictionary *currWallpaperOptions = [[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:[self screen]];
+    
+    if (![prevWallpaperUrl isEqual:currWallpaperUrl] ||
+        ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions]) {
+        [self wallpaperChanged];
+    }
+    prevWallpaperUrl = currWallpaperUrl;
+    prevWallpaperOptions = currWallpaperOptions;
+}
+
+- (void)wallpaperChanged
 {
     [[webView windowScriptObject] evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"];
 }
