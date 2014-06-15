@@ -474,17 +474,15 @@ describe('widget', function() {
 
 
 },{"../../src/widget.coffee":7}],6:[function(require,module,exports){
-var callbacks, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices, slices, wallpaper;
+var cachedWallpaper, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices, slices;
 
 slices = [];
 
-wallpaper = null;
-
-callbacks = [];
+cachedWallpaper = new Image();
 
 window.addEventListener('onwallpaperchange', function() {
-  return loadWallpaper(function() {
-    return renderWallpaperSlices();
+  return loadWallpaper(function(wallpaper) {
+    return renderWallpaperSlices(wallpaper);
   });
 });
 
@@ -494,55 +492,61 @@ exports.makeBgSlice = function(canvas) {
     throw new Error('no canvas element provided');
   }
   slices.push(canvas);
-  return getWallpaper(function() {
-    return renderWallpaperSlice(canvas);
+  return getWallpaper(function(wallpaper) {
+    return renderWallpaperSlice(wallpaper, canvas);
   });
 };
 
 getWallpaper = function(callback) {
-  if (wallpaper != null) {
-    return callback(wallpaper);
+  if (cachedWallpaper.loaded) {
+    return callback(cachedWallpaper);
   }
-  callbacks.push(callback);
-  return loadWallpaper(function(wp) {
-    var cb, _i, _len, _results;
-    _results = [];
-    for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
-      cb = callbacks[_i];
-      _results.push(cb(wp));
+  if (getWallpaper.callbacks == null) {
+    getWallpaper.callbacks = [];
+  }
+  getWallpaper.callbacks.push(callback);
+  if (cachedWallpaper.loading) {
+    return;
+  }
+  cachedWallpaper.loading = true;
+  return loadWallpaper(function(wallpaper) {
+    var _i, _len, _ref;
+    _ref = getWallpaper.callbacks;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      callback = _ref[_i];
+      callback(wallpaper);
     }
-    return _results;
+    getWallpaper.callbacks.length = 0;
+    return cachedWallpaper.loaded = true;
   });
 };
 
 loadWallpaper = function(callback) {
-  var wp;
-  wp = new Image();
-  wp.onload = function() {
-    wallpaper = wp;
-    return callback(wp);
+  cachedWallpaper.onload = function() {
+    return callback(cachedWallpaper);
   };
-  return wp.src = os.wallpaperDataUrl();
+  return cachedWallpaper.src = os.wallpaperDataUrl();
 };
 
-renderWallpaperSlices = function() {
+renderWallpaperSlices = function(wallpaper) {
   var canvas, _i, _len, _results;
   _results = [];
   for (_i = 0, _len = slices.length; _i < _len; _i++) {
     canvas = slices[_i];
-    _results.push(renderWallpaperSlice(canvas));
+    _results.push(renderWallpaperSlice(wallpaper, canvas));
   }
   return _results;
 };
 
-renderWallpaperSlice = function(canvas) {
-  var ctx, height, left, rect, top, width;
-  canvas.width = $(canvas).width();
-  canvas.height = $(canvas).height();
+renderWallpaperSlice = function(wallpaper, canvas) {
+  var ctx, height, left, rect, scale, top, width;
   ctx = canvas.getContext('2d');
+  scale = window.devicePixelRatio / ctx.webkitBackingStorePixelRatio;
   rect = canvas.getBoundingClientRect();
-  left = Math.max(rect.left, 0);
-  top = Math.max(rect.top + 22, 0);
+  canvas.width = rect.width * scale;
+  canvas.height = rect.height * scale;
+  left = Math.max(rect.left, 0) * window.devicePixelRatio;
+  top = Math.max(rect.top + 22, 0) * window.devicePixelRatio;
   width = Math.min(canvas.width, wallpaper.width - left);
   height = Math.min(canvas.height, wallpaper.height - top);
   return ctx.drawImage(wallpaper, Math.round(left), Math.round(top), Math.round(width), Math.round(height), 0, 0, canvas.width, canvas.height);
