@@ -20,8 +20,13 @@ getWidgets = (callback) ->
 
 getChanges = ->
   $.get('/widget-changes')
-    .done( (response) ->
-      initWidgets eval(response) if response
+    .done( (response, _, xhr) ->
+      switch xhr.status
+        when 200 # no changes occured. maybe an error
+          logError response if response
+        when 201 # we have changes
+          widgetUpdates = deserializeWidgets(response)
+          initWidgets widgetUpdates if widgetUpdates
       getChanges()
     )
     .fail -> setTimeout init, 10000
@@ -40,5 +45,24 @@ initWidgets = (widgetSettings) ->
 initWidget = (widget) ->
   contentEl.appendChild widget.create()
   widget.start()
+
+deserializeWidgets = (data) ->
+  return unless data
+
+  deserialized = null
+  try
+    deserialized = eval(data)
+  catch e
+    console.error e
+
+  deserialized
+
+logError = (serialized) ->
+  try
+    errors = JSON.parse(serialized)
+    console.log "Error in #{id}:", err for id, err of errors
+  catch e
+    console.log response
+
 
 window.onload = init

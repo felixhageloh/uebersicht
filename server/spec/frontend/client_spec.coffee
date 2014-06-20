@@ -25,7 +25,7 @@ describe 'client', ->
     window.onload()
 
     expect(server.requests[0].url).toEqual '/widgets'
-    server.requests[0].respond(200, { "Content-Type": "application/json" }, JSON.stringify widgets)
+    server.requests[0].respond(201, { "Content-Type": "application/json" }, JSON.stringify widgets)
 
     expect(contentEl.find('#foo').length).toBe 1
     expect(contentEl.find('#bar').length).toBe 1
@@ -40,6 +40,6 @@ describe 'client', ->
     lastRequest = server.requests[server.requests.length-1]
     expect(lastRequest.url).toEqual '/widget-changes'
 
-    lastRequest.respond 200, { "Content-Type": "application/json" }, JSON.stringify { foo: 'deleted' }
+    lastRequest.respond 201, { "Content-Type": "application/json" }, JSON.stringify { foo: 'deleted' }
     expect(contentEl.find('#foo').length).toBe 0
 

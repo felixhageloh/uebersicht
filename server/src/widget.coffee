@@ -78,11 +78,13 @@ module.exports = (implementation) ->
   redraw = (output, error) ->
     if error
       contentEl.innerHTML = error
+      console.error "#{api.id}:", error
       return rendered = false
 
     try
       renderOutput output
     catch e
+      console.error "#{api.id}:", e.message
       contentEl.innerHTML = e.message
 
   renderOutput = (output) ->

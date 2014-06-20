@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, contentEl, getChanges, getWidgets, init, initWidget, initWidgets, widgets;
+var Widget, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, widgets;
 
 Widget = require('./src/widget.coffee');
 
@@ -32,9 +32,19 @@ getWidgets = function(callback) {
 };
 
 getChanges = function() {
-  return $.get('/widget-changes').done(function(response) {
-    if (response) {
-      initWidgets(eval(response));
+  return $.get('/widget-changes').done(function(response, _, xhr) {
+    var widgetUpdates;
+    switch (xhr.status) {
+      case 200:
+        if (response) {
+          logError(response);
+        }
+        break;
+      case 201:
+        widgetUpdates = deserializeWidgets(response);
+        if (widgetUpdates) {
+          initWidgets(widgetUpdates);
+        }
     }
     return getChanges();
   }).fail(function() {
@@ -64,6 +74,37 @@ initWidgets = function(widgetSettings) {
 initWidget = function(widget) {
   contentEl.appendChild(widget.create());
   return widget.start();
+};
+
+deserializeWidgets = function(data) {
+  var deserialized, e;
+  if (!data) {
+    return;
+  }
+  deserialized = null;
+  try {
+    deserialized = eval(data);
+  } catch (_error) {
+    e = _error;
+    console.error(e);
+  }
+  return deserialized;
+};
+
+logError = function(serialized) {
+  var e, err, errors, id, _results;
+  try {
+    errors = JSON.parse(serialized);
+    _results = [];
+    for (id in errors) {
+      err = errors[id];
+      _results.push(console.log("Error in " + id + ":", err));
+    }
+    return _results;
+  } catch (_error) {
+    e = _error;
+    return console.log(response);
+  }
 };
 
 window.onload = init;
@@ -154,7 +195,7 @@ describe('client', function() {
     require('../../client.coffee');
     window.onload();
     expect(server.requests[0].url).toEqual('/widgets');
-    server.requests[0].respond(200, {
+    server.requests[0].respond(201, {
       "Content-Type": "application/json"
     }, JSON.stringify(widgets));
     expect(contentEl.find('#foo').length).toBe(1);
@@ -174,7 +215,7 @@ describe('client', function() {
     clock.tick();
     lastRequest = server.requests[server.requests.length - 1];
     expect(lastRequest.url).toEqual('/widget-changes');
-    lastRequest.respond(200, {
+    lastRequest.respond(201, {
       "Content-Type": "application/json"
     }, JSON.stringify({
       foo: 'deleted'
@@ -521,12 +562,14 @@ module.exports = function(implementation) {
     var e;
     if (error) {
       contentEl.innerHTML = error;
+      console.error("" + api.id + ":", error);
       return rendered = false;
     }
     try {
       return renderOutput(output);
     } catch (_error) {
       e = _error;
+      console.error("" + api.id + ":", e.message);
       return contentEl.innerHTML = e.message;
     }
   };
@@ -542,9 +585,6 @@ module.exports = function(implementation) {
     }
   };
   refresh = function() {
-    if (window.huh) {
-      console.debug(setTimeout);
-    }
     return $.get('/widgets/' + api.id).done(function(response) {
       if (started) {
         return redraw(response);
@@ -556,9 +596,6 @@ module.exports = function(implementation) {
     }).always(function() {
       if (!started) {
         return;
-      }
-      if (window.huh) {
-        console.debug('yay');
       }
       return timer = setTimeout(refresh, api.refreshFrequency);
     });

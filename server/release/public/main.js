@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, contentEl, getChanges, getWidgets, init, initWidget, initWidgets, widgets;
+var Widget, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, widgets;
 
 Widget = require('./src/widget.coffee');
 
@@ -32,9 +32,19 @@ getWidgets = function(callback) {
 };
 
 getChanges = function() {
-  return $.get('/widget-changes').done(function(response) {
-    if (response) {
-      initWidgets(eval(response));
+  return $.get('/widget-changes').done(function(response, _, xhr) {
+    var widgetUpdates;
+    switch (xhr.status) {
+      case 200:
+        if (response) {
+          logError(response);
+        }
+        break;
+      case 201:
+        widgetUpdates = deserializeWidgets(response);
+        if (widgetUpdates) {
+          initWidgets(widgetUpdates);
+        }
     }
     return getChanges();
   }).fail(function() {
@@ -64,6 +74,37 @@ initWidgets = function(widgetSettings) {
 initWidget = function(widget) {
   contentEl.appendChild(widget.create());
   return widget.start();
+};
+
+deserializeWidgets = function(data) {
+  var deserialized, e;
+  if (!data) {
+    return;
+  }
+  deserialized = null;
+  try {
+    deserialized = eval(data);
+  } catch (_error) {
+    e = _error;
+    console.error(e);
+  }
+  return deserialized;
+};
+
+logError = function(serialized) {
+  var e, err, errors, id, _results;
+  try {
+    errors = JSON.parse(serialized);
+    _results = [];
+    for (id in errors) {
+      err = errors[id];
+      _results.push(console.log("Error in " + id + ":", err));
+    }
+    return _results;
+  } catch (_error) {
+    e = _error;
+    return console.log(response);
+  }
 };
 
 window.onload = init;
@@ -134,69 +175,109 @@ WidgetCommandServer = require('./widget_command_server.coffee');
 ChangesServer = require('./changes_server.coffee');
 
 module.exports = function(port, widgetPath) {
-  var server, widgetDir;
+  var changesServer, server, widgetDir;
   widgetPath = path.resolve(__dirname, widgetPath);
   widgetDir = WidgetDir(widgetPath);
-  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(ChangesServer.middleware).use(connect["static"](widgetPath)).listen(port);
-  widgetDir.onChange(ChangesServer.push);
+  changesServer = ChangesServer();
+  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port);
+  widgetDir.onChange(changesServer.push);
   console.log('server started on port', port);
   return server;
 };
 
 
 },{"./changes_server.coffee":5,"./widget_command_server.coffee":8,"./widget_directory.coffee":9,"./widgets_server.coffee":11,"connect":2,"path":2}],5:[function(require,module,exports){
-var clients, currentChanges, serialize, timer;
+var serialize;
 
 serialize = require('./serialize.coffee');
 
-clients = [];
-
-currentChanges = {};
-
-timer = null;
-
-exports.push = function(changes) {
-  var id, val;
-  clearTimeout(timer);
-  for (id in changes) {
-    val = changes[id];
-    currentChanges[id] = val;
-  }
-  return timer = setTimeout(function() {
-    var client, json, _i, _len;
+module.exports = function() {
+  var api, clients, currentChanges, currentErrors, pushChanges, pushErrors, sendResponse, timer;
+  api = {};
+  clients = [];
+  currentChanges = {};
+  currentErrors = {};
+  timer = null;
+  api.push = function(changes, errors) {
+    var id, val, _ref, _ref1;
+    clearTimeout(timer);
+    _ref = changes != null ? changes : {};
+    for (id in _ref) {
+      val = _ref[id];
+      currentChanges[id] = val;
+    }
+    _ref1 = errors != null ? errors : {};
+    for (id in _ref1) {
+      val = _ref1[id];
+      currentErrors[id] = val;
+    }
+    return timer = setTimeout(function() {
+      if (Object.keys(currentErrors).length > 0) {
+        return pushErrors();
+      } else {
+        return pushChanges();
+      }
+    }, 50);
+  };
+  api.middleware = function(req, res, next) {
+    var client, parts;
+    parts = req.url.replace(/^\//, '').split('/');
+    if (!(parts.length === 1 && parts[0] === 'widget-changes')) {
+      return next();
+    }
+    client = {
+      request: req,
+      response: res
+    };
+    clients.push(client);
+    return setTimeout(function() {
+      var index;
+      index = clients.indexOf(client);
+      if (!(index > -1)) {
+        return;
+      }
+      clients.splice(index, 1);
+      return client.response.end('');
+    }, 25000);
+  };
+  pushChanges = function() {
+    var data, status;
+    if (Object.keys(currentChanges).length > 0) {
+      data = serialize(currentChanges);
+      status = 201;
+    } else {
+      data = '';
+      status = 200;
+    }
     if (clients.length > 0) {
       console.log('pushing changes');
-      json = serialize(currentChanges);
-      for (_i = 0, _len = clients.length; _i < _len; _i++) {
-        client = clients[_i];
-        client.response.end(json);
-      }
+      sendResponse(data, status);
       clients.length = 0;
     }
     return currentChanges = {};
-  }, 50);
-};
-
-exports.middleware = function(req, res, next) {
-  var client, parts;
-  parts = req.url.replace(/^\//, '').split('/');
-  if (!(parts.length === 1 && parts[0] === 'widget-changes')) {
-    return next();
-  }
-  client = {
-    request: req,
-    response: res
   };
-  clients.push(client);
-  return setTimeout(function() {
-    var index;
-    index = clients.indexOf(client);
-    if (!(index > -1)) {
-      return;
+  pushErrors = function() {
+    if (clients.length > 0) {
+      console.log('pushing changes');
+      sendResponse(JSON.stringify(currentErrors), 200);
+      clients.length = 0;
     }
-    clients.splice(index, 1);
-    return client.response.end('');
-  }, 25000);
+    return currentErrors = {};
+  };
+  sendResponse = function(body, status) {
+    var client, _i, _len, _results;
+    if (status == null) {
+      status = 200;
+    }
+    _results = [];
+    for (_i = 0, _len = clients.length; _i < _len; _i++) {
+      client = clients[_i];
+      client.response.writeHead(status);
+      _results.push(client.response.end(body));
+    }
+    return _results;
+  };
+  return api;
 };
 
 
@@ -300,12 +381,14 @@ module.exports = function(implementation) {
     var e;
     if (error) {
       contentEl.innerHTML = error;
+      console.error("" + api.id + ":", error);
       return rendered = false;
     }
     try {
       return renderOutput(output);
     } catch (_error) {
       e = _error;
+      console.error("" + api.id + ":", e.message);
       return contentEl.innerHTML = e.message;
     }
   };
@@ -321,9 +404,6 @@ module.exports = function(implementation) {
     }
   };
   refresh = function() {
-    if (window.huh) {
-      console.debug(setTimeout);
-    }
     return $.get('/widgets/' + api.id).done(function(response) {
       if (started) {
         return redraw(response);
@@ -335,9 +415,6 @@ module.exports = function(implementation) {
     }).always(function() {
       if (!started) {
         return;
-      }
-      if (window.huh) {
-        console.debug('yay');
       }
       return timer = setTimeout(refresh, api.refreshFrequency);
     });
@@ -409,7 +486,7 @@ loader = require('./widget_loader.coffee');
 paths = require('path');
 
 module.exports = function(directoryPath) {
-  var api, changeCallback, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, registerWidget, watcher, widgetId, widgets;
+  var api, changeCallback, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, watcher, widgetId, widgets;
   api = {};
   widgets = {};
   watcher = require('chokidar').watch(directoryPath);
@@ -444,14 +521,15 @@ module.exports = function(directoryPath) {
   loadWidget = function(filePath) {
     var definition, e, id;
     id = widgetId(filePath);
-    definition = loader.loadWidget(filePath);
-    if (definition != null) {
-      definition.id = id;
-    }
     try {
+      definition = loader.loadWidget(filePath);
+      if (definition != null) {
+        definition.id = id;
+      }
       return Widget(definition);
     } catch (_error) {
       e = _error;
+      notifyError(id, e);
       return console.log('error in widget', id + ':', e.message);
     }
   };
@@ -476,6 +554,26 @@ module.exports = function(directoryPath) {
     changes = {};
     changes[id] = change;
     return changeCallback(changes);
+  };
+  notifyError = function(id, error) {
+    var errors;
+    errors = {};
+    errors[id] = prettyPrintError(error);
+    return changeCallback(null, errors);
+  };
+  prettyPrintError = function(error) {
+    var colString, lines, loc, str;
+    str = String(error.message);
+    if (error.code && (loc = error.location)) {
+      str += "\nline " + (loc.last_line + 1) + ", column " + loc.last_column;
+      lines = error.code.split("\n");
+      lines = lines.slice(Math.max(loc.first_line - 1, 0), Math.min(loc.last_line + 1, lines.length - 1));
+      colString = new Array(loc.last_column);
+      colString[loc.last_column] = "^";
+      str += "\n\n" + lines.join('\n');
+      str += "\n" + colString.join(' ');
+    }
+    return str;
   };
   widgetId = function(filePath) {
     var fileParts, part;
@@ -509,21 +607,14 @@ fs = require('fs');
 coffee = require('coffee-script');
 
 exports.loadWidget = loadWidget = function(filePath) {
-  var definition, e;
-  definition = null;
-  try {
-    definition = fs.readFileSync(filePath, {
-      encoding: 'utf8'
-    });
-    if (filePath.match(/\.coffee$/)) {
-      definition = coffee["eval"](definition);
-    } else {
-      definition = eval('({' + definition + '})');
-    }
-    definition;
-  } catch (_error) {
-    e = _error;
-    console.log("error loading widget " + filePath + ":\n" + e.message + "\n");
+  var definition;
+  definition = fs.readFileSync(filePath, {
+    encoding: 'utf8'
+  });
+  if (filePath.match(/\.coffee$/)) {
+    definition = coffee["eval"](definition);
+  } else {
+    definition = eval('({' + definition + '})');
   }
   return definition;
 };

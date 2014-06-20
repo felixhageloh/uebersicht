@@ -33,12 +33,13 @@ module.exports = (directoryPath) ->
 
   loadWidget = (filePath) ->
     id = widgetId filePath
-    definition    = loader.loadWidget(filePath)
-    definition.id = id if definition?
 
     try
+      definition    = loader.loadWidget(filePath)
+      definition.id = id if definition?
       Widget definition
     catch e
+      notifyError id, e
       console.log 'error in widget', id+':', e.message
 
   registerWidget = (widget) ->
@@ -57,6 +58,29 @@ module.exports = (directoryPath) ->
     changes = {}
     changes[id] = change
     changeCallback changes
+
+  notifyError = (id, error) ->
+    errors = {}
+    errors[id] = prettyPrintError(error)
+    changeCallback null, errors
+
+  prettyPrintError = (error) ->
+    str = String(error.message)
+
+    if error.code and (loc = error.location)
+      str += "\nline #{loc.last_line+1}, column #{loc.last_column}"
+
+      lines = error.code.split("\n")
+      lines = lines.slice( Math.max(loc.first_line-1, 0),
+                           Math.min(loc.last_line+1, lines.length-1))
+      colString = new Array(loc.last_column)
+      colString[loc.last_column] = "^"
+
+      str += "\n\n" + lines.join('\n')
+      str += "\n" + colString.join(' ')
+
+    str
+
 
   widgetId = (filePath) ->
     fileParts = filePath.replace(directoryPath, '').split(/\/+/)

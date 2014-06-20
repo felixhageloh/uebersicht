@@ -1,1 +1,5 @@
-render: -> 'this is a broken widget'
+command: ""
+
+render: ->
+  'this is a broken widget'
+    'unexpected indentation'

@@ -7,18 +7,19 @@ WidgetCommandServer = require('./widget_command_server.coffee')
 ChangesServer       = require('./changes_server.coffee')
 
 module.exports = (port, widgetPath) ->
-  widgetPath = path.resolve(__dirname, widgetPath)
-  widgetDir  = WidgetDir widgetPath
+  widgetPath    = path.resolve(__dirname, widgetPath)
+  widgetDir     = WidgetDir widgetPath
+  changesServer = ChangesServer()
 
   server = connect()
     .use(connect.static(path.resolve(__dirname, './public')))
     .use(WidgetCommandServer(widgetDir))
     .use(WidgetsServer(widgetDir))
-    .use(ChangesServer.middleware)
+    .use(changesServer.middleware)
     .use(connect.static(widgetPath))
     .listen port
 
-  widgetDir.onChange ChangesServer.push
+  widgetDir.onChange changesServer.push
   console.log 'server started on port', port
   server
 
