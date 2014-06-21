@@ -63,7 +63,7 @@ module.exports = (directoryPath) ->
     changeCallback null, prettyPrintError(filePath, error)
 
   prettyPrintError = (filePath, error) ->
-    errStr = if error.toString then error.toString() else String(error.message)
+    errStr = error.toString?() or String(error.message)
 
     # coffeescipt errors will have [stdin] when prettyPrinted (because they are
     # parsed from stdin). So lets replace that with the real file path

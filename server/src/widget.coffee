@@ -19,6 +19,7 @@ module.exports = (implementation) ->
 
   defaultStyle = 'top: 30px; left: 10px'
 
+  # throws errors
   init = ->
     if (issues = validate(implementation)).length != 0
       throw new Error(issues.join(', '))
@@ -84,8 +85,8 @@ module.exports = (implementation) ->
     try
       renderOutput output
     catch e
-      console.error "#{api.id}:", e.message
       contentEl.innerHTML = e.message
+      console.error errorToString(e)
 
   renderOutput = (output) ->
     if update? and rendered
@@ -105,23 +106,22 @@ module.exports = (implementation) ->
 
   parseStyle = (style) ->
     return "" unless style
-
     scopedStyle = "##{api.id}\n  " + style.replace(/\n/g, "\n  ")
-    try
-      stylus(scopedStyle)
-        .import('nib')
-        .use(nib())
-        .render()
-    catch e
-      console.log 'error parsing widget style:\n'
-      console.log e.message
-      console.log scopedStyle
-      ""
+    stylus(scopedStyle)
+      .import('nib')
+      .use(nib())
+      .render()
 
   validate = (impl) ->
     issues = []
     return ['empty implementation'] unless impl?
     issues.push 'no command given' unless impl.command?
     issues
+
+  errorToString = (err) ->
+    str = "[#{api.id}] #{err.toString?() or err.message}"
+    str += "\n  in #{err.stack.split('\n')[0]}()" if err.stack
+    str
+
 
   init()

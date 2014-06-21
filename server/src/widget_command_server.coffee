@@ -10,7 +10,7 @@ module.exports = (widgetDir) -> (req, res, next) ->
   widget.exec cwd: widgetDir.path, (err, data, stderr) ->
     if err or stderr
       res.writeHead 500
-      res.end(stderr or err.message)
+      res.end(stderr or (err.toString?() or err.message))
     else
       res.writeHead 200
       res.end(data)

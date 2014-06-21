@@ -95,9 +95,18 @@ describe 'widget', ->
       expect(render.calls.length).toBe 3
 
   describe 'error handling', ->
+    realConsoleError = null
+
+    beforeEach ->
+      realConsoleError = console.error
+      console.error = jasmine.createSpy("console.error")
+
+    afterEach ->
+      console.error = realConsoleError
 
     it 'should catch and show exceptions inside render', ->
-      widget = Widget command: '', id: 'foo', render: -> throw new Error('something went sorry')
+      error  = new Error('something went sorry')
+      widget = Widget command: '', id: 'foo', render: -> throw error
       domEl  = widget.create()
       server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
 
@@ -105,6 +114,9 @@ describe 'widget', ->
       server.respond()
 
       expect($(domEl).find('.widget').text()).toEqual 'something went sorry'
+
+      firstStackItem = error.stack.split('\n')[0]
+      expect(console.error).toHaveBeenCalledWith "[foo] #{error.toString()}\n  in #{firstStackItem}()"
 
     it 'should catch and show exceptions inside update', ->
       widget = Widget command: '', id: 'foo', update: -> throw new Error('up')
@@ -149,6 +161,7 @@ describe 'widget', ->
       widget = Widget command: '', id: 'foo', refreshFrequency: 100, update: (o, domEl) ->
         # important for this test case: do something with the existing innerHTML
         domEl.innerHTML = domEl.innerHTML + '!'
+
       domEl  = widget.create()
 
       server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'all good']

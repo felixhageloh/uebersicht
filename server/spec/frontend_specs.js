@@ -364,12 +364,23 @@ describe('widget', function() {
     });
   });
   return describe('error handling', function() {
+    var realConsoleError;
+    realConsoleError = null;
+    beforeEach(function() {
+      realConsoleError = console.error;
+      return console.error = jasmine.createSpy("console.error");
+    });
+    afterEach(function() {
+      return console.error = realConsoleError;
+    });
     it('should catch and show exceptions inside render', function() {
+      var error, firstStackItem;
+      error = new Error('something went sorry');
       widget = Widget({
         command: '',
         id: 'foo',
         render: function() {
-          throw new Error('something went sorry');
+          throw error;
         }
       });
       domEl = widget.create();
@@ -380,7 +391,9 @@ describe('widget', function() {
       ]);
       widget.start();
       server.respond();
-      return expect($(domEl).find('.widget').text()).toEqual('something went sorry');
+      expect($(domEl).find('.widget').text()).toEqual('something went sorry');
+      firstStackItem = error.stack.split('\n')[0];
+      return expect(console.error).toHaveBeenCalledWith("[foo] " + (error.toString()) + "\n  in " + firstStackItem + "()");
     });
     it('should catch and show exceptions inside update', function() {
       widget = Widget({
@@ -490,7 +503,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
   api = {};
   el = null;
   contentEl = null;
@@ -569,8 +582,8 @@ module.exports = function(implementation) {
       return renderOutput(output);
     } catch (_error) {
       e = _error;
-      console.error("" + api.id + ":", e.message);
-      return contentEl.innerHTML = e.message;
+      contentEl.innerHTML = e.message;
+      return console.error(errorToString(e));
     }
   };
   renderOutput = function(output) {
@@ -601,20 +614,12 @@ module.exports = function(implementation) {
     });
   };
   parseStyle = function(style) {
-    var e, scopedStyle;
+    var scopedStyle;
     if (!style) {
       return "";
     }
     scopedStyle = ("#" + api.id + "\n  ") + style.replace(/\n/g, "\n  ");
-    try {
-      return stylus(scopedStyle)["import"]('nib').use(nib()).render();
-    } catch (_error) {
-      e = _error;
-      console.log('error parsing widget style:\n');
-      console.log(e.message);
-      console.log(scopedStyle);
-      return "";
-    }
+    return stylus(scopedStyle)["import"]('nib').use(nib()).render();
   };
   validate = function(impl) {
     var issues;
@@ -626,6 +631,14 @@ module.exports = function(implementation) {
       issues.push('no command given');
     }
     return issues;
+  };
+  errorToString = function(err) {
+    var str;
+    str = "[" + api.id + "] " + ((typeof err.toString === "function" ? err.toString() : void 0) || err.message);
+    if (err.stack) {
+      str += "\n  in " + (err.stack.split('\n')[0]) + "()";
+    }
+    return str;
   };
   return init();
 };

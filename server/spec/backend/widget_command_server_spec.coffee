@@ -9,7 +9,7 @@ describe 'widget command server', ->
     mathew:
       exec: (opts, callback) -> callback(null, 'command output')
     john:
-      exec: (opts, callback) -> callback(message: 'command error', '', '')
+      exec: (opts, callback) -> callback({toString: -> 'command error'}, '', '')
     billy:
       exec: (opts, callback) -> callback(null, '', 'std error')
 

@@ -303,7 +303,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
   api = {};
   el = null;
   contentEl = null;
@@ -382,8 +382,8 @@ module.exports = function(implementation) {
       return renderOutput(output);
     } catch (_error) {
       e = _error;
-      console.error("" + api.id + ":", e.message);
-      return contentEl.innerHTML = e.message;
+      contentEl.innerHTML = e.message;
+      return console.error(errorToString(e));
     }
   };
   renderOutput = function(output) {
@@ -414,20 +414,12 @@ module.exports = function(implementation) {
     });
   };
   parseStyle = function(style) {
-    var e, scopedStyle;
+    var scopedStyle;
     if (!style) {
       return "";
     }
     scopedStyle = ("#" + api.id + "\n  ") + style.replace(/\n/g, "\n  ");
-    try {
-      return stylus(scopedStyle)["import"]('nib').use(nib()).render();
-    } catch (_error) {
-      e = _error;
-      console.log('error parsing widget style:\n');
-      console.log(e.message);
-      console.log(scopedStyle);
-      return "";
-    }
+    return stylus(scopedStyle)["import"]('nib').use(nib()).render();
   };
   validate = function(impl) {
     var issues;
@@ -439,6 +431,14 @@ module.exports = function(implementation) {
       issues.push('no command given');
     }
     return issues;
+  };
+  errorToString = function(err) {
+    var str;
+    str = "[" + api.id + "] " + ((typeof err.toString === "function" ? err.toString() : void 0) || err.message);
+    if (err.stack) {
+      str += "\n  in " + (err.stack.split('\n')[0]) + "()";
+    }
+    return str;
   };
   return init();
 };
@@ -460,7 +460,7 @@ module.exports = function(widgetDir) {
     }, function(err, data, stderr) {
       if (err || stderr) {
         res.writeHead(500);
-        return res.end(stderr || err.message);
+        return res.end(stderr || ((typeof err.toString === "function" ? err.toString() : void 0) || err.message));
       } else {
         res.writeHead(200);
         return res.end(data);
@@ -554,7 +554,7 @@ module.exports = function(directoryPath) {
   };
   prettyPrintError = function(filePath, error) {
     var errStr;
-    errStr = error.toString ? error.toString() : String(error.message);
+    errStr = (typeof error.toString === "function" ? error.toString() : void 0) || String(error.message);
     if (errStr.indexOf("[stdin]") > -1) {
       errStr = errStr.replace("[stdin]", filePath);
     } else {
