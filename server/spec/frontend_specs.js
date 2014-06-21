@@ -92,18 +92,18 @@ deserializeWidgets = function(data) {
 };
 
 logError = function(serialized) {
-  var e, err, errors, id, _results;
+  var e, err, errors, _i, _len, _results;
   try {
     errors = JSON.parse(serialized);
     _results = [];
-    for (id in errors) {
-      err = errors[id];
-      _results.push(console.log("Error in " + id + ":", err));
+    for (_i = 0, _len = errors.length; _i < _len; _i++) {
+      err = errors[_i];
+      _results.push(console.error(err));
     }
     return _results;
   } catch (_error) {
     e = _error;
-    return console.log(response);
+    return console.error(serialized);
   }
 };
 

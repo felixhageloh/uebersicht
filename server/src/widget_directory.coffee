@@ -39,7 +39,7 @@ module.exports = (directoryPath) ->
       definition.id = id if definition?
       Widget definition
     catch e
-      notifyError id, e
+      notifyError filePath, e
       console.log 'error in widget', id+':', e.message
 
   registerWidget = (widget) ->
@@ -59,28 +59,20 @@ module.exports = (directoryPath) ->
     changes[id] = change
     changeCallback changes
 
-  notifyError = (id, error) ->
-    errors = {}
-    errors[id] = prettyPrintError(error)
-    changeCallback null, errors
+  notifyError = (filePath, error) ->
+    changeCallback null, prettyPrintError(filePath, error)
 
-  prettyPrintError = (error) ->
-    str = String(error.message)
+  prettyPrintError = (filePath, error) ->
+    errStr = if error.toString then error.toString() else String(error.message)
 
-    if error.code and (loc = error.location)
-      str += "\nline #{loc.last_line+1}, column #{loc.last_column}"
+    # coffeescipt errors will have [stdin] when prettyPrinted (because they are
+    # parsed from stdin). So lets replace that with the real file path
+    if errStr.indexOf("[stdin]") > -1
+      errStr = errStr.replace("[stdin]", filePath)
+    else
+      errStr = filePath + ': ' + errStr
 
-      lines = error.code.split("\n")
-      lines = lines.slice( Math.max(loc.first_line-1, 0),
-                           Math.min(loc.last_line+1, lines.length-1))
-      colString = new Array(loc.last_column)
-      colString[loc.last_column] = "^"
-
-      str += "\n\n" + lines.join('\n')
-      str += "\n" + colString.join(' ')
-
-    str
-
+    errStr
 
   widgetId = (filePath) ->
     fileParts = filePath.replace(directoryPath, '').split(/\/+/)

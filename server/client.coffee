@@ -60,9 +60,9 @@ deserializeWidgets = (data) ->
 logError = (serialized) ->
   try
     errors = JSON.parse(serialized)
-    console.log "Error in #{id}:", err for id, err of errors
+    console.error err for err in errors
   catch e
-    console.log response
+    console.error serialized
 
 
 window.onload = init

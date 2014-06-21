@@ -1143,24 +1143,25 @@ module.exports = function() {
   api = {};
   clients = [];
   currentChanges = {};
-  currentErrors = {};
+  currentErrors = [];
   timer = null;
-  api.push = function(changes, errors) {
-    var id, val, _ref, _ref1;
-    clearTimeout(timer);
+  api.push = function(changes, errorString) {
+    var id, val, _ref;
     _ref = changes != null ? changes : {};
     for (id in _ref) {
       val = _ref[id];
       currentChanges[id] = val;
     }
-    _ref1 = errors != null ? errors : {};
-    for (id in _ref1) {
-      val = _ref1[id];
-      currentErrors[id] = val;
+    if (errorString) {
+      currentErrors.push(errorString);
     }
+    clearTimeout(timer);
     return timer = setTimeout(function() {
-      if (Object.keys(currentErrors).length > 0) {
-        return pushErrors();
+      if (currentErrors.length > 0) {
+        pushErrors();
+        if (Object.keys(currentChanges).length > 0) {
+          return timer = setTimeout(pushChanges, 50);
+        }
       } else {
         return pushChanges();
       }
@@ -1196,33 +1197,26 @@ module.exports = function() {
       data = '';
       status = 200;
     }
-    if (clients.length > 0) {
-      console.log('pushing changes');
-      sendResponse(data, status);
-      clients.length = 0;
-    }
+    console.log('pushing changes');
+    sendResponse(data, status);
     return currentChanges = {};
   };
   pushErrors = function() {
-    if (clients.length > 0) {
-      console.log('pushing changes');
-      sendResponse(JSON.stringify(currentErrors), 200);
-      clients.length = 0;
-    }
-    return currentErrors = {};
+    console.log('pushing changes');
+    sendResponse(JSON.stringify(currentErrors), 200);
+    return currentErrors.length = 0;
   };
   sendResponse = function(body, status) {
-    var client, _i, _len, _results;
+    var client, _i, _len;
     if (status == null) {
       status = 200;
     }
-    _results = [];
     for (_i = 0, _len = clients.length; _i < _len; _i++) {
       client = clients[_i];
       client.response.writeHead(status);
-      _results.push(client.response.end(body));
+      client.response.end(body);
     }
-    return _results;
+    return clients.length = 0;
   };
   return api;
 };
@@ -1476,7 +1470,7 @@ module.exports = function(directoryPath) {
       return Widget(definition);
     } catch (_error) {
       e = _error;
-      notifyError(id, e);
+      notifyError(filePath, e);
       return console.log('error in widget', id + ':', e.message);
     }
   };
@@ -1502,25 +1496,18 @@ module.exports = function(directoryPath) {
     changes[id] = change;
     return changeCallback(changes);
   };
-  notifyError = function(id, error) {
-    var errors;
-    errors = {};
-    errors[id] = prettyPrintError(error);
-    return changeCallback(null, errors);
+  notifyError = function(filePath, error) {
+    return changeCallback(null, prettyPrintError(filePath, error));
   };
-  prettyPrintError = function(error) {
-    var colString, lines, loc, str;
-    str = String(error.message);
-    if (error.code && (loc = error.location)) {
-      str += "\nline " + (loc.last_line + 1) + ", column " + loc.last_column;
-      lines = error.code.split("\n");
-      lines = lines.slice(Math.max(loc.first_line - 1, 0), Math.min(loc.last_line + 1, lines.length - 1));
-      colString = new Array(loc.last_column);
-      colString[loc.last_column] = "^";
-      str += "\n\n" + lines.join('\n');
-      str += "\n" + colString.join(' ');
+  prettyPrintError = function(filePath, error) {
+    var errStr;
+    errStr = error.toString ? error.toString() : String(error.message);
+    if (errStr.indexOf("[stdin]") > -1) {
+      errStr = errStr.replace("[stdin]", filePath);
+    } else {
+      errStr = filePath + ': ' + errStr;
     }
-    return str;
+    return errStr;
   };
   widgetId = function(filePath) {
     var fileParts, part;

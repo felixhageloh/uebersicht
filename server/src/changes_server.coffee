@@ -8,19 +8,23 @@ module.exports = ->
   api = {}
   clients        = []
   currentChanges = {}
-  currentErrors  = {}
+  currentErrors  = []
   timer          = null
 
-  api.push = (changes, errors) ->
-    clearTimeout timer
+  api.push = (changes, errorString) ->
     currentChanges[id] = val for id, val of ( changes ? {})
-    currentErrors[id]  = val for id, val of ( errors  ? {})
+    currentErrors.push errorString if errorString
 
     # batch changes together if they occur rappidly. This is not
-    # 100% failsafe but will be no issue when switching to web sockets
+    # 100% failsafe (clients might miss errors or changes if the 'comet'
+    # comes back to late)
+    clearTimeout timer
     timer = setTimeout ->
-      if Object.keys(currentErrors).length > 0
+      if currentErrors.length > 0
         pushErrors()
+        # flush out errors first, but don't neglect changes
+        if Object.keys(currentChanges).length > 0
+          timer = setTimeout pushChanges, 50
       else
         pushChanges()
     , 50
@@ -47,25 +51,20 @@ module.exports = ->
       data   = ''
       status = 200
 
-    if clients.length > 0
-      console.log 'pushing changes'
-      sendResponse data, status
-      clients.length = 0
-
+    console.log 'pushing changes'
+    sendResponse data, status
     currentChanges = {}
 
   pushErrors = ->
-    if clients.length > 0
-      console.log 'pushing changes'
-      sendResponse JSON.stringify(currentErrors), 200
-      clients.length = 0
-
-    currentErrors = {}
+    console.log 'pushing changes'
+    sendResponse JSON.stringify(currentErrors), 200
+    currentErrors.length = 0
 
   sendResponse = (body, status = 200) ->
     for client in clients
       client.response.writeHead status
       client.response.end body
 
+    clients.length = 0
 
   api
