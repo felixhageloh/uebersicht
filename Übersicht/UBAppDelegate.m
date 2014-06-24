@@ -41,9 +41,6 @@
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(aWindowClosed:)
-                                                 name:NSWindowWillCloseNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(wakeFromSleep:)
@@ -191,15 +188,6 @@
     [inspector show:self];
 
 }
-
-- (void)aWindowClosed:(NSNotification *)notification
-{
-    // WebInspcetor might have closed
-    if ([@"WebInspectorWindow" isEqual:NSStringFromClass ([[notification object] class])]) {
-        [mainView.window setLevel:kCGDesktopWindowLevel];
-    }
-}
-
 
 // the inspector might be attached to the webview, in which case we can detect frame changes
 - (void)frameChanged:(NSNotification *)notification
