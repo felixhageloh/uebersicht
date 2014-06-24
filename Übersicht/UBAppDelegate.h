@@ -17,8 +17,7 @@
 
 @interface UBAppDelegate : NSObject <NSApplicationDelegate>
 
-@property (assign) IBOutlet NSWindow *window;
-@property (weak) IBOutlet WebView *mainView;
+@property (assign) IBOutlet UBWindow *window;
 @property (weak) IBOutlet NSMenu *statusBarMenu;
 
 - (void)widgetDirDidChange;

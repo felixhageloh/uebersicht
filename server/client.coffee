@@ -1,9 +1,10 @@
-Widget = require './src/widget.coffee'
+Widget   = require './src/widget.coffee'
 
 widgets   = {}
 contentEl = null
 
 init = ->
+  window.uebersicht = require './src/os_bridge.coffee'
   widgets = {}
   contentEl = document.getElementsByClassName('content')[0]
   contentEl.innerHTML = ''

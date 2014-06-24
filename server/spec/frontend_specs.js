@@ -8,6 +8,7 @@ widgets = {};
 contentEl = null;
 
 init = function() {
+  window.uebersicht = require('./src/os_bridge.coffee');
   widgets = {};
   contentEl = document.getElementsByClassName('content')[0];
   contentEl.innerHTML = '';
@@ -110,7 +111,7 @@ logError = function(serialized) {
 window.onload = init;
 
 
-},{"./src/widget.coffee":6}],2:[function(require,module,exports){
+},{"./src/os_bridge.coffee":6,"./src/widget.coffee":7}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 /* toSource by Marcello Bastea-Forte - zlib license */
@@ -308,6 +309,43 @@ describe('widget', function() {
       return expect($(domEl).find('.widget').text()).toEqual('rendered: baz');
     });
   });
+  describe('with an after-render hook', function() {
+    var afterRender;
+    afterRender = null;
+    beforeEach(function() {
+      afterRender = jasmine.createSpy('after render');
+      widget = Widget({
+        command: '',
+        id: 'foo',
+        render: (function() {}),
+        afterRender: afterRender,
+        refreshFrequency: 100
+      });
+      return domEl = widget.create();
+    });
+    it('calls the after-render hook ', function() {
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'baz'
+      ]);
+      widget.start();
+      server.respond();
+      return expect(afterRender).toHaveBeenCalledWith($(domEl).find('.widget')[0]);
+    });
+    return it('calls the after-render hook after every render', function() {
+      jasmine.Clock.useMock();
+      server.respondWith("GET", "/widgets/foo", [
+        200, {
+          "Content-Type": "text/plain"
+        }, 'stuff'
+      ]);
+      server.autoRespond = true;
+      widget.start();
+      jasmine.Clock.tick(250);
+      return expect(afterRender.calls.length).toBe(3);
+    });
+  });
   describe('with an update method', function() {
     var update;
     update = null;
@@ -346,7 +384,6 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     return it('should keep updating until stop() is called', function() {
-      var done;
       jasmine.Clock.useMock();
       server.respondWith("GET", "/widgets/foo", [
         200, {
@@ -354,7 +391,6 @@ describe('widget', function() {
         }, 'stuff'
       ]);
       server.autoRespond = true;
-      done = false;
       widget.start();
       jasmine.Clock.tick(250);
       expect(render.calls.length).toBe(3);
@@ -491,7 +527,87 @@ describe('widget', function() {
 });
 
 
-},{"../../src/widget.coffee":6}],6:[function(require,module,exports){
+},{"../../src/widget.coffee":7}],6:[function(require,module,exports){
+var cachedWallpaper, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices, slices;
+
+slices = [];
+
+cachedWallpaper = new Image();
+
+window.addEventListener('onwallpaperchange', function() {
+  return loadWallpaper(function(wallpaper) {
+    return renderWallpaperSlices(wallpaper);
+  });
+});
+
+exports.makeBgSlice = function(canvas) {
+  canvas = $(canvas)[0];
+  if (!(canvas != null ? canvas.getContext : void 0)) {
+    throw new Error('no canvas element provided');
+  }
+  slices.push(canvas);
+  return getWallpaper(function(wallpaper) {
+    return renderWallpaperSlice(wallpaper, canvas);
+  });
+};
+
+getWallpaper = function(callback) {
+  if (cachedWallpaper.loaded) {
+    return callback(cachedWallpaper);
+  }
+  if (getWallpaper.callbacks == null) {
+    getWallpaper.callbacks = [];
+  }
+  getWallpaper.callbacks.push(callback);
+  if (cachedWallpaper.loading) {
+    return;
+  }
+  cachedWallpaper.loading = true;
+  return loadWallpaper(function(wallpaper) {
+    var _i, _len, _ref;
+    _ref = getWallpaper.callbacks;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      callback = _ref[_i];
+      callback(wallpaper);
+    }
+    getWallpaper.callbacks.length = 0;
+    return cachedWallpaper.loaded = true;
+  });
+};
+
+loadWallpaper = function(callback) {
+  cachedWallpaper.onload = function() {
+    return callback(cachedWallpaper);
+  };
+  return cachedWallpaper.src = os.wallpaperDataUrl();
+};
+
+renderWallpaperSlices = function(wallpaper) {
+  var canvas, _i, _len, _results;
+  _results = [];
+  for (_i = 0, _len = slices.length; _i < _len; _i++) {
+    canvas = slices[_i];
+    _results.push(renderWallpaperSlice(wallpaper, canvas));
+  }
+  return _results;
+};
+
+renderWallpaperSlice = function(wallpaper, canvas) {
+  var ctx, height, left, rect, scale, top, width;
+  ctx = canvas.getContext('2d');
+  scale = window.devicePixelRatio / ctx.webkitBackingStorePixelRatio;
+  rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * scale;
+  canvas.height = rect.height * scale;
+  left = Math.max(rect.left, 0) * window.devicePixelRatio;
+  top = Math.max(rect.top + 22, 0) * window.devicePixelRatio;
+  width = Math.min(canvas.width, wallpaper.width - left);
+  height = Math.min(canvas.height, wallpaper.height - top);
+  return ctx.drawImage(wallpaper, Math.round(left), Math.round(top), Math.round(width), Math.round(height), 0, 0, canvas.width, canvas.height);
+};
+
+
+},{}],7:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
 exec = require('child_process').exec;
@@ -503,12 +619,11 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   contentEl = null;
   timer = null;
-  update = null;
   render = null;
   started = false;
   rendered = false;
@@ -527,7 +642,6 @@ module.exports = function(implementation) {
     render = (_ref3 = implementation.render) != null ? _ref3 : function(output) {
       return output;
     };
-    update = implementation.update;
     return api;
   };
   api.create = function() {
@@ -587,13 +701,16 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((update != null) && rendered) {
-      return update.call(implementation, output, contentEl);
+    if ((implementation.update != null) && rendered) {
+      return implementation.update(output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      if (typeof implementation.afterRender === "function") {
+        implementation.afterRender(contentEl);
+      }
       rendered = true;
-      if (update != null) {
-        return update.call(implementation, output, contentEl);
+      if (implementation.update != null) {
+        return implementation.update(output, contentEl);
       }
     }
   };

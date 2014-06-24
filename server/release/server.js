@@ -1250,12 +1250,11 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   contentEl = null;
   timer = null;
-  update = null;
   render = null;
   started = false;
   rendered = false;
@@ -1274,7 +1273,6 @@ module.exports = function(implementation) {
     render = (_ref3 = implementation.render) != null ? _ref3 : function(output) {
       return output;
     };
-    update = implementation.update;
     return api;
   };
   api.create = function() {
@@ -1334,13 +1332,16 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((update != null) && rendered) {
-      return update.call(implementation, output, contentEl);
+    if ((implementation.update != null) && rendered) {
+      return implementation.update(output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      if (typeof implementation.afterRender === "function") {
+        implementation.afterRender(contentEl);
+      }
       rendered = true;
-      if (update != null) {
-        return update.call(implementation, output, contentEl);
+      if (implementation.update != null) {
+        return implementation.update(output, contentEl);
       }
     }
   };

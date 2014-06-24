@@ -23,30 +23,22 @@
     WebInspector *inspector;
 }
 
-@synthesize mainView;
+@synthesize window;
 @synthesize statusBarMenu;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    [mainView setDrawsBackground:NO];
-    [mainView setMaintainsBackForwardList:NO];
-    
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     preferences   = [[UBPreferencesController alloc] initWithWindowNibName:@"UBPreferencesController"];
-    
+
     keepServerAlive = YES;
     [self startServer];
-    
+
     // enable the web inspector
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(wakeFromSleep:)
-                                                 name:NSWorkspaceDidWakeNotification
-                                               object:nil];
-    
+    // events to detect web inspector opening/closing
     [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(aWindowClosed:)
                                                  name:NSWindowWillCloseNotification object:nil];
@@ -60,23 +52,21 @@
 - (void)startServer
 {
     NSLog(@"starting server task");
-    
-    [mainView setHidden:YES];
+
     void (^parseOutput)(NSString *) = ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [mainView setMainFrameURL:@"http://localhost:41416"];
-            [mainView setHidden:NO];
+            [window loadUrl:@"http://localhost:41416"];
         } else if ([output rangeOfString:@"error"].location != NSNotFound) {
             [self notifyUser:output withTitle:@"Error"];
         }
     };
-    
+
     void (^keepAlive)(NSTask*) = ^(NSTask* theTask) {
         if (keepServerAlive) {
             [self startServer];
         }
     };
-    
+
     widgetServer = [self launchWidgetServer:[preferences.widgetDir path]
                                      onData:parseOutput
                                      onExit:keepAlive];
@@ -92,14 +82,14 @@
 {
     NSStatusBar*  bar = [NSStatusBar systemStatusBar];
     NSStatusItem* item;
-    
+
     item = [bar statusItemWithLength: NSSquareStatusItemLength];
-    
+
     [item setImage:[[NSBundle mainBundle] imageForResource:@"status-icon"]];
     [item setHighlightMode:YES];
     [item setMenu:aMenu];
     [item setEnabled:YES];
-    
+
     return item;
 }
 
@@ -110,7 +100,7 @@
     NSBundle* bundle     = [NSBundle mainBundle];
     NSString* nodePath   = [bundle pathForResource:@"localnode" ofType:nil];
     NSString* serverPath = [bundle pathForResource:@"server" ofType:@"js"];
-    
+
     // NSTask doesn't terminate when xcode stop is pressed. Other ways of spawning
     // the server, like system() or popen() have the same problem.
     // So, hit em with a hammer :(
@@ -119,35 +109,35 @@
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:nodePath];
     [task setArguments:@[serverPath, @"-d", widgetPath]];
-    
-    
+
+
     NSPipe* nodeout = [NSPipe pipe];
     [task setStandardOutput:nodeout];
     [[nodeout fileHandleForReading] waitForDataInBackgroundAndNotify];
-    
+
     void (^callback)(NSNotification *) = ^(NSNotification *notification) {
         NSData *output   = [[nodeout fileHandleForReading] availableData];
         NSString *outStr = [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
-        
+
         dataHandler(outStr);
-        
+
         NSLog(@"%@", outStr);
         [[nodeout fileHandleForReading] waitForDataInBackgroundAndNotify];
     };
-    
+
     id observer = [[NSNotificationCenter defaultCenter] addObserverForName:NSFileHandleDataAvailableNotification
                                                       object:[nodeout fileHandleForReading]
                                                        queue:nil
                                                   usingBlock:callback];
-    
-    
+
+
     task.terminationHandler = ^(NSTask *theTask) {
         [[NSNotificationCenter defaultCenter] removeObserver:observer];
         dispatch_async(dispatch_get_main_queue(), ^{
             exitHandler(theTask);
         });
     };
-    
+
     [task launch];
     return task;
 }
@@ -167,7 +157,7 @@
     NSUserNotification *notification = [[NSUserNotification alloc] init];
     notification.title = title;
     notification.informativeText = message;
-    
+
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
@@ -186,11 +176,11 @@
 - (IBAction)showDebugConsole:(id)sender
 {
     if (!inspector) {
-        inspector = [WebInspector.alloc initWithWebView:mainView];
+        inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
-    
+
     [inspector show:self];
-    [mainView.window setLevel:kCGNormalWindowLevel-1];
+    [window setLevel:kCGNormalWindowLevel-1];
 
 }
 
@@ -198,29 +188,22 @@
 {
     // WebInspcetor might have closed
     if ([@"WebInspectorWindow" isEqual:NSStringFromClass ([[notification object] class])]) {
-        [mainView.window setLevel:kCGDesktopWindowLevel];
+        [window setLevel:kCGDesktopWindowLevel];
     }
 }
 
 // the inspector might be attached to the webview, in which case we can detect frame changes
 - (void)frameChanged:(NSNotification *)notification
 {
-    if ([notification object] != [[mainView mainFrame] frameView])
+    if ([notification object] != window.webView.mainFrame.frameView)
         return;
-    
-    // make sure the inspector is clickable if attached
-    if (CGRectEqualToRect(mainView.mainFrame.frameView.frame, mainView.frame)) {
-         [mainView.window setLevel:kCGDesktopWindowLevel];
-    } else {
-         [mainView.window setLevel:kCGNormalWindowLevel-1];
-    }
-        
-    
-}
 
-- (void)wakeFromSleep:(NSNotification *)notification
-{
-    [mainView reload:self];
+    // make sure the inspector is clickable if attached
+    if (CGRectEqualToRect(window.webView.mainFrame.frameView.frame, window.webView.frame)) {
+         [window setLevel:kCGDesktopWindowLevel];
+    } else {
+         [window setLevel:kCGNormalWindowLevel-1];
+    }
 }
 
 @end

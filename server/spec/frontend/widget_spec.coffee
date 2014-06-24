@@ -56,6 +56,32 @@ describe 'widget', ->
 
       expect($(domEl).find('.widget').text()).toEqual 'rendered: baz'
 
+  describe 'with an after-render hook', ->
+    afterRender = null
+
+    beforeEach ->
+      afterRender = jasmine.createSpy('after render')
+
+      widget = Widget command: '', id: 'foo', render: ( -> ), afterRender: afterRender, refreshFrequency: 100
+      domEl  = widget.create()
+
+    it 'calls the after-render hook ', ->
+      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+      widget.start()
+      server.respond()
+
+      expect(afterRender).toHaveBeenCalledWith($(domEl).find('.widget')[0])
+
+    it 'calls the after-render hook after every render', ->
+      jasmine.Clock.useMock()
+      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'stuff']
+      server.autoRespond = true
+
+      widget.start()
+      jasmine.Clock.tick 250
+      expect(afterRender.calls.length).toBe 3
+
+
   describe 'with an update method', ->
     update = null
 
@@ -85,7 +111,6 @@ describe 'widget', ->
       jasmine.Clock.useMock()
       server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'stuff']
       server.autoRespond = true
-      done = false
 
       widget.start()
       jasmine.Clock.tick 250

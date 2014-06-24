@@ -8,6 +8,7 @@ widgets = {};
 contentEl = null;
 
 init = function() {
+  window.uebersicht = require('./src/os_bridge.coffee');
   widgets = {};
   contentEl = document.getElementsByClassName('content')[0];
   contentEl.innerHTML = '';
@@ -110,7 +111,7 @@ logError = function(serialized) {
 window.onload = init;
 
 
-},{"./src/widget.coffee":7}],2:[function(require,module,exports){
+},{"./src/os_bridge.coffee":6,"./src/widget.coffee":8}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 /* toSource by Marcello Bastea-Forte - zlib license */
@@ -186,7 +187,7 @@ module.exports = function(port, widgetPath) {
 };
 
 
-},{"./changes_server.coffee":5,"./widget_command_server.coffee":8,"./widget_directory.coffee":9,"./widgets_server.coffee":11,"connect":2,"path":2}],5:[function(require,module,exports){
+},{"./changes_server.coffee":5,"./widget_command_server.coffee":9,"./widget_directory.coffee":10,"./widgets_server.coffee":12,"connect":2,"path":2}],5:[function(require,module,exports){
 var serialize;
 
 serialize = require('./serialize.coffee');
@@ -275,7 +276,87 @@ module.exports = function() {
 };
 
 
-},{"./serialize.coffee":6}],6:[function(require,module,exports){
+},{"./serialize.coffee":7}],6:[function(require,module,exports){
+var cachedWallpaper, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices, slices;
+
+slices = [];
+
+cachedWallpaper = new Image();
+
+window.addEventListener('onwallpaperchange', function() {
+  return loadWallpaper(function(wallpaper) {
+    return renderWallpaperSlices(wallpaper);
+  });
+});
+
+exports.makeBgSlice = function(canvas) {
+  canvas = $(canvas)[0];
+  if (!(canvas != null ? canvas.getContext : void 0)) {
+    throw new Error('no canvas element provided');
+  }
+  slices.push(canvas);
+  return getWallpaper(function(wallpaper) {
+    return renderWallpaperSlice(wallpaper, canvas);
+  });
+};
+
+getWallpaper = function(callback) {
+  if (cachedWallpaper.loaded) {
+    return callback(cachedWallpaper);
+  }
+  if (getWallpaper.callbacks == null) {
+    getWallpaper.callbacks = [];
+  }
+  getWallpaper.callbacks.push(callback);
+  if (cachedWallpaper.loading) {
+    return;
+  }
+  cachedWallpaper.loading = true;
+  return loadWallpaper(function(wallpaper) {
+    var _i, _len, _ref;
+    _ref = getWallpaper.callbacks;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      callback = _ref[_i];
+      callback(wallpaper);
+    }
+    getWallpaper.callbacks.length = 0;
+    return cachedWallpaper.loaded = true;
+  });
+};
+
+loadWallpaper = function(callback) {
+  cachedWallpaper.onload = function() {
+    return callback(cachedWallpaper);
+  };
+  return cachedWallpaper.src = os.wallpaperDataUrl();
+};
+
+renderWallpaperSlices = function(wallpaper) {
+  var canvas, _i, _len, _results;
+  _results = [];
+  for (_i = 0, _len = slices.length; _i < _len; _i++) {
+    canvas = slices[_i];
+    _results.push(renderWallpaperSlice(wallpaper, canvas));
+  }
+  return _results;
+};
+
+renderWallpaperSlice = function(wallpaper, canvas) {
+  var ctx, height, left, rect, scale, top, width;
+  ctx = canvas.getContext('2d');
+  scale = window.devicePixelRatio / ctx.webkitBackingStorePixelRatio;
+  rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * scale;
+  canvas.height = rect.height * scale;
+  left = Math.max(rect.left, 0) * window.devicePixelRatio;
+  top = Math.max(rect.top + 22, 0) * window.devicePixelRatio;
+  width = Math.min(canvas.width, wallpaper.width - left);
+  height = Math.min(canvas.height, wallpaper.height - top);
+  return ctx.drawImage(wallpaper, Math.round(left), Math.round(top), Math.round(width), Math.round(height), 0, 0, canvas.width, canvas.height);
+};
+
+
+},{}],7:[function(require,module,exports){
 module.exports = function(someWidgets) {
   var id, serialized, widget;
   serialized = "({";
@@ -291,7 +372,7 @@ module.exports = function(someWidgets) {
 };
 
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
 exec = require('child_process').exec;
@@ -303,12 +384,11 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, update, validate;
+  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   contentEl = null;
   timer = null;
-  update = null;
   render = null;
   started = false;
   rendered = false;
@@ -327,7 +407,6 @@ module.exports = function(implementation) {
     render = (_ref3 = implementation.render) != null ? _ref3 : function(output) {
       return output;
     };
-    update = implementation.update;
     return api;
   };
   api.create = function() {
@@ -387,13 +466,16 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((update != null) && rendered) {
-      return update.call(implementation, output, contentEl);
+    if ((implementation.update != null) && rendered) {
+      return implementation.update(output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      if (typeof implementation.afterRender === "function") {
+        implementation.afterRender(contentEl);
+      }
       rendered = true;
-      if (update != null) {
-        return update.call(implementation, output, contentEl);
+      if (implementation.update != null) {
+        return implementation.update(output, contentEl);
       }
     }
   };
@@ -444,7 +526,7 @@ module.exports = function(implementation) {
 };
 
 
-},{"child_process":2,"nib":2,"stylus":2,"tosource":3}],8:[function(require,module,exports){
+},{"child_process":2,"nib":2,"stylus":2,"tosource":3}],9:[function(require,module,exports){
 module.exports = function(widgetDir) {
   return function(req, res, next) {
     var parts, widget;
@@ -470,7 +552,7 @@ module.exports = function(widgetDir) {
 };
 
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var Widget, loader, paths;
 
 Widget = require('./widget.coffee');
@@ -586,7 +668,7 @@ module.exports = function(directoryPath) {
 };
 
 
-},{"./widget.coffee":7,"./widget_loader.coffee":10,"chokidar":2,"path":2}],10:[function(require,module,exports){
+},{"./widget.coffee":8,"./widget_loader.coffee":11,"chokidar":2,"path":2}],11:[function(require,module,exports){
 var coffee, fs, loadWidget;
 
 fs = require('fs');
@@ -607,7 +689,7 @@ exports.loadWidget = loadWidget = function(filePath) {
 };
 
 
-},{"coffee-script":2,"fs":2}],11:[function(require,module,exports){
+},{"coffee-script":2,"fs":2}],12:[function(require,module,exports){
 var serialize;
 
 serialize = require('./serialize.coffee');
@@ -624,4 +706,4 @@ module.exports = function(widgetDir) {
 };
 
 
-},{"./serialize.coffee":6}]},{},[1,4,5,6,7,8,9,10,11])
+},{"./serialize.coffee":7}]},{},[1,4,5,6,7,8,9,10,11,12])

@@ -11,7 +11,13 @@
 //  details.
 
 #import <Cocoa/Cocoa.h>
+#import <WebKit/WebKit.h>
+#import <JavaScriptCore/JavaScriptCore.h>
 
 @interface UBWindow : NSWindow
+
+@property (weak) IBOutlet WebView *webView;
+
+- (void)loadUrl:(NSString*)url;
 
 @end

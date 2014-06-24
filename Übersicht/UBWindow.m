@@ -15,7 +15,12 @@
 
 #import "UBWindow.h"
 
-@implementation UBWindow
+@implementation UBWindow {
+    NSURL *prevWallpaperUrl;
+    NSDictionary *prevWallpaperOptions;
+}
+
+@synthesize webView;
 
 - (id) initWithContentRect:(NSRect)contentRect
                  styleMask:(NSUInteger)aStyle
@@ -27,7 +32,7 @@
                             styleMask:NSBorderlessWindowMask
                               backing:bufferingType
                                 defer:flag];
-    
+
     if (self) {
         [self setBackgroundColor:[NSColor clearColor]];
         [self setOpaque:NO];
@@ -35,31 +40,117 @@
         [self setCollectionBehavior:(NSWindowCollectionBehaviorTransient |
                                      NSWindowCollectionBehaviorCanJoinAllSpaces |
                                      NSWindowCollectionBehaviorIgnoresCycle)];
-        [self makeFullscreen];
-        
+
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(makeFullscreen)
                                                      name:NSApplicationDidChangeScreenParametersNotification
                                                    object:nil];
+
+        [[NSWorkspace sharedWorkspace].notificationCenter addObserver:self
+                                                             selector:@selector(onWorkspaceChange:)
+                                                                 name:NSWorkspaceActiveSpaceDidChangeNotification
+                                                               object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(wakeFromSleep:)
+                                                     name:NSWorkspaceDidWakeNotification
+                                                   object:nil];
     }
-    
+
+
     return self;
+}
+
+- (void) awakeFromNib
+{
+    [self initWebView];
+    [self makeFullscreen];
+    prevWallpaperUrl = [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] absoluteURL];
+    prevWallpaperOptions =  [[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:[self screen]];
+}
+
+- (void)initWebView
+{
+
+    [webView setDrawsBackground:NO];
+    [webView setMaintainsBackForwardList:NO];
+    [webView setFrameLoadDelegate:self];
+}
+
+- (void)loadUrl:(NSString*)url
+{
+    [webView setMainFrameURL:url];
+}
+
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
+{
+    if (frame == [frame findFrameNamed:@"_top"]) {
+        [[webView windowScriptObject] setValue:self forKey:@"os"];
+    }
 }
 
 - (void)makeFullscreen
 {
-    NSRect fullscreen = [[NSScreen mainScreen] frame];
-    
-    // TODO: when app launches, this is 0 (I guess mainMenu is not init yet)
-    //int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-    
-    fullscreen.size.height = fullscreen.size.height - 22;
-    [self setFrame:fullscreen display:YES];
+    NSRect fullscreen = [[self screen] frame];
 
+    int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
+
+    fullscreen.size.height = fullscreen.size.height - menuBarHeight;
+    [self setFrame:fullscreen display:YES];
+}
+
+
+
+- (NSString*)wallpaperDataUrl
+{
+    CGImageRef cgImage = CGWindowListCreateImage([self screen].frame,
+                                                 kCGWindowListOptionOnScreenBelowWindow,
+                                                 (CGWindowID)[self windowNumber],
+                                                 kCGWindowImageDefault);
+
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
+    NSData *imgData = [bitmapRep representationUsingType:NSPNGFileType properties:nil];
+
+    NSString *base64 = [imgData base64EncodedStringWithOptions:0];
+
+    CGImageRelease(cgImage);
+    return [@"data:image/png;base64, " stringByAppendingString:base64];
+}
+
+- (void)onWorkspaceChange:(id)sender
+{
+    NSURL *currWallpaperUrl  = [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] absoluteURL];
+    NSDictionary *currWallpaperOptions = [[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:[self screen]];
+
+    if (![prevWallpaperUrl isEqual:currWallpaperUrl] ||
+        ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions]) {
+        [self wallpaperChanged];
+    }
+    prevWallpaperUrl = currWallpaperUrl;
+    prevWallpaperOptions = currWallpaperOptions;
+}
+
+- (void)wallpaperChanged
+{
+    [[webView windowScriptObject] evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"];
+}
+
+
++ (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
+{
+    if (aSelector == @selector(wallpaperDataUrl)) {
+        return NO;
+    }
+
+    return YES;
+}
+
+- (void)wakeFromSleep:(NSNotification *)notification
+{
+    [webView reload:self];
 }
 
 @end
