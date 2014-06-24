@@ -44,6 +44,16 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(aWindowClosed:)
                                                  name:NSWindowWillCloseNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(wakeFromSleep:)
+                                                 name:NSWorkspaceDidWakeNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(frameChanged:)
+                                                 name:NSViewFrameDidChangeNotification
+                                               object:nil];
 }
 
 - (void)startServer
@@ -178,20 +188,38 @@
         inspector = [WebInspector.alloc initWithWebView:mainView];
     }
     
-    // web inspector might be attached, so we need to be clickable
-    [mainView.window setLevel:kCGNormalWindowLevel-1];
-    [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
 
 }
 
 - (void)aWindowClosed:(NSNotification *)notification
 {
-    // WebInspcetor closed
+    // WebInspcetor might have closed
     if ([@"WebInspectorWindow" isEqual:NSStringFromClass ([[notification object] class])]) {
         [mainView.window setLevel:kCGDesktopWindowLevel];
     }
+}
 
+
+// the inspector might be attached to the webview, in which case we can detect frame changes
+- (void)frameChanged:(NSNotification *)notification
+{
+    if ([notification object] != [[mainView mainFrame] frameView])
+        return;
+    
+    
+    if (CGRectEqualToRect(mainView.mainFrame.frameView.frame, mainView.frame)) {
+         [mainView.window setLevel:kCGDesktopWindowLevel];
+    } else {
+         [mainView.window setLevel:kCGNormalWindowLevel-1];
+    }
+        
+    
+}
+
+- (void)wakeFromSleep:(NSNotification *)notification
+{
+    [mainView reload:self];
 }
 
 @end

@@ -45,7 +45,6 @@
                                                  selector:@selector(makeFullscreen)
                                                      name:NSApplicationDidChangeScreenParametersNotification
                                                    object:nil];
-        
     }
     
     return self;
