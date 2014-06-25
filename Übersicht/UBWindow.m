@@ -94,6 +94,7 @@
 
     fullscreen.size.height = fullscreen.size.height - menuBarHeight;
     [self setFrame:fullscreen display:YES];
+    [self onWorkspaceChange:nil];
 }
 
 
