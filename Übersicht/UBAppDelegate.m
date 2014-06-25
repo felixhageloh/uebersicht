@@ -233,7 +233,6 @@
         if (CGDisplayIsInMirrorSet(screenId))
             continue;
         
-        NSLog(@"%i", CGDisplayUnitNumber(screenId));
         if (lastScreen == CGDisplayUnitNumber(screenId)) {
             foundScreenAgain = YES;
             [self sendWindowToScreen:screenId];
