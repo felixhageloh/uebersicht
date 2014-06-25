@@ -12,6 +12,8 @@ describe 'widget command server', ->
       exec: (opts, callback) -> callback({toString: -> 'command error'}, '', '')
     billy:
       exec: (opts, callback) -> callback(null, '', 'std error')
+    'kevin spacey':
+      exec: (opts, callback) -> callback(null, 'foo')
 
   fakeWidgetDir =
     get: (id) ->
@@ -27,7 +29,7 @@ describe 'widget command server', ->
 
   describe 'when a widget exists in the widget dir', ->
 
-    it 'should respond to GET /widgets/<id>', (done) ->
+    it 'responds to GET /widgets/<id>', (done) ->
       http.get "http://localhost:8887/widgets/mathew", (response) ->
         expect(response.statusCode).toBe(200)
 
@@ -38,7 +40,19 @@ describe 'widget command server', ->
 
       setTimeout server.push, 100
 
-    it 'should respond with error in case widget command fails', (done) ->
+    it "doesn't brake for widgets with spaces in their name", (done) ->
+      http.get "http://localhost:8887/widgets/kevin%20spacey", (response) ->
+        expect(response.statusCode).toBe(200)
+
+        response.setEncoding('utf8')
+        response.on 'data',  (responseText) ->
+          expect(responseText).toEqual 'foo'
+          done()
+
+      setTimeout server.push, 100
+
+
+    it 'responds with error in case widget command fails', (done) ->
       http.get "http://localhost:8887/widgets/john", (response) ->
         expect(response.statusCode).toBe(500)
 
@@ -49,7 +63,7 @@ describe 'widget command server', ->
 
       setTimeout server.push, 100
 
-    it 'should pass on stderr', (done) ->
+    it 'passes on stderr', (done) ->
       http.get "http://localhost:8887/widgets/billy", (response) ->
         expect(response.statusCode).toBe(500)
 

@@ -1250,9 +1250,10 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, cssId, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
+  cssId = null;
   contentEl = null;
   timer = null;
   render = null;
@@ -1265,6 +1266,7 @@ module.exports = function(implementation) {
       throw new Error(issues.join(', '));
     }
     api.id = (_ref = implementation.id) != null ? _ref : 'widget';
+    cssId = api.id.replace(/\s/g, '_space_');
     api.refreshFrequency = (_ref1 = implementation.refreshFrequency) != null ? _ref1 : 1000;
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
       implementation.css = parseStyle((_ref2 = implementation.style) != null ? _ref2 : defaultStyle);
@@ -1278,7 +1280,7 @@ module.exports = function(implementation) {
   api.create = function() {
     el = document.createElement('div');
     contentEl = document.createElement('div');
-    contentEl.id = api.id;
+    contentEl.id = cssId;
     contentEl.className = 'widget';
     el.innerHTML = "<style>" + implementation.css + "</style>\n";
     el.appendChild(contentEl);
@@ -1366,7 +1368,7 @@ module.exports = function(implementation) {
     if (!style) {
       return "";
     }
-    scopedStyle = ("#" + api.id + "\n  ") + style.replace(/\n/g, "\n  ");
+    scopedStyle = ("#" + cssId + "\n  ") + style.replace(/\n/g, "\n  ");
     return stylus(scopedStyle)["import"]('nib').use(nib()).render();
   };
   validate = function(impl) {
@@ -1398,7 +1400,7 @@ module.exports = function(widgetDir) {
     var parts, widget;
     parts = req.url.replace(/^\//, '').split('/');
     if (parts[0] === 'widgets') {
-      widget = widgetDir.get(parts[1]);
+      widget = widgetDir.get(decodeURI(parts[1]));
     }
     if (widget == null) {
       return next();

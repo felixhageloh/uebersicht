@@ -191,6 +191,12 @@ describe('client', function() {
         command: '',
         refreshFrequency: 1000,
         css: ''
+      },
+      'with space': {
+        id: 'with space',
+        command: '',
+        refreshFrequency: 1000,
+        css: ''
       }
     };
     require('../../client.coffee');
@@ -201,6 +207,7 @@ describe('client', function() {
     }, JSON.stringify(widgets));
     expect(contentEl.find('#foo').length).toBe(1);
     expect(contentEl.find('#bar').length).toBe(1);
+    expect(contentEl.find('#with_space_space').length).toBe(1);
     requestedUrls = (function() {
       var _i, _len, _ref, _results;
       _ref = server.requests;
@@ -213,6 +220,7 @@ describe('client', function() {
     })();
     expect(requestedUrls.indexOf('/widgets/foo')).not.toBe(-1);
     expect(requestedUrls.indexOf('/widgets/bar')).not.toBe(-1);
+    expect(requestedUrls.indexOf('/widgets/with space')).not.toBe(-1);
     clock.tick();
     lastRequest = server.requests[server.requests.length - 1];
     expect(lastRequest.url).toEqual('/widget-changes');
@@ -619,9 +627,10 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, cssId, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
+  cssId = null;
   contentEl = null;
   timer = null;
   render = null;
@@ -634,6 +643,7 @@ module.exports = function(implementation) {
       throw new Error(issues.join(', '));
     }
     api.id = (_ref = implementation.id) != null ? _ref : 'widget';
+    cssId = api.id.replace(/\s/g, '_space_');
     api.refreshFrequency = (_ref1 = implementation.refreshFrequency) != null ? _ref1 : 1000;
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
       implementation.css = parseStyle((_ref2 = implementation.style) != null ? _ref2 : defaultStyle);
@@ -647,7 +657,7 @@ module.exports = function(implementation) {
   api.create = function() {
     el = document.createElement('div');
     contentEl = document.createElement('div');
-    contentEl.id = api.id;
+    contentEl.id = cssId;
     contentEl.className = 'widget';
     el.innerHTML = "<style>" + implementation.css + "</style>\n";
     el.appendChild(contentEl);
@@ -735,7 +745,7 @@ module.exports = function(implementation) {
     if (!style) {
       return "";
     }
-    scopedStyle = ("#" + api.id + "\n  ") + style.replace(/\n/g, "\n  ");
+    scopedStyle = ("#" + cssId + "\n  ") + style.replace(/\n/g, "\n  ");
     return stylus(scopedStyle)["import"]('nib').use(nib()).render();
   };
   validate = function(impl) {

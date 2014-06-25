@@ -4,7 +4,7 @@
 module.exports = (widgetDir) -> (req, res, next) ->
   parts = req.url.replace(/^\//, '').split '/'
 
-  widget = widgetDir.get parts[1] if parts[0] == 'widgets'
+  widget = widgetDir.get decodeURI(parts[1]) if parts[0] == 'widgets'
   return next() unless widget?
 
   widget.exec cwd: widgetDir.path, (err, data, stderr) ->

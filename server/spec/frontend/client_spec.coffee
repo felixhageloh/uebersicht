@@ -18,7 +18,8 @@ describe 'client', ->
   it 'should manage widgets on the frontend', ->
     widgets = {
       foo: { id: 'foo', command: '', refreshFrequency: 1000, css: '' },
-      bar: { id: 'bar', command: '', refreshFrequency: 1000, css: '' }
+      bar: { id: 'bar', command: '', refreshFrequency: 1000, css: '' },
+      'with space': { id: 'with space', command: '', refreshFrequency: 1000, css: '' }
     }
 
     require '../../client.coffee'
@@ -29,11 +30,13 @@ describe 'client', ->
 
     expect(contentEl.find('#foo').length).toBe 1
     expect(contentEl.find('#bar').length).toBe 1
+    expect(contentEl.find('#with_space_space').length).toBe 1
 
     # check that widgets are started
     requestedUrls = (req.url for req in server.requests)
     expect(requestedUrls.indexOf('/widgets/foo')).not.toBe -1
     expect(requestedUrls.indexOf('/widgets/bar')).not.toBe -1
+    expect(requestedUrls.indexOf('/widgets/with space')).not.toBe -1
 
     # check that changes are requested and applied
     clock.tick()

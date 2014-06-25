@@ -10,6 +10,7 @@ nib      = require('nib')
 module.exports = (implementation) ->
   api   = {}
   el        = null
+  cssId     = null
   contentEl = null
   timer     = null
   render    = null
@@ -24,6 +25,7 @@ module.exports = (implementation) ->
       throw new Error(issues.join(', '))
 
     api.id = implementation.id ? 'widget'
+    cssId  = api.id.replace(/\s/g, '_space_')
     api.refreshFrequency = implementation.refreshFrequency ? 1000
 
     unless implementation.css? or window? # we are client side
@@ -37,7 +39,7 @@ module.exports = (implementation) ->
   api.create  = ->
     el        = document.createElement 'div'
     contentEl = document.createElement 'div'
-    contentEl.id        = api.id
+    contentEl.id        = cssId
     contentEl.className = 'widget'
     el.innerHTML = "<style>#{implementation.css}</style>\n"
     el.appendChild(contentEl)
@@ -104,7 +106,8 @@ module.exports = (implementation) ->
 
   parseStyle = (style) ->
     return "" unless style
-    scopedStyle = "##{api.id}\n  " + style.replace(/\n/g, "\n  ")
+
+    scopedStyle = "##{cssId}\n  " + style.replace(/\n/g, "\n  ")
     stylus(scopedStyle)
       .import('nib')
       .use(nib())
@@ -120,6 +123,5 @@ module.exports = (implementation) ->
     str = "[#{api.id}] #{err.toString?() or err.message}"
     str += "\n  in #{err.stack.split('\n')[0]}()" if err.stack
     str
-
 
   init()
