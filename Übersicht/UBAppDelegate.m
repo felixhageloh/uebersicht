@@ -178,7 +178,7 @@
         if (CGDisplayIsInMirrorSet(displays[i]))
             continue;
         
-        title   = [NSString stringWithFormat:@"Show in Display %u", screenIdx];
+        title   = [NSString stringWithFormat:@"Show on display #%u (%@)", i+1, [self screenNameForDisplay:displays[i]]];
         newItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(screenWasSelected:) keyEquivalent:@""];
         
         [newItem setState:(displays[i] == [self getScreenId:window.screen] ? NSOnState : NSOffState)];
@@ -188,6 +188,16 @@
         
         screenIdx++;
     }
+}
+
+- (NSString*)screenNameForDisplay:(CGDirectDisplayID) displayID
+{
+    NSDictionary *deviceInfo = (__bridge NSDictionary *)IODisplayCreateInfoDictionary(CGDisplayIOServicePort(displayID), kIODisplayOnlyPreferredName);
+    NSDictionary *localizedNames = [deviceInfo objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
+    if ([localizedNames count] > 0) {
+    	return [localizedNames objectForKey:[[localizedNames allKeys] objectAtIndex:0]];
+    }
+    return nil;
 }
 
 - (void)removeScreensFromMenu:(NSMenu*)menu
