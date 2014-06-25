@@ -162,35 +162,38 @@
 {
     NSString *title;
     NSMenuItem *newItem;
-    NSScreen *screen;
 
-    
     NSInteger index = [self indexOfScreenMenuItems:menu];
     newItem = [NSMenuItem separatorItem];
-    [newItem setTag:42];
+    [newItem setRepresentedObject:@"screen"];
     [menu insertItem:newItem atIndex:index];
     
-    for(int i = 0; i < [NSScreen.screens count]; i++) {
-        
-        if (CGDisplayIsInMirrorSet([[[screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue]))
+    CGDirectDisplayID displays[20];
+    uint32_t numDisplays;
+    
+    CGGetActiveDisplayList(20, displays, &numDisplays);
+    
+    int screenIdx = 1;
+    for(int i = 0; i < numDisplays; i++) {
+        if (CGDisplayIsInMirrorSet(displays[i]))
             continue;
         
-        title   = [NSString stringWithFormat:@"Show in Display %u", i+1];
-        screen  = [NSScreen screens][i];
+        title   = [NSString stringWithFormat:@"Show in Display %u", screenIdx];
         newItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(screenWasSelected:) keyEquivalent:@""];
         
-        [newItem setTag:42];
-        
-        [newItem setState:(screen == window.screen ? NSOnState : NSOffState)];
-        [newItem setRepresentedObject:screen];
+        [newItem setState:(displays[i] == [self getScreenId:window.screen] ? NSOnState : NSOffState)];
+        [newItem setTag:displays[i]];
+        [newItem setRepresentedObject:@"screen"];
         [menu insertItem:newItem atIndex:index+i];
+        
+        screenIdx++;
     }
 }
 
 - (void)removeScreensFromMenu:(NSMenu*)menu
 {
     for (NSMenuItem *item in [menu itemArray]){
-        if ([item tag] == 42 || [item.representedObject isKindOfClass:NSScreen.class]) {
+        if ([item.representedObject isEqualToString:@"screen"]) {
             [menu removeItem:item];
         }
     }
@@ -199,7 +202,6 @@
 - (void)screenWasSelected:(id)sender
 {
     NSMenu *menu = [sender menu];
-    NSScreen *screen = [(NSMenuItem*)sender representedObject];
     
     NSInteger index = [self indexOfScreenMenuItems:menu];
     NSInteger lastIndex = index + [NSScreen.screens count];
@@ -209,28 +211,24 @@
     }
     
     [sender setState:NSOnState];
-    [self sendWindowToScreen:[self getScreenId:screen]];
+    [self sendWindowToScreen:(CGDirectDisplayID)[sender tag]];
 }
 
 - (void)screensChanged:(id)sender
 {
-    //NSLog(@"==================================== %i", lastScreen);
-    [self removeScreensFromMenu:statusBarMenu];
-    
-    if ([NSScreen.screens count] > 1)
-        [self addScreensToMenu:statusBarMenu];
-    
-    BOOL foundScreenAgain = NO;
-
     CGDirectDisplayID displays[20];
     uint32_t numDisplays;
     uint32 screenId;
-
-    CGGetActiveDisplayList(20, displays, &numDisplays);
+    BOOL foundScreenAgain = NO;
     
-    //for (NSScreen *screen in [NSScreen screens]) {
-    for (uint32 i = 0; i < numDisplays; i++) {
-        //screenId = [[[window.screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue];
+    CGGetActiveDisplayList(20, displays, &numDisplays);
+
+    [self removeScreensFromMenu:statusBarMenu];
+    
+    if (numDisplays > 1)
+        [self addScreensToMenu:statusBarMenu];
+    
+    for (int i = 0; i < numDisplays; i++) {
         screenId = displays[i];
         if (CGDisplayIsInMirrorSet(screenId))
             continue;
@@ -254,10 +252,12 @@
 
 - (void)sendWindowToScreen:(CGDirectDisplayID)screenId
 {
-    [window fillScreen:CGDisplayBounds(screenId)];
-//    uint32 screenId = [[[screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue];
-//    lastScreen = CGDisplayUnitNumber(screenId);
-//    NSLog(@"curr screen %i", lastScreen);
+    CGRect screenRect = CGDisplayBounds(screenId);
+    CGRect  mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
+    // flip coordinates
+    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height - mainScreenRect.size.height);
+    
+    [window fillScreen:screenRect];
     lastScreen = CGDisplayUnitNumber(screenId);
 }
 
