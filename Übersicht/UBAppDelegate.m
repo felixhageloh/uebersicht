@@ -21,7 +21,7 @@
     UBPreferencesController* preferences;
     BOOL keepServerAlive;
     WebInspector *inspector;
-    uint32 lastScreen;
+    uint32 lastScreenNumber;
 }
 
 @synthesize window;
@@ -153,6 +153,20 @@
     return task;
 }
 
+- (void)notifyUser:(NSString*)message withTitle:(NSString*)title
+{
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
+    notification.title = title;
+    notification.informativeText = message;
+    
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+}
+
+#
+#pragma mark status bar menu handling
+#
+
+// TODO: move these in a controller
 -(NSInteger)indexOfScreenMenuItems:(NSMenu*)menu
 {
     return [menu indexOfItem:[menu itemWithTitle:@"Check for Updates..."]] + 2;
@@ -173,20 +187,15 @@
     
     CGGetActiveDisplayList(20, displays, &numDisplays);
     
-    int screenIdx = 1;
     for(int i = 0; i < numDisplays; i++) {
         if (CGDisplayIsInMirrorSet(displays[i]))
             continue;
         
         title   = [NSString stringWithFormat:@"Show on %@", [self screenNameForDisplay:displays[i]]];
         newItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(screenWasSelected:) keyEquivalent:@""];
-        
-        [newItem setState:(displays[i] == [self getScreenId:window.screen] ? NSOnState : NSOffState)];
         [newItem setTag:displays[i]];
         [newItem setRepresentedObject:@"screen"];
         [menu insertItem:newItem atIndex:index+i];
-        
-        screenIdx++;
     }
 }
 
@@ -209,20 +218,22 @@
     }
 }
 
-- (void)screenWasSelected:(id)sender
+// could probably use bindings for that
+- (void)markScreen:(CGDirectDisplayID)screenId inMenu:(NSMenu*)menu
 {
-    NSMenu *menu = [sender menu];
-    
-    NSInteger index = [self indexOfScreenMenuItems:menu];
-    NSInteger lastIndex = index + [NSScreen.screens count];
-    
-    for (;index < lastIndex; index++) {
-        [[menu itemAtIndex:index] setState:NSOffState];
+    for (NSMenuItem *item in [menu itemArray]){
+        if (![item.representedObject isEqualToString:@"screen"])
+            continue;
+        
+        [item setState:(item.tag == screenId ? NSOnState : NSOffState)];
     }
-    
-    [sender setState:NSOnState];
-    [self sendWindowToScreen:(CGDirectDisplayID)[sender tag]];
 }
+
+
+#
+#pragma mark Screen Handling
+#
+
 
 - (void)screensChanged:(id)sender
 {
@@ -243,7 +254,7 @@
         if (CGDisplayIsInMirrorSet(screenId))
             continue;
         
-        if (lastScreen == CGDisplayUnitNumber(screenId)) {
+        if (lastScreenNumber == CGDisplayUnitNumber(screenId)) {
             foundScreenAgain = YES;
             [self sendWindowToScreen:screenId];
         }
@@ -254,11 +265,6 @@
         
 }
 
-- (CGDirectDisplayID)getScreenId:(NSScreen*) screen
-{
-    return [[[screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue];
-}
-
 - (void)sendWindowToScreen:(CGDirectDisplayID)screenId
 {
     CGRect screenRect = CGDisplayBounds(screenId);
@@ -267,7 +273,19 @@
     screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height - mainScreenRect.size.height);
     
     [window fillScreen:screenRect];
-    lastScreen = CGDisplayUnitNumber(screenId);
+    lastScreenNumber = CGDisplayUnitNumber(screenId);
+    
+    [self markScreen:screenId inMenu:statusBarMenu];
+}
+
+
+#
+# pragma mark received actions
+#
+
+- (void)screenWasSelected:(id)sender
+{
+    [self sendWindowToScreen:(CGDirectDisplayID)[sender tag]];
 }
 
 - (void)widgetDirDidChange
@@ -280,14 +298,6 @@
     }
 }
 
-- (void)notifyUser:(NSString*)message withTitle:(NSString*)title
-{
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
-    notification.title = title;
-    notification.informativeText = message;
-
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-}
 
 - (IBAction)showPreferences:(id)sender
 {
@@ -311,6 +321,10 @@
     [window setLevel:kCGNormalWindowLevel-1];
 
 }
+
+#
+# pragma mark debug console handling
+#
 
 - (void)aWindowClosed:(NSNotification *)notification
 {
