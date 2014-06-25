@@ -178,7 +178,7 @@
         if (CGDisplayIsInMirrorSet(displays[i]))
             continue;
         
-        title   = [NSString stringWithFormat:@"Show on display #%u (%@)", i+1, [self screenNameForDisplay:displays[i]]];
+        title   = [NSString stringWithFormat:@"Show on %@", [self screenNameForDisplay:displays[i]]];
         newItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(screenWasSelected:) keyEquivalent:@""];
         
         [newItem setState:(displays[i] == [self getScreenId:window.screen] ? NSOnState : NSOffState)];
