@@ -176,6 +176,7 @@
 {
     NSString *title;
     NSMenuItem *newItem;
+    NSString *name;
 
     NSInteger index = [self indexOfScreenMenuItems:menu];
     newItem = [NSMenuItem separatorItem];
@@ -191,7 +192,11 @@
         if (CGDisplayIsInMirrorSet(displays[i]))
             continue;
         
-        title   = [NSString stringWithFormat:@"Show on %@", [self screenNameForDisplay:displays[i]]];
+        name = [self screenNameForDisplay:displays[i]];
+        if (!name)
+            name = [NSString stringWithFormat:@"Display %i", i];
+
+        title   = [NSString stringWithFormat:@"Show on %@", name];
         newItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(screenWasSelected:) keyEquivalent:@""];
         [newItem setTag:displays[i]];
         [newItem setRepresentedObject:@"screen"];
@@ -199,14 +204,26 @@
     }
 }
 
-- (NSString*)screenNameForDisplay:(CGDirectDisplayID) displayID
+- (NSString*)screenNameForDisplay:(CGDirectDisplayID)displayID
 {
-    NSDictionary *deviceInfo = (__bridge NSDictionary *)IODisplayCreateInfoDictionary(CGDisplayIOServicePort(displayID), kIODisplayOnlyPreferredName);
-    NSDictionary *localizedNames = [deviceInfo objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
-    if ([localizedNames count] > 0) {
-    	return [localizedNames objectForKey:[[localizedNames allKeys] objectAtIndex:0]];
+    if (CGDisplayIsBuiltin(displayID)) {
+        return @"Built-in Display";
     }
-    return nil;
+    
+    CFDictionaryRef deviceInfo = getDisplayInfoDictionary(displayID);
+    
+    if (!deviceInfo) {
+        return nil;
+    }
+    
+    NSString *name = nil;
+    NSDictionary *localizedNames = [(__bridge NSDictionary *)deviceInfo
+                                    objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
+    if ([localizedNames count] > 0) {
+    	name = [localizedNames objectForKey:[[localizedNames allKeys] objectAtIndex:0]];
+    }
+    CFRelease(deviceInfo);
+    return name;
 }
 
 - (void)removeScreensFromMenu:(NSMenu*)menu
@@ -218,7 +235,7 @@
     }
 }
 
-// could probably use bindings for that
+// could probably use bindings for this
 - (void)markScreen:(CGDirectDisplayID)screenId inMenu:(NSMenu*)menu
 {
     for (NSMenuItem *item in [menu itemArray]){
@@ -228,6 +245,49 @@
         [item setState:(item.tag == screenId ? NSOnState : NSOffState)];
     }
 }
+
+// can't belive you are making. me. do. this.
+static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
+{
+    CFDictionaryRef info;
+    io_iterator_t iter;
+    io_service_t serv;
+    
+    CFMutableDictionaryRef matching = IOServiceMatching("IODisplayConnect");
+    
+    // releases matching for us
+    kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &iter);
+    if (err) return NULL;
+    
+    while ((serv = IOIteratorNext(iter)) != 0)
+    {
+        
+        CFIndex vendorID, productID;
+        CFNumberRef vendorIDRef, productIDRef;
+        Boolean success;
+        
+        info = IODisplayCreateInfoDictionary(serv,kIODisplayOnlyPreferredName);
+        
+        vendorIDRef  = CFDictionaryGetValue(info, CFSTR(kDisplayVendorID));
+        productIDRef = CFDictionaryGetValue(info, CFSTR(kDisplayProductID));
+        
+        success  = CFNumberGetValue(vendorIDRef, kCFNumberCFIndexType, &vendorID);
+        success &= CFNumberGetValue(productIDRef, kCFNumberCFIndexType, &productID);
+        
+        if (!success || CGDisplayVendorNumber(displayID) != vendorID ||
+            CGDisplayModelNumber(displayID)  != productID) {
+            CFRelease(info);
+            continue;
+        }
+        
+        break;
+    }
+    
+    IOObjectRelease(serv);
+    IOObjectRelease(iter);
+    return info;
+}
+
 
 
 #
@@ -268,7 +328,7 @@
 - (void)sendWindowToScreen:(CGDirectDisplayID)screenId
 {
     CGRect screenRect = CGDisplayBounds(screenId);
-    CGRect  mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
+    CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
     // flip coordinates
     screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height - mainScreenRect.size.height);
     
