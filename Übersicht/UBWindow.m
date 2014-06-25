@@ -45,10 +45,6 @@
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(makeFullscreen)
-                                                     name:NSApplicationDidChangeScreenParametersNotification
-                                                   object:nil];
 
         [[NSWorkspace sharedWorkspace].notificationCenter addObserver:self
                                                              selector:@selector(onWorkspaceChange:)
@@ -67,7 +63,6 @@
 - (void) awakeFromNib
 {
     [self initWebView];
-    [self makeFullscreen];
     prevWallpaperUrl = [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] absoluteURL];
     prevWallpaperOptions =  [[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:[self screen]];
 }
@@ -92,9 +87,8 @@
     }
 }
 
-- (void)makeFullscreen
+- (void)fillScreen:(NSRect)fullscreen
 {
-    NSRect fullscreen = [[self screen] frame];
 
     int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
 

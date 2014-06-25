@@ -19,5 +19,6 @@
 @property (weak) IBOutlet WebView *webView;
 
 - (void)loadUrl:(NSString*)url;
+- (void)fillScreen:(NSRect)screenFrame;
 
 @end

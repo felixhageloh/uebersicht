@@ -21,6 +21,7 @@
     UBPreferencesController* preferences;
     BOOL keepServerAlive;
     WebInspector *inspector;
+    uint32 lastScreen;
 }
 
 @synthesize window;
@@ -30,9 +31,19 @@
 {
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     preferences   = [[UBPreferencesController alloc] initWithWindowNibName:@"UBPreferencesController"];
+    
+    if ([NSScreen.screens count] > 1)
+        [self addScreensToMenu:statusBarMenu];
+    
+    [self sendWindowToScreen:CGMainDisplayID()];
 
     keepServerAlive = YES;
     [self startServer];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(screensChanged:)
+                                                 name:NSApplicationDidChangeScreenParametersNotification
+                                               object:nil];
 
     // enable the web inspector
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
@@ -140,6 +151,114 @@
 
     [task launch];
     return task;
+}
+
+-(NSInteger)indexOfScreenMenuItems:(NSMenu*)menu
+{
+    return [menu indexOfItem:[menu itemWithTitle:@"Check for Updates..."]] + 2;
+}
+
+- (void)addScreensToMenu:(NSMenu*)menu
+{
+    NSString *title;
+    NSMenuItem *newItem;
+    NSScreen *screen;
+
+    
+    NSInteger index = [self indexOfScreenMenuItems:menu];
+    newItem = [NSMenuItem separatorItem];
+    [newItem setTag:42];
+    [menu insertItem:newItem atIndex:index];
+    
+    for(int i = 0; i < [NSScreen.screens count]; i++) {
+        
+        if (CGDisplayIsInMirrorSet([[[screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue]))
+            continue;
+        
+        title   = [NSString stringWithFormat:@"Show in Display %u", i+1];
+        screen  = [NSScreen screens][i];
+        newItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(screenWasSelected:) keyEquivalent:@""];
+        
+        [newItem setTag:42];
+        
+        [newItem setState:(screen == window.screen ? NSOnState : NSOffState)];
+        [newItem setRepresentedObject:screen];
+        [menu insertItem:newItem atIndex:index+i];
+    }
+}
+
+- (void)removeScreensFromMenu:(NSMenu*)menu
+{
+    for (NSMenuItem *item in [menu itemArray]){
+        if ([item tag] == 42 || [item.representedObject isKindOfClass:NSScreen.class]) {
+            [menu removeItem:item];
+        }
+    }
+}
+
+- (void)screenWasSelected:(id)sender
+{
+    NSMenu *menu = [sender menu];
+    NSScreen *screen = [(NSMenuItem*)sender representedObject];
+    
+    NSInteger index = [self indexOfScreenMenuItems:menu];
+    NSInteger lastIndex = index + [NSScreen.screens count];
+    
+    for (;index < lastIndex; index++) {
+        [[menu itemAtIndex:index] setState:NSOffState];
+    }
+    
+    [sender setState:NSOnState];
+    [self sendWindowToScreen:[self getScreenId:screen]];
+}
+
+- (void)screensChanged:(id)sender
+{
+    //NSLog(@"==================================== %i", lastScreen);
+    [self removeScreensFromMenu:statusBarMenu];
+    
+    if ([NSScreen.screens count] > 1)
+        [self addScreensToMenu:statusBarMenu];
+    
+    BOOL foundScreenAgain = NO;
+
+    CGDirectDisplayID displays[20];
+    uint32_t numDisplays;
+    uint32 screenId;
+
+    CGGetActiveDisplayList(20, displays, &numDisplays);
+    
+    //for (NSScreen *screen in [NSScreen screens]) {
+    for (uint32 i = 0; i < numDisplays; i++) {
+        //screenId = [[[window.screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue];
+        screenId = displays[i];
+        if (CGDisplayIsInMirrorSet(screenId))
+            continue;
+        
+        NSLog(@"%i", CGDisplayUnitNumber(screenId));
+        if (lastScreen == CGDisplayUnitNumber(screenId)) {
+            foundScreenAgain = YES;
+            [self sendWindowToScreen:screenId];
+        }
+    }
+    
+    if (!foundScreenAgain)
+        [self sendWindowToScreen:CGMainDisplayID()];
+        
+}
+
+- (CGDirectDisplayID)getScreenId:(NSScreen*) screen
+{
+    return [[[screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue];
+}
+
+- (void)sendWindowToScreen:(CGDirectDisplayID)screenId
+{
+    [window fillScreen:CGDisplayBounds(screenId)];
+//    uint32 screenId = [[[screen deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue];
+//    lastScreen = CGDisplayUnitNumber(screenId);
+//    NSLog(@"curr screen %i", lastScreen);
+    lastScreen = CGDisplayUnitNumber(screenId);
 }
 
 - (void)widgetDirDidChange
