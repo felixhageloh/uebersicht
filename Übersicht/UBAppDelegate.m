@@ -371,15 +371,19 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     [[NSWorkspace sharedWorkspace]openURL:preferences.widgetDir];
 }
 
+- (IBAction)refreshWidgets:(id)sender
+{
+    [window.webView reload:sender];
+}
+
 - (IBAction)showDebugConsole:(id)sender
 {
     if (!inspector) {
         inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
 
+    [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
-    [window setLevel:kCGNormalWindowLevel-1];
-
 }
 
 #

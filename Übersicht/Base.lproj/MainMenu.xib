@@ -691,6 +691,12 @@
                         <action selector="openWidgetDir:" target="494" id="dH8-iw-QzP"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Refresh All Widgets" id="wAr-ms-Hyi">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="refreshWidgets:" target="494" id="FyP-k0-ed8"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Show Debug Console" id="mKH-1l-jB3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -712,6 +718,7 @@
                     </connections>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="438.5" y="292.5"/>
         </menu>
     </objects>
 </document>
