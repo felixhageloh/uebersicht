@@ -87,9 +87,9 @@
     }
 }
 
-- (void)fillScreen:(NSRect)fullscreen
+- (void)fillScreen:(CGDirectDisplayID)screenId
 {
-
+    NSRect fullscreen = [self toQuartzCoordinates:CGDisplayBounds(screenId)];
     int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
 
     fullscreen.size.height = fullscreen.size.height - menuBarHeight;
@@ -97,11 +97,20 @@
     [self onWorkspaceChange:nil];
 }
 
+// old coordinate system is flipped
+- (NSRect)toQuartzCoordinates:(NSRect)screenRect
+{
+    CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
 
+    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height - mainScreenRect.size.height);
+    
+    return screenRect;
+}
 
 - (NSString*)wallpaperDataUrl
 {
-    CGImageRef cgImage = CGWindowListCreateImage([self screen].frame,
+    
+    CGImageRef cgImage = CGWindowListCreateImage([self toQuartzCoordinates:self.screen.frame],
                                                  kCGWindowListOptionOnScreenBelowWindow,
                                                  (CGWindowID)[self windowNumber],
                                                  kCGWindowImageDefault);

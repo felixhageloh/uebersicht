@@ -327,12 +327,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
 
 - (void)sendWindowToScreen:(CGDirectDisplayID)screenId
 {
-    CGRect screenRect = CGDisplayBounds(screenId);
-    CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
-    // flip coordinates
-    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height - mainScreenRect.size.height);
-    
-    [window fillScreen:screenRect];
+    [window fillScreen:screenId];
     lastScreenNumber = CGDisplayUnitNumber(screenId);
     
     [self markScreen:screenId inMenu:statusBarMenu];
@@ -381,7 +376,8 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     if (!inspector) {
         inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
-
+    
+    [window setLevel:kCGNormalWindowLevel-1];
     [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
 }
