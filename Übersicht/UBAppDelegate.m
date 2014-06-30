@@ -15,6 +15,8 @@
 #import "UBPreferencesController.m"
 #import "WebInspector.h"
 
+int const MAX_DISPLAYS;
+
 @implementation UBAppDelegate {
     NSStatusItem* statusBarItem;
     NSTask* widgetServer;
@@ -174,17 +176,17 @@
     NSString *title;
     NSMenuItem *newItem;
     NSString *name;
-    NSMutableDictionary *nameList = [[NSMutableDictionary alloc] initWithCapacity:20];
+    NSMutableDictionary *nameList = [[NSMutableDictionary alloc] initWithCapacity:MAX_DISPLAYS];
 
     NSInteger index = [self indexOfScreenMenuItems:menu];
     newItem = [NSMenuItem separatorItem];
     [newItem setRepresentedObject:@"screen"];
     [menu insertItem:newItem atIndex:index];
     
-    CGDirectDisplayID displays[20];
+    CGDirectDisplayID displays[MAX_DISPLAYS];
     uint32_t numDisplays;
     
-    CGGetActiveDisplayList(20, displays, &numDisplays);
+    CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
     
     for(int i = 0; i < numDisplays; i++) {
         if (CGDisplayIsInMirrorSet(displays[i]))
@@ -255,7 +257,7 @@
 // can't belive you are making. me. do. this.
 static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
 {
-    CFDictionaryRef info;
+    CFDictionaryRef info = nil;
     io_iterator_t iter;
     io_service_t serv;
     
@@ -263,7 +265,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     
     // releases matching for us
     kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &iter);
-    if (err) return NULL;
+    if (err) return nil;
     
     while ((serv = IOIteratorNext(iter)) != 0)
     {
@@ -303,11 +305,11 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
 
 - (void)screensChanged:(id)sender
 {
-    CGDirectDisplayID displays[20];
+    CGDirectDisplayID displays[MAX_DISPLAYS];
     uint32_t numDisplays;
     uint32 screenId;
     
-    CGGetActiveDisplayList(20, displays, &numDisplays);
+    CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
 
     [self removeScreensFromMenu:statusBarMenu];
     
@@ -315,7 +317,8 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
         [self addScreensToMenu:statusBarMenu];
     }
     
-    // Most recently preferred screens will be listed first, so the first match we found will be the preferred screen.
+    // Most recently preferred screens will be listed first,
+    // so the first match we found will be the preferred screen.
     NSArray* preferredScreens = [self getPreferredScreens];
     for (int i = 0; i < preferredScreens.count; i++) {
         NSInteger preferredScreenNumber = [preferredScreens[i] integerValue];
@@ -364,7 +367,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     [preferredScreens removeObject:displayNumber];
     // Most recently preferred screens are at the beginning of the array
     [preferredScreens insertObject:displayNumber atIndex:0];
-
+    
     [[NSUserDefaults standardUserDefaults]
      setObject:preferredScreens forKey:@"preferredScreens"];
     [[NSUserDefaults standardUserDefaults] synchronize];
