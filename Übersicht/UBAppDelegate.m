@@ -177,6 +177,7 @@
     NSString *title;
     NSMenuItem *newItem;
     NSString *name;
+    NSMutableDictionary *nameList = [[NSMutableDictionary alloc] initWithCapacity:20];
 
     NSInteger index = [self indexOfScreenMenuItems:menu];
     newItem = [NSMenuItem separatorItem];
@@ -195,7 +196,15 @@
         name = [self screenNameForDisplay:displays[i]];
         if (!name)
             name = [NSString stringWithFormat:@"Display %i", i];
-
+        
+        NSNumber *count;
+        if ((count = nameList[name])) {
+            nameList[name] = [NSNumber numberWithInt:count.intValue+1];
+            name = [name stringByAppendingString:[NSString stringWithFormat:@" (%i)", count.intValue+1]];
+        } else {
+            nameList[name] = [NSNumber numberWithInt:1];
+        }
+       
         title   = [NSString stringWithFormat:@"Show on %@", name];
         newItem = [[NSMenuItem alloc] initWithTitle:title action:@selector(screenWasSelected:) keyEquivalent:@""];
         [newItem setTag:displays[i]];
