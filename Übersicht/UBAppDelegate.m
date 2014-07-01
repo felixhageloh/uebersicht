@@ -15,7 +15,7 @@
 #import "UBPreferencesController.m"
 #import "WebInspector.h"
 
-int const MAX_DISPLAYS;
+int const MAX_DISPLAYS = 42;
 
 @implementation UBAppDelegate {
     NSStatusItem* statusBarItem;
