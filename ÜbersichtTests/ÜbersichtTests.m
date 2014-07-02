@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import "UBAppDelegate.h"
+#import "UBWindow.h"
 
 @interface ÜbersichtTests : XCTestCase
 @end
@@ -27,15 +28,19 @@
     [super tearDown];
 }
 
-- (void)testMainViewIsFullscreen
+- (void)testWindowIsFullscreen
 {
-    XCTAssertNotNil(deletgate.mainView);
+    XCTAssertNotNil(deletgate.window);
     
     // view should occupy the entire screen minus the menubar
-    NSRect viewFrame         = [deletgate.mainView frame];
+    NSRect windowFrame       = [deletgate.window frame];
     NSRect screenFrame       = [[NSScreen mainScreen] frame];
     screenFrame.size.height -= [[NSApp mainMenu] menuBarHeight];
-    XCTAssertEqual(viewFrame, screenFrame);
+    
+    XCTAssertEqual(windowFrame.size.width, screenFrame.size.width);
+    XCTAssertEqual(windowFrame.size.height, screenFrame.size.height);
+    XCTAssertEqual(windowFrame.origin.x, screenFrame.origin.x);
+    XCTAssertEqual(windowFrame.origin.y, screenFrame.origin.y);
 }
 
 - (void)testServerTask
