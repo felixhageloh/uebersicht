@@ -10,7 +10,7 @@ init = ->
   contentEl.innerHTML = ''
   getWidgets (err, widgetSettings) ->
     console.log err if err?
-    return setTimeout init, 10000 if err?
+    return setTimeout bail, 10000 if err?
     initWidgets widgetSettings
     setTimeout getChanges
 
@@ -30,7 +30,7 @@ getChanges = ->
           initWidgets widgetUpdates if widgetUpdates
       getChanges()
     )
-    .fail -> setTimeout init, 10000
+    .fail -> bail()
 
 initWidgets = (widgetSettings) ->
   for id, settings of widgetSettings
@@ -57,6 +57,9 @@ deserializeWidgets = (data) ->
     console.error e
 
   deserialized
+
+bail = ->
+  window.location.reload(true)
 
 logError = (serialized) ->
   try

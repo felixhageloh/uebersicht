@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, widgets;
+var Widget, bail, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, widgets;
 
 Widget = require('./src/widget.coffee');
 
@@ -17,7 +17,7 @@ init = function() {
       console.log(err);
     }
     if (err != null) {
-      return setTimeout(init, 10000);
+      return setTimeout(bail, 10000);
     }
     initWidgets(widgetSettings);
     return setTimeout(getChanges);
@@ -49,7 +49,7 @@ getChanges = function() {
     }
     return getChanges();
   }).fail(function() {
-    return setTimeout(init, 10000);
+    return bail();
   });
 };
 
@@ -90,6 +90,10 @@ deserializeWidgets = function(data) {
     console.error(e);
   }
   return deserialized;
+};
+
+bail = function() {
+  return window.location.reload(true);
 };
 
 logError = function(serialized) {
