@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,300italic' rel='stylesheet' type='text/css'>
-  <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
   <title>Übersicht</title>
   <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
@@ -112,8 +110,26 @@
       ga('send', 'event', 'download', 'app');
     })
 
-    hljs.initHighlightingOnLoad()
+    hljs.initHighlightingOnLoad();
   };
+
+  setTimeout(function () {
+    var styleTag
+      , styles = [
+      "main.css",
+      "http://fonts.googleapis.com/css?family=Ubuntu:300,300italic",
+      "http://fonts.googleapis.com/css?family=Ubuntu+Mono"
+    ];
+
+    for(var i=0; i < styles.length; i++) {
+      styleTag = document.createElement('link');
+      styleTag.rel  = 'stylesheet';
+      styleTag.type = 'text/css';
+      styleTag.href = styles[i];
+      document.body.appendChild(styleTag);
+    }
+  });
+
 </script>
 
 <script src='js/libs.js' type="text/javascript" async onload='init()'></script>
