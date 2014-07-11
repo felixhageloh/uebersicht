@@ -7,10 +7,13 @@
 
 In essence, widgets are plain JavaScript objects that define a few key properties and methods. They need to be defined in a single file with a `.js` or `.coffee` extension for Übersicht to pick them up. Übersicht will listen to file changes inside your widget directory, so you can edit widgets and see the result live.
 
-They can also be written in [CoffeeScript](http://coffeescript.org) which has a cleaner multi-line string syntax that comes in handy in several places. This documentation will use the CoffeScript syntax. The following properties and methods are currently supported:
+They can also be written in [CoffeeScript](http://coffeescript.org) which has a cleaner multi-line string syntax that comes in handy in several places. This documentation will use the CoffeScript syntax, but here is a small example widget [in pure JavaScript](https://gist.github.com/felixhageloh/34645a899a0f22f583bb). As an alternative, you could use CoffeScript's back-tick <tt>`</tt> operator to only write the relevant parts in JavaScript.
+
+The following properties and methods are currently supported:
 
 
-### command `required`
+### command
+> _required_
 
 
 A **string** containing the shell command to be executed, for example:
