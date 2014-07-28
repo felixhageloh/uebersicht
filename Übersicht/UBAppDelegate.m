@@ -94,8 +94,10 @@ int const MAX_DISPLAYS = 42;
     NSStatusItem* item;
 
     item = [bar statusItemWithLength: NSSquareStatusItemLength];
-
-    [item setImage:[[NSBundle mainBundle] imageForResource:@"status-icon"]];
+    
+    NSImage *image = [[NSBundle mainBundle] imageForResource:@"status-icon"];
+    [image setTemplate:YES];
+    [item setImage: image];
     [item setHighlightMode:YES];
     [item setMenu:aMenu];
     [item setEnabled:YES];
