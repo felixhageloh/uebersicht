@@ -408,6 +408,11 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     [[NSWorkspace sharedWorkspace]openURL:preferences.widgetDir];
 }
 
+- (IBAction)visitWidgetGallery:(id)sender
+{
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://tracesof.net/uebersicht-widgets/"]];
+}
+
 - (IBAction)refreshWidgets:(id)sender
 {
     [window.webView reload:sender];
