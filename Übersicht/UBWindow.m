@@ -107,20 +107,24 @@
     return screenRect;
 }
 
-- (NSString*)wallpaperDataUrl
+- (NSData*)wallpaper
 {
-    
     CGImageRef cgImage = CGWindowListCreateImage([self toQuartzCoordinates:self.screen.frame],
                                                  kCGWindowListOptionOnScreenBelowWindow,
                                                  (CGWindowID)[self windowNumber],
                                                  kCGWindowImageDefault);
-
+    
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
-    NSData *imgData = [bitmapRep representationUsingType:NSPNGFileType properties:nil];
-
-    NSString *base64 = [imgData base64EncodedStringWithOptions:0];
-
     CGImageRelease(cgImage);
+    
+    return [bitmapRep representationUsingType:NSPNGFileType properties:nil];
+}
+    
+- (NSString*)wallpaperDataUrl
+{
+    NSString *base64 = [self.wallpaper base64EncodedStringWithOptions:0];
+
+    
     return [@"data:image/png;base64, " stringByAppendingString:base64];
 }
 
