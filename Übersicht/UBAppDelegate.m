@@ -69,6 +69,9 @@ int const PORT         = 41416;
     
     [MASShortcut registerGlobalShortcutWithUserDefaultsKey:kPreferenceGlobalShortcut handler:^{
         [window setLevel:kCGNormalWindowLevel-1];
+        [NSApp activateIgnoringOtherApps:YES];
+        [window makeKeyAndOrderFront:self];
+        
     }];
 }
 

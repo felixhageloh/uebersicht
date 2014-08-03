@@ -18,6 +18,7 @@
 @implementation UBWindow {
     NSURL *prevWallpaperUrl;
     NSDictionary *prevWallpaperOptions;
+    NSString *widgetsUrl;
 }
 
 @synthesize webView;
@@ -72,10 +73,12 @@
     [webView setDrawsBackground:NO];
     [webView setMaintainsBackForwardList:NO];
     [webView setFrameLoadDelegate:self];
+    [webView setResourceLoadDelegate:self];
 }
 
 - (void)loadUrl:(NSString*)url
 {
+    widgetsUrl = url;
     [webView setMainFrameURL:url];
 }
 
@@ -96,6 +99,19 @@
 - (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error
                                                          forFrame:(WebFrame *)frame {
     [self handleWebviewLoadError:error];
+}
+
+- (NSURLRequest*)webView:(WebView *)sender resource:(id)identifier
+         willSendRequest:(NSURLRequest *)request
+        redirectResponse:(NSURLResponse *)redirectResponse
+          fromDataSource:(WebDataSource *)dataSource
+{
+    if ([request.mainDocumentURL.host isEqualToString: @"localhost"]) {
+        return request;
+    } else {
+        [[NSWorkspace sharedWorkspace] openURL:request.URL];
+        return [NSURLRequest requestWithURL:[NSURL URLWithString:widgetsUrl]];
+    }
 }
 
 - (void)handleWebviewLoadError:(NSError *)error
@@ -180,5 +196,16 @@
 {
     [webView reload:self];
 }
+
+#
+#pragma mark accept mouse events
+#
+
+- (BOOL) canBecomeKeyWindow { return YES; }
+- (BOOL) canBecomeMainWindow { return YES; }
+- (BOOL) acceptsFirstResponder { return YES; }
+- (BOOL) becomeFirstResponder { return YES; }
+- (BOOL) resignFirstResponder { return YES; }
+- (BOOL) acceptsMouseMovedEvents { return YES; }
 
 @end
