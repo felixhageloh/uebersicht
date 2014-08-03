@@ -16,6 +16,7 @@
 #import "WebInspector.h"
 
 int const MAX_DISPLAYS = 42;
+int const PORT         = 41416;
 
 @implementation UBAppDelegate {
     NSStatusItem* statusBarItem;
@@ -35,9 +36,16 @@ int const MAX_DISPLAYS = 42;
     
     // Handles the screen entries in the menu, and will send the window to the user's preferred screen
     [self screensChanged:self];
-
+    
+    // start server and load webview
     keepServerAlive = YES;
-    [self startServer];
+    [self startServer: ^(NSString* output) {
+        if ([output rangeOfString:@"server started"].location != NSNotFound) {
+            [window loadUrl:[NSString stringWithFormat:@"http://localhost:%d", PORT]];
+        } else if ([output rangeOfString:@"error"].location != NSNotFound) {
+            [self notifyUser:output withTitle:@"Error"];
+        };
+    }];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(screensChanged:)
@@ -59,26 +67,18 @@ int const MAX_DISPLAYS = 42;
                                                object:nil];
 }
 
-- (void)startServer
+- (void)startServer:(void (^)(NSString*))callback
 {
     NSLog(@"starting server task");
 
-    void (^parseOutput)(NSString *) = ^(NSString* output) {
-        if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [window loadUrl:@"http://localhost:41416"];
-        } else if ([output rangeOfString:@"error"].location != NSNotFound) {
-            [self notifyUser:output withTitle:@"Error"];
-        }
-    };
-
     void (^keepAlive)(NSTask*) = ^(NSTask* theTask) {
         if (keepServerAlive) {
-            [self startServer];
+            [self startServer: callback];
         }
     };
 
     widgetServer = [self launchWidgetServer:[preferences.widgetDir path]
-                                     onData:parseOutput
+                                     onData:callback
                                      onExit:keepAlive];
 }
 
@@ -120,7 +120,8 @@ int const MAX_DISPLAYS = 42;
 
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:nodePath];
-    [task setArguments:@[serverPath, @"-d", widgetPath]];
+    [task setArguments:@[serverPath, @"-d", widgetPath,
+                                     @"-p", [NSString stringWithFormat:@"%d", PORT]]];
 
 
     NSPipe* nodeout = [NSPipe pipe];
@@ -390,8 +391,6 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     if (widgetServer){
         // server will restart by itself
         [widgetServer terminate];
-    } else {
-        [self startServer];
     }
 }
 
