@@ -11,11 +11,15 @@
 //  details.
 
 #import <Cocoa/Cocoa.h>
+#import "MASShortcutView+UserDefaults.h"
+
+NSString *const kPreferenceGlobalShortcut = @"keyboardShortcutBringToFront";
 
 @interface UBPreferencesController : NSWindowController
 
 @property (weak) IBOutlet NSToolbar* toolbar;
 @property (weak) IBOutlet NSPopUpButton *filePicker;
+@property (nonatomic, weak) IBOutlet MASShortcutView *shortcutView;
 @property BOOL startAtLogin;
 @property NSURL* widgetDir;
 

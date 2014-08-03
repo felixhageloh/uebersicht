@@ -25,6 +25,14 @@
 		DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */; };
 		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
+		DCA88D221988D6A500A532ED /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = DCA88D141988D6A500A532ED /* .gitignore */; };
+		DCA88D231988D6A500A532ED /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = DCA88D151988D6A500A532ED /* LICENSE */; };
+		DCA88D241988D6A500A532ED /* MASShortcut+Monitoring.m in Sources */ = {isa = PBXBuildFile; fileRef = DCA88D171988D6A500A532ED /* MASShortcut+Monitoring.m */; };
+		DCA88D251988D6A500A532ED /* MASShortcut+UserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = DCA88D191988D6A500A532ED /* MASShortcut+UserDefaults.m */; };
+		DCA88D261988D6A500A532ED /* MASShortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = DCA88D1B1988D6A500A532ED /* MASShortcut.m */; };
+		DCA88D271988D6A500A532ED /* MASShortcut.podspec in Resources */ = {isa = PBXBuildFile; fileRef = DCA88D1C1988D6A500A532ED /* MASShortcut.podspec */; };
+		DCA88D281988D6A500A532ED /* MASShortcutView+UserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = DCA88D1E1988D6A500A532ED /* MASShortcutView+UserDefaults.m */; };
+		DCA88D291988D6A500A532ED /* MASShortcutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DCA88D201988D6A500A532ED /* MASShortcutView.m */; };
 		DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* getting-started.coffee */; };
 		DCB5D9871948802C000D5C83 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
@@ -88,6 +96,20 @@
 		DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UBPreferencesController.xib; sourceTree = "<group>"; };
 		DC5D25BB18FC46E0000078C4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		DC99A7C418DC41A600E61222 /* Übersicht.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Übersicht.entitlements"; sourceTree = "<group>"; };
+		DCA88D141988D6A500A532ED /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		DCA88D151988D6A500A532ED /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		DCA88D161988D6A500A532ED /* MASShortcut+Monitoring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcut+Monitoring.h"; sourceTree = "<group>"; };
+		DCA88D171988D6A500A532ED /* MASShortcut+Monitoring.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcut+Monitoring.m"; sourceTree = "<group>"; };
+		DCA88D181988D6A500A532ED /* MASShortcut+UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcut+UserDefaults.h"; sourceTree = "<group>"; };
+		DCA88D191988D6A500A532ED /* MASShortcut+UserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcut+UserDefaults.m"; sourceTree = "<group>"; };
+		DCA88D1A1988D6A500A532ED /* MASShortcut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcut.h; sourceTree = "<group>"; };
+		DCA88D1B1988D6A500A532ED /* MASShortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcut.m; sourceTree = "<group>"; };
+		DCA88D1C1988D6A500A532ED /* MASShortcut.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MASShortcut.podspec; sourceTree = "<group>"; };
+		DCA88D1D1988D6A500A532ED /* MASShortcutView+UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcutView+UserDefaults.h"; sourceTree = "<group>"; };
+		DCA88D1E1988D6A500A532ED /* MASShortcutView+UserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcutView+UserDefaults.m"; sourceTree = "<group>"; };
+		DCA88D1F1988D6A500A532ED /* MASShortcutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcutView.h; sourceTree = "<group>"; };
+		DCA88D201988D6A500A532ED /* MASShortcutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcutView.m; sourceTree = "<group>"; };
+		DCA88D211988D6A500A532ED /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DCAAAF9518DF0B050097677F /* getting-started.coffee */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "getting-started.coffee"; sourceTree = "<group>"; };
 		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		DCE2453D18ED864800C9FAE3 /* WebInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebInspector.h; sourceTree = "<group>"; };
@@ -125,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				DC43AD8517EC2D9500241CC2 /* Übersicht */,
+				DCA88D131988D6A500A532ED /* MASShortcut */,
 				DCECA1C21893F1C300C0CA32 /* server */,
 				DC43ADA317EC2D9500241CC2 /* ÜbersichtTests */,
 				DC43AD7E17EC2D9500241CC2 /* Frameworks */,
@@ -215,6 +238,27 @@
 				DC43ADA617EC2D9500241CC2 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		DCA88D131988D6A500A532ED /* MASShortcut */ = {
+			isa = PBXGroup;
+			children = (
+				DCA88D141988D6A500A532ED /* .gitignore */,
+				DCA88D151988D6A500A532ED /* LICENSE */,
+				DCA88D161988D6A500A532ED /* MASShortcut+Monitoring.h */,
+				DCA88D171988D6A500A532ED /* MASShortcut+Monitoring.m */,
+				DCA88D181988D6A500A532ED /* MASShortcut+UserDefaults.h */,
+				DCA88D191988D6A500A532ED /* MASShortcut+UserDefaults.m */,
+				DCA88D1A1988D6A500A532ED /* MASShortcut.h */,
+				DCA88D1B1988D6A500A532ED /* MASShortcut.m */,
+				DCA88D1C1988D6A500A532ED /* MASShortcut.podspec */,
+				DCA88D1D1988D6A500A532ED /* MASShortcutView+UserDefaults.h */,
+				DCA88D1E1988D6A500A532ED /* MASShortcutView+UserDefaults.m */,
+				DCA88D1F1988D6A500A532ED /* MASShortcutView.h */,
+				DCA88D201988D6A500A532ED /* MASShortcutView.m */,
+				DCA88D211988D6A500A532ED /* README.md */,
+			);
+			path = MASShortcut;
 			sourceTree = "<group>";
 		};
 		DCECA1C21893F1C300C0CA32 /* server */ = {
@@ -324,8 +368,11 @@
 				DC4F43F3189E90DD00937925 /* status-icon.png in Resources */,
 				DC43AD9017EC2D9500241CC2 /* Credits.rtf in Resources */,
 				DCECA1CE1893FE5500C0CA32 /* node_modules in Resources */,
+				DCA88D221988D6A500A532ED /* .gitignore in Resources */,
+				DCA88D231988D6A500A532ED /* LICENSE in Resources */,
 				DCECA1CA1893F4EF00C0CA32 /* public in Resources */,
 				DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */,
+				DCA88D271988D6A500A532ED /* MASShortcut.podspec in Resources */,
 				DCECA1C71893F23200C0CA32 /* localnode in Resources */,
 				DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */,
 				DCECA1C81893F23200C0CA32 /* server.js in Resources */,
@@ -377,8 +424,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */,
+				DCA88D241988D6A500A532ED /* MASShortcut+Monitoring.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
+				DCA88D251988D6A500A532ED /* MASShortcut+UserDefaults.m in Sources */,
+				DCA88D291988D6A500A532ED /* MASShortcutView.m in Sources */,
+				DCA88D281988D6A500A532ED /* MASShortcutView+UserDefaults.m in Sources */,
 				DC43AD9317EC2D9500241CC2 /* UBAppDelegate.m in Sources */,
+				DCA88D261988D6A500A532ED /* MASShortcut.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,6 +14,7 @@
 #import "UBWindow.h"
 #import "UBPreferencesController.m"
 #import "WebInspector.h"
+#import "MASShortcut+UserDefaults.h"
 
 int const MAX_DISPLAYS = 42;
 
@@ -57,6 +58,10 @@ int const MAX_DISPLAYS = 42;
                                              selector:@selector(frameChanged:)
                                                  name:NSViewFrameDidChangeNotification
                                                object:nil];
+    
+    [MASShortcut registerGlobalShortcutWithUserDefaultsKey:kPreferenceGlobalShortcut handler:^{
+        [window setLevel:kCGNormalWindowLevel-1];
+    }];
 }
 
 - (void)startServer
