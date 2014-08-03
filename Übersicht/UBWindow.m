@@ -69,7 +69,6 @@
 
 - (void)initWebView
 {
-
     [webView setDrawsBackground:NO];
     [webView setMaintainsBackForwardList:NO];
     [webView setFrameLoadDelegate:self];
@@ -82,9 +81,30 @@
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
+    NSLog(@"loaded %@", webView.mainFrameURL);
     if (frame == [frame findFrameNamed:@"_top"]) {
         [[webView windowScriptObject] setValue:self forKey:@"os"];
     }
+}
+
+- (void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error
+                                              forFrame:(WebFrame *)frame
+{
+    [self handleWebviewLoadError:error];
+}
+
+- (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error
+                                                         forFrame:(WebFrame *)frame {
+    [self handleWebviewLoadError:error];
+}
+
+- (void)handleWebviewLoadError:(NSError *)error
+{
+    NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
+    NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
+    
+    [self performSelector:@selector(loadUrl:) withObject:url.absoluteString
+               afterDelay:5.0];
 }
 
 - (void)fillScreen:(CGDirectDisplayID)screenId
