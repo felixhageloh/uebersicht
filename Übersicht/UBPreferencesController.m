@@ -46,8 +46,6 @@
 {
     [super windowDidLoad];
     
-//    [self.window setLevel:NSFloatingWindowLevel];
-    
     [[self.window standardWindowButton:NSWindowMiniaturizeButton] setEnabled:NO];
     [[self.window standardWindowButton:NSWindowZoomButton] setEnabled:NO];
     

@@ -37,7 +37,7 @@
     if (self) {
         [self setBackgroundColor:[NSColor clearColor]];
         [self setOpaque:NO];
-        [self setLevel:kCGDesktopWindowLevel];
+        [self sendToDesktop];
         [self setCollectionBehavior:(NSWindowCollectionBehaviorTransient |
                                      NSWindowCollectionBehaviorCanJoinAllSpaces |
                                      NSWindowCollectionBehaviorIgnoresCycle)];
@@ -82,6 +82,58 @@
     [webView setMainFrameURL:url];
 }
 
+- (void)onWorkspaceChange:(id)sender
+{
+    NSURL *currWallpaperUrl  = [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] absoluteURL];
+    NSDictionary *currWallpaperOptions = [[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:[self screen]];
+
+    if (![prevWallpaperUrl isEqual:currWallpaperUrl] ||
+        ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions]) {
+        [self wallpaperChanged];
+    }
+    prevWallpaperUrl = currWallpaperUrl;
+    prevWallpaperOptions = currWallpaperOptions;
+}
+
+- (void)wakeFromSleep:(NSNotification *)notification
+{
+    [webView reloadFromOrigin:self];
+}
+
+#
+#pragma mark window control
+#
+
+- (void)fillScreen:(CGDirectDisplayID)screenId
+{
+    NSRect fullscreen = [self toQuartzCoordinates:CGDisplayBounds(screenId)];
+    int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
+    
+    fullscreen.size.height = fullscreen.size.height - menuBarHeight;
+    [self setFrame:fullscreen display:YES];
+    [self onWorkspaceChange:nil];
+}
+
+- (void)sendToDesktop
+{
+    [self setLevel:kCGDesktopWindowLevel];
+}
+
+- (void)comeToFront
+{
+    [self setLevel:kCGNormalWindowLevel-1];
+    [self makeKeyAndOrderFront:self];
+}
+
+- (BOOL)isInFront
+{
+    return self.level == kCGNormalWindowLevel-1;
+}
+
+#
+#pragma mark WebView delegates
+#
+
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     NSLog(@"loaded %@", webView.mainFrameURL);
@@ -91,13 +143,13 @@
 }
 
 - (void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error
-                                              forFrame:(WebFrame *)frame
+       forFrame:(WebFrame *)frame
 {
     [self handleWebviewLoadError:error];
 }
 
 - (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error
-                                                         forFrame:(WebFrame *)frame {
+       forFrame:(WebFrame *)frame {
     [self handleWebviewLoadError:error];
 }
 
@@ -123,25 +175,9 @@
                afterDelay:5.0];
 }
 
-- (void)fillScreen:(CGDirectDisplayID)screenId
-{
-    NSRect fullscreen = [self toQuartzCoordinates:CGDisplayBounds(screenId)];
-    int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-
-    fullscreen.size.height = fullscreen.size.height - menuBarHeight;
-    [self setFrame:fullscreen display:YES];
-    [self onWorkspaceChange:nil];
-}
-
-// old coordinate system is flipped
-- (NSRect)toQuartzCoordinates:(NSRect)screenRect
-{
-    CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
-
-    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height - mainScreenRect.size.height);
-    
-    return screenRect;
-}
+#
+#pragma mark wallpaper methods
+#
 
 - (NSData*)wallpaper
 {
@@ -155,31 +191,32 @@
     
     return [bitmapRep representationUsingType:NSPNGFileType properties:nil];
 }
-    
-- (NSString*)wallpaperDataUrl
-{
-    NSString *base64 = [self.wallpaper base64EncodedStringWithOptions:0];
 
+// old coordinate system is flipped
+- (NSRect)toQuartzCoordinates:(NSRect)screenRect
+{
+    CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
     
-    return [@"data:image/png;base64, " stringByAppendingString:base64];
+    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height - mainScreenRect.size.height);
+    
+    return screenRect;
 }
 
-- (void)onWorkspaceChange:(id)sender
-{
-    NSURL *currWallpaperUrl  = [[[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[self screen]] absoluteURL];
-    NSDictionary *currWallpaperOptions = [[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:[self screen]];
-
-    if (![prevWallpaperUrl isEqual:currWallpaperUrl] ||
-        ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions]) {
-        [self wallpaperChanged];
-    }
-    prevWallpaperUrl = currWallpaperUrl;
-    prevWallpaperOptions = currWallpaperOptions;
-}
 
 - (void)wallpaperChanged
 {
     [[webView windowScriptObject] evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"];
+}
+
+
+#
+#pragma mark WebscriptObject
+#
+
+- (NSString*)wallpaperDataUrl
+{
+    NSString *base64 = [self.wallpaper base64EncodedStringWithOptions:0];
+    return [@"data:image/png;base64, " stringByAppendingString:base64];
 }
 
 
@@ -192,20 +229,15 @@
     return YES;
 }
 
-- (void)wakeFromSleep:(NSNotification *)notification
-{
-    [webView reload:self];
-}
-
 #
-#pragma mark accept mouse events
+#pragma mark flags
 #
 
-- (BOOL) canBecomeKeyWindow { return YES; }
-- (BOOL) canBecomeMainWindow { return YES; }
-- (BOOL) acceptsFirstResponder { return YES; }
-- (BOOL) becomeFirstResponder { return YES; }
-- (BOOL) resignFirstResponder { return YES; }
-- (BOOL) acceptsMouseMovedEvents { return YES; }
+- (BOOL)canBecomeKeyWindow { return YES; }
+- (BOOL)canBecomeMainWindow { return YES; }
+- (BOOL)acceptsFirstResponder { return YES; }
+- (BOOL)becomeFirstResponder { return YES; }
+- (BOOL)resignFirstResponder { return YES; }
+- (BOOL)acceptsMouseMovedEvents { return YES; }
 
 @end

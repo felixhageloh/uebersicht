@@ -68,10 +68,12 @@ int const PORT         = 41416;
                                                object:nil];
     
     [MASShortcut registerGlobalShortcutWithUserDefaultsKey:kPreferenceGlobalShortcut handler:^{
-        [window setLevel:kCGNormalWindowLevel-1];
-        [NSApp activateIgnoringOtherApps:YES];
-        [window makeKeyAndOrderFront:self];
-        
+        if(window.isInFront) {
+            [window sendToDesktop];
+        } else {
+            [window comeToFront];
+            [NSApp activateIgnoringOtherApps:YES];
+        }
     }];
 }
 
@@ -402,7 +404,6 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     }
 }
 
-
 - (IBAction)showPreferences:(id)sender
 {
     [preferences showWindow:nil];
@@ -422,7 +423,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
 
 - (IBAction)refreshWidgets:(id)sender
 {
-    [window.webView reload:sender];
+    [window.webView reloadFromOrigin:self];
 }
 
 - (IBAction)showDebugConsole:(id)sender
@@ -431,7 +432,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
         inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
     
-    [window setLevel:kCGNormalWindowLevel-1];
+    [window comeToFront];
     [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
 }
@@ -444,7 +445,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
 {
     // WebInspcetor might have closed
     if ([@"WebInspectorWindow" isEqual:NSStringFromClass ([[notification object] class])]) {
-        [window setLevel:kCGDesktopWindowLevel];
+        [window sendToDesktop];
     }
 }
 
@@ -456,9 +457,9 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
 
     // make sure the inspector is clickable if attached
     if (CGRectEqualToRect(window.webView.mainFrame.frameView.frame, window.webView.frame)) {
-         [window setLevel:kCGDesktopWindowLevel];
+         [window sendToDesktop];
     } else {
-         [window setLevel:kCGNormalWindowLevel-1];
+         [window comeToFront];
     }
 }
 
