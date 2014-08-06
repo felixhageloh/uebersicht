@@ -1,5 +1,5 @@
 # Übersicht
-> Keep an eye on what's happening on your machine and in the world.
+*Keep an eye on what's happening on your machine and in the world.*
 
 For general info check out the [Übersicht website.](http://tracesof.net/uebersicht)
 
