@@ -1,7 +1,7 @@
 # Übersicht
+> Keep an eye on what's happening on your machine and in the world.
 
-*Keep an eye on what's happening on your machine and in the world*
-
+For general info check out the [Übersicht website.](http://tracesof.net/uebersicht)
 
 ## Writing Widgets
 
@@ -18,18 +18,24 @@ The following properties and methods are currently supported:
 
 A **string** containing the shell command to be executed, for example:
 
-    command: "echo Hello World"
+```coffeescript
+command: "echo Hello World"
+```
+
 
 Note, that in some cases they need to properly escaped, like:
 
-    command: "ps axo \"rss,pid,ucomm\" | sort -nr | head -n3"
-
+```coffeescript
+command: "ps axo \"rss,pid,ucomm\" | sort -nr | head -n3"
+```
 
 ### refreshFrequency
 
 An **integer** specifying how often the above command is executed. It defines the delay in milliseconds between consecutive commands executions. Example:
 
-    refreshFrequency: 10000
+```coffeescript
+refreshFrequency: 10000
+```
 
 the default is 1000 (1s).
 
@@ -37,14 +43,16 @@ the default is 1000 (1s).
 
 A **string** defining the css style of this widget, which is also used to control the position. In order to allow for easy scoping of CSS rules, styles are written using the [Stylus](http://learnboost.github.io/stylus/) preprocessor. Example:
 
-    style: """
-      top:  0
-      left: 0
-      color: #fff
+```coffeescript
+style: """
+  top:  0
+  left: 0
+  color: #fff
 
-      .some-class
-        box-shadow: 0 0 2px rgba(#000, 0.1)
-    """
+  .some-class
+    box-shadow: 0 0 2px rgba(#000, 0.1)
+"""
+```
 
 For convenience, the [nib library](http://visionmedia.github.io/nib/) for Stylus is included, so mixins for CSS3 are available.
 
@@ -55,11 +63,13 @@ Note that widgets are positioned absolute in relation to the screen (minus the m
 
 A **function** returning a HTML string to render this widget. It gets the output of `command` passed in as a string. For example, a widget with:
 
-    command: "echo Hello World!"
+```coffeescript
+command: "echo Hello World!"
 
-    render: (output) -> """
-      <h1>#{output}</h1>
-    """
+render: (output) -> """
+  <h1>#{output}</h1>
+"""
+```
 
 would render as **Hello World!**. Usually, your `output` will be something more complicated, for example a JSON string, so you will have to parse it first.
 
@@ -72,13 +82,15 @@ A **function** implementing update behavior of this widget. If specified, `rende
 
 Since `render` will simply replace the inner HTML of a widget every time, you can use render to do a partial update of your widgets, kick off animations etc. For example, if the output of your command returns a percentage, you could do something like:
 
-    # we don't care about output here
-    render: (_) -> """
-      <div class='bar'></div>
-    """
+```coffeescript
+# we don't care about output here
+render: (_) -> """
+  <div class='bar'></div>
+"""
 
-    update: (output, domEl) ->
-      $(domEl).find('.bar').css height: output+'%'
+update: (output, domEl) ->
+  $(domEl).find('.bar').css height: output+'%'
+```
 
 This will set the height of .bar every time this widget refreshes. As you can see, jQuery is available.
 
@@ -89,7 +101,9 @@ The code base consists of two parts, a cocoa app and a NodeJS app inside `server
 
 The node app can be run standalone using
 
-    coffee server/server.coffee -d <path/to/widget/dir> -p <port>
+```coffeescript
+coffee server/server.coffee -d <path/to/widget/dir> -p <port>
+```
 
 Then point your browser to `localhost:<port>`. Naturally, you will need to have NodeJS and the following dependencies installed:
 
