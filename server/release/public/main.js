@@ -534,6 +534,10 @@ module.exports = function(implementation) {
 
 
 },{"child_process":2,"nib":2,"stylus":2,"tosource":3}],9:[function(require,module,exports){
+var BUFFER_SIZE;
+
+BUFFER_SIZE = 500 * 1024;
+
 module.exports = function(widgetDir) {
   return function(req, res, next) {
     var parts, widget;
@@ -545,7 +549,8 @@ module.exports = function(widgetDir) {
       return next();
     }
     return widget.exec({
-      cwd: widgetDir.path
+      cwd: widgetDir.path,
+      maxBuffer: BUFFER_SIZE
     }, function(err, data, stderr) {
       if (err || stderr) {
         res.writeHead(500);
