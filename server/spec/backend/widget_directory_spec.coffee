@@ -13,6 +13,7 @@ mockChokidar = ->
 describe 'widget directory', ->
   widgetDir     = null
   chokidarMock  = null
+  callback      = null
   testWidgetDir = path.resolve(__dirname, '../test_widgets')
 
   beforeEach ->
@@ -23,8 +24,12 @@ describe 'widget directory', ->
     mockery.registerAllowable '../../src/widget_directory.coffee'
 
     widgetDir = require('../../src/widget_directory.coffee')(testWidgetDir)
+    callback = jasmine.createSpy('change callback')
+    widgetDir.watch callback
+
     mockery.disable()
     mockery.deregisterMock('chokidar')
+
 
   it 'should load new widgets and assign them an id', ->
     chokidarMock.trigger 'add', testWidgetDir+'/widget-1.coffee'
@@ -60,9 +65,6 @@ describe 'widget directory', ->
     expect(widgetDir.get('widget-1-coffee')).toBeDefined()
 
   it 'should notify listeners to changes', ->
-    callback = jasmine.createSpy('change callback')
-    widgetDir.onChange callback
-
     chokidarMock.trigger 'add', testWidgetDir+'/widget-1.coffee'
     expect(callback).toHaveBeenCalledWith 'widget-1-coffee': jasmine.any(Object)
     callback.reset()

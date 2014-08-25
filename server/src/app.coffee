@@ -17,10 +17,10 @@ module.exports = (port, widgetPath) ->
     .use(WidgetsServer(widgetDir))
     .use(changesServer.middleware)
     .use(connect.static(widgetPath))
-    .listen port
+    .listen port, ->
+      console.log 'server started on port', port
+      widgetDir.watch changesServer.push
 
-  widgetDir.onChange changesServer.push
-  console.log 'server started on port', port
   server
 
 

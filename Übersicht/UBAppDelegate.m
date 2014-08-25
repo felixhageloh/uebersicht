@@ -14,7 +14,6 @@
 #import "UBWindow.h"
 #import "UBPreferencesController.m"
 #import "WebInspector.h"
-#import "MASShortcut+UserDefaults.h"
 
 int const MAX_DISPLAYS = 42;
 int const PORT         = 41416;
@@ -25,6 +24,7 @@ int const PORT         = 41416;
     UBPreferencesController* preferences;
     BOOL keepServerAlive;
     WebInspector *inspector;
+    int portOffset;
 }
 
 @synthesize window;
@@ -38,11 +38,24 @@ int const PORT         = 41416;
     // Handles the screen entries in the menu, and will send the window to the user's preferred screen
     [self screensChanged:self];
     
+    
+    // NSTask doesn't terminate when xcode stop is pressed. Other ways of spawning
+    // the server, like system() or popen() have the same problem.
+    // So, hit em with a hammer :(
+    system("killall localnode");
+    
     // start server and load webview
+    portOffset      = 0;
     keepServerAlive = YES;
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [window loadUrl:[NSString stringWithFormat:@"http://localhost:%d", PORT]];
+            [window loadUrl:[NSString stringWithFormat:@"http://localhost:%d", PORT+portOffset]];
+        } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
+            portOffset++;
+            if (portOffset >= 20) {
+                keepServerAlive = NO;
+                NSLog(@"couldn't find an open port. Giving up...");
+            }
         } else if ([output rangeOfString:@"error"].location != NSNotFound) {
             [self notifyUser:output withTitle:@"Error"];
         };
@@ -67,14 +80,16 @@ int const PORT         = 41416;
                                                  name:NSViewFrameDidChangeNotification
                                                object:nil];
     
-    [MASShortcut registerGlobalShortcutWithUserDefaultsKey:kPreferenceGlobalShortcut handler:^{
-        if(window.isInFront) {
-            [window sendToDesktop];
-        } else {
-            [window comeToFront];
-            [NSApp activateIgnoringOtherApps:YES];
-        }
-    }];
+//    CFMachPortRef keyUpEventTap = CGEventTapCreate(kCGHIDEventTap,
+//                                                   kCGHeadInsertEventTap,
+//                                                   kCGEventTapOptionListenOnly,
+//                                                   CGEventMaskBit(kCGEventFlagsChanged),
+//                                                   &keyUpCallback,
+//                                                   NULL);
+//    CFRunLoopSourceRef keyUpRunLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, keyUpEventTap, 0);
+//    CFRelease(keyUpEventTap);
+//    CFRunLoopAddSource(CFRunLoopGetCurrent(), keyUpRunLoopSourceRef, kCFRunLoopDefaultMode);
+//    CFRelease(keyUpRunLoopSourceRef);
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -83,7 +98,7 @@ int const PORT         = 41416;
 
     void (^keepAlive)(NSTask*) = ^(NSTask* theTask) {
         if (keepServerAlive) {
-            [self startServer: callback];
+            [self performSelector:@selector(startServer:) withObject:callback afterDelay:5.0];
         }
     };
 
@@ -123,44 +138,29 @@ int const PORT         = 41416;
     NSString* nodePath   = [bundle pathForResource:@"localnode" ofType:nil];
     NSString* serverPath = [bundle pathForResource:@"server" ofType:@"js"];
 
-    // NSTask doesn't terminate when xcode stop is pressed. Other ways of spawning
-    // the server, like system() or popen() have the same problem.
-    // So, hit em with a hammer :(
-    system("killall localnode");
-
     NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:nodePath];
-    [task setArguments:@[serverPath, @"-d", widgetPath,
-                                     @"-p", [NSString stringWithFormat:@"%d", PORT]]];
 
-
-    NSPipe* nodeout = [NSPipe pipe];
-    [task setStandardOutput:nodeout];
-    [[nodeout fileHandleForReading] waitForDataInBackgroundAndNotify];
-
-    void (^callback)(NSNotification *) = ^(NSNotification *notification) {
-        NSData *output   = [[nodeout fileHandleForReading] availableData];
+    [task setStandardOutput:[NSPipe pipe]];
+    [task.standardOutput fileHandleForReading].readabilityHandler = ^(NSFileHandle *handle) {
+        NSData *output   = [handle availableData];
         NSString *outStr = [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
-
-        dataHandler(outStr);
-
+        
         NSLog(@"%@", outStr);
-        [[nodeout fileHandleForReading] waitForDataInBackgroundAndNotify];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            dataHandler(outStr);
+        });
     };
-
-    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:NSFileHandleDataAvailableNotification
-                                                      object:[nodeout fileHandleForReading]
-                                                       queue:nil
-                                                  usingBlock:callback];
-
-
+    
     task.terminationHandler = ^(NSTask *theTask) {
-        [[NSNotificationCenter defaultCenter] removeObserver:observer];
+        [theTask.standardOutput fileHandleForReading].readabilityHandler = nil;
         dispatch_async(dispatch_get_main_queue(), ^{
             exitHandler(theTask);
         });
     };
-
+    
+    [task setLaunchPath:nodePath];
+    [task setArguments:@[serverPath, @"-d", widgetPath,
+                         @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset]]];
     [task launch];
     return task;
 }

@@ -49,7 +49,7 @@ getChanges = function() {
     }
     return getChanges();
   }).fail(function() {
-    return setTimeout(bail, 10000);
+    return bail();
   });
 };
 
@@ -93,7 +93,7 @@ deserializeWidgets = function(data) {
 };
 
 bail = function() {
-  return window.location.reload();
+  return window.location.reload(true);
 };
 
 logError = function(serialized) {

@@ -184,9 +184,10 @@ module.exports = function(port, widgetPath) {
   widgetPath = path.resolve(__dirname, widgetPath);
   widgetDir = WidgetDir(widgetPath);
   changesServer = ChangesServer();
-  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port);
-  widgetDir.onChange(changesServer.push);
-  console.log('server started on port', port);
+  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port, function() {
+    console.log('server started on port', port);
+    return widgetDir.watch(changesServer.push);
+  });
   return server;
 };
 
@@ -533,6 +534,10 @@ module.exports = function(implementation) {
 
 
 },{"child_process":2,"nib":2,"stylus":2,"tosource":3}],9:[function(require,module,exports){
+var BUFFER_SIZE;
+
+BUFFER_SIZE = 500 * 1024;
+
 module.exports = function(widgetDir) {
   return function(req, res, next) {
     var parts, widget;
@@ -544,7 +549,8 @@ module.exports = function(widgetDir) {
       return next();
     }
     return widget.exec({
-      cwd: widgetDir.path
+      cwd: widgetDir.path,
+      maxBuffer: BUFFER_SIZE
     }, function(err, data, stderr) {
       if (err || stderr) {
         res.writeHead(500);
@@ -568,12 +574,13 @@ loader = require('./widget_loader.coffee');
 paths = require('path');
 
 module.exports = function(directoryPath) {
-  var api, changeCallback, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, watcher, widgetId, widgets;
+  var api, changeCallback, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, widgetId, widgets;
   api = {};
   widgets = {};
-  watcher = require('chokidar').watch(directoryPath);
   changeCallback = function() {};
   init = function() {
+    var watcher;
+    watcher = require('chokidar').watch(directoryPath);
     watcher.on('change', function(filePath) {
       if (isWidgetPath(filePath)) {
         return registerWidget(loadWidget(filePath));
@@ -590,14 +597,15 @@ module.exports = function(directoryPath) {
     console.log('watching', directoryPath);
     return api;
   };
+  api.watch = function(callback) {
+    changeCallback = callback;
+    return init();
+  };
   api.widgets = function() {
     return widgets;
   };
   api.get = function(id) {
     return widgets[id];
-  };
-  api.onChange = function(callback) {
-    return changeCallback = callback;
   };
   api.path = directoryPath;
   loadWidget = function(filePath) {
@@ -670,7 +678,7 @@ module.exports = function(directoryPath) {
     var _ref;
     return (_ref = filePath.match(/\.coffee$/)) != null ? _ref : filePath.match(/\.js$/);
   };
-  return init();
+  return api;
 };
 
 

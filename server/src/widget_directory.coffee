@@ -6,11 +6,10 @@ module.exports = (directoryPath) ->
   api = {}
 
   widgets  = {}
-  watcher  = require('chokidar').watch directoryPath
-
   changeCallback = ->
 
   init = ->
+    watcher = require('chokidar').watch directoryPath
     watcher
       .on 'change', (filePath) ->
         registerWidget loadWidget(filePath) if isWidgetPath(filePath)
@@ -22,12 +21,13 @@ module.exports = (directoryPath) ->
     console.log 'watching', directoryPath
     api
 
+  api.watch = (callback) ->
+    changeCallback = callback
+    init()
+
   api.widgets = -> widgets
 
   api.get = (id) -> widgets[id]
-
-  api.onChange = (callback) ->
-    changeCallback = callback
 
   api.path = directoryPath
 
@@ -83,4 +83,4 @@ module.exports = (directoryPath) ->
   isWidgetPath = (filePath) ->
     filePath.match(/\.coffee$/) ? filePath.match(/\.js$/)
 
-  init()
+  api

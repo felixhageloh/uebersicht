@@ -52,7 +52,6 @@
     [toolbar setSelectedItemIdentifier:@"general"];
     [self widgetDirChanged:self.widgetDir];
     
-    self.shortcutView.associatedUserDefaultsKey = kPreferenceGlobalShortcut;
 }
 
 #
