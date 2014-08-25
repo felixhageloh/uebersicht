@@ -19,9 +19,12 @@ header, section
 
 a, a:link, a:visited
   color: #86585a
+  text-decoration: none
+  font-weight: 500
 
   &:hover
     color: #852a2f
+    text-decoration: underline
 
 
 header
@@ -51,7 +54,7 @@ main
   pre
     margin: 20px 0
     font-family: Ubuntu Mono, Menlo, Currier New, Mono
-    border: 1px solid #eee
+    border: 1px solid #e0e0e0
 
   ul
     padding: 4px 0 8px 0
@@ -67,7 +70,7 @@ main
 
   a, a:link, a:visited
     font-size: 16px
-    text-decoration: none
+    font-weight: 300
     padding: 10px 20px
     display: inline-block
     background-color: #ac7a7b
@@ -80,6 +83,7 @@ main
 
     &:hover
       background-color: #810034
+      text-decoration: none
 
   a.app
     background-color: #c29785
@@ -104,11 +108,58 @@ main
     img
       width: 100%
 
+.more-info
+  h1
+    border-color: transparent
+    padding-top: 8px
+
+  .badges
+    text-align: center
+    font-size: 0
+
+    a, a:link, a:visited
+      display: inline-block
+      font-size: 24px
+      line-height: 1
+      text-decoration: none
+      font-weight: 500
+      word-spacing: normal
+      margin: 32px 32px
+      min-width: 30%
+      text-align: left
+
+      h2
+        font-size: 14px
+        font-weight: 200
+        color: #666
+        margin-bottom: 4px
+
+  .twitter
+    span
+      color: #292f33
+      font-family: Gotham, Helvetica Neue, Helvetica, Arial, sans-serif
+    img
+      height: 18px
+      width: 22px
+      vertical-align: baseline
+
+  .github
+    span
+      color: #333
+      font-family: Helvetica, Arial, freesans, clean, sans-serif
+    img
+      height: 24px
+      width: 24px
+      vertical-align: bottom
+
+
+
 #disqus_thread
   width: 500px
-  margin: 40px auto 20px auto
-  padding-top: 40px
+  margin: 4px auto
+  padding-top: 32px
   border-top: 1px solid #e0e0e0
+
 
 
 
