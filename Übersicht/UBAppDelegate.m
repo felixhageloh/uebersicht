@@ -80,16 +80,16 @@ int const PORT         = 41416;
                                                  name:NSViewFrameDidChangeNotification
                                                object:nil];
     
-//    CFMachPortRef keyUpEventTap = CGEventTapCreate(kCGHIDEventTap,
-//                                                   kCGHeadInsertEventTap,
-//                                                   kCGEventTapOptionListenOnly,
-//                                                   CGEventMaskBit(kCGEventFlagsChanged),
-//                                                   &keyUpCallback,
-//                                                   NULL);
-//    CFRunLoopSourceRef keyUpRunLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, keyUpEventTap, 0);
-//    CFRelease(keyUpEventTap);
-//    CFRunLoopAddSource(CFRunLoopGetCurrent(), keyUpRunLoopSourceRef, kCFRunLoopDefaultMode);
-//    CFRelease(keyUpRunLoopSourceRef);
+    CFMachPortRef eventTap = CGEventTapCreate(kCGHIDEventTap,
+                                                   kCGHeadInsertEventTap,
+                                                   kCGEventTapOptionListenOnly,
+                                                   CGEventMaskBit(kCGEventFlagsChanged),
+                                                   &cmdKeyChange,
+                                                   (__bridge void *)(window));
+    CFRunLoopSourceRef runLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, eventTap, 0);
+    CFRelease(eventTap);
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSourceRef, kCFRunLoopDefaultMode);
+    CFRelease(runLoopSourceRef);
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -461,6 +461,15 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     } else {
          [window comeToFront];
     }
+}
+
+CGEventRef cmdKeyChange (CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* window) {
+    if((CGEventGetFlags(event) & kCGEventFlagMaskCommand) == 0) {
+        [(__bridge UBWindow*)window sendToDesktop];
+    } else {
+        [(__bridge UBWindow*)window comeToFront];
+    }
+    return event;
 }
 
 @end

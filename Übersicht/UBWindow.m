@@ -233,11 +233,11 @@
 #pragma mark flags
 #
 
-- (BOOL)canBecomeKeyWindow { return YES; }
-- (BOOL)canBecomeMainWindow { return YES; }
-- (BOOL)acceptsFirstResponder { return YES; }
-- (BOOL)becomeFirstResponder { return YES; }
-- (BOOL)resignFirstResponder { return YES; }
-- (BOOL)acceptsMouseMovedEvents { return YES; }
+- (BOOL)canBecomeKeyWindow      { return [self isInFront]; }
+- (BOOL)canBecomeMainWindow     { return [self isInFront]; }
+- (BOOL)acceptsFirstResponder   { return [self isInFront]; }
+- (BOOL)becomeFirstResponder    { return [self isInFront]; }
+- (BOOL)resignFirstResponder    { return [self isInFront]; }
+- (BOOL)acceptsMouseMovedEvents { return [self isInFront]; }
 
 @end
