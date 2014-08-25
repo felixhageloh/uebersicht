@@ -116,6 +116,7 @@ main
   .badges
     text-align: center
     font-size: 0
+    margin: 32px 0
 
     a, a:link, a:visited
       display: inline-block
@@ -124,7 +125,6 @@ main
       text-decoration: none
       font-weight: 500
       word-spacing: normal
-      margin: 32px 32px
       min-width: 30%
       text-align: left
 
@@ -135,6 +135,8 @@ main
         margin-bottom: 4px
 
   .twitter
+    margin-left: 64px
+
     span
       color: #292f33
       font-family: Gotham, Helvetica Neue, Helvetica, Arial, sans-serif
@@ -161,8 +163,6 @@ main
   border-top: 1px solid #e0e0e0
 
 
-
-
 @media only screen and (max-width: 500px)
   body, html
     width: 100%
@@ -177,3 +177,12 @@ main
     margin: 10px 0 0 0
     width: 100%
     box-sizing: border-box
+
+  .more-info .badges
+    whitespace: nowrap
+
+    a, a:link, a:visited
+      min-width: auto
+
+    .twitter
+      margin-left: 32px

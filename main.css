@@ -336,9 +336,10 @@ main li{margin:8px 0;border-left:8px solid #ddd;padding-left:8px}
 .screenshots li{width:25%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:10px solid #fff;display:inline-block;margin:0;}
 .screenshots li img{width:100%}
 .more-info h1{border-color:transparent;padding-top:8px}
-.more-info .badges{text-align:center;font-size:0;}
-.more-info .badges a,.more-info .badges a:link,.more-info .badges a:visited{display:inline-block;font-size:24px;line-height:1;text-decoration:none;font-weight:500;word-spacing:normal;margin:32px 32px;min-width:30%;text-align:left;}
+.more-info .badges{text-align:center;font-size:0;margin:32px 0;}
+.more-info .badges a,.more-info .badges a:link,.more-info .badges a:visited{display:inline-block;font-size:24px;line-height:1;text-decoration:none;font-weight:500;word-spacing:normal;min-width:30%;text-align:left;}
 .more-info .badges a h2,.more-info .badges a:link h2,.more-info .badges a:visited h2{font-size:14px;font-weight:200;color:#666;margin-bottom:4px}
+.more-info .twitter{margin-left:64px;}
 .more-info .twitter span{color:#292f33;font-family:Gotham,Helvetica Neue,Helvetica,Arial,sans-serif}
 .more-info .twitter img{height:18px;width:22px;vertical-align:baseline}
 .more-info .github span{color:#333;font-family:Helvetica,Arial,freesans,clean,sans-serif}
@@ -347,4 +348,7 @@ main li{margin:8px 0;border-left:8px solid #ddd;padding-left:8px}
 @media only screen and (max-width: 500px){body,html{width:100%}
 header,section,#disqus_thread{width:100%;padding-left:16px;padding-right:16px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
 .download a{margin:10px 0 0 0;width:100%;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+.more-info .badges{white-space:nowrap;}
+.more-info .badges a,.more-info .badges a:link,.more-info .badges a:visited{min-width:auto}
+.more-info .badges .twitter{margin-left:32px}
 }
