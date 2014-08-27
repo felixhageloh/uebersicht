@@ -19,6 +19,7 @@
 @implementation UBWindow {
     NSString *widgetsUrl;
     UBWallperServer* wallpaperServer;
+    WebDataSource *mainDocument;
 }
 
 @synthesize webView;
@@ -58,15 +59,12 @@
 
 - (void) awakeFromNib
 {
-    [self initWebView];
     wallpaperServer = [[UBWallperServer alloc] initWithWindow:self];
-    
     [wallpaperServer onWallpaperChange:^{
         [self notifyWebviewOfWallaperChange];
     }];
     
-    [self notifyWebviewOfWallaperChange];
-
+    [self initWebView];
 }
 
 - (void)initWebView
@@ -137,6 +135,7 @@
     NSLog(@"loaded %@", webView.mainFrameURL);
     if (frame == [frame findFrameNamed:@"_top"]) {
         [[webView windowScriptObject] setValue:self forKey:@"os"];
+        [self notifyWebviewOfWallaperChange];
     }
 }
 
@@ -156,9 +155,16 @@
         redirectResponse:(NSURLResponse *)redirectResponse
           fromDataSource:(WebDataSource *)dataSource
 {
-    if ([request.mainDocumentURL.absoluteString isEqualToString:webView.mainFrameURL]) {
+    
+    if (!mainDocument) {
+        mainDocument = dataSource;
+        return request;
+    }
+    
+    if ([dataSource.pageTitle isEqualToString:mainDocument.pageTitle]) {
         return request;
     } else {
+        NSLog(@"delegating");
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
         return [NSURLRequest requestWithURL:[NSURL URLWithString:widgetsUrl]];
     }
@@ -186,9 +192,8 @@
 
 - (NSString*)wallpaperDataUrl
 {
-    NSData* wallpaper = [wallpaperServer currentWallpaper];
-    NSString *base64  = [wallpaper base64EncodedStringWithOptions:0];
-    return [@"data:image/png;base64, " stringByAppendingString:base64];
+    return [NSString stringWithFormat:@"http://localhost:%@/wallpaper",
+                                        wallpaperServer.port];
 }
 
 

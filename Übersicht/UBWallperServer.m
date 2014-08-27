@@ -8,12 +8,16 @@
 
 #import "UBWallperServer.h"
 
-
 @implementation UBWallperServer {
     NSWindow* window;
     NSURL *prevWallpaperUrl;
     NSDictionary *prevWallpaperOptions;
     WallpaperChangeBlock changeHandler;
+    
+    NSSocketPort *socketPort;
+    NSFileHandle *fileHandle;
+    NSFileHandle *currentClient;
+    int port;
 }
 ;
 - (id)initWithWindow:(NSWindow*)aWindow
@@ -22,6 +26,7 @@
     
     if (self) {
         window = aWindow;
+        port   = 41620;
         
         NSWorkspace* ws  = [NSWorkspace sharedWorkspace];
         NSNotificationCenter* notifications = [ws notificationCenter];
@@ -32,23 +37,23 @@
         
         prevWallpaperUrl     = [[ws desktopImageURLForScreen:window.screen] absoluteURL];
         prevWallpaperOptions = [ws desktopImageOptionsForScreen:window.screen];
+        
+        [self startHTTPServer:port];
     }
     
     return self;
 }
 
-- (void)startWallperServer
+- (void)startHTTPServer:(int)aPort
 {
-    NSSocketPort *socketPort;
-    socketPort = [[NSSocketPort alloc] initWithTCPPort:4567];
-    
-    NSFileHandle *fileHandle;
+    socketPort = [[NSSocketPort alloc] initWithTCPPort:aPort];
+
     fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:socketPort.socket
                                                closeOnDealloc:YES];
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self
-           selector:@selector(newWpConnection:)
+           selector:@selector(newConnection:)
                name:NSFileHandleConnectionAcceptedNotification
              object:nil];
     
@@ -56,10 +61,11 @@
     
 }
 
-- (void)newWpConnection:(NSNotification *)notification
+- (void)newConnection:(NSNotification *)notification
 {
+    NSLog(@"wallaper server: received wallpaper request");
     NSDictionary *userInfo = [notification userInfo];
-    NSFileHandle *remoteFileHandle = [userInfo objectForKey:
+    NSFileHandle *client   = [userInfo objectForKey:
                                       NSFileHandleNotificationFileHandleItem];
     
     NSNumber *errorNo = [userInfo objectForKey:@"NSFileHandleError"];
@@ -68,25 +74,52 @@
         return;
     }
     
-//    [fileHandle acceptConnectionInBackgroundAndNotify];
-//    
-//    if( remoteFileHandle ) {
-//        SimpleHTTPConnection *connection;
-//        connection = [[SimpleHTTPConnection alloc] initWithFileHandle:
-//                      remoteFileHandle
-//                                                             delegate:self];
-//        if( connection ) {
-//            NSIndexSet *insertedIndexes;
-//            insertedIndexes = [NSIndexSet indexSetWithIndex:
-//                               [connections count]];
-//            [self willChange:NSKeyValueChangeInsertion
-//             valuesAtIndexes:insertedIndexes forKey:@"connections"];
-//            [connections addObject:connection];
-//            [self didChange:NSKeyValueChangeInsertion
-//            valuesAtIndexes:insertedIndexes forKey:@"connections"];
-//            [connection release];
-//        }
-//    }
+    [fileHandle acceptConnectionInBackgroundAndNotify];
+    
+    [currentClient closeFile];
+    currentClient = client;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self sendWallaper:client];
+    });
+}
+
+- (void)sendWallaper:(NSFileHandle*)client
+{
+    NSLog(@"wallaper server: sending wallpaper");
+    NSData *wallpaper = [self currentWallpaper];
+    
+    CFHTTPMessageRef response = CFHTTPMessageCreateResponse(kCFAllocatorDefault,
+                                                            200,
+                                                            NULL,
+                                                            kCFHTTPVersion1_1);
+    CFHTTPMessageSetHeaderFieldValue(response,
+                                     (CFStringRef)@"Content-Type",
+                                     (CFStringRef)@"image/png");
+    CFHTTPMessageSetHeaderFieldValue(response,
+                                     (CFStringRef)@"Connection",
+                                     (CFStringRef)@"close");
+    CFHTTPMessageSetHeaderFieldValue(response,
+                                     (CFStringRef)@"Content-Length",
+                                     (__bridge CFStringRef)[NSString stringWithFormat:@"%ld", wallpaper.length]);
+    CFDataRef headerData = CFHTTPMessageCopySerializedMessage(response);
+    
+    @try
+    {
+        [client writeData:(__bridge NSData *)headerData];
+        [client writeData:wallpaper];
+    }
+    @catch (NSException *exception)
+    {
+        NSLog(@"wallaper server: %@", exception);
+    }
+    @finally
+    {
+        NSLog(@"wallpaper server: done");
+        CFRelease(headerData);
+    }
+    
+    [client closeFile];
 }
 
 - (NSData*)currentWallpaper
@@ -135,5 +168,10 @@
     changeHandler = handler;
 }
 
+
+- (NSNumber*)port
+{
+    return [NSNumber numberWithInt:port];
+}
 
 @end
