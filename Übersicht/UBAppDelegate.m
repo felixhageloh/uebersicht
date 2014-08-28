@@ -423,7 +423,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
 
 - (IBAction)refreshWidgets:(id)sender
 {
-    [window.webView reloadFromOrigin:self];
+    [window reload];
 }
 
 - (IBAction)showDebugConsole:(id)sender

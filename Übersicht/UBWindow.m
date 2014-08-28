@@ -19,7 +19,7 @@
 @implementation UBWindow {
     NSString *widgetsUrl;
     UBWallperServer* wallpaperServer;
-    WebDataSource *mainDocument;
+    BOOL webviewLoaded;
 }
 
 @synthesize webView;
@@ -77,8 +77,15 @@
 
 - (void)loadUrl:(NSString*)url
 {
-    widgetsUrl = url;
+    widgetsUrl    = url;
+    webviewLoaded = NO;
     [webView setMainFrameURL:url];
+}
+
+- (void)reload
+{
+    webviewLoaded = NO;
+    [webView reloadFromOrigin:self];
 }
 
 
@@ -155,13 +162,10 @@
         redirectResponse:(NSURLResponse *)redirectResponse
           fromDataSource:(WebDataSource *)dataSource
 {
-    
-    if (!mainDocument) {
-        mainDocument = dataSource;
-        return request;
-    }
-    
-    if ([dataSource.pageTitle isEqualToString:mainDocument.pageTitle]) {
+    // Title is blank means we are requesting a new website.
+    // Only way I found so far to check whether we are navigating away.
+    if (dataSource.pageTitle || (!dataSource.pageTitle && !webviewLoaded)) {
+        webviewLoaded = YES;
         return request;
     } else {
         NSLog(@"delegating");

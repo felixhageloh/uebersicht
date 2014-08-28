@@ -19,6 +19,7 @@
 @property (weak) IBOutlet WebView *webView;
 
 - (void)loadUrl:(NSString*)url;
+- (void)reload;
 - (void)fillScreen:(CGDirectDisplayID)screenId;
 - (void)sendToDesktop;
 - (void)comeToFront;
