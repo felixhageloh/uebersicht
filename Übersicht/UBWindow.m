@@ -73,6 +73,7 @@
     [webView setMaintainsBackForwardList:NO];
     [webView setFrameLoadDelegate:self];
     [webView setResourceLoadDelegate:self];
+    [webView setPolicyDelegate:self];
 }
 
 - (void)loadUrl:(NSString*)url
@@ -116,6 +117,7 @@
 {
     [self setLevel:kCGNormalWindowLevel-1];
     [self makeKeyAndOrderFront:self];
+    [NSApp activateIgnoringOtherApps:NO];
 }
 
 - (BOOL)isInFront
@@ -157,21 +159,19 @@
     [self handleWebviewLoadError:error];
 }
 
-- (NSURLRequest*)webView:(WebView *)sender resource:(id)identifier
-         willSendRequest:(NSURLRequest *)request
-        redirectResponse:(NSURLResponse *)redirectResponse
-          fromDataSource:(WebDataSource *)dataSource
+
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+                                                           request:(NSURLRequest *)request
+                                                             frame:(WebFrame *)frame
+                                                   decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-    // Title is blank means we are requesting a new website.
-    // Only way I found so far to check whether we are navigating away.
-    if (dataSource.pageTitle || (!dataSource.pageTitle && !webviewLoaded)) {
-        webviewLoaded = YES;
-        return request;
-    } else {
-        NSLog(@"delegating");
+    if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
-        return [NSURLRequest requestWithURL:[NSURL URLWithString:widgetsUrl]];
+        [listener ignore];
+    } else {
+        [listener use];
     }
+
 }
 
 - (void)handleWebviewLoadError:(NSError *)error
