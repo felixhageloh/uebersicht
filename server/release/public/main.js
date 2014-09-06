@@ -282,9 +282,7 @@ module.exports = function() {
 
 
 },{"./serialize.coffee":7}],6:[function(require,module,exports){
-var cachedWallpaper, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices, slices;
-
-slices = [];
+var cachedWallpaper, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
 cachedWallpaper = new Image();
 
@@ -295,13 +293,14 @@ window.addEventListener('onwallpaperchange', function() {
 });
 
 exports.makeBgSlice = function(canvas) {
-  canvas = $(canvas)[0];
-  if (!(canvas != null ? canvas.getContext : void 0)) {
+  var _ref;
+  canvas = $(canvas);
+  if (!((_ref = canvas[0]) != null ? _ref.getContext : void 0)) {
     throw new Error('no canvas element provided');
   }
-  slices.push(canvas);
+  canvas.attr('data-bg-slice', true);
   return getWallpaper(function(wallpaper) {
-    return renderWallpaperSlice(wallpaper, canvas);
+    return renderWallpaperSlice(wallpaper, canvas[0]);
   });
 };
 
@@ -337,10 +336,11 @@ loadWallpaper = function(callback) {
 };
 
 renderWallpaperSlices = function(wallpaper) {
-  var canvas, _i, _len, _results;
+  var canvas, _i, _len, _ref, _results;
+  _ref = $('[data-bg-slice=true]');
   _results = [];
-  for (_i = 0, _len = slices.length; _i < _len; _i++) {
-    canvas = slices[_i];
+  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+    canvas = _ref[_i];
     _results.push(renderWallpaperSlice(wallpaper, canvas));
   }
   return _results;

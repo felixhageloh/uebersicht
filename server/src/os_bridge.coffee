@@ -1,4 +1,3 @@
-slices          = []
 cachedWallpaper = new Image()
 
 window.addEventListener 'onwallpaperchange', ->
@@ -6,12 +5,12 @@ window.addEventListener 'onwallpaperchange', ->
     renderWallpaperSlices(wallpaper)
 
 exports.makeBgSlice = (canvas) ->
-  canvas = $(canvas)[0]
-  throw new Error('no canvas element provided') unless canvas?.getContext
+  canvas = $(canvas)
+  throw new Error('no canvas element provided') unless canvas[0]?.getContext
 
-  slices.push canvas
+  canvas.attr('data-bg-slice', true)
   getWallpaper (wallpaper) ->
-    renderWallpaperSlice wallpaper, canvas
+    renderWallpaperSlice wallpaper, canvas[0]
 
 # this should be a promise
 getWallpaper = (callback) ->
@@ -32,7 +31,9 @@ loadWallpaper = (callback) ->
   cachedWallpaper.src = os.wallpaperUrl()
 
 renderWallpaperSlices = (wallpaper) ->
-  renderWallpaperSlice(wallpaper, canvas) for canvas in slices
+  # slower than storing those, but avoids memory leaks
+  for canvas in $('[data-bg-slice=true]')
+    renderWallpaperSlice(wallpaper, canvas)
 
 renderWallpaperSlice = (wallpaper, canvas) ->
   ctx   = canvas.getContext('2d')
