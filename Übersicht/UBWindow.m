@@ -115,6 +115,8 @@
 
 - (void)comeToFront
 {
+    if (self.level == kCGNormalWindowLevel-1) return;
+    
     [self setLevel:kCGNormalWindowLevel-1];
     [self makeKeyAndOrderFront:self];
     [NSApp activateIgnoringOtherApps:NO];

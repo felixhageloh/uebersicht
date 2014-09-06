@@ -175,6 +175,15 @@ int const PORT         = 41416;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
+CGEventRef cmdKeyChange (CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* window) {
+    if((CGEventGetFlags(event) & kCGEventFlagMaskCommand) == 0) {
+        [(__bridge UBWindow*)window sendToDesktop];
+    } else {
+        [(__bridge UBWindow*)window comeToFront];
+    }
+    return event;
+}
+
 #
 #pragma mark status bar menu handling
 #
@@ -462,15 +471,6 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     } else {
          [window comeToFront];
     }
-}
-
-CGEventRef cmdKeyChange (CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* window) {
-    if((CGEventGetFlags(event) & kCGEventFlagMaskCommand) == 0) {
-        [(__bridge UBWindow*)window sendToDesktop];
-    } else {
-        [(__bridge UBWindow*)window comeToFront];
-    }
-    return event;
 }
 
 @end
