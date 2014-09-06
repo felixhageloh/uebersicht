@@ -29,7 +29,7 @@ getWallpaper = (callback) ->
 
 loadWallpaper = (callback) ->
   cachedWallpaper.onload = -> callback(cachedWallpaper)
-  cachedWallpaper.src = os.wallpaperDataUrl()
+  cachedWallpaper.src = os.wallpaperUrl()
 
 renderWallpaperSlices = (wallpaper) ->
   renderWallpaperSlice(wallpaper, canvas) for canvas in slices

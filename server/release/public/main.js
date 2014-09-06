@@ -333,7 +333,7 @@ loadWallpaper = function(callback) {
   cachedWallpaper.onload = function() {
     return callback(cachedWallpaper);
   };
-  return cachedWallpaper.src = os.wallpaperDataUrl();
+  return cachedWallpaper.src = os.wallpaperUrl();
 };
 
 renderWallpaperSlices = function(wallpaper) {

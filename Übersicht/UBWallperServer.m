@@ -18,6 +18,7 @@
     NSFileHandle *fileHandle;
     NSFileHandle *currentClient;
     int port;
+    UInt32 wallpaperId;
 }
 ;
 - (id)initWithWindow:(NSWindow*)aWindow
@@ -28,20 +29,41 @@
         window = aWindow;
         port   = 41620;
         
-        NSWorkspace* ws  = [NSWorkspace sharedWorkspace];
-        NSNotificationCenter* notifications = [ws notificationCenter];
-        [notifications addObserver:self
-                          selector:@selector(onWorkspaceChange:)
-                              name:NSWorkspaceActiveSpaceDidChangeNotification
-                            object:nil];
-        
+        NSWorkspace* ws      = [NSWorkspace sharedWorkspace];
         prevWallpaperUrl     = [[ws desktopImageURLForScreen:window.screen] absoluteURL];
         prevWallpaperOptions = [ws desktopImageOptionsForScreen:window.screen];
+        wallpaperId          = 0;
         
+        NSLog(@"%@", self);
         [self startHTTPServer:port];
     }
     
     return self;
+}
+
+- (void)listenToWallpaperChanges
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                         NSUserDomainMask,
+                                                         YES);
+    CFStringRef path = (__bridge CFStringRef)[paths[0]
+                                              stringByAppendingPathComponent:@"/Application Support/Dock/"];
+    
+    FSEventStreamContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
+    FSEventStreamRef stream;
+    
+    stream = FSEventStreamCreate(NULL,
+                                 &wallpaperSettingsChanged,
+                                 &context,
+                                 CFArrayCreate(NULL, (const void **)&path, 1, NULL),
+                                 kFSEventStreamEventIdSinceNow,
+                                 0,
+                                 kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes
+                                 );
+    
+    FSEventStreamScheduleWithRunLoop(stream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    FSEventStreamStart(stream);
+
 }
 
 - (void)startHTTPServer:(int)aPort
@@ -136,6 +158,11 @@
     return [bitmapRep representationUsingType:NSPNGFileType properties:nil];
 }
 
+- (UInt32)wallpaperId
+{
+    return wallpaperId;
+}
+
 // old coordinate system is flipped
 - (NSRect)toQuartzCoordinates:(NSRect)screenRect
 {
@@ -148,7 +175,25 @@
 }
 
 
-- (void)onWorkspaceChange:(NSNotification*)event
+- (void)notifyWallaperChange
+{
+    // batch wallpaper change calls together
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(triggerChangeHandler)
+                                               object:nil];
+    
+    [self performSelector:@selector(triggerChangeHandler)
+               withObject:nil
+               afterDelay:1];
+}
+
+- (void)triggerChangeHandler
+{
+    wallpaperId++;
+    if(changeHandler) changeHandler();
+}
+
+- (void)workspaceChanged:(NSNotification*)event
 {
     NSURL *currWallpaperUrl = [[[NSWorkspace sharedWorkspace]
                                  desktopImageURLForScreen:window.screen] absoluteURL];
@@ -157,7 +202,7 @@
     
     if ((prevWallpaperUrl && ![prevWallpaperUrl isEqual:currWallpaperUrl]) ||
         (prevWallpaperOptions && ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions])) {
-        changeHandler();
+        [self notifyWallaperChange];
     }
     prevWallpaperUrl = currWallpaperUrl;
     prevWallpaperOptions = currWallpaperOptions;
@@ -166,12 +211,43 @@
 - (void)onWallpaperChange:(WallpaperChangeBlock)handler
 {
     changeHandler = handler;
+    [self listenToWallpaperChanges];
+    
+    NSWorkspace* ws  = [NSWorkspace sharedWorkspace];
+    NSNotificationCenter* notifications = [ws notificationCenter];
+    [notifications addObserver:self
+                      selector:@selector(workspaceChanged:)
+                          name:NSWorkspaceActiveSpaceDidChangeNotification
+                        object:nil];
 }
 
 
 - (NSNumber*)port
 {
     return [NSNumber numberWithInt:port];
+}
+
+void wallpaperSettingsChanged(
+                ConstFSEventStreamRef streamRef,
+                void *this,
+                size_t numEvents,
+                void *eventPaths,
+                const FSEventStreamEventFlags eventFlags[],
+                const FSEventStreamEventId eventIds[])
+{
+    CFStringRef path;
+    CFArrayRef  paths = eventPaths;
+
+    printf("Callback called\n");
+    for (int i=0; i < numEvents; i++) {
+        path = CFArrayGetValueAtIndex(paths, i);
+        if (CFStringFindWithOptions(path, CFSTR("desktoppicture.db"),
+                                    CFRangeMake(0,CFStringGetLength(path)),
+                                    kCFCompareCaseInsensitive,
+                                    NULL) == true) {
+            [(__bridge UBWallperServer*)this notifyWallaperChange];
+        }
+    }
 }
 
 @end

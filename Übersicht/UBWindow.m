@@ -194,16 +194,17 @@
         evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"];
 }
 
-- (NSString*)wallpaperDataUrl
+- (NSString*)wallpaperUrl
 {
-    return [NSString stringWithFormat:@"http://localhost:%@/wallpaper",
-                                        wallpaperServer.port];
+    return [NSString stringWithFormat:@"http://localhost:%@/wallpaper/%i",
+                                        wallpaperServer.port,
+                                        wallpaperServer.wallpaperId];
 }
 
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
 {
-    if (aSelector == @selector(wallpaperDataUrl)) {
+    if (aSelector == @selector(wallpaperUrl)) {
         return NO;
     }
 

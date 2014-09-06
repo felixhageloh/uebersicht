@@ -80,6 +80,7 @@ int const PORT         = 41416;
                                                  name:NSViewFrameDidChangeNotification
                                                object:nil];
     
+    // listen to command key changes
     CFMachPortRef eventTap = CGEventTapCreate(kCGHIDEventTap,
                                                    kCGHeadInsertEventTap,
                                                    kCGEventTapOptionListenOnly,

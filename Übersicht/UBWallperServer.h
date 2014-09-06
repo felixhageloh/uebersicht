@@ -16,5 +16,6 @@ typedef void (^WallpaperChangeBlock)(void);
 - (void)onWallpaperChange:(WallpaperChangeBlock)handler;
 - (NSData*)currentWallpaper;
 - (NSNumber*)port;
+- (UInt32)wallpaperId;
 
 @end
