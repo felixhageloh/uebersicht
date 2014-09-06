@@ -57,13 +57,8 @@
     return self;
 }
 
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
-    wallpaperServer = [[UBWallperServer alloc] initWithWindow:self];
-    [wallpaperServer onWallpaperChange:^{
-        [self notifyWebviewOfWallaperChange];
-    }];
-    
     [self initWebView];
 }
 
@@ -78,6 +73,13 @@
 
 - (void)loadUrl:(NSString*)url
 {
+    if (!wallpaperServer) {
+        wallpaperServer = [[UBWallperServer alloc] initWithWindow:self];
+        [wallpaperServer onWallpaperChange:^{
+            [self notifyWebviewOfWallaperChange];
+        }];
+    }
+    
     widgetsUrl    = url;
     webviewLoaded = NO;
     [webView setMainFrameURL:url];
@@ -198,9 +200,7 @@
 
 - (NSString*)wallpaperUrl
 {
-    return [NSString stringWithFormat:@"http://localhost:%@/wallpaper/%i",
-                                        wallpaperServer.port,
-                                        wallpaperServer.wallpaperId];
+    return wallpaperServer.url;
 }
 
 

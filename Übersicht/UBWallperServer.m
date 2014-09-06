@@ -29,13 +29,15 @@
         window = aWindow;
         port   = 41620;
         
+        int tries = 0;
+        while (![self startHTTPServer:port] && tries < 10) {
+            tries++; port++;
+        }
+        
         NSWorkspace* ws      = [NSWorkspace sharedWorkspace];
         prevWallpaperUrl     = [[ws desktopImageURLForScreen:window.screen] absoluteURL];
         prevWallpaperOptions = [ws desktopImageOptionsForScreen:window.screen];
         wallpaperId          = 0;
-        
-        NSLog(@"%@", self);
-        [self startHTTPServer:port];
     }
     
     return self;
@@ -66,9 +68,12 @@
 
 }
 
-- (void)startHTTPServer:(int)aPort
+- (bool)startHTTPServer:(int)aPort
 {
     socketPort = [[NSSocketPort alloc] initWithTCPPort:aPort];
+    if (!socketPort) {
+        return false;
+    }
 
     fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:socketPort.socket
                                                closeOnDealloc:YES];
@@ -81,11 +86,13 @@
     
     [fileHandle acceptConnectionInBackgroundAndNotify];
     
+    return YES;
+    
 }
 
 - (void)newConnection:(NSNotification *)notification
 {
-    NSLog(@"wallaper server: received wallpaper request");
+    //NSLog(@"wallaper server: received wallpaper request");
     NSDictionary *userInfo = [notification userInfo];
     NSFileHandle *client   = [userInfo objectForKey:
                                       NSFileHandleNotificationFileHandleItem];
@@ -108,7 +115,7 @@
 
 - (void)sendWallaper:(NSFileHandle*)client
 {
-    NSLog(@"wallaper server: sending wallpaper");
+    //NSLog(@"wallaper server: sending wallpaper");
     NSData *wallpaper = [self currentWallpaper];
     
     CFHTTPMessageRef response = CFHTTPMessageCreateResponse(kCFAllocatorDefault,
@@ -137,7 +144,7 @@
     }
     @finally
     {
-        NSLog(@"wallpaper server: done");
+        //NSLog(@"wallpaper server: done");
         CFRelease(headerData);
     }
     
@@ -204,12 +211,18 @@
         (prevWallpaperOptions && ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions])) {
         [self notifyWallaperChange];
     }
+    
     prevWallpaperUrl = currWallpaperUrl;
     prevWallpaperOptions = currWallpaperOptions;
 }
 
 - (void)onWallpaperChange:(WallpaperChangeBlock)handler
 {
+    if (!fileHandle) {
+        NSLog(@"wallpaper change listener requested, but wallpaper server could not be started.");
+        return;
+    }
+    
     changeHandler = handler;
     [self listenToWallpaperChanges];
     
@@ -222,9 +235,11 @@
 }
 
 
-- (NSNumber*)port
+- (NSString*)url
 {
-    return [NSNumber numberWithInt:port];
+    return [NSString stringWithFormat:@"http://127.0.0.1:%d/wallpaper/%i",
+            port,
+            wallpaperId];
 }
 
 void wallpaperSettingsChanged(
@@ -238,7 +253,7 @@ void wallpaperSettingsChanged(
     CFStringRef path;
     CFArrayRef  paths = eventPaths;
 
-    printf("Callback called\n");
+    //printf("Callback called\n");
     for (int i=0; i < numEvents; i++) {
         path = CFArrayGetValueAtIndex(paths, i);
         if (CFStringFindWithOptions(path, CFSTR("desktoppicture.db"),
