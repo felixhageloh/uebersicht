@@ -146,6 +146,7 @@
     {
         //NSLog(@"wallpaper server: done");
         CFRelease(headerData);
+        CFRelease(response);
     }
     
     [client closeFile];
