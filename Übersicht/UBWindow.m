@@ -67,7 +67,6 @@
     [webView setDrawsBackground:NO];
     [webView setMaintainsBackForwardList:NO];
     [webView setFrameLoadDelegate:self];
-    [webView setResourceLoadDelegate:self];
     [webView setPolicyDelegate:self];
 }
 
