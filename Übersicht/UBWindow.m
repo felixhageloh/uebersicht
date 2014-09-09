@@ -116,11 +116,11 @@
 
 - (void)comeToFront
 {
-    if (self.level == kCGNormalWindowLevel-1) return;
+    if (self.isInFront) return;
     
     [self setLevel:kCGNormalWindowLevel-1];
-    [self makeKeyAndOrderFront:self];
     [NSApp activateIgnoringOtherApps:NO];
+    [self makeKeyAndOrderFront:self];
 }
 
 - (BOOL)isInFront
@@ -219,8 +219,6 @@
 - (BOOL)canBecomeKeyWindow      { return [self isInFront]; }
 - (BOOL)canBecomeMainWindow     { return [self isInFront]; }
 - (BOOL)acceptsFirstResponder   { return [self isInFront]; }
-- (BOOL)becomeFirstResponder    { return [self isInFront]; }
-- (BOOL)resignFirstResponder    { return [self isInFront]; }
 - (BOOL)acceptsMouseMovedEvents { return [self isInFront]; }
 
 @end
