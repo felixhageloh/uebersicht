@@ -59,7 +59,7 @@ For convenience, the [nib library](http://visionmedia.github.io/nib/) for Stylus
 Note that widgets are positioned absolute in relation to the screen (minus the menu bar), so a widget with `top: 0` and `left: 0` will be positioned in the top left corner of the screen, just below the menu bar.
 
 
-### render (output)
+### render : output
 
 A **function** returning a HTML string to render this widget. It gets the output of `command` passed in as a string. For example, a widget with:
 
@@ -75,8 +75,12 @@ would render as **Hello World!**. Usually, your `output` will be something more 
 
 The default implementation of render just returns `output`.
 
+### afterRender : domEl
 
-### update (output, domEl)
+A **function** that gets called, as the name suggests, after `render` with a reference to our newly rendered DOM element. It can be used to do one time setups that you wouldn't want to do on every update.
+
+
+### update : output, domEl
 
 A **function** implementing update behavior of this widget. If specified, `render` will be called once when the widget is first initialized. Afterwards, update will be called for every refresh cycle. If no update method is provided, `render` will be called instead.
 
@@ -93,6 +97,16 @@ update: (output, domEl) ->
 ```
 
 This will set the height of .bar every time this widget refreshes. As you can see, jQuery is available.
+
+## Hosted Functionality
+
+A global object called `uebersicht` exists which exposes extra functionality that is typically not available in a browser. At the moment it is very limited:
+
+
+### uebersicht.makeBgSlice(canvas)
+
+Can be called with a canvas element to render a slice of the desktop wallpaper. This can be used to create filter effects, like blur, with the background. The dimensions of the slice are determined by the size and position of the canvas element. They are chosen so that they match exactly what would be directly underneath the canvas element. This means, it is important that the canvas element is correctly positioned before this method is called.
+Calling `makeBgSlice` is like registering an event handler. The background slice will get re-rendered every time the wallpaper changes, so there is no need to call this method repeatedly. In fact, just like an event handler, you should not call this method repeatedly on the same DOM element. For this reason `afterReander` is usually the best place to call this method from.
 
 
 ## Building Übersicht
