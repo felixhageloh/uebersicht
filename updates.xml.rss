@@ -5,7 +5,19 @@
       <link>http://tracesof.net/uebersicht/updates.xml.rss</link>
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
-         <item>
+        <item>
+            <title>Version 0.3</title>
+            <sparkle:releaseNotesLink>
+              http://tracesof.net/uebersicht/releases/0.3.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Tue, Sep 9 2014 09:08:00 +0200</pubDate>
+            <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.3.app.zip"
+                       sparkle:version="10"
+                       sparkle:shortVersionString="0.3"
+                       length="9896"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.2.7</title>
             <sparkle:releaseNotesLink>
               http://tracesof.net/uebersicht/releases/0.2.7.html
