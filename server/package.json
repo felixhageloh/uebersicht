@@ -20,11 +20,11 @@
     "nib": "~1.0.2"
   },
   "dependencies": {
-    "connect": "~2.9.0",
-    "chokidar": "~0.8.1",
+    "chokidar": "^0.8.4",
     "coffee-script": "~1.7.1",
-    "tosource": "~0.1.1",
+    "connect": "~2.9.0",
+    "minimist": "0.0.8",
     "stylus": "~0.42.2",
-    "minimist": "0.0.8"
+    "tosource": "~0.1.1"
   }
 }
