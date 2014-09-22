@@ -4,7 +4,7 @@ describe 'server app', ->
   http = require 'http'
 
   it 'should start on the specified port', (done) ->
-    app = App(3030, 'some/dir')
+    app = App(3030, '../spec/test_widgets')
 
     http.get "http://localhost:3030/widgets", (res) ->
       expect(res.statusCode).toBe 200

@@ -574,22 +574,26 @@ loader = require('./widget_loader.coffee');
 paths = require('path');
 
 module.exports = function(directoryPath) {
-  var api, changeCallback, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, widgetId, widgets;
+  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, stopWatching, watchWidget, watchers, widgetId, widgets;
   api = {};
+  chokidar = require('chokidar');
   widgets = {};
+  watchers = {};
   changeCallback = function() {};
   init = function() {
     var watcher;
-    watcher = require('chokidar').watch(directoryPath);
-    watcher.on('change', function(filePath) {
-      if (isWidgetPath(filePath)) {
-        return registerWidget(loadWidget(filePath));
+    watcher = chokidar.watch(directoryPath, {
+      usePolling: false,
+      persistent: true
+    });
+    watcher.on('add', function(filePath) {
+      if (!isWidgetPath(filePath)) {
+        return;
       }
-    }).on('add', function(filePath) {
-      if (isWidgetPath(filePath)) {
-        return registerWidget(loadWidget(filePath));
-      }
+      registerWidget(loadWidget(filePath));
+      return watchWidget(filePath);
     }).on('unlink', function(filePath) {
+      stopWatching(filePath);
       if (isWidgetPath(filePath)) {
         return deleteWidget(widgetId(filePath));
       }
@@ -608,6 +612,29 @@ module.exports = function(directoryPath) {
     return widgets[id];
   };
   api.path = directoryPath;
+  watchWidget = function(filePath, realChange) {
+    if (realChange == null) {
+      realChange = true;
+    }
+    stopWatching(filePath);
+    watchers[filePath] = chokidar.watch(filePath, {
+      usePolling: false,
+      persistent: false
+    });
+    return watchers[filePath].on('change', function() {
+      watchWidget(filePath, !realChange);
+      if (realChange) {
+        return registerWidget(loadWidget(filePath));
+      }
+    });
+  };
+  stopWatching = function(filePath) {
+    if (watchers[filePath] == null) {
+      return;
+    }
+    watchers[filePath].close();
+    return delete watchers[filePath];
+  };
   loadWidget = function(filePath) {
     var definition, e, id;
     id = widgetId(filePath);

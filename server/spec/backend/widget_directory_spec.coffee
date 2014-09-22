@@ -8,9 +8,10 @@ mockChokidar = ->
       on: (name, cb) ->
         callbacks[name] = cb
         watcher
+      close: ->
   trigger: (name, path) -> callbacks[name]?(path)
 
-describe 'widget directory', ->
+describe 'the widget directory', ->
   widgetDir     = null
   chokidarMock  = null
   callback      = null
@@ -31,7 +32,7 @@ describe 'widget directory', ->
     mockery.deregisterMock('chokidar')
 
 
-  it 'should load new widgets and assign them an id', ->
+  it 'loads new widgets and assign them an id', ->
     chokidarMock.trigger 'add', testWidgetDir+'/widget-1.coffee'
     expect(Object.keys(widgetDir.widgets()).length).toBe 1
     expect(widgetDir.widgets()['widget-1-coffee']).toBeDefined()
