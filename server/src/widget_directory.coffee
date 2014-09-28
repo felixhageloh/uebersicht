@@ -2,6 +2,7 @@ Widget   = require './widget.coffee'
 loader   = require './widget_loader.coffee'
 paths    = require 'path'
 
+
 module.exports = (directoryPath) ->
   api = {}
 
@@ -9,6 +10,8 @@ module.exports = (directoryPath) ->
   widgets  = {}
   watchers = {}
   changeCallback = ->
+
+  osVersion = parseInt require('os').release()
 
   init = ->
     watcher = chokidar.watch directoryPath, usePolling: false, persistent: true
@@ -18,6 +21,7 @@ module.exports = (directoryPath) ->
         registerWidget loadWidget(filePath)
         watchWidget filePath
       .on 'unlink', (filePath) ->
+        console.log 'removed', filePath
         stopWatching filePath
         deleteWidget widgetId(filePath) if isWidgetPath filePath
 
@@ -47,7 +51,11 @@ module.exports = (directoryPath) ->
     stopWatching filePath
     watchers[filePath] = chokidar.watch(filePath, usePolling: false, persistent: false)
     watchers[filePath].on 'change', ->
-      watchWidget filePath, !realChange
+      return unless watchers[filePath]
+      if osVersion < 14
+        watchWidget filePath, true
+      else
+        watchWidget filePath, !realChange
       registerWidget loadWidget(filePath) if realChange
 
   stopWatching = (filePath) ->
@@ -63,6 +71,7 @@ module.exports = (directoryPath) ->
       definition.id = id if definition?
       Widget definition
     catch e
+      return if e.code == 'ENOENT' # widget has been deleted
       notifyError filePath, e
       console.log 'error in widget', id+':', e.message
 
