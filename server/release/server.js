@@ -1256,7 +1256,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, cssId, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   cssId = null;
@@ -1344,6 +1344,7 @@ module.exports = function(implementation) {
       return implementation.update(output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      loadScripts(contentEl);
       if (typeof implementation.afterRender === "function") {
         implementation.afterRender(contentEl);
       }
@@ -1352,6 +1353,18 @@ module.exports = function(implementation) {
         return implementation.update(output, contentEl);
       }
     }
+  };
+  loadScripts = function(domEl) {
+    var s, script, _i, _len, _ref, _results;
+    _ref = domEl.getElementsByTagName('script');
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      script = _ref[_i];
+      s = document.createElement('script');
+      s.src = script.src;
+      _results.push(domEl.replaceChild(s, script));
+    }
+    return _results;
   };
   refresh = function() {
     return $.get('/widgets/' + api.id).done(function(response) {
@@ -1432,7 +1445,8 @@ module.exports = function(widgetDir) {
 
 
 },{}],13:[function(require,module,exports){
-var Widget, loader, paths;
+var Widget, loader, paths,
+  __slice = [].slice;
 
 Widget = require('./widget.coffee');
 
@@ -1441,12 +1455,13 @@ loader = require('./widget_loader.coffee');
 paths = require('path');
 
 module.exports = function(directoryPath) {
-  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, stopWatching, watchWidget, watchers, widgetId, widgets;
+  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, osVersion, prettyPrintError, registerWidget, stopWatching, watchWidget, watchers, widgetId, widgets;
   api = {};
   chokidar = require('chokidar');
   widgets = {};
   watchers = {};
   changeCallback = function() {};
+  osVersion = parseInt(require('os').release());
   init = function() {
     var watcher;
     watcher = chokidar.watch(directoryPath, {
@@ -1460,6 +1475,7 @@ module.exports = function(directoryPath) {
       registerWidget(loadWidget(filePath));
       return watchWidget(filePath);
     }).on('unlink', function(filePath) {
+      console.log('removed', filePath);
       stopWatching(filePath);
       if (isWidgetPath(filePath)) {
         return deleteWidget(widgetId(filePath));
@@ -1489,7 +1505,15 @@ module.exports = function(directoryPath) {
       persistent: false
     });
     return watchers[filePath].on('change', function() {
-      watchWidget(filePath, !realChange);
+      console.log.apply(console, ['change'].concat(__slice.call(arguments)));
+      if (!watchers[filePath]) {
+        return;
+      }
+      if (osVersion < 14) {
+        watchWidget(filePath, true);
+      } else {
+        watchWidget(filePath, !realChange);
+      }
       if (realChange) {
         return registerWidget(loadWidget(filePath));
       }
@@ -1513,6 +1537,9 @@ module.exports = function(directoryPath) {
       return Widget(definition);
     } catch (_error) {
       e = _error;
+      if (e.code === 'ENOENT') {
+        return;
+      }
       notifyError(filePath, e);
       return console.log('error in widget', id + ':', e.message);
     }
@@ -1576,7 +1603,7 @@ module.exports = function(directoryPath) {
 };
 
 
-},{"./widget.coffee":11,"./widget_loader.coffee":14,"chokidar":1,"path":false}],14:[function(require,module,exports){
+},{"./widget.coffee":11,"./widget_loader.coffee":14,"chokidar":1,"os":4,"path":false}],14:[function(require,module,exports){
 var coffee, fs, loadWidget;
 
 fs = require('fs');

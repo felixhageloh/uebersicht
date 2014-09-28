@@ -92,9 +92,17 @@ module.exports = (implementation) ->
       implementation.update(output, contentEl)
     else
       contentEl.innerHTML = render.call(implementation, output)
+      loadScripts(contentEl)
+
       implementation.afterRender?(contentEl)
       rendered = true
       implementation.update(output, contentEl) if implementation.update?
+
+  loadScripts = (domEl) ->
+    for script in domEl.getElementsByTagName('script')
+      s = document.createElement('script')
+      s.src = script.src
+      domEl.replaceChild s, script
 
   refresh = ->
     $.get('/widgets/'+api.id)
