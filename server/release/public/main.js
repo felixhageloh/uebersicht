@@ -389,7 +389,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, cssId, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   cssId = null;
@@ -477,6 +477,7 @@ module.exports = function(implementation) {
       return implementation.update(output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      loadScripts(contentEl);
       if (typeof implementation.afterRender === "function") {
         implementation.afterRender(contentEl);
       }
@@ -485,6 +486,18 @@ module.exports = function(implementation) {
         return implementation.update(output, contentEl);
       }
     }
+  };
+  loadScripts = function(domEl) {
+    var s, script, _i, _len, _ref, _results;
+    _ref = domEl.getElementsByTagName('script');
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      script = _ref[_i];
+      s = document.createElement('script');
+      s.src = script.src;
+      _results.push(domEl.replaceChild(s, script));
+    }
+    return _results;
   };
   refresh = function() {
     return $.get('/widgets/' + api.id).done(function(response) {
