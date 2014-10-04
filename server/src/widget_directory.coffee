@@ -2,7 +2,6 @@ Widget   = require './widget.coffee'
 loader   = require './widget_loader.coffee'
 paths    = require 'path'
 
-
 module.exports = (directoryPath) ->
   api = {}
 
@@ -10,8 +9,6 @@ module.exports = (directoryPath) ->
   widgets  = {}
   watchers = {}
   changeCallback = ->
-
-  osVersion = parseInt require('os').release()
 
   init = ->
     watcher = chokidar.watch directoryPath, usePolling: false, persistent: true
@@ -21,7 +18,6 @@ module.exports = (directoryPath) ->
         registerWidget loadWidget(filePath)
         watchWidget filePath
       .on 'unlink', (filePath) ->
-        console.log 'removed', filePath
         stopWatching filePath
         deleteWidget widgetId(filePath) if isWidgetPath filePath
 
@@ -38,7 +34,7 @@ module.exports = (directoryPath) ->
 
   api.path = directoryPath
 
-  # watching without polling is quriky:
+  # watching without polling is quirky:
   # - watching persistent works exactly once, after which you never hear from
   #   the file again
   # - Re-subscribing to a change event works, but a second change event is
@@ -51,11 +47,7 @@ module.exports = (directoryPath) ->
     stopWatching filePath
     watchers[filePath] = chokidar.watch(filePath, usePolling: false, persistent: false)
     watchers[filePath].on 'change', ->
-      return unless watchers[filePath]
-      if osVersion < 14
-        watchWidget filePath, true
-      else
-        watchWidget filePath, !realChange
+      watchWidget filePath, !realChange
       registerWidget loadWidget(filePath) if realChange
 
   stopWatching = (filePath) ->

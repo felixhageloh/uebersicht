@@ -1445,8 +1445,7 @@ module.exports = function(widgetDir) {
 
 
 },{}],13:[function(require,module,exports){
-var Widget, loader, paths,
-  __slice = [].slice;
+var Widget, loader, paths;
 
 Widget = require('./widget.coffee');
 
@@ -1455,13 +1454,12 @@ loader = require('./widget_loader.coffee');
 paths = require('path');
 
 module.exports = function(directoryPath) {
-  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, osVersion, prettyPrintError, registerWidget, stopWatching, watchWidget, watchers, widgetId, widgets;
+  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, stopWatching, watchWidget, watchers, widgetId, widgets;
   api = {};
   chokidar = require('chokidar');
   widgets = {};
   watchers = {};
   changeCallback = function() {};
-  osVersion = parseInt(require('os').release());
   init = function() {
     var watcher;
     watcher = chokidar.watch(directoryPath, {
@@ -1475,7 +1473,6 @@ module.exports = function(directoryPath) {
       registerWidget(loadWidget(filePath));
       return watchWidget(filePath);
     }).on('unlink', function(filePath) {
-      console.log('removed', filePath);
       stopWatching(filePath);
       if (isWidgetPath(filePath)) {
         return deleteWidget(widgetId(filePath));
@@ -1505,15 +1502,7 @@ module.exports = function(directoryPath) {
       persistent: false
     });
     return watchers[filePath].on('change', function() {
-      console.log.apply(console, ['change'].concat(__slice.call(arguments)));
-      if (!watchers[filePath]) {
-        return;
-      }
-      if (osVersion < 14) {
-        watchWidget(filePath, true);
-      } else {
-        watchWidget(filePath, !realChange);
-      }
+      watchWidget(filePath, !realChange);
       if (realChange) {
         return registerWidget(loadWidget(filePath));
       }
@@ -1603,7 +1592,7 @@ module.exports = function(directoryPath) {
 };
 
 
-},{"./widget.coffee":11,"./widget_loader.coffee":14,"chokidar":1,"os":4,"path":false}],14:[function(require,module,exports){
+},{"./widget.coffee":11,"./widget_loader.coffee":14,"chokidar":1,"path":false}],14:[function(require,module,exports){
 var coffee, fs, loadWidget;
 
 fs = require('fs');
