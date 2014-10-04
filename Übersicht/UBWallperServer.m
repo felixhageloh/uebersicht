@@ -203,18 +203,22 @@
 
 - (void)workspaceChanged:(NSNotification*)event
 {
-    NSURL *currWallpaperUrl = [[[NSWorkspace sharedWorkspace]
-                                 desktopImageURLForScreen:window.screen] absoluteURL];
-    NSDictionary *currWallpaperOptions = [[NSWorkspace sharedWorkspace]
-                                          desktopImageOptionsForScreen:window.screen];
-    
-    if ((prevWallpaperUrl && ![prevWallpaperUrl isEqual:currWallpaperUrl]) ||
-        (prevWallpaperOptions && ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions])) {
-        [self notifyWallaperChange];
-    }
-    
-    prevWallpaperUrl = currWallpaperUrl;
-    prevWallpaperOptions = currWallpaperOptions;
+// == This checks whether the wallpaper has actually changed. Disabled for now as it was causing issues 
+//    NSLog(@"workpace changed");
+//    NSURL *currWallpaperUrl = [[[NSWorkspace sharedWorkspace]
+//                                 desktopImageURLForScreen:window.screen] absoluteURL];
+//    NSDictionary *currWallpaperOptions = [[NSWorkspace sharedWorkspace]
+//                                          desktopImageOptionsForScreen:window.screen];
+    [self notifyWallaperChange];
+
+//    if ((prevWallpaperUrl && ![prevWallpaperUrl isEqual:currWallpaperUrl]) ||
+//        (prevWallpaperOptions && ![prevWallpaperOptions isEqualToDictionary:currWallpaperOptions])) {
+//        NSLog(@"wallpaper is different");
+//        [self notifyWallaperChange];
+//    }
+//    
+//    prevWallpaperUrl = currWallpaperUrl;
+//    prevWallpaperOptions = currWallpaperOptions;
 }
 
 - (void)onWallpaperChange:(WallpaperChangeBlock)handler
