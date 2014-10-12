@@ -46,7 +46,7 @@
             @"cmd"  : @(kCGEventFlagMaskCommand),
             @"ctrl" : @(kCGEventFlagMaskControl),
             @"alt"  : @(kCGEventFlagMaskAlternate),
-            @"shift": @(kCGEventFlagMaskAlphaShift),
+            @"shift": @(kCGEventFlagMaskShift),
             @"none" : @(0x00000000)
         };
         
