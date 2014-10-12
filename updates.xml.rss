@@ -6,6 +6,18 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 0.3.12</title>
+            <sparkle:releaseNotesLink>
+              http://tracesof.net/uebersicht/releases/0.3.12.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sun, Oct 12 2014 12:35:00 +0200</pubDate>
+            <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.3.12.app.zip"
+                       sparkle:version="12"
+                       sparkle:shortVersionString="0.3.12"
+                       length="9752"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.3.11</title>
             <sparkle:releaseNotesLink>
               http://tracesof.net/uebersicht/releases/0.3.11.html
