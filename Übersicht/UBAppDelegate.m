@@ -82,11 +82,11 @@ int const PORT         = 41416;
     
     // listen to command key changes
     CFMachPortRef eventTap = CGEventTapCreate(kCGHIDEventTap,
-                                                   kCGHeadInsertEventTap,
-                                                   kCGEventTapOptionListenOnly,
-                                                   CGEventMaskBit(kCGEventFlagsChanged),
-                                                   &cmdKeyChange,
-                                                   (__bridge void *)(window));
+                                              kCGHeadInsertEventTap,
+                                              kCGEventTapOptionListenOnly,
+                                              CGEventMaskBit(kCGEventFlagsChanged),
+                                              &cmdKeyChange,
+                                              (__bridge void *)(self));
     CFRunLoopSourceRef runLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, eventTap, 0);
     CFRelease(eventTap);
     CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSourceRef, kCFRunLoopDefaultMode);
@@ -175,14 +175,22 @@ int const PORT         = 41416;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
-CGEventRef cmdKeyChange (CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* window) {
-    if((CGEventGetFlags(event) & kCGEventFlagMaskCommand) == 0) {
-        [(__bridge UBWindow*)window sendToDesktop];
+CGEventRef cmdKeyChange (CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* self) {
+    
+    UBAppDelegate* this = (__bridge UBAppDelegate*)self;
+    if((CGEventGetFlags(event) & this.interactionShortcutKey) == 0) {
+        [this.window sendToDesktop];
     } else {
-        [(__bridge UBWindow*)window comeToFront];
+        [this.window comeToFront];
     }
     return event;
 }
+
+- (CGEventFlags)interactionShortcutKey
+{
+    return preferences.interactionShortcut;
+}
+
 
 #
 #pragma mark status bar menu handling
