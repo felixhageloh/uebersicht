@@ -1,858 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-var EventEmitter = require('events').EventEmitter;
-var fs = require('fs');
-var os = require('os');
-var sysPath = require('path');
-
-var fsevents, recursiveReaddir;
-try {
-  fsevents = require('fsevents');
-  recursiveReaddir = require('recursive-readdir');
-} catch (error) {}
-
-var isWindows = os.platform() === 'win32';
-var canUseFsEvents = os.platform() === 'darwin' && !!fsevents;
-
-// To disable FSEvents completely.
-// var canUseFsEvents = false;
-
-// Binary file handling code.
-var _binExts = ['adp', 'au', 'mid', 'mp4a', 'mpga', 'oga', 's3m', 'sil', 'eol', 'dra', 'dts', 'dtshd', 'lvp', 'pya', 'ecelp4800', 'ecelp7470', 'ecelp9600', 'rip', 'weba', 'aac', 'aif', 'caf', 'flac', 'mka', 'm3u', 'wax', 'wma', 'wav', 'xm', 'flac', '3gp', '3g2', 'h261', 'h263', 'h264', 'jpgv', 'jpm', 'mj2', 'mp4', 'mpeg', 'ogv', 'qt', 'uvh', 'uvm', 'uvp', 'uvs', 'dvb', 'fvt', 'mxu', 'pyv', 'uvu', 'viv', 'webm', 'f4v', 'fli', 'flv', 'm4v', 'mkv', 'mng', 'asf', 'vob', 'wm', 'wmv', 'wmx', 'wvx', 'movie', 'smv', 'ts', 'bmp', 'cgm', 'g3', 'gif', 'ief', 'jpg', 'jpeg', 'ktx', 'png', 'btif', 'sgi', 'svg', 'tiff', 'psd', 'uvi', 'sub', 'djvu', 'dwg', 'dxf', 'fbs', 'fpx', 'fst', 'mmr', 'rlc', 'mdi', 'wdp', 'npx', 'wbmp', 'xif', 'webp', '3ds', 'ras', 'cmx', 'fh', 'ico', 'pcx', 'pic', 'pnm', 'pbm', 'pgm', 'ppm', 'rgb', 'tga', 'xbm', 'xpm', 'xwd', 'zip', 'rar', 'tar', 'bz2', 'eot', 'ttf', 'woff'];
-
-var binExts = Object.create(null);
-_binExts.forEach(function(ext) { binExts[ext] = true; });
-
-var isBinary = function(extension) {
-  if (extension === '') return false;
-  return !!binExts[extension];
-}
-
-var isBinaryPath = function(path) {
-  return isBinary(sysPath.extname(path).slice(1));
-};
-
-exports.isBinaryPath = isBinaryPath;
-
-// Main code.
-//
-// Watches files & directories for changes.
-//
-// Emitted events: `add`, `change`, `unlink`, `error`.
-//
-// Examples
-//
-//   var watcher = new FSWatcher()
-//     .add(directories)
-//     .on('add', function(path) {console.log('File', path, 'was added');})
-//     .on('change', function(path) {console.log('File', path, 'was changed');})
-//     .on('unlink', function(path) {console.log('File', path, 'was removed');})
-//
-function FSWatcher(_opts) {
-  if (_opts == null) _opts = {};
-  var opts = {};
-  for (var opt in _opts) opts[opt] = _opts[opt]
-  this.close = this.close.bind(this);
-  EventEmitter.call(this);
-  this.watched = Object.create(null);
-  this.watchers = [];
-  this.closed = false;
-
-  // Set up default options.
-  if (opts.persistent == null) opts.persistent = false;
-  if (opts.ignoreInitial == null) opts.ignoreInitial = false;
-  if (opts.interval == null) opts.interval = 100;
-  if (opts.binaryInterval == null) opts.binaryInterval = 300;
-
-  // Use polling on Mac and Linux.
-  // Disable polling on Windows.
-  if (opts.usePolling == null) opts.usePolling = !isWindows;
-
-  // Enable fsevents on OS X when polling is disabled.
-  // Which is basically super fast watcher.
-  if (opts.useFsEvents == null) opts.useFsEvents = !opts.usePolling;
-  // If we can't use fs events, disable it in any case.
-  if (!canUseFsEvents) opts.useFsEvents = false;
-
-  if (opts.ignorePermissionErrors == null) opts.ignorePermissionErrors = false;
-
-  this.enableBinaryInterval = opts.binaryInterval !== opts.interval;
-
-  this._isIgnored = (function(ignored) {
-    switch (toString.call(ignored)) {
-      case '[object RegExp]':
-        return function(string) {
-          return ignored.test(string);
-        };
-      case '[object Function]':
-        return ignored;
-      default:
-        return function() {
-          return false;
-        };
-    }
-  })(opts.ignored);
-
-  this.options = opts;
-
-  // You’re frozen when your heart’s not open.
-  Object.freeze(opts);
-}
-
-FSWatcher.prototype = Object.create(EventEmitter.prototype);
-
-// Directory helpers
-// -----------------
-
-var directoryEndRegex = /[\\\/]$/;
-FSWatcher.prototype._getWatchedDir = function(directory) {
-  var dir = directory.replace(directoryEndRegex, '');
-  if (this.watched[dir] == null) { this.watched[dir] = []; }
-  return this.watched[dir];
-};
-
-FSWatcher.prototype._addToWatchedDir = function(directory, basename) {
-  var watchedFiles = this._getWatchedDir(directory);
-  return watchedFiles.push(basename);
-};
-
-FSWatcher.prototype._removeFromWatchedDir = function(directory, file) {
-  var watchedFiles = this._getWatchedDir(directory);
-  return watchedFiles.some(function(watchedFile, index) {
-    if (watchedFile === file) {
-      watchedFiles.splice(index, 1);
-      return true;
-    }
-  });
-};
-
-// File helpers
-// ------------
-
-// Private: Check for read permissions
-// Based on this answer on SO: http://stackoverflow.com/a/11781404/1358405
-//
-// stats - fs.Stats object
-//
-// Returns Boolean
-FSWatcher.prototype._hasReadPermissions = function(stats) {
-  return Boolean(4 & parseInt((stats.mode & 0x1ff).toString(8)[0]));
-};
-
-// Private: Handles emitting unlink events for
-// files and directories, and via recursion, for
-// files and directories within directories that are unlinked
-//
-// directory - string, directory within which the following item is located
-// item      - string, base path of item/directory
-//
-// Returns nothing.
-FSWatcher.prototype._remove = function(directory, item) {
-  // if what is being deleted is a directory, get that directory's paths
-  // for recursive deleting and cleaning of watched object
-  // if it is not a directory, nestedDirectoryChildren will be empty array
-  var fullPath = sysPath.join(directory, item);
-  var isDirectory = this.watched[fullPath];
-
-  // This will create a new entry in the watched object in either case
-  // so we got to do the directory check beforehand
-  var nestedDirectoryChildren = this._getWatchedDir(fullPath).slice();
-
-  // Remove directory / file from watched list.
-  this._removeFromWatchedDir(directory, item);
-
-  // Recursively remove children directories / files.
-  nestedDirectoryChildren.forEach(function(nestedItem) {
-    return this._remove(fullPath, nestedItem);
-  }, this);
-
-  if (this.options.usePolling) fs.unwatchFile(fullPath);
-
-  // The Entry will either be a directory that just got removed
-  // or a bogus entry to a file, in either case we have to remove it
-  delete this.watched[fullPath];
-  var eventName = isDirectory ? 'unlinkDir' : 'unlink';
-  this.emit(eventName, fullPath);
-};
-
-// FS Events helper.
-var createFSEventsInstance = function(path, callback) {
-  var watcher = new fsevents(path);
-  watcher.on('fsevent', callback);
-  watcher.start();
-  return watcher;
-};
-
-FSWatcher.prototype._watchWithFsEvents = function(path) {
-  var _this = this;
-  var watcher = createFSEventsInstance(path, function(path, flags) {
-    var emit, info;
-    if (_this._isIgnored(path)) {
-      return;
-    }
-    info = fsevents.getInfo(path, flags);
-    emit = function(event) {
-      var name;
-      name = info.type === 'file' ? event : "" + event + "Dir";
-      if (event === 'add' || event === 'addDir') {
-        _this._addToWatchedDir(sysPath.dirname(path), sysPath.basename(path));
-      } else if (event === 'unlink' || event === 'unlinkDir') {
-        _this._remove(sysPath.dirname(path), sysPath.basename(path));
-        return; // Don't emit event twice.
-      }
-      return _this.emit(name, path);
-    };
-    switch (info.event) {
-      case 'created':
-        return emit('add');
-      case 'modified':
-        return emit('change');
-      case 'deleted':
-        return emit('unlink');
-      case 'moved':
-        return fs.stat(path, function(error, stats) {
-          return emit(error || !stats ? 'unlink' : 'add');
-        });
-    }
-  });
-  return this.watchers.push(watcher);
-};
-
-// Private: Watch file for changes with fs.watchFile or fs.watch.
-
-// item     - string, path to file or directory.
-// callback - function that will be executed on fs change.
-
-// Returns nothing.
-FSWatcher.prototype._watch = function(item, callback) {
-  var basename, directory, options, parent, watcher;
-  if (callback == null) callback = Function.prototype; // empty function
-  directory = sysPath.dirname(item);
-  basename = sysPath.basename(item);
-  parent = this._getWatchedDir(directory);
-  if (parent.indexOf(basename) !== -1) return;
-
-  this._addToWatchedDir(directory, basename);
-  options = {persistent: this.options.persistent};
-
-  if (this.options.usePolling) {
-    options.interval = this.enableBinaryInterval && isBinaryPath(basename) ?
-      this.options.binaryInterval : this.options.interval;
-    fs.watchFile(item, options, function(curr, prev) {
-      if (curr.mtime.getTime() > prev.mtime.getTime()) {
-        callback(item, curr);
-      }
-    });
-  } else {
-    watcher = fs.watch(item, options, function(event, path) {
-      callback(item);
-    });
-    this.watchers.push(watcher);
-  }
-};
-
-// Workaround for the "Windows rough edge" regarding the deletion of directories
-// (https://github.com/joyent/node/issues/4337)
-FSWatcher.prototype._emitError = function(error) {
-  var emit = (function() {
-    this.emit('error', error);
-  }).bind(this);
-
-  if (isWindows && error.code === 'EPERM') {
-    fs.exists(item, function(exists) {
-      if (exists) emit();
-    });
-  } else {
-    emit();
-  }
-};
-
-// Private: Emit `change` event once and watch file to emit it in the future
-// once the file is changed.
-
-// file       - string, fs path.
-// stats      - object, result of executing stat(1) on file.
-// initialAdd - boolean, was the file added at the launch?
-
-// Returns nothing.
-FSWatcher.prototype._handleFile = function(file, stats, initialAdd) {
-  var _this = this;
-  if (initialAdd == null) initialAdd = false;
-  this._watch(file, function(file, newStats) {
-    return _this.emit('change', file, newStats);
-  });
-  if (!(initialAdd && this.options.ignoreInitial)) {
-    return this.emit('add', file, stats);
-  }
-};
-
-// Private: Read directory to add / remove files from `@watched` list
-// and re-read it on change.
-
-// directory - string, fs path.
-
-// Returns nothing.
-FSWatcher.prototype._handleDir = function(directory, stats, initialAdd) {
-  var _this = this;
-  var read = function(directory, initialAdd) {
-    return fs.readdir(directory, function(error, current) {
-      if (error != null) return _this._emitError(error);
-      if (!current) return;
-
-      var previous = _this._getWatchedDir(directory);
-
-      // Files that absent in current directory snapshot
-      // but present in previous emit `remove` event
-      // and are removed from @watched[directory].
-      previous.filter(function(file) {
-        return current.indexOf(file) === -1;
-      }).forEach(function(file) {
-        return _this._remove(directory, file);
-      });
-
-      // Files that present in current directory snapshot
-      // but absent in previous are added to watch list and
-      // emit `add` event.
-      current.filter(function(file) {
-        return previous.indexOf(file) === -1;
-      }).forEach(function(file) {
-        _this._handle(sysPath.join(directory, file), initialAdd);
-      });
-    });
-  };
-  read(directory, initialAdd);
-  this._watch(directory, function(dir) {
-    return read(dir, false);
-  });
-  if (!(initialAdd && this.options.ignoreInitial)) {
-    return this.emit('addDir', directory, stats);
-  }
-};
-
-// Private: Handle added file or directory.
-// Delegates call to _handleFile / _handleDir after checks.
-
-// item - string, path to file or directory.
-
-// Returns nothing.
-FSWatcher.prototype._handle = function(item, initialAdd) {
-  var _this = this;
-  if (this._isIgnored(item)) return;
-  if (_this.closed) return;
-
-  return fs.realpath(item, function(error, path) {
-    if (_this.closed) return;
-    if (error && error.code === 'ENOENT') return;
-    if (error != null) return _this._emitError(error);
-    fs.stat(path, function(error, stats) {
-      if (_this.closed) return;
-      if (error && error.code === 'ENOENT') return;
-      if (error != null) return _this._emitError(error);
-      if (_this.options.ignorePermissionErrors && (!_this._hasReadPermissions(stats))) {
-        return;
-      }
-      if (_this._isIgnored.length === 2 && _this._isIgnored(item, stats)) {
-        return;
-      }
-      if (stats.isFile()) _this._handleFile(item, stats, initialAdd);
-      if (stats.isDirectory()) _this._handleDir(item, stats, initialAdd);
-    });
-  });
-};
-
-FSWatcher.prototype.emit = function(event, arg1) {
-  var data = arguments.length === 2 ? [arg1] : [].slice.call(arguments, 1);
-  var args = [event].concat(data);
-  EventEmitter.prototype.emit.apply(this, args);
-  if (event === 'add' || event === 'addDir' || event === 'change' ||
-      event === 'unlink' || event === 'unlinkDir') {
-    EventEmitter.prototype.emit.apply(this, ['all'].concat(args));
-  }
-};
-
-FSWatcher.prototype._addToFsEvents = function(files) {
-  var _this = this;
-  var handle = function(path) {
-    return _this.emit('add', path);
-  };
-  files.forEach(function(file) {
-    if (!_this.options.ignoreInitial) {
-      fs.stat(file, function(error, stats) {
-        if (error != null) return _this._emitError(error);
-
-        if (stats.isDirectory()) {
-          recursiveReaddir(file, function(error, dirFiles) {
-            if (error != null) return _this._emitError(error);
-            dirFiles
-            .filter(function(path) {
-              return !_this._isIgnored(path);
-            })
-            .forEach(handle);
-          });
-        } else {
-          handle(file);
-        }
-      });
-    }
-    _this._watchWithFsEvents(file);
-  });
-  return this;
-};
-
-// Public: Adds directories / files for tracking.
-
-// * files - array of strings (file paths).
-
-// Examples
-
-//   add ['app', 'vendor']
-
-// Returns an instance of FSWatcher for chaning.
-FSWatcher.prototype.add = function(files) {
-  if (this._initialAdd == null) this._initialAdd = true;
-  if (!Array.isArray(files)) files = [files];
-
-  if (this.options.useFsEvents) return this._addToFsEvents(files);
-
-  files.forEach(function(file) {
-    return this._handle(file, this._initialAdd);
-  }, this);
-  this._initialAdd = false;
-  return this;
-};
-
-// Public: Remove all listeners from watched files.
-// Returns an instance of FSWatcher for chaning.
-FSWatcher.prototype.close = function() {
-  if(this.closed) {
-    return this;
-  }
-
-  var useFsEvents = this.options.useFsEvents;
-  var method = useFsEvents ? 'stop' : 'close';
-
-  this.closed = true;
-  this.watchers.forEach(function(watcher) {
-    watcher[method]();
-  });
-
-  if (this.options.usePolling) {
-    var watched = this.watched;
-    Object.keys(watched).forEach(function(directory) {
-      return watched[directory].forEach(function(file) {
-        return fs.unwatchFile(sysPath.join(directory, file));
-      });
-    });
-  }
-  this.watched = Object.create(null);
-
-  this.removeAllListeners();
-  return this;
-};
-
-exports.FSWatcher = FSWatcher;
-
-exports.watch = function(files, options) {
-  return new FSWatcher(options).add(files);
-};
-
-},{"events":3,"fs":false,"os":4,"path":false,"recursive-readdir":2}],2:[function(require,module,exports){
-var fs = require('fs')
-
-// how to know when you are done?
-function readdir(path, callback) {
-  var list = []
-
-  fs.readdir(path, function (err, files) {
-    if (err) {
-      return callback(err)
-    }
-
-    var pending = files.length
-    if (!pending) {
-      // we are done, woop woop
-      return callback(null, list)
-    }
-
-    files.forEach(function (file) {
-      fs.stat(path + '/' + file, function (err, stats) {
-        if (err) {
-          return callback(err)
-        }
-
-        if (stats.isDirectory()) {
-          files = readdir(path + '/' + file, function (err, res) {
-            list = list.concat(res)
-            pending -= 1
-            if (!pending) {
-              callback(null, list)
-            }
-          })
-        }
-        else {
-          list.push(path + '/' + file)
-          pending -= 1
-          if (!pending) {
-            callback(null, list)
-          }
-        }
-      })
-    })
-  })
-}
-
-module.exports = readdir
-
-},{"fs":false}],3:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        throw TypeError('Uncaught, unspecified "error" event.');
-      }
-      return false;
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        len = arguments.length;
-        args = new Array(len - 1);
-        for (i = 1; i < len; i++)
-          args[i - 1] = arguments[i];
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    len = arguments.length;
-    args = new Array(len - 1);
-    for (i = 1; i < len; i++)
-      args[i - 1] = arguments[i];
-
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    var m;
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      console.trace();
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  var ret;
-  if (!emitter._events || !emitter._events[type])
-    ret = 0;
-  else if (isFunction(emitter._events[type]))
-    ret = 1;
-  else
-    ret = emitter._events[type].length;
-  return ret;
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}],4:[function(require,module,exports){
-exports.endianness = function () { return 'LE' };
-
-exports.hostname = function () {
-    if (typeof location !== 'undefined') {
-        return location.hostname
-    }
-    else return '';
-};
-
-exports.loadavg = function () { return [] };
-
-exports.uptime = function () { return 0 };
-
-exports.freemem = function () {
-    return Number.MAX_VALUE;
-};
-
-exports.totalmem = function () {
-    return Number.MAX_VALUE;
-};
-
-exports.cpus = function () { return [] };
-
-exports.type = function () { return 'Browser' };
-
-exports.release = function () {
-    if (typeof navigator !== 'undefined') {
-        return navigator.appVersion;
-    }
-    return '';
-};
-
-exports.networkInterfaces
-= exports.getNetworkInterfaces
-= function () { return {} };
-
-exports.arch = function () { return 'javascript' };
-
-exports.platform = function () { return 'browser' };
-
-exports.tmpdir = exports.tmpDir = function () {
-    return '/tmp';
-};
-
-exports.EOL = '\n';
-
-},{}],5:[function(require,module,exports){
 module.exports = function (args, opts) {
     if (!opts) opts = {};
     
@@ -1041,7 +187,7 @@ function longest (xs) {
     return Math.max.apply(null, xs.map(function (x) { return x.length }));
 }
 
-},{}],6:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 /* toSource by Marcello Bastea-Forte - zlib license */
 module.exports = function(object, filter, indent, startingIndent) {
     var seen = []
@@ -1088,7 +234,7 @@ var KEYWORD_REGEXP = /^(abstract|boolean|break|byte|case|catch|char|class|const|
 function legalKey(string) {
     return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
 }
-},{}],7:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var UebersichtServer, args, e, handleError, parseArgs, port, server, widgetPath, _ref, _ref1, _ref2, _ref3;
 
 parseArgs = require('minimist');
@@ -1111,7 +257,7 @@ try {
 }
 
 
-},{"./src/app.coffee":8,"minimist":5}],8:[function(require,module,exports){
+},{"./src/app.coffee":4,"minimist":1}],4:[function(require,module,exports){
 var ChangesServer, WidgetCommandServer, WidgetDir, WidgetsServer, connect, path;
 
 connect = require('connect');
@@ -1139,7 +285,7 @@ module.exports = function(port, widgetPath) {
 };
 
 
-},{"./changes_server.coffee":9,"./widget_command_server.coffee":12,"./widget_directory.coffee":13,"./widgets_server.coffee":15,"connect":false,"path":false}],9:[function(require,module,exports){
+},{"./changes_server.coffee":5,"./widget_command_server.coffee":8,"./widget_directory.coffee":9,"./widgets_server.coffee":11,"connect":false,"path":false}],5:[function(require,module,exports){
 var serialize;
 
 serialize = require('./serialize.coffee');
@@ -1228,7 +374,7 @@ module.exports = function() {
 };
 
 
-},{"./serialize.coffee":10}],10:[function(require,module,exports){
+},{"./serialize.coffee":6}],6:[function(require,module,exports){
 module.exports = function(someWidgets) {
   var id, serialized, widget;
   serialized = "({";
@@ -1244,7 +390,7 @@ module.exports = function(someWidgets) {
 };
 
 
-},{}],11:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
 exec = require('child_process').exec;
@@ -1413,7 +559,7 @@ module.exports = function(implementation) {
 };
 
 
-},{"child_process":false,"nib":false,"stylus":false,"tosource":6}],12:[function(require,module,exports){
+},{"child_process":false,"nib":false,"stylus":false,"tosource":2}],8:[function(require,module,exports){
 var BUFFER_SIZE;
 
 BUFFER_SIZE = 500 * 1024;
@@ -1444,7 +590,7 @@ module.exports = function(widgetDir) {
 };
 
 
-},{}],13:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var Widget, loader, paths;
 
 Widget = require('./widget.coffee');
@@ -1454,26 +600,26 @@ loader = require('./widget_loader.coffee');
 paths = require('path');
 
 module.exports = function(directoryPath) {
-  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, stopWatching, watchWidget, watchers, widgetId, widgets;
+  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, widgetId, widgets;
   api = {};
   chokidar = require('chokidar');
   widgets = {};
-  watchers = {};
   changeCallback = function() {};
   init = function() {
     var watcher;
     watcher = chokidar.watch(directoryPath, {
-      usePolling: false,
+      useFsEvents: true,
       persistent: true
     });
     watcher.on('add', function(filePath) {
-      if (!isWidgetPath(filePath)) {
-        return;
+      if (isWidgetPath(filePath)) {
+        return registerWidget(loadWidget(filePath));
       }
-      registerWidget(loadWidget(filePath));
-      return watchWidget(filePath);
+    }).on('change', function(filePath) {
+      if (isWidgetPath(filePath)) {
+        return registerWidget(loadWidget(filePath));
+      }
     }).on('unlink', function(filePath) {
-      stopWatching(filePath);
       if (isWidgetPath(filePath)) {
         return deleteWidget(widgetId(filePath));
       }
@@ -1492,29 +638,6 @@ module.exports = function(directoryPath) {
     return widgets[id];
   };
   api.path = directoryPath;
-  watchWidget = function(filePath, realChange) {
-    if (realChange == null) {
-      realChange = true;
-    }
-    stopWatching(filePath);
-    watchers[filePath] = chokidar.watch(filePath, {
-      usePolling: false,
-      persistent: false
-    });
-    return watchers[filePath].on('change', function() {
-      watchWidget(filePath, !realChange);
-      if (realChange) {
-        return registerWidget(loadWidget(filePath));
-      }
-    });
-  };
-  stopWatching = function(filePath) {
-    if (watchers[filePath] == null) {
-      return;
-    }
-    watchers[filePath].close();
-    return delete watchers[filePath];
-  };
   loadWidget = function(filePath) {
     var definition, e, id;
     id = widgetId(filePath);
@@ -1592,7 +715,7 @@ module.exports = function(directoryPath) {
 };
 
 
-},{"./widget.coffee":11,"./widget_loader.coffee":14,"chokidar":1,"path":false}],14:[function(require,module,exports){
+},{"./widget.coffee":7,"./widget_loader.coffee":10,"chokidar":false,"path":false}],10:[function(require,module,exports){
 var coffee, fs, loadWidget;
 
 fs = require('fs');
@@ -1613,7 +736,7 @@ exports.loadWidget = loadWidget = function(filePath) {
 };
 
 
-},{"coffee-script":false,"fs":false}],15:[function(require,module,exports){
+},{"coffee-script":false,"fs":false}],11:[function(require,module,exports){
 var serialize;
 
 serialize = require('./serialize.coffee');
@@ -1630,4 +753,4 @@ module.exports = function(widgetDir) {
 };
 
 
-},{"./serialize.coffee":10}]},{},[7,8,9,10,11,12,13,14,15])
+},{"./serialize.coffee":6}]},{},[3,4,5,6,7,8,9,10,11])

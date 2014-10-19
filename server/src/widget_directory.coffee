@@ -7,18 +7,16 @@ module.exports = (directoryPath) ->
 
   chokidar = require('chokidar')
   widgets  = {}
-  watchers = {}
   changeCallback = ->
 
   init = ->
-    watcher = chokidar.watch directoryPath, usePolling: false, persistent: true
+    watcher = chokidar.watch directoryPath, useFsEvents: true, persistent: true
     watcher
       .on 'add', (filePath) ->
-        return unless  isWidgetPath(filePath)
-        registerWidget loadWidget(filePath)
-        watchWidget filePath
+        registerWidget loadWidget(filePath) if isWidgetPath(filePath)
+      .on 'change', (filePath) ->
+        registerWidget loadWidget(filePath) if isWidgetPath(filePath)
       .on 'unlink', (filePath) ->
-        stopWatching filePath
         deleteWidget widgetId(filePath) if isWidgetPath filePath
 
     console.log 'watching', directoryPath
@@ -34,26 +32,6 @@ module.exports = (directoryPath) ->
 
   api.path = directoryPath
 
-  # watching without polling is quirky:
-  # - watching persistent works exactly once, after which you never hear from
-  #   the file again
-  # - Re-subscribing to a change event works, but a second change event is
-  #   triggered almost immediately after. Not catching this event will cause
-  #   no further events being fired, but we also do not want to reload the widget
-  #   a second time.
-  # Hence the wierd setup, where if you signal a 'real' change event, the next
-  # following event gets ignored
-  watchWidget = (filePath, realChange = true) ->
-    stopWatching filePath
-    watchers[filePath] = chokidar.watch(filePath, usePolling: false, persistent: false)
-    watchers[filePath].on 'change', ->
-      watchWidget filePath, !realChange
-      registerWidget loadWidget(filePath) if realChange
-
-  stopWatching = (filePath) ->
-    return unless watchers[filePath]?
-    watchers[filePath].close()
-    delete watchers[filePath]
 
   loadWidget = (filePath) ->
     id = widgetId filePath
