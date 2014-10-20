@@ -37,10 +37,13 @@ module.exports = (directoryPath) ->
 
   api.path = directoryPath
 
+  # adds a widget if file path is a widget file (js or coffee)
   addWidget = (filePath) ->
     return unless isWidgetPath(filePath)
     registerWidget loadWidget(filePath)
 
+  # calls itself recursively for every directory and calls addWidget on every
+  # leaf (file path)
   checkWidgetAdded = (path, type) ->
     return addWidget path if type == 'file'
 
@@ -48,15 +51,18 @@ module.exports = (directoryPath) ->
       return console.log err if err
       for subPath in subPaths
         fullPath = paths.join(path, subPath)
-        recurse(fullPath, checkWidgetAdded)
+        getPathType fullPath, checkWidgetAdded
 
+  # removes all widgets where path is the root path or is identical to the
+  # widget path
   checkWidgetRemoved = (path, type) ->
-    return deleteWidget(widgetId(path)) if type == 'file'
-
     for id, widget of widgets when widget.filePath.indexOf(path) == 0
       deleteWidget id
 
-  recurse = (path, callback) ->
+  # get type of path as either 'file' or 'directory'
+  # callback gets called with (path, type) where path is the path passed in, for
+  # convenience
+  getPathType = (path, callback) ->
     #console.log path
     fs.stat path, (err, stat) ->
       return console.log err if err
