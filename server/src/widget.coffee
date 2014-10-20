@@ -24,10 +24,11 @@ module.exports = (implementation) ->
     if (issues = validate(implementation)).length != 0
       throw new Error(issues.join(', '))
 
-    api.id = implementation.id ? 'widget'
-    cssId  = api.id.replace(/\s/g, '_space_')
+    api.id       = implementation.id ? 'widget'
+    api.filePath = implementation.filePath
     api.refreshFrequency = implementation.refreshFrequency ? 1000
 
+    cssId = api.id.replace(/\s/g, '_space_')
     unless implementation.css? or window? # we are client side
       implementation.css = parseStyle(implementation.style ? defaultStyle)
       delete implementation.style

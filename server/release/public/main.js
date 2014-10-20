@@ -405,8 +405,9 @@ module.exports = function(implementation) {
       throw new Error(issues.join(', '));
     }
     api.id = (_ref = implementation.id) != null ? _ref : 'widget';
-    cssId = api.id.replace(/\s/g, '_space_');
+    api.filePath = implementation.filePath;
     api.refreshFrequency = (_ref1 = implementation.refreshFrequency) != null ? _ref1 : 1000;
+    cssId = api.id.replace(/\s/g, '_space_');
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
       implementation.css = parseStyle((_ref2 = implementation.style) != null ? _ref2 : defaultStyle);
       delete implementation.style;
@@ -659,10 +660,19 @@ module.exports = function(directoryPath) {
       return _results;
     });
   };
-  checkWidgetRemoved = function(filePath, type) {
+  checkWidgetRemoved = function(path, type) {
+    var id, widget, _results;
     if (type === 'file') {
-      return deleteWidget(widgetId(filePath));
+      return deleteWidget(widgetId(path));
     }
+    _results = [];
+    for (id in widgets) {
+      widget = widgets[id];
+      if (widget.filePath.indexOf(path) === 0) {
+        _results.push(deleteWidget(id));
+      }
+    }
+    return _results;
   };
   recurse = function(path, callback) {
     return fs.stat(path, function(err, stat) {
@@ -770,6 +780,7 @@ exports.loadWidget = loadWidget = function(filePath) {
   } else {
     definition = eval('({' + definition + '})');
   }
+  definition.filePath = filePath;
   return definition;
 };
 

@@ -10,4 +10,5 @@ exports.loadWidget = loadWidget = (filePath) ->
   else
     definition = eval '({' + definition + '})'
 
+  definition.filePath = filePath
   definition

@@ -15,8 +15,6 @@ module.exports = (directoryPath) ->
     watcher.on 'change', (filePath, info) ->
       console.log filePath, JSON.stringify(info)
       return if info.type  == 'directory' and !isWidgetDirPath(info.path)
-      return if info.type  == 'file'      and !isWidgetPath(info.path)
-      return if info.event == 'modified'  and !widgets[widgetId(filePath)]
 
       switch info.event
         when 'modified'             then addWidget filePath
@@ -52,8 +50,11 @@ module.exports = (directoryPath) ->
         fullPath = paths.join(path, subPath)
         recurse(fullPath, checkWidgetAdded)
 
-  checkWidgetRemoved = (filePath, type) ->
-    return deleteWidget(widgetId(filePath)) if type == 'file'
+  checkWidgetRemoved = (path, type) ->
+    return deleteWidget(widgetId(path)) if type == 'file'
+
+    for id, widget of widgets when widget.filePath.indexOf(path) == 0
+      deleteWidget id
 
   recurse = (path, callback) ->
     #console.log path
