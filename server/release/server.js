@@ -591,7 +591,7 @@ module.exports = function(widgetDir) {
 
 
 },{}],9:[function(require,module,exports){
-var Widget, loader, paths;
+var Widget, fs, loader, paths;
 
 Widget = require('./widget.coffee');
 
@@ -599,32 +599,42 @@ loader = require('./widget_loader.coffee');
 
 paths = require('path');
 
+fs = require('fs');
+
 module.exports = function(directoryPath) {
-  var api, changeCallback, chokidar, deleteWidget, init, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, widgetId, widgets;
+  var addWidget, api, changeCallback, checkWidgetAdded, checkWidgetRemoved, deleteWidget, fsevents, init, isWidgetDirPath, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, recurse, registerWidget, widgetId, widgets;
   api = {};
-  chokidar = require('chokidar');
+  fsevents = require('fsevents');
   widgets = {};
   changeCallback = function() {};
   init = function() {
     var watcher;
-    watcher = chokidar.watch(directoryPath, {
-      useFsEvents: true,
-      persistent: true
+    watcher = fsevents(directoryPath);
+    watcher.on('change', function(filePath, info) {
+      console.log(filePath, JSON.stringify(info));
+      if (info.type === 'directory' && !isWidgetDirPath(info.path)) {
+        return;
+      }
+      if (info.type === 'file' && !isWidgetPath(info.path)) {
+        return;
+      }
+      if (info.event === 'modified' && !widgets[widgetId(filePath)]) {
+        return;
+      }
+      switch (info.event) {
+        case 'modified':
+          return addWidget(filePath);
+        case 'moved-in':
+        case 'created':
+          return checkWidgetAdded(filePath, info.type);
+        case 'moved-out':
+        case 'deleted':
+          return checkWidgetRemoved(filePath, info.type);
+      }
     });
-    watcher.on('add', function(filePath) {
-      if (isWidgetPath(filePath)) {
-        return registerWidget(loadWidget(filePath));
-      }
-    }).on('change', function(filePath) {
-      if (isWidgetPath(filePath)) {
-        return registerWidget(loadWidget(filePath));
-      }
-    }).on('unlink', function(filePath) {
-      if (isWidgetPath(filePath)) {
-        return deleteWidget(widgetId(filePath));
-      }
-    });
+    watcher.start();
     console.log('watching', directoryPath);
+    checkWidgetAdded(directoryPath, 'directory');
     return api;
   };
   api.watch = function(callback) {
@@ -638,6 +648,45 @@ module.exports = function(directoryPath) {
     return widgets[id];
   };
   api.path = directoryPath;
+  addWidget = function(filePath) {
+    if (!isWidgetPath(filePath)) {
+      return;
+    }
+    return registerWidget(loadWidget(filePath));
+  };
+  checkWidgetAdded = function(path, type) {
+    if (type === 'file') {
+      return addWidget(path);
+    }
+    return fs.readdir(path, function(err, subPaths) {
+      var fullPath, subPath, _i, _len, _results;
+      if (err) {
+        return console.log(err);
+      }
+      _results = [];
+      for (_i = 0, _len = subPaths.length; _i < _len; _i++) {
+        subPath = subPaths[_i];
+        fullPath = paths.join(path, subPath);
+        _results.push(recurse(fullPath, checkWidgetAdded));
+      }
+      return _results;
+    });
+  };
+  checkWidgetRemoved = function(filePath, type) {
+    if (type === 'file') {
+      return deleteWidget(widgetId(filePath));
+    }
+  };
+  recurse = function(path, callback) {
+    return fs.stat(path, function(err, stat) {
+      var type;
+      if (err) {
+        return console.log(err);
+      }
+      type = stat.isDirectory() ? 'directory' : 'file';
+      return callback(path, type);
+    });
+  };
   loadWidget = function(filePath) {
     var definition, e, id;
     id = widgetId(filePath);
@@ -708,14 +757,16 @@ module.exports = function(directoryPath) {
     return fileParts.join('-').replace(/\./g, '-');
   };
   isWidgetPath = function(filePath) {
-    var _ref;
-    return (_ref = filePath.match(/\.coffee$/)) != null ? _ref : filePath.match(/\.js$/);
+    return /\.coffee$|\.js$/.test(filePath);
+  };
+  isWidgetDirPath = function(path) {
+    return /\.widget$/.test(path);
   };
   return api;
 };
 
 
-},{"./widget.coffee":7,"./widget_loader.coffee":10,"chokidar":false,"path":false}],10:[function(require,module,exports){
+},{"./widget.coffee":7,"./widget_loader.coffee":10,"fs":false,"fsevents":false,"path":false}],10:[function(require,module,exports){
 var coffee, fs, loadWidget;
 
 fs = require('fs');

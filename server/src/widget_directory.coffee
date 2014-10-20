@@ -1,25 +1,32 @@
 Widget   = require './widget.coffee'
 loader   = require './widget_loader.coffee'
 paths    = require 'path'
+fs       = require 'fs'
 
 module.exports = (directoryPath) ->
   api = {}
 
-  chokidar = require('chokidar')
+  fsevents = require('fsevents')
   widgets  = {}
   changeCallback = ->
 
   init = ->
-    watcher = chokidar.watch directoryPath, useFsEvents: true, persistent: true
-    watcher
-      .on 'add', (filePath) ->
-        registerWidget loadWidget(filePath) if isWidgetPath(filePath)
-      .on 'change', (filePath) ->
-        registerWidget loadWidget(filePath) if isWidgetPath(filePath)
-      .on 'unlink', (filePath) ->
-        deleteWidget widgetId(filePath) if isWidgetPath filePath
+    watcher = fsevents directoryPath
+    watcher.on 'change', (filePath, info) ->
+      console.log filePath, JSON.stringify(info)
+      return if info.type  == 'directory' and !isWidgetDirPath(info.path)
+      return if info.type  == 'file'      and !isWidgetPath(info.path)
+      return if info.event == 'modified'  and !widgets[widgetId(filePath)]
 
+      switch info.event
+        when 'modified'             then addWidget filePath
+        when 'moved-in',  'created' then checkWidgetAdded filePath, info.type
+        when 'moved-out', 'deleted' then checkWidgetRemoved filePath, info.type
+
+    watcher.start()
     console.log 'watching', directoryPath
+
+    checkWidgetAdded directoryPath, 'directory'
     api
 
   api.watch = (callback) ->
@@ -32,6 +39,28 @@ module.exports = (directoryPath) ->
 
   api.path = directoryPath
 
+  addWidget = (filePath) ->
+    return unless isWidgetPath(filePath)
+    registerWidget loadWidget(filePath)
+
+  checkWidgetAdded = (path, type) ->
+    return addWidget path if type == 'file'
+
+    fs.readdir path, (err, subPaths) ->
+      return console.log err if err
+      for subPath in subPaths
+        fullPath = paths.join(path, subPath)
+        recurse(fullPath, checkWidgetAdded)
+
+  checkWidgetRemoved = (filePath, type) ->
+    return deleteWidget(widgetId(filePath)) if type == 'file'
+
+  recurse = (path, callback) ->
+    #console.log path
+    fs.stat path, (err, stat) ->
+      return console.log err if err
+      type = if stat.isDirectory() then 'directory' else 'file'
+      callback path, type
 
   loadWidget = (filePath) ->
     id = widgetId filePath
@@ -84,6 +113,9 @@ module.exports = (directoryPath) ->
     fileParts.join('-').replace(/\./g, '-')
 
   isWidgetPath = (filePath) ->
-    filePath.match(/\.coffee$/) ? filePath.match(/\.js$/)
+    /\.coffee$|\.js$/.test filePath
+
+  isWidgetDirPath = (path) ->
+    /\.widget$/.test path
 
   api
