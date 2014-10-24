@@ -282,13 +282,18 @@ module.exports = function() {
 
 
 },{"./serialize.coffee":7}],6:[function(require,module,exports){
-var cachedWallpaper, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
+var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
 cachedWallpaper = new Image();
 
 window.addEventListener('onwallpaperchange', function() {
+  var slices;
+  slices = getWallpaperSlices();
+  if (!(slices.length > 0)) {
+    return;
+  }
   return loadWallpaper(function(wallpaper) {
-    return renderWallpaperSlices(wallpaper);
+    return renderWallpaperSlices(wallpaper, slices);
   });
 });
 
@@ -335,12 +340,15 @@ loadWallpaper = function(callback) {
   return cachedWallpaper.src = os.wallpaperUrl();
 };
 
-renderWallpaperSlices = function(wallpaper) {
-  var canvas, _i, _len, _ref, _results;
-  _ref = $('[data-bg-slice=true]');
+getWallpaperSlices = function() {
+  return $('[data-bg-slice=true]');
+};
+
+renderWallpaperSlices = function(wallpaper, slices) {
+  var canvas, _i, _len, _results;
   _results = [];
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    canvas = _ref[_i];
+  for (_i = 0, _len = slices.length; _i < _len; _i++) {
+    canvas = slices[_i];
     _results.push(renderWallpaperSlice(wallpaper, canvas));
   }
   return _results;
