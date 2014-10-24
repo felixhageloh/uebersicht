@@ -142,7 +142,6 @@
     
     @try
     {
-        NSLog(@"wallaper server: sending wallpaper");
         [client writeData:(__bridge NSData *)headerData];
         [client writeData:wallpaper];
     }
