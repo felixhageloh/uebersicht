@@ -1,5 +1,6 @@
 mockery = require 'mockery'
 path    = require 'path'
+fs      = require 'fs'
 
 fsEventsMock = null
 
@@ -16,7 +17,7 @@ describe 'the widget directory', ->
   widgetDir     = null
   fsEventsMock  = null
   callback      = null
-  testWidgetDir = path.resolve(__dirname, '../test_widgets')
+  testDirPath   = path.resolve(__dirname, '../test_widgets')
 
   beforeEach ->
     mockery.enable()
@@ -24,14 +25,14 @@ describe 'the widget directory', ->
     mockery.registerAllowable '../../src/widget.coffee'
     mockery.registerAllowable '../../src/widget_directory.coffee'
 
-    widgetDir = require('../../src/widget_directory.coffee')(testWidgetDir)
+    widgetDir = require('../../src/widget_directory.coffee')(testDirPath)
     callback = jasmine.createSpy('change callback')
     widgetDir.watch callback
 
     mockery.disable()
     mockery.deregisterMock('fsevents')
 
-  it "loads widgets that are already present in the widget dir", ->
+  it "loads widgets that are already present in the widget dir", (done) ->
     waitsFor ->
       Object.keys(widgetDir.widgets()).length == 3
 
@@ -39,18 +40,18 @@ describe 'the widget directory', ->
       expect(widgetDir.widgets()['widget-1-coffee']).toBeDefined()
       expect(widgetDir.widgets()['widget-2-coffee']).toBeDefined()
       expect(widgetDir.widgets()['some-dir-widget-index-1-coffee']).toBeDefined()
-
+      done()
 
   describe 'single file events', ->
     # this works because widgets are loaded async
     it 'loads new widgets and assign them an id', ->
-      fsEventsMock.trigger 'created', 'file', testWidgetDir+'/widget-1.coffee'
+      fsEventsMock.trigger 'created', 'file', testDirPath+'/widget-1.coffee'
       expect(Object.keys(widgetDir.widgets()).length).toBe 1
       expect(widgetDir.widgets()['widget-1-coffee']).toBeDefined()
       expect(widgetDir.widgets()['widget-1-coffee'].id).toEqual 'widget-1-coffee'
       callback.reset()
 
-      fsEventsMock.trigger 'moved-in', 'file', testWidgetDir+'/widget-2.coffee'
+      fsEventsMock.trigger 'moved-in', 'file', testDirPath+'/widget-2.coffee'
       expect(Object.keys(widgetDir.widgets()).length).toBe 2
       expect(widgetDir.widgets()['widget-1-coffee']).toBeDefined()
       expect(widgetDir.widgets()['widget-1-coffee'].id).toEqual 'widget-1-coffee'
@@ -58,38 +59,39 @@ describe 'the widget directory', ->
       expect(widgetDir.widgets()['widget-2-coffee'].id).toEqual 'widget-2-coffee'
 
 
-    it 'unloads deleted widgets', ->
+    it 'unloads deleted widgets', (done) ->
       waitsFor ->
         Object.keys(widgetDir.widgets()).length == 3
 
       runs ->
         # deleted event
-        fsEventsMock.trigger 'deleted', 'file', testWidgetDir+'/widget-1.coffee'
+        fsEventsMock.trigger 'deleted', 'file', testDirPath+'/widget-1.coffee'
         expect(Object.keys(widgetDir.widgets()).length).toBe 2
         expect(widgetDir.widgets()['widget-1-coffee']).not.toBeDefined()
 
         # moved-out event
-        fsEventsMock.trigger 'moved-out', 'file', testWidgetDir+'/widget-2.coffee'
+        fsEventsMock.trigger 'moved-out', 'file', testDirPath+'/widget-2.coffee'
         expect(Object.keys(widgetDir.widgets()).length).toBe 1
         expect(widgetDir.widgets()['widget-1-coffee']).not.toBeDefined()
+        done()
 
     it 'provides a widget accessor', ->
-      fsEventsMock.trigger 'created', 'file', testWidgetDir+'/widget-1.coffee'
+      fsEventsMock.trigger 'created', 'file', testDirPath+'/widget-1.coffee'
       expect(widgetDir.get('widget-1-coffee')).toBeDefined()
 
     it 'notifies listeners to changes', ->
-      fsEventsMock.trigger 'modified', 'file', testWidgetDir+'/widget-1.coffee'
+      fsEventsMock.trigger 'modified', 'file', testDirPath+'/widget-1.coffee'
       expect(callback).toHaveBeenCalledWith 'widget-1-coffee': jasmine.any(Object)
       callback.reset()
 
-      fsEventsMock.trigger 'deleted', '', testWidgetDir+'/widget-1.coffee'
+      fsEventsMock.trigger 'deleted', '', testDirPath+'/widget-1.coffee'
       expect(callback).toHaveBeenCalledWith 'widget-1-coffee': 'deleted'
 
     it "doesn't interpret other files as widgets", ->
-      fsEventsMock.trigger 'created', 'file', testWidgetDir+'/some-other-file'
+      fsEventsMock.trigger 'created', 'file', testDirPath+'/some-other-file'
       expect(callback).not.toHaveBeenCalled()
 
-      fsEventsMock.trigger 'moved-in', 'file', testWidgetDir+'/foo.js.lib'
+      fsEventsMock.trigger 'moved-in', 'file', testDirPath+'/foo.js.lib'
       expect(callback).not.toHaveBeenCalled()
 
 
@@ -100,21 +102,37 @@ describe 'the widget directory', ->
         lastMessage = Array::slice.call(arguments).join(' ')
         realLog.apply console, arguments
 
-      fsEventsMock.trigger 'created', 'file', testWidgetDir+'/broken-widget.coffee'
+      fsEventsMock.trigger 'created', 'file', testDirPath+'/broken-widget.coffee'
       expect(lastMessage.indexOf('error')).not.toBe -1
       expect(lastMessage.indexOf('broken-widget-coffee')).not.toBe -1
 
       console.log = realLog
 
-  # describe 'directory events', ->
-  #   it 'loads widgets inside a directory', ->
-  #     fsEventsMock.trigger 'created', 'directory', testWidgetDir+'/some-dir.widget/index-1.coffee'
+  # TODO: these specs are not self contained and need to run in order.
+  describe 'directory events', ->
+    it 'loads widgets inside a new directory', (done) ->
+      fs.mkdirSync "#{testDirPath}/another.widget"
+      fs.writeFileSync "#{testDirPath}/another.widget/index.coffee", "command: ''"
+      fsEventsMock.trigger 'created', 'directory', "#{testDirPath}/another.widget"
 
-  #     waitsFor ->
-  #       Object.keys(widgetDir.widgets()).length == 1
+      waitsFor ->
+        Object.keys(widgetDir.widgets()).length == 4
 
-  #     runs ->
-  #       expect(widgetDir.widgets()['some-dir-widget-index-1-coffee']).toBeDefined()
-  #       expect(widgetDir.widgets()['some-dir-widget-index-1-coffee'].id).toEqual 'some-dir-widget-index-1-coffee'
+      runs ->
+        expect(widgetDir.widgets()['another-widget-index-coffee']).toBeDefined()
+        expect(widgetDir.widgets()['another-widget-index-coffee'].id).toEqual 'another-widget-index-coffee'
+        done()
+
+    it 'deletes widgets inside a deleted directory', (done) ->
+      fs.unlinkSync "#{testDirPath}/another.widget/index.coffee"
+      fs.rmdirSync "#{testDirPath}/another.widget"
+      fsEventsMock.trigger 'deleted', 'directory', "#{testDirPath}/another.widget"
+
+      waitsFor ->
+        Object.keys(widgetDir.widgets()).length == 3
+
+      runs ->
+        expect(widgetDir.widgets()['another-widget-index-coffee']).not.toBeDefined()
+        done()
 
 
