@@ -1,8 +1,11 @@
 cachedWallpaper = new Image()
 
 window.addEventListener 'onwallpaperchange', ->
+  slices = getWallpaperSlices()
+  return unless slices.length > 0
+
   loadWallpaper (wallpaper) ->
-    renderWallpaperSlices(wallpaper)
+    renderWallpaperSlices(wallpaper, slices)
 
 exports.makeBgSlice = (canvas) ->
   canvas = $(canvas)
@@ -30,9 +33,12 @@ loadWallpaper = (callback) ->
   cachedWallpaper.onload = -> callback(cachedWallpaper)
   cachedWallpaper.src = os.wallpaperUrl()
 
-renderWallpaperSlices = (wallpaper) ->
+getWallpaperSlices = ->
   # slower than storing those, but avoids memory leaks
-  for canvas in $('[data-bg-slice=true]')
+  $('[data-bg-slice=true]')
+
+renderWallpaperSlices = (wallpaper, slices) ->
+  for canvas in slices
     renderWallpaperSlice(wallpaper, canvas)
 
 renderWallpaperSlice = (wallpaper, canvas) ->

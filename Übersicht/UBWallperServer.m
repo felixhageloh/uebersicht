@@ -104,8 +104,6 @@
     }
     
     [fileHandle acceptConnectionInBackgroundAndNotify];
-    
-    [currentClient closeFile];
     currentClient = client;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -117,6 +115,10 @@
 {
     //NSLog(@"wallaper server: sending wallpaper");
     NSData *wallpaper = [self currentWallpaper];
+    if (!(wallpaper && wallpaper.length > 0)) {
+        [client closeFile];
+        return;
+    }
     
     CFHTTPMessageRef response = CFHTTPMessageCreateResponse(kCFAllocatorDefault,
                                                             200,
@@ -133,6 +135,11 @@
                                      (__bridge CFStringRef)[NSString stringWithFormat:@"%ld", wallpaper.length]);
     CFDataRef headerData = CFHTTPMessageCopySerializedMessage(response);
     
+    if (client != currentClient) {
+        [client closeFile];
+        return;
+    }
+    
     @try
     {
         [client writeData:(__bridge NSData *)headerData];
@@ -147,9 +154,8 @@
         //NSLog(@"wallpaper server: done");
         CFRelease(headerData);
         CFRelease(response);
+        [client closeFile];
     }
-    
-    [client closeFile];
 }
 
 - (NSData*)currentWallpaper
