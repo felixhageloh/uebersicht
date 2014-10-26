@@ -540,13 +540,18 @@ describe('widget', function() {
 
 
 },{"../../src/widget.coffee":7}],6:[function(require,module,exports){
-var cachedWallpaper, getWallpaper, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
+var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
 cachedWallpaper = new Image();
 
 window.addEventListener('onwallpaperchange', function() {
+  var slices;
+  slices = getWallpaperSlices();
+  if (!(slices.length > 0)) {
+    return;
+  }
   return loadWallpaper(function(wallpaper) {
-    return renderWallpaperSlices(wallpaper);
+    return renderWallpaperSlices(wallpaper, slices);
   });
 });
 
@@ -593,12 +598,15 @@ loadWallpaper = function(callback) {
   return cachedWallpaper.src = os.wallpaperUrl();
 };
 
-renderWallpaperSlices = function(wallpaper) {
-  var canvas, _i, _len, _ref, _results;
-  _ref = $('[data-bg-slice=true]');
+getWallpaperSlices = function() {
+  return $('[data-bg-slice=true]');
+};
+
+renderWallpaperSlices = function(wallpaper, slices) {
+  var canvas, _i, _len, _results;
   _results = [];
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    canvas = _ref[_i];
+  for (_i = 0, _len = slices.length; _i < _len; _i++) {
+    canvas = slices[_i];
     _results.push(renderWallpaperSlice(wallpaper, canvas));
   }
   return _results;
@@ -631,7 +639,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, cssId, defaultStyle, el, errorToString, init, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   cssId = null;
@@ -647,8 +655,9 @@ module.exports = function(implementation) {
       throw new Error(issues.join(', '));
     }
     api.id = (_ref = implementation.id) != null ? _ref : 'widget';
-    cssId = api.id.replace(/\s/g, '_space_');
+    api.filePath = implementation.filePath;
     api.refreshFrequency = (_ref1 = implementation.refreshFrequency) != null ? _ref1 : 1000;
+    cssId = api.id.replace(/\s/g, '_space_');
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
       implementation.css = parseStyle((_ref2 = implementation.style) != null ? _ref2 : defaultStyle);
       delete implementation.style;
@@ -719,6 +728,7 @@ module.exports = function(implementation) {
       return implementation.update(output, contentEl);
     } else {
       contentEl.innerHTML = render.call(implementation, output);
+      loadScripts(contentEl);
       if (typeof implementation.afterRender === "function") {
         implementation.afterRender(contentEl);
       }
@@ -727,6 +737,18 @@ module.exports = function(implementation) {
         return implementation.update(output, contentEl);
       }
     }
+  };
+  loadScripts = function(domEl) {
+    var s, script, _i, _len, _ref, _results;
+    _ref = domEl.getElementsByTagName('script');
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      script = _ref[_i];
+      s = document.createElement('script');
+      s.src = script.src;
+      _results.push(domEl.replaceChild(s, script));
+    }
+    return _results;
   };
   refresh = function() {
     return $.get('/widgets/' + api.id).done(function(response) {

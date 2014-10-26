@@ -13,8 +13,8 @@ module.exports = (directoryPath) ->
   init = ->
     watcher = fsevents directoryPath
     watcher.on 'change', (filePath, info) ->
-      console.log filePath, JSON.stringify(info)
-      return if info.type  == 'directory' and !isWidgetDirPath(info.path)
+      # can be enabled in the future to make the watcher more strict
+      #return if info.type  == 'directory' and !isWidgetDirPath(info.path)
 
       switch info.event
         when 'modified'             then addWidget filePath

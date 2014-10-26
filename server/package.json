@@ -10,11 +10,11 @@
   "author": "Felix Hageloh",
   "license": "GPL v3 <http://www.gnu.org/licenses/>",
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-browserify": "~1.2.12",
     "coffeeify": "~0.5.2",
+    "grunt": "~0.4.1",
+    "grunt-browserify": "~1.2.12",
     "grunt-contrib-jasmine": "~0.5.3",
+    "grunt-contrib-watch": "~0.5.3",
     "jasmine-node": "~1.11.0",
     "mockery": "~1.4.0",
     "nib": "~1.0.2"

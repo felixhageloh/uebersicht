@@ -598,7 +598,7 @@ paths = require('path');
 fs = require('fs');
 
 module.exports = function(directoryPath) {
-  var addWidget, api, changeCallback, checkWidgetAdded, checkWidgetRemoved, deleteWidget, fsevents, init, isWidgetDirPath, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, recurse, registerWidget, widgetId, widgets;
+  var addWidget, api, changeCallback, checkWidgetAdded, checkWidgetRemoved, deleteWidget, fsevents, getPathType, init, isWidgetDirPath, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, widgetId, widgets;
   api = {};
   fsevents = require('fsevents');
   widgets = {};
@@ -607,16 +607,7 @@ module.exports = function(directoryPath) {
     var watcher;
     watcher = fsevents(directoryPath);
     watcher.on('change', function(filePath, info) {
-      console.log(filePath, JSON.stringify(info));
-      if (info.type === 'directory' && !isWidgetDirPath(info.path)) {
-        return;
-      }
-      if (info.type === 'file' && !isWidgetPath(info.path)) {
-        return;
-      }
-      if (info.event === 'modified' && !widgets[widgetId(filePath)]) {
-        return;
-      }
+      console.log(filePath, info.event, info.type);
       switch (info.event) {
         case 'modified':
           return addWidget(filePath);
@@ -663,16 +654,13 @@ module.exports = function(directoryPath) {
       for (_i = 0, _len = subPaths.length; _i < _len; _i++) {
         subPath = subPaths[_i];
         fullPath = paths.join(path, subPath);
-        _results.push(recurse(fullPath, checkWidgetAdded));
+        _results.push(getPathType(fullPath, checkWidgetAdded));
       }
       return _results;
     });
   };
   checkWidgetRemoved = function(path, type) {
     var id, widget, _results;
-    if (type === 'file') {
-      return deleteWidget(widgetId(path));
-    }
     _results = [];
     for (id in widgets) {
       widget = widgets[id];
@@ -682,7 +670,7 @@ module.exports = function(directoryPath) {
     }
     return _results;
   };
-  recurse = function(path, callback) {
+  getPathType = function(path, callback) {
     return fs.stat(path, function(err, stat) {
       var type;
       if (err) {
