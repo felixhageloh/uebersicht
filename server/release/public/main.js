@@ -607,7 +607,6 @@ module.exports = function(directoryPath) {
     var watcher;
     watcher = fsevents(directoryPath);
     watcher.on('change', function(filePath, info) {
-      console.log(filePath, info.event, info.type);
       switch (info.event) {
         case 'modified':
           return addWidget(filePath);
