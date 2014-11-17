@@ -16,3 +16,7 @@ profile
 *.moved-aside
 DerivedData
 .idea/
+
+# manual
+
+server/node_modules
