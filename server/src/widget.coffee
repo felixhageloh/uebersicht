@@ -8,14 +8,15 @@ nib      = require('nib')
 # A widgets mostly lives client side, in the DOM. However, the
 # backend also initializes widgets and runs widgets commands.
 module.exports = (implementation) ->
-  api   = {}
+  api = {}
+
   el        = null
   cssId     = null
   contentEl = null
   timer     = null
-  render    = null
   started   = false
   rendered  = false
+  childProc = null
 
   defaultStyle = 'top: 30px; left: 10px'
 
@@ -24,17 +25,23 @@ module.exports = (implementation) ->
     if (issues = validate(implementation)).length != 0
       throw new Error(issues.join(', '))
 
-    api.id       = implementation.id ? 'widget'
-    api.filePath = implementation.filePath
-    api.refreshFrequency = implementation.refreshFrequency ? 1000
+    api[k] = v for k, v of implementation
 
     cssId = api.id.replace(/\s/g, '_space_')
     unless implementation.css? or window? # we are client side
       implementation.css = parseStyle(implementation.style ? defaultStyle)
       delete implementation.style
 
-    render = implementation.render ? (output) -> output
     api
+
+  # defaults
+  api.id = 'widget'
+
+  api.refreshFrequency = 1000
+
+  api.render = (output) -> output
+
+  api.afterRender = ->
 
   # renders and returns the widget's dom element
   api.create  = ->
@@ -66,7 +73,10 @@ module.exports = (implementation) ->
 
   # runs the widget command. This happens server side
   api.exec = (options, callback) ->
-    exec implementation.command, options, callback
+    childProc.kill "SIGKILL" if childProc?
+    childProc = exec api.command, options, (err, stdout, stderr) ->
+      callback(err, stdout, stderr)
+      childProc = null
 
   api.domEl = -> el
 
@@ -89,15 +99,15 @@ module.exports = (implementation) ->
       console.error errorToString(e)
 
   renderOutput = (output) ->
-    if implementation.update? and rendered
-      implementation.update(output, contentEl)
+    if api.update? and rendered
+      api.update(output, contentEl)
     else
-      contentEl.innerHTML = render.call(implementation, output)
+      contentEl.innerHTML = api.render(output)
       loadScripts(contentEl)
 
-      implementation.afterRender?(contentEl)
+      api.afterRender(contentEl)
       rendered = true
-      implementation.update(output, contentEl) if implementation.update?
+      api.update(output, contentEl) if api.update?
 
   loadScripts = (domEl) ->
     for script in domEl.getElementsByTagName('script')
@@ -106,11 +116,15 @@ module.exports = (implementation) ->
       domEl.replaceChild s, script
 
   refresh = ->
-    $.get('/widgets/'+api.id)
+    return redraw() unless api.command?
+    url = "/widgets/#{api.id}?cachebuster=#{new Date().getTime()}"
+
+    $.ajax(url: url, timeout: api.refreshFrequency)
       .done((response) -> redraw(response) if started )
       .fail((response) -> redraw(null, response.responseText) if started)
       .always ->
         return unless started
+        return if api.refreshFrequency == false
         timer = setTimeout refresh, api.refreshFrequency
 
   parseStyle = (style) ->
@@ -125,7 +139,8 @@ module.exports = (implementation) ->
   validate = (impl) ->
     issues = []
     return ['empty implementation'] unless impl?
-    issues.push 'no command given' unless impl.command?
+    if not impl.command? and impl.refreshFrequency != false
+      issues.push 'no command given'
     issues
 
   errorToString = (err) ->
