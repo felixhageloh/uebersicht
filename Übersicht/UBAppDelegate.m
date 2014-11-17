@@ -49,7 +49,8 @@ int const PORT         = 41416;
     keepServerAlive = YES;
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [window loadUrl:[NSString stringWithFormat:@"http://127.0.0.1:%d", PORT+portOffset]];
+            // trailing slash required for load policy in UBWindow
+            [window loadUrl:[NSString stringWithFormat:@"http://127.0.0.1:%d/", PORT+portOffset]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
             if (portOffset >= 20) {

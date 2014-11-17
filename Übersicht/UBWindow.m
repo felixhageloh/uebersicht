@@ -171,8 +171,10 @@
     if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
         [listener ignore];
-    } else {
+    } else if ([request.URL.absoluteString isEqualToString:widgetsUrl]) {
         [listener use];
+    } else {
+        [listener ignore];
     }
 
 }
