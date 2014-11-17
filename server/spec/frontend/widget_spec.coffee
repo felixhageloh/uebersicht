@@ -20,6 +20,7 @@ describe 'widget', ->
   server = null
   widget = null
   domEl  = null
+  route  = /\/widgets\/foo\?.+/
 
   beforeEach ->
     server = sinon.fakeServer.create()
@@ -30,12 +31,17 @@ describe 'widget', ->
 
   describe 'without a render method', ->
 
+
     beforeEach ->
       widget = Widget command: '', id: 'foo'
       domEl  = widget.create()
 
     it 'should just render server response', ->
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'bar']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'bar'
+      ]
 
       widget.start()
       server.respond()
@@ -49,7 +55,11 @@ describe 'widget', ->
       domEl  = widget.create()
 
     it 'should render what render returns', ->
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'baz'
+      ]
 
       widget.start()
       server.respond()
@@ -66,20 +76,28 @@ describe 'widget', ->
       domEl  = widget.create()
 
     it 'calls the after-render hook ', ->
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'baz'
+      ]
       widget.start()
       server.respond()
 
       expect(afterRender).toHaveBeenCalledWith($(domEl).find('.widget')[0])
 
     it 'calls the after-render hook after every render', ->
-      jasmine.Clock.useMock()
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'stuff']
+      jasmine.clock().install()
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'stuff'
+      ]
       server.autoRespond = true
 
       widget.start()
-      jasmine.Clock.tick 250
-      expect(afterRender.calls.length).toBe 3
+      jasmine.clock().tick 250
+      expect(afterRender.calls.count()).toBe 3
 
 
   describe 'with an update method', ->
@@ -91,7 +109,11 @@ describe 'widget', ->
       domEl  = widget.create()
 
     it 'should render output and then call update', ->
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'stuff']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'stuff'
+      ]
 
       widget.start()
       server.respond()
@@ -108,16 +130,20 @@ describe 'widget', ->
       domEl  = widget.create()
 
     it 'should keep updating until stop() is called', ->
-      jasmine.Clock.useMock()
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'stuff']
+      jasmine.clock().install()
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'stuff'
+      ]
       server.autoRespond = true
 
       widget.start()
-      jasmine.Clock.tick 250
-      expect(render.calls.length).toBe 3
+      jasmine.clock().tick 250
+      expect(render.calls.count()).toBe 3
       widget.stop()
-      jasmine.Clock.tick 1000
-      expect(render.calls.length).toBe 3
+      jasmine.clock().tick 1000
+      expect(render.calls.count()).toBe 3
 
   describe 'error handling', ->
     realConsoleError = null
@@ -133,7 +159,11 @@ describe 'widget', ->
       error  = new Error('something went sorry')
       widget = Widget command: '', id: 'foo', render: -> throw error
       domEl  = widget.create()
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'baz'
+      ]
 
       widget.start()
       server.respond()
@@ -146,7 +176,11 @@ describe 'widget', ->
     it 'should catch and show exceptions inside update', ->
       widget = Widget command: '', id: 'foo', update: -> throw new Error('up')
       domEl  = widget.create()
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'baz'
+      ]
 
       widget.start()
       server.respond()
@@ -162,7 +196,11 @@ describe 'widget', ->
         update : update
 
       domEl  = widget.create()
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'baz']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'baz'
+      ]
 
       widget.start()
       server.respond()
@@ -174,7 +212,11 @@ describe 'widget', ->
       widget = Widget command: '', id: 'foo', render: ->
       domEl  = widget.create()
 
-      server.respondWith "GET", "/widgets/foo", [500, { "Content-Type": "text/plain" }, 'puke']
+      server.respondWith "GET", route, [
+        500,
+        "Content-Type": "text/plain",
+        'puke'
+      ]
 
       widget.start()
       server.respond()
@@ -182,25 +224,37 @@ describe 'widget', ->
       expect($(domEl).find('.widget').text()).toEqual 'puke'
 
     it 'should be able to recover after an error', ->
-      jasmine.Clock.useMock()
+      jasmine.clock().install()
       widget = Widget command: '', id: 'foo', refreshFrequency: 100, update: (o, domEl) ->
         # important for this test case: do something with the existing innerHTML
         domEl.innerHTML = domEl.innerHTML + '!'
 
       domEl  = widget.create()
 
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'all good']
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'all good'
+      ]
       widget.start()
       server.respond()
       expect($(domEl).find('.widget').text()).toEqual 'all good!'
 
-      server.respondWith "GET", "/widgets/foo", [500, { "Content-Type": "text/plain" }, 'oh noes']
-      jasmine.Clock.tick(100)
+      server.respondWith "GET", route, [
+        500,
+        "Content-Type": "text/plain",
+        'oh noes'
+      ]
+      jasmine.clock().tick(100)
       server.respond()
       expect($(domEl).find('.widget').text()).toEqual 'oh noes'
 
-      server.respondWith "GET", "/widgets/foo", [200, { "Content-Type": "text/plain" }, 'all good again']
-      jasmine.Clock.tick(100)
+      server.respondWith "GET", route, [
+        200,
+        "Content-Type": "text/plain",
+        'all good again'
+      ]
+      jasmine.clock().tick(100)
       server.respond()
       expect($(domEl).find('.widget').text()).toEqual 'all good again!'
 

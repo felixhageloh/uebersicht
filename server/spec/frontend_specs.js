@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Widget, bail, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, widgets;
 
 Widget = require('./src/widget.coffee');
@@ -115,6 +115,7 @@ logError = function(serialized) {
 window.onload = init;
 
 
+
 },{"./src/os_bridge.coffee":6,"./src/widget.coffee":7}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
@@ -218,7 +219,7 @@ describe('client', function() {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         req = _ref[_i];
-        _results.push(req.url);
+        _results.push(req.url.replace(/\?.+$/, ''));
       }
       return _results;
     })();
@@ -236,6 +237,7 @@ describe('client', function() {
     return expect(contentEl.find('#foo').length).toBe(0);
   });
 });
+
 
 
 },{"../../client.coffee":1}],5:[function(require,module,exports){
@@ -269,10 +271,11 @@ describe('widget', function() {
 });
 
 describe('widget', function() {
-  var domEl, server, widget;
+  var domEl, route, server, widget;
   server = null;
   widget = null;
   domEl = null;
+  route = /\/widgets\/foo\?.+/;
   beforeEach(function() {
     return server = sinon.fakeServer.create();
   });
@@ -289,7 +292,7 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     return it('should just render server response', function() {
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'bar'
@@ -311,7 +314,7 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     return it('should render what render returns', function() {
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'baz'
@@ -336,7 +339,7 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     it('calls the after-render hook ', function() {
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'baz'
@@ -346,16 +349,16 @@ describe('widget', function() {
       return expect(afterRender).toHaveBeenCalledWith($(domEl).find('.widget')[0]);
     });
     return it('calls the after-render hook after every render', function() {
-      jasmine.Clock.useMock();
-      server.respondWith("GET", "/widgets/foo", [
+      jasmine.clock().install();
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'stuff'
       ]);
       server.autoRespond = true;
       widget.start();
-      jasmine.Clock.tick(250);
-      return expect(afterRender.calls.length).toBe(3);
+      jasmine.clock().tick(250);
+      return expect(afterRender.calls.count()).toBe(3);
     });
   });
   describe('with an update method', function() {
@@ -371,7 +374,7 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     return it('should render output and then call update', function() {
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'stuff'
@@ -396,19 +399,19 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     return it('should keep updating until stop() is called', function() {
-      jasmine.Clock.useMock();
-      server.respondWith("GET", "/widgets/foo", [
+      jasmine.clock().install();
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'stuff'
       ]);
       server.autoRespond = true;
       widget.start();
-      jasmine.Clock.tick(250);
-      expect(render.calls.length).toBe(3);
+      jasmine.clock().tick(250);
+      expect(render.calls.count()).toBe(3);
       widget.stop();
-      jasmine.Clock.tick(1000);
-      return expect(render.calls.length).toBe(3);
+      jasmine.clock().tick(1000);
+      return expect(render.calls.count()).toBe(3);
     });
   });
   return describe('error handling', function() {
@@ -432,7 +435,7 @@ describe('widget', function() {
         }
       });
       domEl = widget.create();
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'baz'
@@ -452,7 +455,7 @@ describe('widget', function() {
         }
       });
       domEl = widget.create();
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'baz'
@@ -473,7 +476,7 @@ describe('widget', function() {
         update: update
       });
       domEl = widget.create();
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'baz'
@@ -490,7 +493,7 @@ describe('widget', function() {
         render: function() {}
       });
       domEl = widget.create();
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         500, {
           "Content-Type": "text/plain"
         }, 'puke'
@@ -500,7 +503,7 @@ describe('widget', function() {
       return expect($(domEl).find('.widget').text()).toEqual('puke');
     });
     return it('should be able to recover after an error', function() {
-      jasmine.Clock.useMock();
+      jasmine.clock().install();
       widget = Widget({
         command: '',
         id: 'foo',
@@ -510,7 +513,7 @@ describe('widget', function() {
         }
       });
       domEl = widget.create();
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'all good'
@@ -518,25 +521,26 @@ describe('widget', function() {
       widget.start();
       server.respond();
       expect($(domEl).find('.widget').text()).toEqual('all good!');
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         500, {
           "Content-Type": "text/plain"
         }, 'oh noes'
       ]);
-      jasmine.Clock.tick(100);
+      jasmine.clock().tick(100);
       server.respond();
       expect($(domEl).find('.widget').text()).toEqual('oh noes');
-      server.respondWith("GET", "/widgets/foo", [
+      server.respondWith("GET", route, [
         200, {
           "Content-Type": "text/plain"
         }, 'all good again'
       ]);
-      jasmine.Clock.tick(100);
+      jasmine.clock().tick(100);
       server.respond();
       return expect($(domEl).find('.widget').text()).toEqual('all good again!');
     });
   });
 });
+
 
 
 },{"../../src/widget.coffee":7}],6:[function(require,module,exports){
@@ -627,6 +631,7 @@ renderWallpaperSlice = function(wallpaper, canvas) {
 };
 
 
+
 },{}],7:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
@@ -639,34 +644,38 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
+  var api, childProc, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   cssId = null;
   contentEl = null;
   timer = null;
-  render = null;
   started = false;
   rendered = false;
+  childProc = null;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
-    var issues, _ref, _ref1, _ref2, _ref3;
+    var issues, k, v, _ref;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
     }
-    api.id = (_ref = implementation.id) != null ? _ref : 'widget';
-    api.filePath = implementation.filePath;
-    api.refreshFrequency = (_ref1 = implementation.refreshFrequency) != null ? _ref1 : 1000;
+    for (k in implementation) {
+      v = implementation[k];
+      api[k] = v;
+    }
     cssId = api.id.replace(/\s/g, '_space_');
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
-      implementation.css = parseStyle((_ref2 = implementation.style) != null ? _ref2 : defaultStyle);
+      implementation.css = parseStyle((_ref = implementation.style) != null ? _ref : defaultStyle);
       delete implementation.style;
     }
-    render = (_ref3 = implementation.render) != null ? _ref3 : function(output) {
-      return output;
-    };
     return api;
   };
+  api.id = 'widget';
+  api.refreshFrequency = 1000;
+  api.render = function(output) {
+    return output;
+  };
+  api.afterRender = function() {};
   api.create = function() {
     el = document.createElement('div');
     contentEl = document.createElement('div');
@@ -700,7 +709,13 @@ module.exports = function(implementation) {
     }
   };
   api.exec = function(options, callback) {
-    return exec(implementation.command, options, callback);
+    if (childProc != null) {
+      childProc.kill("SIGKILL");
+    }
+    return childProc = exec(api.command, options, function(err, stdout, stderr) {
+      callback(err, stdout, stderr);
+      return childProc = null;
+    });
   };
   api.domEl = function() {
     return el;
@@ -724,17 +739,15 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((implementation.update != null) && rendered) {
-      return implementation.update(output, contentEl);
+    if ((api.update != null) && rendered) {
+      return api.update(output, contentEl);
     } else {
-      contentEl.innerHTML = render.call(implementation, output);
+      contentEl.innerHTML = api.render(output);
       loadScripts(contentEl);
-      if (typeof implementation.afterRender === "function") {
-        implementation.afterRender(contentEl);
-      }
+      api.afterRender(contentEl);
       rendered = true;
-      if (implementation.update != null) {
-        return implementation.update(output, contentEl);
+      if (api.update != null) {
+        return api.update(output, contentEl);
       }
     }
   };
@@ -751,7 +764,15 @@ module.exports = function(implementation) {
     return _results;
   };
   refresh = function() {
-    return $.get('/widgets/' + api.id).done(function(response) {
+    var url;
+    if (api.command == null) {
+      return redraw();
+    }
+    url = "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime());
+    return $.ajax({
+      url: url,
+      timeout: api.refreshFrequency
+    }).done(function(response) {
       if (started) {
         return redraw(response);
       }
@@ -761,6 +782,9 @@ module.exports = function(implementation) {
       }
     }).always(function() {
       if (!started) {
+        return;
+      }
+      if (api.refreshFrequency === false) {
         return;
       }
       return timer = setTimeout(refresh, api.refreshFrequency);
@@ -780,7 +804,7 @@ module.exports = function(implementation) {
     if (impl == null) {
       return ['empty implementation'];
     }
-    if (impl.command == null) {
+    if ((impl.command == null) && impl.refreshFrequency !== false) {
       issues.push('no command given');
     }
     return issues;
@@ -797,4 +821,5 @@ module.exports = function(implementation) {
 };
 
 
-},{"child_process":2,"nib":2,"stylus":2,"tosource":3}]},{},[4,5])
+
+},{"child_process":2,"nib":2,"stylus":2,"tosource":3}]},{},[4,5]);

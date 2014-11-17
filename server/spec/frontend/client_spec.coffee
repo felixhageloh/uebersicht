@@ -33,7 +33,7 @@ describe 'client', ->
     expect(contentEl.find('#with_space_space').length).toBe 1
 
     # check that widgets are started
-    requestedUrls = (req.url for req in server.requests)
+    requestedUrls = (req.url.replace(/\?.+$/, '') for req in server.requests)
     expect(requestedUrls.indexOf('/widgets/foo')).not.toBe -1
     expect(requestedUrls.indexOf('/widgets/bar')).not.toBe -1
     expect(requestedUrls.indexOf('/widgets/with space')).not.toBe -1

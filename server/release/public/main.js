@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Widget, bail, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, widgets;
 
 Widget = require('./src/widget.coffee');
@@ -115,7 +115,8 @@ logError = function(serialized) {
 window.onload = init;
 
 
-},{"./src/os_bridge.coffee":6,"./src/widget.coffee":8}],2:[function(require,module,exports){
+
+},{"./src/os_bridge.coffee":4,"./src/widget.coffee":5}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 /* toSource by Marcello Bastea-Forte - zlib license */
@@ -165,123 +166,6 @@ function legalKey(string) {
     return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
 }
 },{}],4:[function(require,module,exports){
-var ChangesServer, WidgetCommandServer, WidgetDir, WidgetsServer, connect, path;
-
-connect = require('connect');
-
-path = require('path');
-
-WidgetDir = require('./widget_directory.coffee');
-
-WidgetsServer = require('./widgets_server.coffee');
-
-WidgetCommandServer = require('./widget_command_server.coffee');
-
-ChangesServer = require('./changes_server.coffee');
-
-module.exports = function(port, widgetPath) {
-  var changesServer, server, widgetDir;
-  widgetPath = path.resolve(__dirname, widgetPath);
-  widgetDir = WidgetDir(widgetPath);
-  changesServer = ChangesServer();
-  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port, function() {
-    console.log('server started on port', port);
-    return widgetDir.watch(changesServer.push);
-  });
-  return server;
-};
-
-
-},{"./changes_server.coffee":5,"./widget_command_server.coffee":9,"./widget_directory.coffee":10,"./widgets_server.coffee":12,"connect":2,"path":2}],5:[function(require,module,exports){
-var serialize;
-
-serialize = require('./serialize.coffee');
-
-module.exports = function() {
-  var api, clients, currentChanges, currentErrors, pushChanges, pushErrors, sendResponse, timer;
-  api = {};
-  clients = [];
-  currentChanges = {};
-  currentErrors = [];
-  timer = null;
-  api.push = function(changes, errorString) {
-    var id, val, _ref;
-    _ref = changes != null ? changes : {};
-    for (id in _ref) {
-      val = _ref[id];
-      currentChanges[id] = val;
-    }
-    if (errorString) {
-      currentErrors.push(errorString);
-    }
-    clearTimeout(timer);
-    return timer = setTimeout(function() {
-      if (currentErrors.length > 0) {
-        pushErrors();
-        if (Object.keys(currentChanges).length > 0) {
-          return timer = setTimeout(pushChanges, 50);
-        }
-      } else {
-        return pushChanges();
-      }
-    }, 50);
-  };
-  api.middleware = function(req, res, next) {
-    var client, parts;
-    parts = req.url.replace(/^\//, '').split('/');
-    if (!(parts.length === 1 && parts[0] === 'widget-changes')) {
-      return next();
-    }
-    client = {
-      request: req,
-      response: res
-    };
-    clients.push(client);
-    return setTimeout(function() {
-      var index;
-      index = clients.indexOf(client);
-      if (!(index > -1)) {
-        return;
-      }
-      clients.splice(index, 1);
-      return client.response.end('');
-    }, 25000);
-  };
-  pushChanges = function() {
-    var data, status;
-    if (Object.keys(currentChanges).length > 0) {
-      data = serialize(currentChanges);
-      status = 201;
-    } else {
-      data = '';
-      status = 200;
-    }
-    console.log('pushing changes');
-    sendResponse(data, status);
-    return currentChanges = {};
-  };
-  pushErrors = function() {
-    console.log('pushing changes');
-    sendResponse(JSON.stringify(currentErrors), 200);
-    return currentErrors.length = 0;
-  };
-  sendResponse = function(body, status) {
-    var client, _i, _len;
-    if (status == null) {
-      status = 200;
-    }
-    for (_i = 0, _len = clients.length; _i < _len; _i++) {
-      client = clients[_i];
-      client.response.writeHead(status);
-      client.response.end(body);
-    }
-    return clients.length = 0;
-  };
-  return api;
-};
-
-
-},{"./serialize.coffee":7}],6:[function(require,module,exports){
 var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
 cachedWallpaper = new Image();
@@ -369,23 +253,8 @@ renderWallpaperSlice = function(wallpaper, canvas) {
 };
 
 
-},{}],7:[function(require,module,exports){
-module.exports = function(someWidgets) {
-  var id, serialized, widget;
-  serialized = "({";
-  for (id in someWidgets) {
-    widget = someWidgets[id];
-    if (widget === 'deleted') {
-      serialized += "'" + id + "': 'deleted',";
-    } else {
-      serialized += "'" + id + "': " + (widget.serialize()) + ",";
-    }
-  }
-  return serialized.replace(/,$/, '') + '})';
-};
 
-
-},{}],8:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
 exec = require('child_process').exec;
@@ -397,34 +266,38 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, render, renderOutput, rendered, started, timer, validate;
+  var api, childProc, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   cssId = null;
   contentEl = null;
   timer = null;
-  render = null;
   started = false;
   rendered = false;
+  childProc = null;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
-    var issues, _ref, _ref1, _ref2, _ref3;
+    var issues, k, v, _ref;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
     }
-    api.id = (_ref = implementation.id) != null ? _ref : 'widget';
-    api.filePath = implementation.filePath;
-    api.refreshFrequency = (_ref1 = implementation.refreshFrequency) != null ? _ref1 : 1000;
+    for (k in implementation) {
+      v = implementation[k];
+      api[k] = v;
+    }
     cssId = api.id.replace(/\s/g, '_space_');
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
-      implementation.css = parseStyle((_ref2 = implementation.style) != null ? _ref2 : defaultStyle);
+      implementation.css = parseStyle((_ref = implementation.style) != null ? _ref : defaultStyle);
       delete implementation.style;
     }
-    render = (_ref3 = implementation.render) != null ? _ref3 : function(output) {
-      return output;
-    };
     return api;
   };
+  api.id = 'widget';
+  api.refreshFrequency = 1000;
+  api.render = function(output) {
+    return output;
+  };
+  api.afterRender = function() {};
   api.create = function() {
     el = document.createElement('div');
     contentEl = document.createElement('div');
@@ -458,7 +331,13 @@ module.exports = function(implementation) {
     }
   };
   api.exec = function(options, callback) {
-    return exec(implementation.command, options, callback);
+    if (childProc != null) {
+      childProc.kill("SIGKILL");
+    }
+    return childProc = exec(api.command, options, function(err, stdout, stderr) {
+      callback(err, stdout, stderr);
+      return childProc = null;
+    });
   };
   api.domEl = function() {
     return el;
@@ -482,17 +361,15 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((implementation.update != null) && rendered) {
-      return implementation.update(output, contentEl);
+    if ((api.update != null) && rendered) {
+      return api.update(output, contentEl);
     } else {
-      contentEl.innerHTML = render.call(implementation, output);
+      contentEl.innerHTML = api.render(output);
       loadScripts(contentEl);
-      if (typeof implementation.afterRender === "function") {
-        implementation.afterRender(contentEl);
-      }
+      api.afterRender(contentEl);
       rendered = true;
-      if (implementation.update != null) {
-        return implementation.update(output, contentEl);
+      if (api.update != null) {
+        return api.update(output, contentEl);
       }
     }
   };
@@ -509,7 +386,15 @@ module.exports = function(implementation) {
     return _results;
   };
   refresh = function() {
-    return $.get('/widgets/' + api.id).done(function(response) {
+    var url;
+    if (api.command == null) {
+      return redraw();
+    }
+    url = "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime());
+    return $.ajax({
+      url: url,
+      timeout: api.refreshFrequency
+    }).done(function(response) {
       if (started) {
         return redraw(response);
       }
@@ -519,6 +404,9 @@ module.exports = function(implementation) {
       }
     }).always(function() {
       if (!started) {
+        return;
+      }
+      if (api.refreshFrequency === false) {
         return;
       }
       return timer = setTimeout(refresh, api.refreshFrequency);
@@ -538,7 +426,7 @@ module.exports = function(implementation) {
     if (impl == null) {
       return ['empty implementation'];
     }
-    if (impl.command == null) {
+    if ((impl.command == null) && impl.refreshFrequency !== false) {
       issues.push('no command given');
     }
     return issues;
@@ -555,246 +443,5 @@ module.exports = function(implementation) {
 };
 
 
-},{"child_process":2,"nib":2,"stylus":2,"tosource":3}],9:[function(require,module,exports){
-var BUFFER_SIZE;
 
-BUFFER_SIZE = 500 * 1024;
-
-module.exports = function(widgetDir) {
-  return function(req, res, next) {
-    var parts, widget;
-    parts = req.url.replace(/^\//, '').split('/');
-    if (parts[0] === 'widgets') {
-      widget = widgetDir.get(decodeURI(parts[1]));
-    }
-    if (widget == null) {
-      return next();
-    }
-    return widget.exec({
-      cwd: widgetDir.path,
-      maxBuffer: BUFFER_SIZE
-    }, function(err, data, stderr) {
-      if (err || stderr) {
-        res.writeHead(500);
-        return res.end(stderr || ((typeof err.toString === "function" ? err.toString() : void 0) || err.message));
-      } else {
-        res.writeHead(200);
-        return res.end(data);
-      }
-    });
-  };
-};
-
-
-},{}],10:[function(require,module,exports){
-var Widget, fs, loader, paths;
-
-Widget = require('./widget.coffee');
-
-loader = require('./widget_loader.coffee');
-
-paths = require('path');
-
-fs = require('fs');
-
-module.exports = function(directoryPath) {
-  var addWidget, api, changeCallback, checkWidgetAdded, checkWidgetRemoved, deleteWidget, fsevents, getPathType, init, isWidgetDirPath, isWidgetPath, loadWidget, notifyChange, notifyError, prettyPrintError, registerWidget, widgetId, widgets;
-  api = {};
-  fsevents = require('fsevents');
-  widgets = {};
-  changeCallback = function() {};
-  init = function() {
-    var watcher;
-    watcher = fsevents(directoryPath);
-    watcher.on('change', function(filePath, info) {
-      switch (info.event) {
-        case 'modified':
-          return addWidget(filePath);
-        case 'moved-in':
-        case 'created':
-          return checkWidgetAdded(filePath, info.type);
-        case 'moved-out':
-        case 'deleted':
-          return checkWidgetRemoved(filePath, info.type);
-      }
-    });
-    watcher.start();
-    console.log('watching', directoryPath);
-    checkWidgetAdded(directoryPath, 'directory');
-    return api;
-  };
-  api.watch = function(callback) {
-    changeCallback = callback;
-    return init();
-  };
-  api.widgets = function() {
-    return widgets;
-  };
-  api.get = function(id) {
-    return widgets[id];
-  };
-  api.path = directoryPath;
-  addWidget = function(filePath) {
-    if (!isWidgetPath(filePath)) {
-      return;
-    }
-    return registerWidget(loadWidget(filePath));
-  };
-  checkWidgetAdded = function(path, type) {
-    if (type === 'file') {
-      return addWidget(path);
-    }
-    return fs.readdir(path, function(err, subPaths) {
-      var fullPath, subPath, _i, _len, _results;
-      if (err) {
-        return console.log(err);
-      }
-      _results = [];
-      for (_i = 0, _len = subPaths.length; _i < _len; _i++) {
-        subPath = subPaths[_i];
-        fullPath = paths.join(path, subPath);
-        _results.push(getPathType(fullPath, checkWidgetAdded));
-      }
-      return _results;
-    });
-  };
-  checkWidgetRemoved = function(path, type) {
-    var id, widget, _results;
-    _results = [];
-    for (id in widgets) {
-      widget = widgets[id];
-      if (widget.filePath.indexOf(path) === 0) {
-        _results.push(deleteWidget(id));
-      }
-    }
-    return _results;
-  };
-  getPathType = function(path, callback) {
-    return fs.stat(path, function(err, stat) {
-      var type;
-      if (err) {
-        return console.log(err);
-      }
-      type = stat.isDirectory() ? 'directory' : 'file';
-      return callback(path, type);
-    });
-  };
-  loadWidget = function(filePath) {
-    var definition, e, id;
-    id = widgetId(filePath);
-    try {
-      definition = loader.loadWidget(filePath);
-      if (definition != null) {
-        definition.id = id;
-      }
-      return Widget(definition);
-    } catch (_error) {
-      e = _error;
-      if (e.code === 'ENOENT') {
-        return;
-      }
-      notifyError(filePath, e);
-      return console.log('error in widget', id + ':', e.message);
-    }
-  };
-  registerWidget = function(widget) {
-    if (widget == null) {
-      return;
-    }
-    console.log('registering widget', widget.id);
-    widgets[widget.id] = widget;
-    return notifyChange(widget.id, widget);
-  };
-  deleteWidget = function(id) {
-    if (widgets[id] == null) {
-      return;
-    }
-    console.log('deleting widget', id);
-    delete widgets[id];
-    return notifyChange(id, 'deleted');
-  };
-  notifyChange = function(id, change) {
-    var changes;
-    changes = {};
-    changes[id] = change;
-    return changeCallback(changes);
-  };
-  notifyError = function(filePath, error) {
-    return changeCallback(null, prettyPrintError(filePath, error));
-  };
-  prettyPrintError = function(filePath, error) {
-    var errStr;
-    errStr = (typeof error.toString === "function" ? error.toString() : void 0) || String(error.message);
-    if (errStr.indexOf("[stdin]") > -1) {
-      errStr = errStr.replace("[stdin]", filePath);
-    } else {
-      errStr = filePath + ': ' + errStr;
-    }
-    return errStr;
-  };
-  widgetId = function(filePath) {
-    var fileParts, part;
-    fileParts = filePath.replace(directoryPath, '').split(/\/+/);
-    fileParts = (function() {
-      var _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = fileParts.length; _i < _len; _i++) {
-        part = fileParts[_i];
-        if (part) {
-          _results.push(part);
-        }
-      }
-      return _results;
-    })();
-    return fileParts.join('-').replace(/\./g, '-');
-  };
-  isWidgetPath = function(filePath) {
-    return /\.coffee$|\.js$/.test(filePath);
-  };
-  isWidgetDirPath = function(path) {
-    return /\.widget$/.test(path);
-  };
-  return api;
-};
-
-
-},{"./widget.coffee":8,"./widget_loader.coffee":11,"fs":2,"fsevents":2,"path":2}],11:[function(require,module,exports){
-var coffee, fs, loadWidget;
-
-fs = require('fs');
-
-coffee = require('coffee-script');
-
-exports.loadWidget = loadWidget = function(filePath) {
-  var definition;
-  definition = fs.readFileSync(filePath, {
-    encoding: 'utf8'
-  });
-  if (filePath.match(/\.coffee$/)) {
-    definition = coffee["eval"](definition);
-  } else {
-    definition = eval('({' + definition + '})');
-  }
-  definition.filePath = filePath;
-  return definition;
-};
-
-
-},{"coffee-script":2,"fs":2}],12:[function(require,module,exports){
-var serialize;
-
-serialize = require('./serialize.coffee');
-
-module.exports = function(widgetDir) {
-  return function(req, res, next) {
-    var parts;
-    parts = req.url.replace(/^\//, '').split('/');
-    if (!(parts.length === 1 && parts[0] === 'widgets')) {
-      return next();
-    }
-    return res.end(serialize(widgetDir.widgets()));
-  };
-};
-
-
-},{"./serialize.coffee":7}]},{},[1,4,5,6,7,8,9,10,11,12])
+},{"child_process":2,"nib":2,"stylus":2,"tosource":3}]},{},[1]);

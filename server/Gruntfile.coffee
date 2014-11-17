@@ -12,28 +12,30 @@ module.exports = (grunt) ->
     browserify:
       server:
         files:
-          '<%=config.releaseDir%>/server.js': ['server.coffee', '<%=config.srcDir%>/**/*.coffee']
+          '<%=config.releaseDir%>/server.js': ['server.coffee']
         options:
           #debug: true
-          external: ['fs', 'path', 'child_process', 'connect', 'coffee-script', 'stylus', 'nib', 'fsevents']
-          ignore: ['<%=config.srcDir%>/os_bridge.coffee']
           transform: ['coffeeify']
-          detectGlobals: false
+          external: ['fs', 'path', 'child_process', 'connect', 'coffee-script', 'stylus', 'nib', 'fsevents']
+          browserifyOptions:
+            detectGlobals: false
       client:
         files:
-          '<%=config.releaseDir%>/public/main.js': ['client.coffee', '<%=config.srcDir%>/**/*.coffee']
+          '<%=config.releaseDir%>/public/main.js': ['client.coffee']
         options:
           #debug: true
           ignore: ['connect', 'fs', 'path', 'child_process', 'fsevents', 'coffee-script', 'stylus', 'nib', 'minimist']
           transform: ['coffeeify']
-          detectGlobals: false
+          browserifyOptions:
+            detectGlobals: false
       specs:
         files:
           '<%=config.specDir%>/frontend_specs.js': ['<%=config.specDir%>/frontend/**/*_spec.coffee']
         options:
           ignore: ['stylus', 'nib']
           transform: ['coffeeify']
-          detectGlobals: false
+          browserifyOptions:
+            detectGlobals: false
 
     watch:
       scripts:
@@ -81,5 +83,6 @@ module.exports = (grunt) ->
       done()
 
   grunt.registerTask 'spec', ['jasmine:fs', 'browserify:specs', 'jasmine']
+  grunt.registerTask 'frontend-spec', ['browserify:specs', 'jasmine:src']
   grunt.registerTask 'release', ['browserify:server', 'browserify:client']
   grunt.registerTask 'default', ['spec', 'release', 'watch']
