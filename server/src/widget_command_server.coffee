@@ -1,12 +1,14 @@
 # middleware to serve the results of widget commands
 # Listens to /widgets/<id>
 
+url         = require 'url'
+ID_REGEX    = /\/widgets\/([^\/]+)/i
 BUFFER_SIZE = 500 * 1024
 
 module.exports = (widgetDir) -> (req, res, next) ->
-  parts = req.url.replace(/^\//, '').split '/'
-
-  widget = widgetDir.get decodeURI(parts[1]) if parts[0] == 'widgets'
+  parsed   = url.parse(req.url)
+  widgetId = parsed.pathname.match(ID_REGEX)?[1]
+  widget   = widgetDir.get decodeURI(widgetId) if widgetId?
   return next() unless widget?
 
   widget.exec cwd: widgetDir.path, maxBuffer: BUFFER_SIZE, (err, data, stderr) ->
