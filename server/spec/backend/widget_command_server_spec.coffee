@@ -7,13 +7,13 @@ describe 'widget command server', ->
 
   fakeWidgets =
     mathew:
-      exec: (opts, callback) -> callback(null, 'command output')
+      exec: (opts, cmd, callback) -> callback(null, 'command output')
     john:
-      exec: (opts, callback) -> callback({toString: -> 'command error'}, '', '')
+      exec: (opts, cmd, callback) -> callback({toString: -> 'command error'}, '', '')
     billy:
-      exec: (opts, callback) -> callback(null, '', 'std error')
+      exec: (opts, cmd, callback) -> callback(null, '', 'std error')
     'kevin spacey':
-      exec: (opts, callback) -> callback(null, 'foo')
+      exec: (opts, cmd, callback) -> callback(null, 'foo')
 
   fakeWidgetDir =
     get: (id) ->

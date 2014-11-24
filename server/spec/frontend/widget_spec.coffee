@@ -20,10 +20,17 @@ describe 'widget', ->
   server = null
   widget = null
   domEl  = null
-  route  = /\/widgets\/foo\?.+/
 
   beforeEach ->
     server = sinon.fakeServer.create()
+    server.respondToWidget = (id, body, status = 200) ->
+      route = new RegExp("/widgets/#{id}\?.+$")
+
+      server.respondWith "POST", route, [
+        status,
+        "Content-Type": "text/plain",
+        body
+      ]
 
   afterEach ->
     server.restore()
@@ -31,17 +38,12 @@ describe 'widget', ->
 
   describe 'without a render method', ->
 
-
     beforeEach ->
-      widget = Widget command: '', id: 'foo'
+      widget = Widget command: 'some-command', id: 'foo'
       domEl  = widget.create()
 
     it 'should just render server response', ->
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'bar'
-      ]
+      server.respondToWidget 'foo', 'bar'
 
       widget.start()
       server.respond()
@@ -55,11 +57,7 @@ describe 'widget', ->
       domEl  = widget.create()
 
     it 'should render what render returns', ->
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'baz'
-      ]
+      server.respondToWidget 'foo', 'baz'
 
       widget.start()
       server.respond()
@@ -72,15 +70,16 @@ describe 'widget', ->
     beforeEach ->
       afterRender = jasmine.createSpy('after render')
 
-      widget = Widget command: '', id: 'foo', render: ( -> ), afterRender: afterRender, refreshFrequency: 100
+      widget = Widget
+        command    : 'some-command',
+        id         : 'foo',
+        render     :  ( -> ),
+        afterRender: afterRender,
+        refreshFrequency: 100
       domEl  = widget.create()
 
     it 'calls the after-render hook ', ->
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'baz'
-      ]
+      server.respondToWidget "foo", 'baz'
       widget.start()
       server.respond()
 
@@ -88,11 +87,7 @@ describe 'widget', ->
 
     it 'calls the after-render hook after every render', ->
       jasmine.clock().install()
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'stuff'
-      ]
+      server.respondToWidget "foo", 'stuff'
       server.autoRespond = true
 
       widget.start()
@@ -105,15 +100,14 @@ describe 'widget', ->
 
     beforeEach ->
       update = jasmine.createSpy('update')
-      widget = Widget command: '', id: 'foo', update: update
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        update : update
       domEl  = widget.create()
 
     it 'should render output and then call update', ->
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'stuff'
-      ]
+      server.respondToWidget "foo", 'stuff'
 
       widget.start()
       server.respond()
@@ -126,16 +120,16 @@ describe 'widget', ->
 
     beforeEach ->
       render = jasmine.createSpy('render')
-      widget = Widget command: '', id: 'foo', render: render, refreshFrequency: 100
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        render : render,
+        refreshFrequency: 100
       domEl  = widget.create()
 
     it 'should keep updating until stop() is called', ->
       jasmine.clock().install()
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'stuff'
-      ]
+      server.respondToWidget "foo", 'stuff'
       server.autoRespond = true
 
       widget.start()
@@ -157,13 +151,12 @@ describe 'widget', ->
 
     it 'should catch and show exceptions inside render', ->
       error  = new Error('something went sorry')
-      widget = Widget command: '', id: 'foo', render: -> throw error
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        render : -> throw error
       domEl  = widget.create()
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'baz'
-      ]
+      server.respondToWidget "foo", 'baz'
 
       widget.start()
       server.respond()
@@ -174,13 +167,12 @@ describe 'widget', ->
       expect(console.error).toHaveBeenCalledWith "[foo] #{error.toString()}\n  in #{firstStackItem}()"
 
     it 'should catch and show exceptions inside update', ->
-      widget = Widget command: '', id: 'foo', update: -> throw new Error('up')
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        update : -> throw new Error('up')
       domEl  = widget.create()
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'baz'
-      ]
+      server.respondToWidget "foo", 'baz'
 
       widget.start()
       server.respond()
@@ -190,17 +182,13 @@ describe 'widget', ->
     it 'should not call update when render fails', ->
       update = jasmine.createSpy('update')
       widget = Widget
-        command: ''
+        command: 'some-command'
         id     : 'foo'
         render : -> throw new Error('oops')
         update : update
 
       domEl  = widget.create()
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'baz'
-      ]
+      server.respondToWidget "foo", 'baz'
 
       widget.start()
       server.respond()
@@ -209,14 +197,13 @@ describe 'widget', ->
       expect(update).not.toHaveBeenCalled()
 
     it 'should render backend errors', ->
-      widget = Widget command: '', id: 'foo', render: ->
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        render : ->
       domEl  = widget.create()
 
-      server.respondWith "GET", route, [
-        500,
-        "Content-Type": "text/plain",
-        'puke'
-      ]
+      server.respondToWidget "foo", 'puke', 500
 
       widget.start()
       server.respond()
@@ -225,35 +212,27 @@ describe 'widget', ->
 
     it 'should be able to recover after an error', ->
       jasmine.clock().install()
-      widget = Widget command: '', id: 'foo', refreshFrequency: 100, update: (o, domEl) ->
-        # important for this test case: do something with the existing innerHTML
-        domEl.innerHTML = domEl.innerHTML + '!'
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        update : (o, domEl) ->
+          # important for this test case: do something with the existing innerHTML
+          domEl.innerHTML = domEl.innerHTML + '!'
+        refreshFrequency: 100,
 
       domEl  = widget.create()
 
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'all good'
-      ]
+      server.respondToWidget "foo", 'all good', 200
       widget.start()
       server.respond()
       expect($(domEl).find('.widget').text()).toEqual 'all good!'
 
-      server.respondWith "GET", route, [
-        500,
-        "Content-Type": "text/plain",
-        'oh noes'
-      ]
+      server.respondToWidget "foo", 'oh noes', 500
       jasmine.clock().tick(100)
       server.respond()
       expect($(domEl).find('.widget').text()).toEqual 'oh noes'
 
-      server.respondWith "GET", route, [
-        200,
-        "Content-Type": "text/plain",
-        'all good again'
-      ]
+      server.respondToWidget "foo", 'all good again', 200
       jasmine.clock().tick(100)
       server.respond()
       expect($(domEl).find('.widget').text()).toEqual 'all good again!'

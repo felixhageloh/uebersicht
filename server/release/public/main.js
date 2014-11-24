@@ -122,9 +122,9 @@ window.onload = init;
 /* toSource by Marcello Bastea-Forte - zlib license */
 module.exports = function(object, filter, indent, startingIndent) {
     var seen = []
-    return walk(object, filter, indent === undefined ? '  ' : (indent || ''), startingIndent || '')
+    return walk(object, filter, indent === undefined ? '  ' : (indent || ''), startingIndent || '', seen)
 
-    function walk(object, filter, indent, currentIndent) {
+    function walk(object, filter, indent, currentIndent, seen) {
         var nextIndent = currentIndent + indent
         object = filter ? filter(object) : object
         switch (typeof object) {
@@ -132,9 +132,10 @@ module.exports = function(object, filter, indent, startingIndent) {
                 return JSON.stringify(object)
             case 'boolean':
             case 'number':
-            case 'function':
             case 'undefined':
                 return ''+object
+            case 'function':
+                return object.toString()
         }
 
         if (object === null) return 'null'
@@ -150,12 +151,12 @@ module.exports = function(object, filter, indent, startingIndent) {
 
         if (Array.isArray(object)) {
             return '[' + join(object.map(function(element){
-                return walk(element, filter, indent, nextIndent)
+                return walk(element, filter, indent, nextIndent, seen.slice())
             })) + ']'
         }
         var keys = Object.keys(object)
         return keys.length ? '{' + join(keys.map(function (key) {
-            return (legalKey(key) ? key : JSON.stringify(key)) + ':' + walk(object[key], filter, indent, nextIndent)
+            return (legalKey(key) ? key : JSON.stringify(key)) + ':' + walk(object[key], filter, indent, nextIndent, seen.slice())
         })) + '}' : '{}'
     }
 }
@@ -165,6 +166,7 @@ var KEYWORD_REGEXP = /^(abstract|boolean|break|byte|case|catch|char|class|const|
 function legalKey(string) {
     return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
 }
+
 },{}],4:[function(require,module,exports){
 var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
@@ -295,7 +297,11 @@ module.exports = function(implementation) {
   api.id = 'widget';
   api.refreshFrequency = 1000;
   api.render = function(output) {
-    return output;
+    if (api.command && output) {
+      return output;
+    } else {
+      return "warning: no render method";
+    }
   };
   api.afterRender = function() {};
   api.create = function() {
@@ -330,11 +336,14 @@ module.exports = function(implementation) {
       return clearTimeout(timer);
     }
   };
-  api.exec = function(options, callback) {
+  api.exec = function(options, command, callback) {
+    if (command == null) {
+      command = api.command;
+    }
     if (childProc != null) {
       childProc.kill("SIGKILL");
     }
-    return childProc = exec(api.command, options, function(err, stdout, stderr) {
+    return childProc = exec(command, options, function(err, stdout, stderr) {
       callback(err, stdout, stderr);
       return childProc = null;
     });
@@ -345,7 +354,41 @@ module.exports = function(implementation) {
   api.serialize = function() {
     return toSource(implementation);
   };
-  redraw = function(output, error) {
+  api.refresh = refresh = function() {
+    var request;
+    if (api.command == null) {
+      return redraw();
+    }
+    request = api.run(api.command, function(err, output) {
+      if (started) {
+        return redraw(err, output);
+      }
+    });
+    return request.always(function() {
+      if (!started) {
+        return;
+      }
+      if (api.refreshFrequency === false) {
+        return;
+      }
+      return timer = setTimeout(refresh, api.refreshFrequency);
+    });
+  };
+  api.run = function(command, callback) {
+    return $.ajax({
+      url: "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime()),
+      method: 'POST',
+      data: command,
+      timeout: api.refreshFrequency,
+      error: function(xhr) {
+        return callback(xhr.responseText || 'error running command');
+      },
+      success: function(output) {
+        return callback(null, output);
+      }
+    });
+  };
+  redraw = function(error, output) {
     var e;
     if (error) {
       contentEl.innerHTML = error;
@@ -384,33 +427,6 @@ module.exports = function(implementation) {
       _results.push(domEl.replaceChild(s, script));
     }
     return _results;
-  };
-  refresh = function() {
-    var url;
-    if (api.command == null) {
-      return redraw();
-    }
-    url = "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime());
-    return $.ajax({
-      url: url,
-      timeout: api.refreshFrequency
-    }).done(function(response) {
-      if (started) {
-        return redraw(response);
-      }
-    }).fail(function(response) {
-      if (started) {
-        return redraw(null, response.responseText);
-      }
-    }).always(function() {
-      if (!started) {
-        return;
-      }
-      if (api.refreshFrequency === false) {
-        return;
-      }
-      return timer = setTimeout(refresh, api.refreshFrequency);
-    });
   };
   parseStyle = function(style) {
     var scopedStyle;

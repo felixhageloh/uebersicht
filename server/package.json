@@ -15,7 +15,7 @@
     "grunt-browserify": "^3.2.0",
     "grunt-contrib-jasmine": "^0.8.1",
     "grunt-contrib-watch": "~0.5.3",
-    "jasmine-node": "~1.11.0",
+    "jasmine-node": "~1.14.3",
     "mockery": "~1.4.0",
     "nib": "~1.0.2"
   },

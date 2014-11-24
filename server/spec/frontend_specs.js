@@ -1,130 +1,12 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, bail, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, widgets;
 
-Widget = require('./src/widget.coffee');
-
-widgets = {};
-
-contentEl = null;
-
-init = function() {
-  window.uebersicht = require('./src/os_bridge.coffee');
-  widgets = {};
-  contentEl = document.getElementsByClassName('content')[0];
-  contentEl.innerHTML = '';
-  return getWidgets(function(err, widgetSettings) {
-    if (err != null) {
-      console.log(err);
-    }
-    if (err != null) {
-      return setTimeout(bail, 10000);
-    }
-    initWidgets(widgetSettings);
-    return setTimeout(getChanges);
-  });
-};
-
-getWidgets = function(callback) {
-  return $.get('/widgets').done(function(response) {
-    return callback(null, eval(response));
-  }).fail(function() {
-    return callback(response, null);
-  });
-};
-
-getChanges = function() {
-  return $.get('/widget-changes').done(function(response, _, xhr) {
-    var widgetUpdates;
-    switch (xhr.status) {
-      case 200:
-        if (response) {
-          logError(response);
-        }
-        break;
-      case 201:
-        widgetUpdates = deserializeWidgets(response);
-        if (widgetUpdates) {
-          initWidgets(widgetUpdates);
-        }
-    }
-    return getChanges();
-  }).fail(function() {
-    return bail();
-  });
-};
-
-initWidgets = function(widgetSettings) {
-  var id, settings, widget, _results;
-  _results = [];
-  for (id in widgetSettings) {
-    settings = widgetSettings[id];
-    if (widgets[id] != null) {
-      widgets[id].destroy();
-    }
-    if (settings === 'deleted') {
-      _results.push(delete widgets[id]);
-    } else {
-      widget = Widget(settings);
-      widgets[widget.id] = widget;
-      _results.push(initWidget(widget));
-    }
-  }
-  return _results;
-};
-
-initWidget = function(widget) {
-  contentEl.appendChild(widget.create());
-  return widget.start();
-};
-
-deserializeWidgets = function(data) {
-  var deserialized, e;
-  if (!data) {
-    return;
-  }
-  deserialized = null;
-  try {
-    deserialized = eval(data);
-  } catch (_error) {
-    e = _error;
-    console.error(e);
-  }
-  return deserialized;
-};
-
-bail = function() {
-  return window.location.reload(true);
-};
-
-logError = function(serialized) {
-  var e, err, errors, _i, _len, _results;
-  try {
-    errors = JSON.parse(serialized);
-    _results = [];
-    for (_i = 0, _len = errors.length; _i < _len; _i++) {
-      err = errors[_i];
-      _results.push(console.error(err));
-    }
-    return _results;
-  } catch (_error) {
-    e = _error;
-    return console.error(serialized);
-  }
-};
-
-window.onload = init;
-
-
-
-},{"./src/os_bridge.coffee":6,"./src/widget.coffee":7}],2:[function(require,module,exports){
-
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 /* toSource by Marcello Bastea-Forte - zlib license */
 module.exports = function(object, filter, indent, startingIndent) {
     var seen = []
-    return walk(object, filter, indent === undefined ? '  ' : (indent || ''), startingIndent || '')
+    return walk(object, filter, indent === undefined ? '  ' : (indent || ''), startingIndent || '', seen)
 
-    function walk(object, filter, indent, currentIndent) {
+    function walk(object, filter, indent, currentIndent, seen) {
         var nextIndent = currentIndent + indent
         object = filter ? filter(object) : object
         switch (typeof object) {
@@ -132,9 +14,10 @@ module.exports = function(object, filter, indent, startingIndent) {
                 return JSON.stringify(object)
             case 'boolean':
             case 'number':
-            case 'function':
             case 'undefined':
                 return ''+object
+            case 'function':
+                return object.toString()
         }
 
         if (object === null) return 'null'
@@ -150,12 +33,12 @@ module.exports = function(object, filter, indent, startingIndent) {
 
         if (Array.isArray(object)) {
             return '[' + join(object.map(function(element){
-                return walk(element, filter, indent, nextIndent)
+                return walk(element, filter, indent, nextIndent, seen.slice())
             })) + ']'
         }
         var keys = Object.keys(object)
         return keys.length ? '{' + join(keys.map(function (key) {
-            return (legalKey(key) ? key : JSON.stringify(key)) + ':' + walk(object[key], filter, indent, nextIndent)
+            return (legalKey(key) ? key : JSON.stringify(key)) + ':' + walk(object[key], filter, indent, nextIndent, seen.slice())
         })) + '}' : '{}'
     }
 }
@@ -165,82 +48,18 @@ var KEYWORD_REGEXP = /^(abstract|boolean|break|byte|case|catch|char|class|const|
 function legalKey(string) {
     return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
 }
-},{}],4:[function(require,module,exports){
+
+},{}],3:[function(require,module,exports){
 describe('client', function() {
   var clock, contentEl, server;
   server = null;
   contentEl = null;
-  clock = null;
-  beforeEach(function() {
-    clock = sinon.useFakeTimers();
-    contentEl = $('<div class="content"></div>');
-    $(document.body).append(contentEl);
-    return server = sinon.fakeServer.create();
-  });
-  afterEach(function() {
-    server.restore();
-    contentEl.remove();
-    return clock.restore();
-  });
-  return it('should manage widgets on the frontend', function() {
-    var lastRequest, req, requestedUrls, widgets;
-    widgets = {
-      foo: {
-        id: 'foo',
-        command: '',
-        refreshFrequency: 1000,
-        css: ''
-      },
-      bar: {
-        id: 'bar',
-        command: '',
-        refreshFrequency: 1000,
-        css: ''
-      },
-      'with space': {
-        id: 'with space',
-        command: '',
-        refreshFrequency: 1000,
-        css: ''
-      }
-    };
-    require('../../client.coffee');
-    window.onload();
-    expect(server.requests[0].url).toEqual('/widgets');
-    server.requests[0].respond(201, {
-      "Content-Type": "application/json"
-    }, JSON.stringify(widgets));
-    expect(contentEl.find('#foo').length).toBe(1);
-    expect(contentEl.find('#bar').length).toBe(1);
-    expect(contentEl.find('#with_space_space').length).toBe(1);
-    requestedUrls = (function() {
-      var _i, _len, _ref, _results;
-      _ref = server.requests;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        req = _ref[_i];
-        _results.push(req.url.replace(/\?.+$/, ''));
-      }
-      return _results;
-    })();
-    expect(requestedUrls.indexOf('/widgets/foo')).not.toBe(-1);
-    expect(requestedUrls.indexOf('/widgets/bar')).not.toBe(-1);
-    expect(requestedUrls.indexOf('/widgets/with space')).not.toBe(-1);
-    clock.tick();
-    lastRequest = server.requests[server.requests.length - 1];
-    expect(lastRequest.url).toEqual('/widget-changes');
-    lastRequest.respond(201, {
-      "Content-Type": "application/json"
-    }, JSON.stringify({
-      foo: 'deleted'
-    }));
-    return expect(contentEl.find('#foo').length).toBe(0);
-  });
+  return clock = null;
 });
 
 
 
-},{"../../client.coffee":1}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var Widget;
 
 Widget = require('../../src/widget.coffee');
@@ -271,13 +90,24 @@ describe('widget', function() {
 });
 
 describe('widget', function() {
-  var domEl, route, server, widget;
+  var domEl, server, widget;
   server = null;
   widget = null;
   domEl = null;
-  route = /\/widgets\/foo\?.+/;
   beforeEach(function() {
-    return server = sinon.fakeServer.create();
+    server = sinon.fakeServer.create();
+    return server.respondToWidget = function(id, body, status) {
+      var route;
+      if (status == null) {
+        status = 200;
+      }
+      route = new RegExp("/widgets/" + id + "\?.+$");
+      return server.respondWith("POST", route, [
+        status, {
+          "Content-Type": "text/plain"
+        }, body
+      ]);
+    };
   });
   afterEach(function() {
     server.restore();
@@ -286,17 +116,13 @@ describe('widget', function() {
   describe('without a render method', function() {
     beforeEach(function() {
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo'
       });
       return domEl = widget.create();
     });
     return it('should just render server response', function() {
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'bar'
-      ]);
+      server.respondToWidget('foo', 'bar');
       widget.start();
       server.respond();
       return expect($(domEl).find('.widget').text()).toEqual('bar');
@@ -314,11 +140,7 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     return it('should render what render returns', function() {
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'baz'
-      ]);
+      server.respondToWidget('foo', 'baz');
       widget.start();
       server.respond();
       return expect($(domEl).find('.widget').text()).toEqual('rendered: baz');
@@ -330,7 +152,7 @@ describe('widget', function() {
     beforeEach(function() {
       afterRender = jasmine.createSpy('after render');
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
         render: (function() {}),
         afterRender: afterRender,
@@ -339,22 +161,14 @@ describe('widget', function() {
       return domEl = widget.create();
     });
     it('calls the after-render hook ', function() {
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'baz'
-      ]);
+      server.respondToWidget("foo", 'baz');
       widget.start();
       server.respond();
       return expect(afterRender).toHaveBeenCalledWith($(domEl).find('.widget')[0]);
     });
     return it('calls the after-render hook after every render', function() {
       jasmine.clock().install();
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'stuff'
-      ]);
+      server.respondToWidget("foo", 'stuff');
       server.autoRespond = true;
       widget.start();
       jasmine.clock().tick(250);
@@ -367,18 +181,14 @@ describe('widget', function() {
     beforeEach(function() {
       update = jasmine.createSpy('update');
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
         update: update
       });
       return domEl = widget.create();
     });
     return it('should render output and then call update', function() {
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'stuff'
-      ]);
+      server.respondToWidget("foo", 'stuff');
       widget.start();
       server.respond();
       expect($(domEl).find('.widget').text()).toEqual('stuff');
@@ -391,7 +201,7 @@ describe('widget', function() {
     beforeEach(function() {
       render = jasmine.createSpy('render');
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
         render: render,
         refreshFrequency: 100
@@ -400,11 +210,7 @@ describe('widget', function() {
     });
     return it('should keep updating until stop() is called', function() {
       jasmine.clock().install();
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'stuff'
-      ]);
+      server.respondToWidget("foo", 'stuff');
       server.autoRespond = true;
       widget.start();
       jasmine.clock().tick(250);
@@ -428,18 +234,14 @@ describe('widget', function() {
       var error, firstStackItem;
       error = new Error('something went sorry');
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
         render: function() {
           throw error;
         }
       });
       domEl = widget.create();
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'baz'
-      ]);
+      server.respondToWidget("foo", 'baz');
       widget.start();
       server.respond();
       expect($(domEl).find('.widget').text()).toEqual('something went sorry');
@@ -448,18 +250,14 @@ describe('widget', function() {
     });
     it('should catch and show exceptions inside update', function() {
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
         update: function() {
           throw new Error('up');
         }
       });
       domEl = widget.create();
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'baz'
-      ]);
+      server.respondToWidget("foo", 'baz');
       widget.start();
       server.respond();
       return expect($(domEl).find('.widget').text()).toEqual('up');
@@ -468,7 +266,7 @@ describe('widget', function() {
       var update;
       update = jasmine.createSpy('update');
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
         render: function() {
           throw new Error('oops');
@@ -476,11 +274,7 @@ describe('widget', function() {
         update: update
       });
       domEl = widget.create();
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'baz'
-      ]);
+      server.respondToWidget("foo", 'baz');
       widget.start();
       server.respond();
       expect($(domEl).find('.widget').text()).toEqual('oops');
@@ -488,16 +282,12 @@ describe('widget', function() {
     });
     it('should render backend errors', function() {
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
         render: function() {}
       });
       domEl = widget.create();
-      server.respondWith("GET", route, [
-        500, {
-          "Content-Type": "text/plain"
-        }, 'puke'
-      ]);
+      server.respondToWidget("foo", 'puke', 500);
       widget.start();
       server.respond();
       return expect($(domEl).find('.widget').text()).toEqual('puke');
@@ -505,35 +295,23 @@ describe('widget', function() {
     return it('should be able to recover after an error', function() {
       jasmine.clock().install();
       widget = Widget({
-        command: '',
+        command: 'some-command',
         id: 'foo',
-        refreshFrequency: 100,
         update: function(o, domEl) {
           return domEl.innerHTML = domEl.innerHTML + '!';
-        }
+        },
+        refreshFrequency: 100
       });
       domEl = widget.create();
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'all good'
-      ]);
+      server.respondToWidget("foo", 'all good', 200);
       widget.start();
       server.respond();
       expect($(domEl).find('.widget').text()).toEqual('all good!');
-      server.respondWith("GET", route, [
-        500, {
-          "Content-Type": "text/plain"
-        }, 'oh noes'
-      ]);
+      server.respondToWidget("foo", 'oh noes', 500);
       jasmine.clock().tick(100);
       server.respond();
       expect($(domEl).find('.widget').text()).toEqual('oh noes');
-      server.respondWith("GET", route, [
-        200, {
-          "Content-Type": "text/plain"
-        }, 'all good again'
-      ]);
+      server.respondToWidget("foo", 'all good again', 200);
       jasmine.clock().tick(100);
       server.respond();
       return expect($(domEl).find('.widget').text()).toEqual('all good again!');
@@ -543,96 +321,7 @@ describe('widget', function() {
 
 
 
-},{"../../src/widget.coffee":7}],6:[function(require,module,exports){
-var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
-
-cachedWallpaper = new Image();
-
-window.addEventListener('onwallpaperchange', function() {
-  var slices;
-  slices = getWallpaperSlices();
-  if (!(slices.length > 0)) {
-    return;
-  }
-  return loadWallpaper(function(wallpaper) {
-    return renderWallpaperSlices(wallpaper, slices);
-  });
-});
-
-exports.makeBgSlice = function(canvas) {
-  var _ref;
-  canvas = $(canvas);
-  if (!((_ref = canvas[0]) != null ? _ref.getContext : void 0)) {
-    throw new Error('no canvas element provided');
-  }
-  canvas.attr('data-bg-slice', true);
-  return getWallpaper(function(wallpaper) {
-    return renderWallpaperSlice(wallpaper, canvas[0]);
-  });
-};
-
-getWallpaper = function(callback) {
-  if (cachedWallpaper.loaded) {
-    return callback(cachedWallpaper);
-  }
-  if (getWallpaper.callbacks == null) {
-    getWallpaper.callbacks = [];
-  }
-  getWallpaper.callbacks.push(callback);
-  if (cachedWallpaper.loading) {
-    return;
-  }
-  cachedWallpaper.loading = true;
-  return loadWallpaper(function(wallpaper) {
-    var _i, _len, _ref;
-    _ref = getWallpaper.callbacks;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      callback = _ref[_i];
-      callback(wallpaper);
-    }
-    getWallpaper.callbacks.length = 0;
-    return cachedWallpaper.loaded = true;
-  });
-};
-
-loadWallpaper = function(callback) {
-  cachedWallpaper.onload = function() {
-    return callback(cachedWallpaper);
-  };
-  return cachedWallpaper.src = os.wallpaperUrl();
-};
-
-getWallpaperSlices = function() {
-  return $('[data-bg-slice=true]');
-};
-
-renderWallpaperSlices = function(wallpaper, slices) {
-  var canvas, _i, _len, _results;
-  _results = [];
-  for (_i = 0, _len = slices.length; _i < _len; _i++) {
-    canvas = slices[_i];
-    _results.push(renderWallpaperSlice(wallpaper, canvas));
-  }
-  return _results;
-};
-
-renderWallpaperSlice = function(wallpaper, canvas) {
-  var ctx, height, left, rect, scale, top, width;
-  ctx = canvas.getContext('2d');
-  scale = window.devicePixelRatio / ctx.webkitBackingStorePixelRatio;
-  rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * scale;
-  canvas.height = rect.height * scale;
-  left = Math.max(rect.left, 0) * window.devicePixelRatio;
-  top = Math.max(rect.top + 22, 0) * window.devicePixelRatio;
-  width = Math.min(canvas.width, wallpaper.width - left);
-  height = Math.min(canvas.height, wallpaper.height - top);
-  return ctx.drawImage(wallpaper, Math.round(left), Math.round(top), Math.round(width), Math.round(height), 0, 0, canvas.width, canvas.height);
-};
-
-
-
-},{}],7:[function(require,module,exports){
+},{"../../src/widget.coffee":5}],5:[function(require,module,exports){
 var exec, nib, stylus, toSource;
 
 exec = require('child_process').exec;
@@ -673,7 +362,11 @@ module.exports = function(implementation) {
   api.id = 'widget';
   api.refreshFrequency = 1000;
   api.render = function(output) {
-    return output;
+    if (api.command && output) {
+      return output;
+    } else {
+      return "warning: no render method";
+    }
   };
   api.afterRender = function() {};
   api.create = function() {
@@ -708,11 +401,14 @@ module.exports = function(implementation) {
       return clearTimeout(timer);
     }
   };
-  api.exec = function(options, callback) {
+  api.exec = function(options, command, callback) {
+    if (command == null) {
+      command = api.command;
+    }
     if (childProc != null) {
       childProc.kill("SIGKILL");
     }
-    return childProc = exec(api.command, options, function(err, stdout, stderr) {
+    return childProc = exec(command, options, function(err, stdout, stderr) {
       callback(err, stdout, stderr);
       return childProc = null;
     });
@@ -723,7 +419,41 @@ module.exports = function(implementation) {
   api.serialize = function() {
     return toSource(implementation);
   };
-  redraw = function(output, error) {
+  api.refresh = refresh = function() {
+    var request;
+    if (api.command == null) {
+      return redraw();
+    }
+    request = api.run(api.command, function(err, output) {
+      if (started) {
+        return redraw(err, output);
+      }
+    });
+    return request.always(function() {
+      if (!started) {
+        return;
+      }
+      if (api.refreshFrequency === false) {
+        return;
+      }
+      return timer = setTimeout(refresh, api.refreshFrequency);
+    });
+  };
+  api.run = function(command, callback) {
+    return $.ajax({
+      url: "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime()),
+      method: 'POST',
+      data: command,
+      timeout: api.refreshFrequency,
+      error: function(xhr) {
+        return callback(xhr.responseText || 'error running command');
+      },
+      success: function(output) {
+        return callback(null, output);
+      }
+    });
+  };
+  redraw = function(error, output) {
     var e;
     if (error) {
       contentEl.innerHTML = error;
@@ -763,33 +493,6 @@ module.exports = function(implementation) {
     }
     return _results;
   };
-  refresh = function() {
-    var url;
-    if (api.command == null) {
-      return redraw();
-    }
-    url = "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime());
-    return $.ajax({
-      url: url,
-      timeout: api.refreshFrequency
-    }).done(function(response) {
-      if (started) {
-        return redraw(response);
-      }
-    }).fail(function(response) {
-      if (started) {
-        return redraw(null, response.responseText);
-      }
-    }).always(function() {
-      if (!started) {
-        return;
-      }
-      if (api.refreshFrequency === false) {
-        return;
-      }
-      return timer = setTimeout(refresh, api.refreshFrequency);
-    });
-  };
   parseStyle = function(style) {
     var scopedStyle;
     if (!style) {
@@ -822,4 +525,4 @@ module.exports = function(implementation) {
 
 
 
-},{"child_process":2,"nib":2,"stylus":2,"tosource":3}]},{},[4,5]);
+},{"child_process":1,"nib":1,"stylus":1,"tosource":2}]},{},[3,4]);

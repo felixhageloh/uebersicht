@@ -3,6 +3,31 @@
 ** Licensed under MIT License.
 */
 
+// constants from https://developer.apple.com/library/mac/documentation/Darwin/Reference/FSEvents_Ref/index.html#//apple_ref/doc/constant_group/FSEventStreamCreateFlags
+#ifndef kFSEventStreamCreateFlagNone
+#define kFSEventStreamCreateFlagNone 0x00000000
+#endif
+
+#ifndef kFSEventStreamCreateFlagUseCFTypes
+#define kFSEventStreamCreateFlagUseCFTypes 0x00000001
+#endif
+
+#ifndef kFSEventStreamCreateFlagNoDefer
+#define kFSEventStreamCreateFlagNoDefer 0x00000002
+#endif
+
+#ifndef kFSEventStreamCreateFlagWatchRoot
+#define kFSEventStreamCreateFlagWatchRoot 0x00000004
+#endif
+
+#ifndef kFSEventStreamCreateFlagIgnoreSelf
+#define kFSEventStreamCreateFlagIgnoreSelf 0x00000008
+#endif
+
+#ifndef kFSEventStreamCreateFlagFileEvents
+#define kFSEventStreamCreateFlagFileEvents 0x00000010
+#endif
+
 void FSEvents::threadStart() {
   if (threadloop) return;
   pthread_create(&thread, NULL, &FSEvents::threadRun, this);

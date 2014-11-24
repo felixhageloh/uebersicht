@@ -33,7 +33,6 @@ namespace fse {
     void asyncStop();
 
     // thread.cc
-    bool threadStarted;
     pthread_t thread;
     CFRunLoopRef threadloop;
     void threadStart();
@@ -48,12 +47,12 @@ namespace fse {
     CFArrayRef paths;
     CFMutableArrayRef events;
     static void Initialize(v8::Handle<v8::Object> exports);
-    
+
     // methods.cc - exposed
     static NAN_METHOD(New);
     static NAN_METHOD(Stop);
     static NAN_METHOD(Start);
-      
+
   };
 }
 

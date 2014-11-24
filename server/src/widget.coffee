@@ -39,7 +39,11 @@ module.exports = (implementation) ->
 
   api.refreshFrequency = 1000
 
-  api.render = (output) -> output
+  api.render = (output) ->
+    if api.command and output
+      output
+    else
+      "warning: no render method"
 
   api.afterRender = ->
 
@@ -72,9 +76,11 @@ module.exports = (implementation) ->
     clearTimeout timer if timer?
 
   # runs the widget command. This happens server side
-  api.exec = (options, callback) ->
+  api.exec = (options, command, callback) ->
+    command ?= api.command
+
     childProc.kill "SIGKILL" if childProc?
-    childProc = exec api.command, options, (err, stdout, stderr) ->
+    childProc = exec command, options, (err, stdout, stderr) ->
       callback(err, stdout, stderr)
       childProc = null
 
@@ -86,7 +92,28 @@ module.exports = (implementation) ->
   api.serialize = ->
     toSource implementation
 
-  redraw = (output, error) ->
+  api.refresh = refresh = ->
+    return redraw() unless api.command?
+
+    request = api.run api.command, (err, output) ->
+      redraw err, output if started
+
+    request.always ->
+      return unless started
+      return if api.refreshFrequency == false
+      timer = setTimeout refresh, api.refreshFrequency
+
+  api.run = (command, callback) ->
+    $.ajax(
+      url    : "/widgets/#{api.id}?cachebuster=#{new Date().getTime()}"
+      method : 'POST'
+      data   : command
+      timeout: api.refreshFrequency
+      error  : (xhr)    -> callback(xhr.responseText || 'error running command')
+      success: (output) -> callback(null, output)
+    )
+
+  redraw = (error, output) ->
     if error
       contentEl.innerHTML = error
       console.error "#{api.id}:", error
@@ -114,18 +141,6 @@ module.exports = (implementation) ->
       s = document.createElement('script')
       s.src = script.src
       domEl.replaceChild s, script
-
-  refresh = ->
-    return redraw() unless api.command?
-    url = "/widgets/#{api.id}?cachebuster=#{new Date().getTime()}"
-
-    $.ajax(url: url, timeout: api.refreshFrequency)
-      .done((response) -> redraw(response) if started )
-      .fail((response) -> redraw(null, response.responseText) if started)
-      .always ->
-        return unless started
-        return if api.refreshFrequency == false
-        timer = setTimeout refresh, api.refreshFrequency
 
   parseStyle = (style) ->
     return "" unless style
