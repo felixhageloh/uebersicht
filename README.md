@@ -111,7 +111,34 @@ Calling `makeBgSlice` is like registering an event handler. The background slice
 
 ## Building Übersicht
 
-The code base consists of two parts, a cocoa app and a NodeJS app inside `server/`. To build the node app, use `grunt release`, then build the cocoa app using Xcode. Unfortunately you have to clean your build (⇧⌘K) every time you build the node app.
+To build Übersicht you will need to have NodeJS and a few dependencies installed:
+
+### setup
+
+Install node and npm using homebrew
+
+    brew install node
+
+then run
+
+    npm install -g coffee-script
+    npm install -g grunt-cli
+
+finally, inside the project dir run
+
+    npm install
+
+### git and unicode characters
+
+Git might not like the umlaut (ü) in some of the path names and will constantly show them as untracked files. To get rid of this issue, I had to use
+
+    git config core.precomposeunicode false
+
+However, the common advice is to set this to `true`. It might depend on the OS and git version which one to use.s
+
+### building
+
+The code base consists of two parts, a cocoa app and a NodeJS app inside `server/`. To build the node app seperately, use `grunt release`. This happens automatically every time you build using XCode.
 
 The node app can be run standalone using
 
@@ -119,12 +146,7 @@ The node app can be run standalone using
 coffee server/server.coffee -d <path/to/widget/dir> -p <port>
 ```
 
-Then point your browser to `localhost:<port>`. Naturally, you will need to have NodeJS and the following dependencies installed:
-
-    npm install -g coffee-script
-    npm install -g grunt-cli
-
-While developing you can use
+Then point your browser to `localhost:<port>`. While developing you can use
 
     cd server
     grunt
