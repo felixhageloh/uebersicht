@@ -1,22 +1,6 @@
 Widget = require '../../src/widget.coffee'
 
-describe 'widget', ->
-
-  it 'should create a dom element with the widget id', ->
-    widget = Widget command: '', id: 'foo', css: ''
-
-    el = widget.create()
-    expect($(el).length).toBe 1
-    expect($(el).find("#foo").length).toBe 1
-    widget.stop()
-
-  it 'should create a style element with the widget style', ->
-    widget = Widget command: '', css: "background: red"
-    el = widget.create()
-    expect($(el).find("style").html().indexOf('background: red')).not.toBe -1
-    widget.stop()
-
-describe 'widget', ->
+describe 'a widget', ->
   server = null
   widget = null
   domEl  = null
@@ -35,6 +19,33 @@ describe 'widget', ->
   afterEach ->
     server.restore()
     widget.stop()
+
+  it 'should create a dom element with the widget id', ->
+    widget = Widget command: '', id: 'foo', css: ''
+
+    el = widget.create()
+    expect($(el).length).toBe 1
+    expect($(el).find("#foo").length).toBe 1
+    widget.stop()
+
+  it 'should create a style element with the widget style', ->
+    widget = Widget command: '', css: "background: red"
+    el = widget.create()
+    expect($(el).find("style").html().indexOf('background: red')).not.toBe -1
+    widget.stop()
+
+
+  it 'exposes a method to run commands on the backend', ->
+    widget   = Widget id: 'bar', command: '', css: ''
+    callback = jasmine.createSpy 'callback'
+
+    server.respondToWidget 'bar', 'some output'
+
+    widget.run "some command", callback
+    expect(server.requests[0].requestBody).toEqual 'some command'
+
+    server.respond()
+    expect(callback).toHaveBeenCalledWith null, 'some output'
 
   describe 'without a render method', ->
 
@@ -116,16 +127,13 @@ describe 'widget', ->
       expect(update).toHaveBeenCalledWith 'stuff', $(domEl).find('.widget')[0]
 
   describe 'when started', ->
-    render = null
-
     beforeEach ->
-      render = jasmine.createSpy('render')
       widget = Widget
         command: 'some-command',
         id     : 'foo',
-        render : render,
+        render : jasmine.createSpy('render'),
         refreshFrequency: 100
-      domEl  = widget.create()
+      widget.create()
 
     it 'should keep updating until stop() is called', ->
       jasmine.clock().install()
@@ -134,10 +142,33 @@ describe 'widget', ->
 
       widget.start()
       jasmine.clock().tick 250
-      expect(render.calls.count()).toBe 3
+      expect(widget.render.calls.count()).toBe 3
       widget.stop()
       jasmine.clock().tick 1000
-      expect(render.calls.count()).toBe 3
+      expect(widget.render.calls.count()).toBe 3
+
+  describe 'when stopped', ->
+    beforeEach ->
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        render : jasmine.createSpy('render'),
+        refreshFrequency: 100
+
+      jasmine.clock().install()
+      server.respondToWidget "foo", 'stuff'
+      server.autoRespond = true
+
+    it 'can be started again', ->
+      widget.create()
+      widget.start()
+      jasmine.clock().tick 250
+      widget.stop()
+
+      expect(widget.render.calls.count()).toBe 3
+      widget.start()
+      jasmine.clock().tick 300
+      expect(widget.render.calls.count()).toBe 6
 
   describe 'error handling', ->
     realConsoleError = null

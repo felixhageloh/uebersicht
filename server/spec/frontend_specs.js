@@ -247,32 +247,7 @@ var Widget;
 
 Widget = require('../../src/widget.coffee');
 
-describe('widget', function() {
-  it('should create a dom element with the widget id', function() {
-    var el, widget;
-    widget = Widget({
-      command: '',
-      id: 'foo',
-      css: ''
-    });
-    el = widget.create();
-    expect($(el).length).toBe(1);
-    expect($(el).find("#foo").length).toBe(1);
-    return widget.stop();
-  });
-  return it('should create a style element with the widget style', function() {
-    var el, widget;
-    widget = Widget({
-      command: '',
-      css: "background: red"
-    });
-    el = widget.create();
-    expect($(el).find("style").html().indexOf('background: red')).not.toBe(-1);
-    return widget.stop();
-  });
-});
-
-describe('widget', function() {
+describe('a widget', function() {
   var domEl, server, widget;
   server = null;
   widget = null;
@@ -295,6 +270,42 @@ describe('widget', function() {
   afterEach(function() {
     server.restore();
     return widget.stop();
+  });
+  it('should create a dom element with the widget id', function() {
+    var el;
+    widget = Widget({
+      command: '',
+      id: 'foo',
+      css: ''
+    });
+    el = widget.create();
+    expect($(el).length).toBe(1);
+    expect($(el).find("#foo").length).toBe(1);
+    return widget.stop();
+  });
+  it('should create a style element with the widget style', function() {
+    var el;
+    widget = Widget({
+      command: '',
+      css: "background: red"
+    });
+    el = widget.create();
+    expect($(el).find("style").html().indexOf('background: red')).not.toBe(-1);
+    return widget.stop();
+  });
+  it('exposes a method to run commands on the backend', function() {
+    var callback;
+    widget = Widget({
+      id: 'bar',
+      command: '',
+      css: ''
+    });
+    callback = jasmine.createSpy('callback');
+    server.respondToWidget('bar', 'some output');
+    widget.run("some command", callback);
+    expect(server.requests[0].requestBody).toEqual('some command');
+    server.respond();
+    return expect(callback).toHaveBeenCalledWith(null, 'some output');
   });
   describe('without a render method', function() {
     beforeEach(function() {
@@ -379,17 +390,14 @@ describe('widget', function() {
     });
   });
   describe('when started', function() {
-    var render;
-    render = null;
     beforeEach(function() {
-      render = jasmine.createSpy('render');
       widget = Widget({
         command: 'some-command',
         id: 'foo',
-        render: render,
+        render: jasmine.createSpy('render'),
         refreshFrequency: 100
       });
-      return domEl = widget.create();
+      return widget.create();
     });
     return it('should keep updating until stop() is called', function() {
       jasmine.clock().install();
@@ -397,10 +405,33 @@ describe('widget', function() {
       server.autoRespond = true;
       widget.start();
       jasmine.clock().tick(250);
-      expect(render.calls.count()).toBe(3);
+      expect(widget.render.calls.count()).toBe(3);
       widget.stop();
       jasmine.clock().tick(1000);
-      return expect(render.calls.count()).toBe(3);
+      return expect(widget.render.calls.count()).toBe(3);
+    });
+  });
+  describe('when stopped', function() {
+    beforeEach(function() {
+      widget = Widget({
+        command: 'some-command',
+        id: 'foo',
+        render: jasmine.createSpy('render'),
+        refreshFrequency: 100
+      });
+      jasmine.clock().install();
+      server.respondToWidget("foo", 'stuff');
+      return server.autoRespond = true;
+    });
+    return it('can be started again', function() {
+      widget.create();
+      widget.start();
+      jasmine.clock().tick(250);
+      widget.stop();
+      expect(widget.render.calls.count()).toBe(3);
+      widget.start();
+      jasmine.clock().tick(300);
+      return expect(widget.render.calls.count()).toBe(6);
     });
   });
   return describe('error handling', function() {
@@ -716,12 +747,14 @@ module.exports = function(implementation) {
       url: "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime()),
       method: 'POST',
       data: command,
-      timeout: api.refreshFrequency,
-      error: function(xhr) {
-        return callback(xhr.responseText || 'error running command');
-      },
       success: function(output) {
         return callback(null, output);
+      },
+      error: function(xhr, type) {
+        if (type === 'abort') {
+          return;
+        }
+        return callback(xhr.responseText || 'error running command');
       }
     });
   };
