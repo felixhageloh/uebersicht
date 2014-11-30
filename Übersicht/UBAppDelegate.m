@@ -317,6 +317,7 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
         if (!success || CGDisplayVendorNumber(displayID) != vendorID ||
             CGDisplayModelNumber(displayID)  != productID) {
             CFRelease(info);
+            info = nil;
             continue;
         }
         
