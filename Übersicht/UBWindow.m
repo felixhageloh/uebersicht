@@ -15,11 +15,13 @@
 
 #import "UBWindow.h"
 #import "UBWallperServer.h"
+#import "UBAppDelegate.h"
 
 @implementation UBWindow {
     NSString *widgetsUrl;
     UBWallperServer* wallpaperServer;
     BOOL webviewLoaded;
+    CLLocationManager* locationManager;
 }
 
 @synthesize webView;
@@ -46,6 +48,12 @@
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
+        
+        // Start location services
+        locationManager = [[CLLocationManager alloc] init];
+        locationManager.delegate = self;
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        [locationManager startUpdatingLocation];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(wakeFromSleep:)
@@ -139,6 +147,27 @@
 }
 
 #
+#pragma mark CoreLocation delegates
+#
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
+    if (newLocation) {
+        NSDictionary* dict;
+        dict = @{ @"latitude": @(newLocation.coordinate.latitude), @"longitude": @(newLocation.coordinate.longitude) };
+        
+        [[webView windowScriptObject] setValue:dict forKey:@"__LOCATION__"];
+    } else {
+        [[webView windowScriptObject] removeWebScriptKey:@"__LOCATION__"];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    if (webviewLoaded) {
+        [[webView windowScriptObject] removeWebScriptKey:@"__LOCATION__"];
+    }
+}
+
+#
 #pragma mark WebView delegates
 #
 
@@ -146,6 +175,24 @@
 {
     NSLog(@"loaded %@", webView.mainFrameURL);
     if (frame == [frame findFrameNamed:@"_top"]) {
+        
+        // Hand the current location off to the script's window object
+        // Not sure this is actually happening early enough to be useful
+        // to the widget initially...
+        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized
+            && locationManager.location) {
+            CLLocation* location = locationManager.location;
+            
+            NSDictionary* dict;
+            dict = @{ @"latitude": @(location.coordinate.latitude), @"longitude": @(location.coordinate.longitude) };
+            
+            [[webView windowScriptObject] setValue:dict forKey:@"__LOCATION__"];
+        } else {
+            // Make sure the script doesn't think there's a location if the app
+            // has lost it for any reason
+            [[webView windowScriptObject] removeWebScriptKey:@"__LOCATION__"];
+        }
+        
         [[webView windowScriptObject] setValue:self forKey:@"os"];
         [self notifyWebviewOfWallaperChange];
     }

@@ -13,8 +13,9 @@
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 #import <JavaScriptCore/JavaScriptCore.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface UBWindow : NSWindow
+@interface UBWindow : NSWindow <CLLocationManagerDelegate>
 
 @property (weak) IBOutlet WebView *webView;
 
