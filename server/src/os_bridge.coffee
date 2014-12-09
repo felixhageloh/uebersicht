@@ -1,5 +1,15 @@
 cachedWallpaper = new Image()
 
+window.addEventListener 'onlocationchange', (e) ->
+  # When new widgets come online (including those available at launch)
+  # it's unlikely that an event will be sent soon enough with the
+  # current position. We'll watch for position changes here and cache
+  # the current value to send to widgets as they are created
+  if e.detail && e.detail.position
+    console.log 'Caching current position globally'
+    console.log e.detail.position
+    window._ub_location_position = e.detail.position
+
 window.addEventListener 'onwallpaperchange', ->
   slices = getWallpaperSlices()
   return unless slices.length > 0
