@@ -208,10 +208,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    NSLog(@"locationManager:(CLLocationManager *)manager didUpdateToLocation");
     // Only notify the webview if the location has actually changed
-    NSLog(@"old: %f %f", oldLocation.coordinate.latitude, oldLocation.coordinate.longitude);
-    NSLog(@"new: %f %f", newLocation.coordinate.latitude, newLocation.coordinate.longitude);
     if (!oldLocation || !CLCOORDINATES_EQUAL2(newLocation.coordinate, oldLocation.coordinate)) {
         [self notifyWebviewOfLocationChange:newLocation];
     }
@@ -219,7 +216,6 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    NSLog(@"%@", error);
     [self notifyWebviewOfLocationChange:nil];
 }
 
@@ -240,8 +236,6 @@
 
 - (void)notifyWebviewOfLocationChange:(CLLocation *)location
 {
-    NSLog(@"DEBUG notifyWebviewOfLocationChange");
-    
     // It may make more sense to retain the last known location so widgets will continue to
     // work until there's another valid location
     if (!location) {
