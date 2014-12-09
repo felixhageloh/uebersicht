@@ -15,7 +15,9 @@
 
 #import "UBWindow.h"
 #import "UBWallperServer.h"
-#import "UBAppDelegate.h"
+
+#define CLCOORDINATE_EPSILON 0.005f
+#define CLCOORDINATES_EQUAL2( coord1, coord2 ) (fabs(coord1.latitude - coord2.latitude) < CLCOORDINATE_EPSILON && fabs(coord1.longitude - coord2.longitude) < CLCOORDINATE_EPSILON)
 
 @implementation UBWindow {
     NSString *widgetsUrl;
@@ -44,16 +46,16 @@
         [self setCollectionBehavior:(NSWindowCollectionBehaviorTransient |
                                      NSWindowCollectionBehaviorCanJoinAllSpaces |
                                      NSWindowCollectionBehaviorIgnoresCycle)];
-
-        [self setRestorable:NO];
-        [self disableSnapshotRestoration];
-        [self setDisplaysWhenScreenProfileChanges:YES];
         
         // Start location services
         locationManager = [[CLLocationManager alloc] init];
         locationManager.delegate = self;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         [locationManager startUpdatingLocation];
+
+        [self setRestorable:NO];
+        [self disableSnapshotRestoration];
+        [self setDisplaysWhenScreenProfileChanges:YES];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(wakeFromSleep:)
@@ -147,27 +149,6 @@
 }
 
 #
-#pragma mark CoreLocation delegates
-#
-
-- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
-    if (newLocation) {
-        NSDictionary* dict;
-        dict = @{ @"latitude": @(newLocation.coordinate.latitude), @"longitude": @(newLocation.coordinate.longitude) };
-        
-        [[webView windowScriptObject] setValue:dict forKey:@"__LOCATION__"];
-    } else {
-        [[webView windowScriptObject] removeWebScriptKey:@"__LOCATION__"];
-    }
-}
-
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
-    if (webviewLoaded) {
-        [[webView windowScriptObject] removeWebScriptKey:@"__LOCATION__"];
-    }
-}
-
-#
 #pragma mark WebView delegates
 #
 
@@ -175,26 +156,12 @@
 {
     NSLog(@"loaded %@", webView.mainFrameURL);
     if (frame == [frame findFrameNamed:@"_top"]) {
-        
-        // Hand the current location off to the script's window object
-        // Not sure this is actually happening early enough to be useful
-        // to the widget initially...
-        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized
-            && locationManager.location) {
-            CLLocation* location = locationManager.location;
-            
-            NSDictionary* dict;
-            dict = @{ @"latitude": @(location.coordinate.latitude), @"longitude": @(location.coordinate.longitude) };
-            
-            [[webView windowScriptObject] setValue:dict forKey:@"__LOCATION__"];
-        } else {
-            // Make sure the script doesn't think there's a location if the app
-            // has lost it for any reason
-            [[webView windowScriptObject] removeWebScriptKey:@"__LOCATION__"];
-        }
-        
         [[webView windowScriptObject] setValue:self forKey:@"os"];
         [self notifyWebviewOfWallaperChange];
+        
+        if (locationManager.location) {
+            [self notifyWebviewOfLocationChange:locationManager.location];
+        }
     }
 }
 
@@ -235,6 +202,26 @@
                afterDelay:5.0];
 }
 
+#
+#pragma mark CoreLocation delegates
+#
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    NSLog(@"locationManager:(CLLocationManager *)manager didUpdateToLocation");
+    // Only notify the webview if the location has actually changed
+    NSLog(@"old: %f %f", oldLocation.coordinate.latitude, oldLocation.coordinate.longitude);
+    NSLog(@"new: %f %f", newLocation.coordinate.latitude, newLocation.coordinate.longitude);
+    if (!oldLocation || !CLCOORDINATES_EQUAL2(newLocation.coordinate, oldLocation.coordinate)) {
+        [self notifyWebviewOfLocationChange:newLocation];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    NSLog(@"%@", error);
+    [self notifyWebviewOfLocationChange:nil];
+}
 
 #
 #pragma mark WebscriptObject
@@ -249,6 +236,47 @@
 - (NSString*)wallpaperUrl
 {
     return wallpaperServer.url;
+}
+
+- (void)notifyWebviewOfLocationChange:(CLLocation *)location
+{
+    NSLog(@"DEBUG notifyWebviewOfLocationChange");
+    
+    // It may make more sense to retain the last known location so widgets will continue to
+    // work until there's another valid location
+    if (!location) {
+        NSString *script;
+        script = [NSString stringWithFormat:@"window.dispatchEvent(new CustomEvent('onlocationchange', { 'detail': { 'position': {} } }))"];
+        
+        [[webView windowScriptObject] evaluateWebScript:script];
+    }
+    
+    // Coordinates properties (Position.coords)
+    CLLocationDegrees latitude = location.coordinate.latitude;
+    CLLocationDegrees longitude = location.coordinate.longitude;
+    CLLocationDistance altitude = location.altitude;
+    CLLocationSpeed speed = location.speed;
+    CLLocationDirection heading = location.course;
+    CLLocationAccuracy accuracy = location.horizontalAccuracy;
+    CLLocationAccuracy altitudeAccuracy = location.verticalAccuracy;
+    // Position.timestamp
+    NSDate *timestamp = location.timestamp;
+    
+    NSString *detail;
+    detail = [NSString stringWithFormat:@"{ 'position': { 'timestamp': %f, 'coords': { 'latitude': %f, 'longitude': %f, 'altitude': %f, 'accuracy': %f, 'altitudeAccuracy': %f, 'heading': %f, 'speed': %f } } }",
+              (timestamp.timeIntervalSince1970 * 1000),
+              latitude,
+              longitude,
+              altitude,
+              accuracy,
+              altitudeAccuracy,
+              heading,
+              speed];
+    
+    NSString *script;
+    script = [NSString stringWithFormat:@"window.dispatchEvent(new CustomEvent('onlocationchange', { 'detail': %@ }))", detail];
+    
+    [[webView windowScriptObject] evaluateWebScript:script];
 }
 
 
