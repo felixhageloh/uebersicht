@@ -14,7 +14,6 @@
 //
 
 #import "UBWindow.h"
-#import "UBWallperServer.h"
 
 @implementation UBWindow {
     NSString *widgetsUrl;
@@ -146,7 +145,11 @@
 {
     NSLog(@"loaded %@", webView.mainFrameURL);
     if (frame == [frame findFrameNamed:@"_top"]) {
+        JSContextRef jsContext = [frame globalContext];
+        UBLocation* location   = [[UBLocation alloc] initWithContext:jsContext];
+        
         [[webView windowScriptObject] setValue:self forKey:@"os"];
+        [[webView windowScriptObject] setValue:location forKey:@"geolocation"];
         [self notifyWebviewOfWallaperChange];
     }
 }
