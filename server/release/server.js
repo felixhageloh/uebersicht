@@ -1851,7 +1851,6 @@ module.exports = function(implementation) {
     el.appendChild(contentEl);
     if (api.refreshOnLocationChange) {
       el.addEventListener('onlocationchange', function(_) {
-        console.log('refresh because location changed');
         return refresh();
       });
     }
