@@ -11,33 +11,46 @@
 @implementation UBLocation {
     BOOL serviceStarted;
     JSContextRef jsContext;
-    NSMutableArray* listeners;
+    NSMutableDictionary* listeners;
+    NSMutableArray* pendingCallbacks;
     CLLocationManager* locationManager;
     CLLocation * currentLocation;
+    NSNumber* currListenerId;
 }
 
 - (id) initWithContext:(JSContextRef)context {
     self = [super init];
     
     if (self) {
-        jsContext = context;
-        currentLocation = nil;
-        serviceStarted = NO;
-        listeners = [[NSMutableArray alloc] init];
+        jsContext        = context;
+        currentLocation  = nil;
+        serviceStarted   = NO;
+        pendingCallbacks = [[NSMutableArray alloc] init];
+        listeners        = [[NSMutableDictionary alloc] init];
+        currListenerId   = @1;
+        
+        locationManager = [[CLLocationManager alloc] init];
+        locationManager.delegate = self;
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     }
     
     return self;
 }
 
 - (void)startService {
-    if (serviceStarted) { return;}
+    if (serviceStarted) { return; }
     
-    locationManager = [[CLLocationManager alloc] init];
-    locationManager.delegate = self;
-    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     [locationManager startUpdatingLocation];
     
     serviceStarted = YES;
+}
+
+- (void)stopService {
+    if (!serviceStarted) { return; }
+    
+    [locationManager stopUpdatingLocation];
+    currentLocation = nil;
+    serviceStarted  = NO;
 }
 
 - (NSString*)toJSString:(CLLocation *)location
@@ -96,19 +109,36 @@
 - (void)getCurrentPosition:(WebScriptObject *)callback {
     
     if (!serviceStarted) [self startService];
+    [pendingCallbacks addObject:callback];
+
+}
+
+- (NSNumber*)watchPosition:(WebScriptObject *)callback {
     
-    if (!currentLocation) {
-        [listeners addObject:callback];
-    } else {
-        [self callJSFunction:callback withLocation:currentLocation];
+    if (!serviceStarted) [self startService];
+
+    currListenerId = [NSNumber numberWithInt:currListenerId.intValue + 1];
+    listeners[currListenerId] = callback;
+    
+    if (currentLocation) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self callJSFunction:callback withLocation:currentLocation];
+        });
     }
     
-   
+    return currListenerId;
 }
+
+- (void)clearWatch:(NSNumber *)listenerId {
+    [listeners removeObjectForKey:listenerId];
+}
+
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
 {
-    if (aSelector == @selector(getCurrentPosition:)) {
+    if (aSelector == @selector(getCurrentPosition:) ||
+        aSelector == @selector(watchPosition:) ||
+        aSelector == @selector(clearWatch:)) {
         return NO;
     }
     
@@ -119,6 +149,10 @@
 {
     if (sel == @selector(getCurrentPosition:))
         return @"getCurrentPosition";
+    else if (sel == @selector(watchPosition:))
+        return @"watchPosition";
+    else if (sel == @selector(clearWatch:))
+        return @"clearWatch";
     
     return nil;
 }
@@ -129,16 +163,20 @@
 #
 
 - (void)locationManager:(CLLocationManager *)manager
-    didUpdateToLocation:(CLLocation *)newLocation
-           fromLocation:(CLLocation *)oldLocation
+     didUpdateLocations:(NSArray *)locations
 {
-    currentLocation = newLocation;
+    currentLocation = [locations lastObject];
     
-    for (id callback in listeners) {
+    for (id callback in pendingCallbacks) {
         [self callJSFunction:callback withLocation:currentLocation];
     }
+    for (id key in listeners) {
+        [self callJSFunction:listeners[key] withLocation:currentLocation];
+    }
     
-    [listeners removeAllObjects];
+    [pendingCallbacks removeAllObjects];
+    
+    if (listeners.count == 0) [self stopService];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
