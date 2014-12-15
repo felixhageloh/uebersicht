@@ -1860,6 +1860,9 @@ module.exports = function(implementation) {
     return contentEl = null;
   };
   api.start = function() {
+    if (started) {
+      return;
+    }
     started = true;
     if (timer != null) {
       clearTimeout(timer);
@@ -1867,6 +1870,9 @@ module.exports = function(implementation) {
     return refresh();
   };
   api.stop = function() {
+    if (!started) {
+      return;
+    }
     started = false;
     rendered = false;
     if (timer != null) {
@@ -1881,8 +1887,11 @@ module.exports = function(implementation) {
       childProc.kill("SIGKILL");
     }
     return childProc = exec(command, options, function(err, stdout, stderr) {
-      callback(err, stdout, stderr);
-      return childProc = null;
+      childProc = null;
+      if (err && err.killed) {
+        return;
+      }
+      return callback(err, stdout, stderr);
     });
   };
   api.domEl = function() {

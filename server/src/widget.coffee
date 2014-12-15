@@ -66,11 +66,13 @@ module.exports = (implementation) ->
 
   # starts the widget refresh cycle
   api.start = ->
+    return if started
     started = true
     clearTimeout timer if timer?
     refresh()
 
   api.stop = ->
+    return unless started
     started  = false
     rendered = false
     clearTimeout timer if timer?
@@ -81,8 +83,9 @@ module.exports = (implementation) ->
 
     childProc.kill "SIGKILL" if childProc?
     childProc = exec command, options, (err, stdout, stderr) ->
-      callback(err, stdout, stderr)
       childProc = null
+      return if err and err.killed
+      callback(err, stdout, stderr)
 
   api.domEl = -> el
 
