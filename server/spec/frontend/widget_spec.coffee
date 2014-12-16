@@ -147,6 +147,16 @@ describe 'a widget', ->
       jasmine.clock().tick 1000
       expect(widget.render.calls.count()).toBe 3
 
+    it "doesn't re-run when start is called again", ->
+      spyOn(widget, 'run').and.callThrough()
+
+      widget.start()
+      expect(widget.run.calls.count()).toBe 1
+
+      widget.start()
+      expect(widget.run.calls.count()).toBe 1
+
+
   describe 'when stopped', ->
     beforeEach ->
       widget = Widget

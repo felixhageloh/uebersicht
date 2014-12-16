@@ -83,6 +83,6 @@ module.exports = (grunt) ->
       done()
 
   grunt.registerTask 'spec', ['jasmine:fs', 'browserify:specs', 'jasmine']
-  grunt.registerTask 'frontend-spec', ['browserify:specs', 'jasmine:src']
+  grunt.registerTask 'spec:frontend', ['browserify:specs', 'jasmine:src']
   grunt.registerTask 'release', ['browserify:server', 'browserify:client']
   grunt.registerTask 'default', ['spec', 'release', 'watch']

@@ -399,7 +399,7 @@ describe('a widget', function() {
       });
       return widget.create();
     });
-    return it('should keep updating until stop() is called', function() {
+    it('should keep updating until stop() is called', function() {
       jasmine.clock().install();
       server.respondToWidget("foo", 'stuff');
       server.autoRespond = true;
@@ -409,6 +409,13 @@ describe('a widget', function() {
       widget.stop();
       jasmine.clock().tick(1000);
       return expect(widget.render.calls.count()).toBe(3);
+    });
+    return it("doesn't re-run when start is called again", function() {
+      spyOn(widget, 'run').and.callThrough();
+      widget.start();
+      expect(widget.run.calls.count()).toBe(1);
+      widget.start();
+      return expect(widget.run.calls.count()).toBe(1);
     });
   });
   describe('when stopped', function() {
@@ -691,6 +698,9 @@ module.exports = function(implementation) {
     return contentEl = null;
   };
   api.start = function() {
+    if (started) {
+      return;
+    }
     started = true;
     if (timer != null) {
       clearTimeout(timer);
@@ -698,6 +708,9 @@ module.exports = function(implementation) {
     return refresh();
   };
   api.stop = function() {
+    if (!started) {
+      return;
+    }
     started = false;
     rendered = false;
     if (timer != null) {
@@ -712,8 +725,11 @@ module.exports = function(implementation) {
       childProc.kill("SIGKILL");
     }
     return childProc = exec(command, options, function(err, stdout, stderr) {
-      callback(err, stdout, stderr);
-      return childProc = null;
+      childProc = null;
+      if (err && err.killed) {
+        return;
+      }
+      return callback(err, stdout, stderr);
     });
   };
   api.domEl = function() {
@@ -747,14 +763,12 @@ module.exports = function(implementation) {
       url: "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime()),
       method: 'POST',
       data: command,
+      timeout: api.refreshFrequency,
+      error: function(xhr) {
+        return callback(xhr.responseText || 'error running command');
+      },
       success: function(output) {
         return callback(null, output);
-      },
-      error: function(xhr, type) {
-        if (type === 'abort') {
-          return;
-        }
-        return callback(xhr.responseText || 'error running command');
       }
     });
   };
