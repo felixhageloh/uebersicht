@@ -47,6 +47,23 @@ describe 'a widget', ->
     server.respond()
     expect(callback).toHaveBeenCalledWith null, 'some output'
 
+  it 'exposes a refresh method to trigger manual refresh', ->
+    widget = Widget
+      id     : 'bar'
+      command: 'refresh me'
+      css    : ''
+      refreshFrequency: false
+
+    domEl = widget.create()
+    widget.start()
+    server.respondToWidget 'bar', 'some output'
+
+    widget.refresh()
+    expect(server.requests[0].requestBody).toEqual 'refresh me'
+
+    server.respond()
+    expect($(domEl).text().replace(/^\s+/g, '')).toEqual 'some output'
+
   describe 'without a render method', ->
 
     beforeEach ->
