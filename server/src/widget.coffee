@@ -34,7 +34,8 @@ module.exports = (implementation) ->
 
     api
 
-  # defaults
+  # == defaults
+
   api.id = 'widget'
 
   api.refreshFrequency = 1000
@@ -46,6 +47,8 @@ module.exports = (implementation) ->
       "warning: no render method"
 
   api.afterRender = ->
+
+  # == /defaults
 
   # renders and returns the widget's dom element
   api.create  = ->
@@ -71,6 +74,7 @@ module.exports = (implementation) ->
     clearTimeout timer if timer?
     refresh()
 
+  # stops the widget refresh cycle
   api.stop = ->
     return unless started
     started  = false
@@ -95,6 +99,7 @@ module.exports = (implementation) ->
   api.serialize = ->
     toSource implementation
 
+  # run widget command and redraw the widget
   api.refresh = refresh = ->
     return redraw() unless api.command?
 
@@ -106,6 +111,7 @@ module.exports = (implementation) ->
       return if api.refreshFrequency == false
       timer = setTimeout refresh, api.refreshFrequency
 
+  # runs command in the shell and calls callback with the result (err, stdout)
   api.run = (command, callback) ->
     $.ajax(
       url    : "/widgets/#{api.id}?cachebuster=#{new Date().getTime()}"

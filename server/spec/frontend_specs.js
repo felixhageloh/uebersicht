@@ -404,6 +404,68 @@ describe('a widget', function() {
       return expect(update).toHaveBeenCalledWith('stuff', $(domEl).find('.widget')[0]);
     });
   });
+  describe('with a refreshFrequency', function() {
+    beforeEach(function() {
+      widget = Widget({
+        command: 'some-command',
+        id: 'foo',
+        refreshFrequency: 100
+      });
+      return widget.create();
+    });
+    return it('refreshes with that frequency', function() {
+      jasmine.clock().install();
+      server.respondToWidget("foo", 'stuff');
+      server.autoRespond = true;
+      spyOn(widget, 'run').and.callThrough();
+      spyOn(widget, 'render').and.callThrough();
+      widget.start();
+      jasmine.clock().tick(250);
+      expect(widget.run.calls.count()).toBe(3);
+      return expect(widget.render.calls.count()).toBe(3);
+    });
+  });
+  describe('without a refreshFrequency', function() {
+    beforeEach(function() {
+      widget = Widget({
+        command: 'some-command',
+        id: 'foo'
+      });
+      return widget.create();
+    });
+    return it('is uses a default of 1000ms', function() {
+      jasmine.clock().install();
+      server.respondToWidget("foo", 'stuff');
+      server.autoRespond = true;
+      spyOn(widget, 'run').and.callThrough();
+      spyOn(widget, 'render').and.callThrough();
+      widget.start();
+      jasmine.clock().tick(1050);
+      expect(widget.run.calls.count()).toBe(2);
+      return expect(widget.render.calls.count()).toBe(2);
+    });
+  });
+  describe('when refreshFrequency is set to false', function() {
+    beforeEach(function() {
+      widget = Widget({
+        command: 'some-command',
+        id: 'foo',
+        refreshFrequency: false
+      });
+      return widget.create();
+    });
+    return it("doesn't update automatically", function() {
+      jasmine.clock().install();
+      server.respondToWidget("foo", 'stuff');
+      server.autoRespond = true;
+      spyOn(widget, 'run').and.callThrough();
+      spyOn(widget, 'render').and.callThrough();
+      widget.start();
+      jasmine.clock().tick(1050);
+      expect(widget.run.calls.count()).toBe(1);
+      return expect(widget.render.calls.count()).toBe(1);
+    });
+  });
   describe('when started', function() {
     beforeEach(function() {
       widget = Widget({
@@ -414,7 +476,7 @@ describe('a widget', function() {
       });
       return widget.create();
     });
-    it('should keep updating until stop() is called', function() {
+    it('keeps updating until stop() is called', function() {
       jasmine.clock().install();
       server.respondToWidget("foo", 'stuff');
       server.autoRespond = true;
