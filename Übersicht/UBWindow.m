@@ -16,10 +16,14 @@
 #import "UBWindow.h"
 #import "UBWallperServer.h"
 
+#define CLCOORDINATE_EPSILON 0.005f
+#define CLCOORDINATES_EQUAL2( coord1, coord2 ) (fabs(coord1.latitude - coord2.latitude) < CLCOORDINATE_EPSILON && fabs(coord1.longitude - coord2.longitude) < CLCOORDINATE_EPSILON)
+
 @implementation UBWindow {
     NSString *widgetsUrl;
     UBWallperServer* wallpaperServer;
     BOOL webviewLoaded;
+    CLLocationManager* locationManager;
 }
 
 @synthesize webView;
@@ -42,6 +46,12 @@
         [self setCollectionBehavior:(NSWindowCollectionBehaviorTransient |
                                      NSWindowCollectionBehaviorCanJoinAllSpaces |
                                      NSWindowCollectionBehaviorIgnoresCycle)];
+        
+        // Start location services
+        locationManager = [[CLLocationManager alloc] init];
+        locationManager.delegate = self;
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        [locationManager startUpdatingLocation];
 
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
@@ -148,6 +158,10 @@
     if (frame == [frame findFrameNamed:@"_top"]) {
         [[webView windowScriptObject] setValue:self forKey:@"os"];
         [self notifyWebviewOfWallaperChange];
+        
+        if (locationManager.location) {
+            [self notifyWebviewOfLocationChange:locationManager.location];
+        }
     }
 }
 
@@ -188,6 +202,22 @@
                afterDelay:5.0];
 }
 
+#
+#pragma mark CoreLocation delegates
+#
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    // Only notify the webview if the location has actually changed
+    if (!oldLocation || !CLCOORDINATES_EQUAL2(newLocation.coordinate, oldLocation.coordinate)) {
+        [self notifyWebviewOfLocationChange:newLocation];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    [self notifyWebviewOfLocationChange:nil];
+}
 
 #
 #pragma mark WebscriptObject
@@ -202,6 +232,45 @@
 - (NSString*)wallpaperUrl
 {
     return wallpaperServer.url;
+}
+
+- (void)notifyWebviewOfLocationChange:(CLLocation *)location
+{
+    // It may make more sense to retain the last known location so widgets will continue to
+    // work until there's another valid location
+    if (!location) {
+        NSString *script;
+        script = [NSString stringWithFormat:@"window.dispatchEvent(new CustomEvent('onlocationchange', { 'detail': { 'position': {} } }))"];
+        
+        [[webView windowScriptObject] evaluateWebScript:script];
+    }
+    
+    // Coordinates properties (Position.coords)
+    CLLocationDegrees latitude = location.coordinate.latitude;
+    CLLocationDegrees longitude = location.coordinate.longitude;
+    CLLocationDistance altitude = location.altitude;
+    CLLocationSpeed speed = location.speed;
+    CLLocationDirection heading = location.course;
+    CLLocationAccuracy accuracy = location.horizontalAccuracy;
+    CLLocationAccuracy altitudeAccuracy = location.verticalAccuracy;
+    // Position.timestamp
+    NSDate *timestamp = location.timestamp;
+    
+    NSString *detail;
+    detail = [NSString stringWithFormat:@"{ 'position': { 'timestamp': %f, 'coords': { 'latitude': %f, 'longitude': %f, 'altitude': %f, 'accuracy': %f, 'altitudeAccuracy': %f, 'heading': %f, 'speed': %f } } }",
+              (timestamp.timeIntervalSince1970 * 1000),
+              latitude,
+              longitude,
+              altitude,
+              accuracy,
+              altitudeAccuracy,
+              heading,
+              speed];
+    
+    NSString *script;
+    script = [NSString stringWithFormat:@"window.dispatchEvent(new CustomEvent('onlocationchange', { 'detail': %@ }))", detail];
+    
+    [[webView windowScriptObject] evaluateWebScript:script];
 }
 
 

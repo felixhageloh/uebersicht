@@ -7,6 +7,22 @@ widgets = {};
 
 contentEl = null;
 
+(function() {
+  return window.navigator.geolocation.getCurrentPosition(function() {}, function(positionError) {
+    var proxied;
+    proxied = window.navigator.geolocation.getCurrentPosition;
+    return window.navigator.geolocation.getCurrentPosition = function(success, error, options) {
+      var position;
+      position = window._ub_location_position;
+      if (position) {
+        return success(position);
+      } else {
+        return error(positionError);
+      }
+    };
+  });
+})();
+
 init = function() {
   window.uebersicht = require('./src/os_bridge.coffee');
   widgets = {};
@@ -172,6 +188,14 @@ var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWall
 
 cachedWallpaper = new Image();
 
+window.addEventListener('onlocationchange', function(e) {
+  if (e.detail && e.detail.position) {
+    console.log('Caching current position globally');
+    console.log(e.detail.position);
+    return window._ub_location_position = e.detail.position;
+  }
+});
+
 window.addEventListener('onwallpaperchange', function() {
   var slices;
   slices = getWallpaperSlices();
@@ -296,6 +320,7 @@ module.exports = function(implementation) {
   };
   api.id = 'widget';
   api.refreshFrequency = 1000;
+  api.refreshOnLocationChange = false;
   api.render = function(output) {
     if (api.command && output) {
       return output;
@@ -311,6 +336,12 @@ module.exports = function(implementation) {
     contentEl.className = 'widget';
     el.innerHTML = "<style>" + implementation.css + "</style>\n";
     el.appendChild(contentEl);
+    if (api.refreshOnLocationChange) {
+      el.addEventListener('onlocationchange', function(_) {
+        console.log('refresh because location changed');
+        return refresh();
+      });
+    }
     return el;
   };
   api.destroy = function() {

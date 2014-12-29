@@ -40,6 +40,8 @@ module.exports = (implementation) ->
 
   api.refreshFrequency = 1000
 
+  api.refreshOnLocationChange = false
+
   api.render = (output) ->
     if api.command and output
       output
@@ -58,6 +60,13 @@ module.exports = (implementation) ->
     contentEl.className = 'widget'
     el.innerHTML = "<style>#{implementation.css}</style>\n"
     el.appendChild(contentEl)
+
+    # If the widget opts in to location changes, call
+    # update whenever the `onlocationchange` event is fired
+    if api.refreshOnLocationChange
+      el.addEventListener 'onlocationchange', (_) ->
+        refresh()
+
     el
 
   api.destroy = ->

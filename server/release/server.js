@@ -1833,6 +1833,7 @@ module.exports = function(implementation) {
   };
   api.id = 'widget';
   api.refreshFrequency = 1000;
+  api.refreshOnLocationChange = false;
   api.render = function(output) {
     if (api.command && output) {
       return output;
@@ -1848,6 +1849,11 @@ module.exports = function(implementation) {
     contentEl.className = 'widget';
     el.innerHTML = "<style>" + implementation.css + "</style>\n";
     el.appendChild(contentEl);
+    if (api.refreshOnLocationChange) {
+      el.addEventListener('onlocationchange', function(_) {
+        return refresh();
+      });
+    }
     return el;
   };
   api.destroy = function() {

@@ -3,6 +3,23 @@ Widget   = require './src/widget.coffee'
 widgets   = {}
 contentEl = null
 
+(->
+  # We know the native getCurrentPosition() will call the error callback,
+  # so we call it on purpose to capture a PositionError. This is the
+  # only way to be able to pass a real PositionError to widgets when
+  # we don't have a position from Core Location to give.
+  window.navigator.geolocation.getCurrentPosition -> return,
+  (positionError) ->
+    proxied = window.navigator.geolocation.getCurrentPosition;
+
+    # Now we can override getCurrentPosition to handle the position value
+    # from the OS Bridge. This supports the success and error arguments,
+    # but options (used for timeout, accuracy, etc) is ignored.
+    window.navigator.geolocation.getCurrentPosition = (success, error, options) ->
+      position = window._ub_location_position
+      if position then success(position) else error(positionError)
+)()
+
 init = ->
   window.uebersicht = require './src/os_bridge.coffee'
   widgets = {}
