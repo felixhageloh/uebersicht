@@ -62,10 +62,20 @@
 {
     NSMenu* mainMenu = deletgate.statusBarMenu;
     
-    XCTAssertEqual([[mainMenu itemAtIndex:3] action], @selector(openWidgetDir:));
-    XCTAssert([deletgate respondsToSelector:@selector(openWidgetDir:)]);
+    bool hasOpenWidgetsDir;
+    bool hasShowDebugConsole;
     
-    XCTAssertEqual([[mainMenu itemAtIndex:4] action], @selector(showDebugConsole:));
+    for(id item in mainMenu.itemArray) {
+        if(((NSMenuItem*)item).action == @selector(openWidgetDir:))
+            hasOpenWidgetsDir = YES;
+        else if (((NSMenuItem*)item).action == @selector(showDebugConsole:))
+            hasShowDebugConsole = YES;
+    }
+    
+    XCTAssert(hasOpenWidgetsDir);
+    XCTAssert(hasShowDebugConsole);
+    
+    XCTAssert([deletgate respondsToSelector:@selector(openWidgetDir:)]);
     XCTAssert([deletgate respondsToSelector:@selector(showDebugConsole:)]);
 }
 
