@@ -144,8 +144,8 @@
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
-    NSLog(@"loaded %@", webView.mainFrameURL);
-    if (frame == [frame findFrameNamed:@"_top"]) {
+    if (frame == webView.mainFrame) {
+        NSLog(@"loaded %@", webView.mainFrameURL);
         [[webView windowScriptObject] setValue:self forKey:@"os"];
         [self notifyWebviewOfWallaperChange];
     }
@@ -168,7 +168,9 @@
                                                              frame:(WebFrame *)frame
                                                    decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-    if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
+    if (frame != webView.mainFrame) {
+        [listener use];
+    } else if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
         [listener ignore];
     } else if ([request.URL.absoluteString isEqualToString:widgetsUrl]) {
@@ -182,10 +184,12 @@
 - (void)handleWebviewLoadError:(NSError *)error
 {
     NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
-    NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
-    
-    [self performSelector:@selector(loadUrl:) withObject:url.absoluteString
-               afterDelay:5.0];
+    if ([url.absoluteString isEqualToString:widgetsUrl]) {
+        NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
+        
+        [self performSelector:@selector(loadUrl:) withObject:widgetsUrl
+                   afterDelay:5.0];
+    }
 }
 
 
