@@ -59,7 +59,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		DC43AD7C17EC2D9500241CC2 /* Uebersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Uebersicht.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC43AD7C17EC2D9500241CC2 /* Übersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Übersicht.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		DC43AD8217EC2D9500241CC2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		DC43AD8317EC2D9500241CC2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -138,7 +138,7 @@
 		DC43AD7D17EC2D9500241CC2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DC43AD7C17EC2D9500241CC2 /* Uebersicht.app */,
+				DC43AD7C17EC2D9500241CC2 /* Übersicht.app */,
 				DC43AD9D17EC2D9500241CC2 /* UebersichtTests.xctest */,
 			);
 			name = Products;
@@ -236,9 +236,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DC43AD7B17EC2D9500241CC2 /* Uebersicht */ = {
+		DC43AD7B17EC2D9500241CC2 /* Übersicht */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Uebersicht" */;
+			buildConfigurationList = DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Übersicht" */;
 			buildPhases = (
 				DC06A1C01985092700789130 /* Compile JS */,
 				DC43AD7817EC2D9500241CC2 /* Sources */,
@@ -251,9 +251,9 @@
 			);
 			dependencies = (
 			);
-			name = Uebersicht;
+			name = "Übersicht";
 			productName = "Übersicht";
-			productReference = DC43AD7C17EC2D9500241CC2 /* Uebersicht.app */;
+			productReference = DC43AD7C17EC2D9500241CC2 /* Übersicht.app */;
 			productType = "com.apple.product-type.application";
 		};
 		DC43AD9C17EC2D9500241CC2 /* UebersichtTests */ = {
@@ -297,7 +297,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Uebersicht" */;
+			buildConfigurationList = DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Übersicht" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -310,7 +310,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DC43AD7B17EC2D9500241CC2 /* Uebersicht */,
+				DC43AD7B17EC2D9500241CC2 /* Übersicht */,
 				DC43AD9C17EC2D9500241CC2 /* UebersichtTests */,
 			);
 		};
@@ -404,7 +404,7 @@
 /* Begin PBXTargetDependency section */
 		DC43ADA217EC2D9500241CC2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DC43AD7B17EC2D9500241CC2 /* Uebersicht */;
+			target = DC43AD7B17EC2D9500241CC2 /* Übersicht */;
 			targetProxy = DC43ADA117EC2D9500241CC2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -530,7 +530,7 @@
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_NAME = Uebersicht;
+				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = app;
@@ -552,7 +552,7 @@
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_NAME = Uebersicht;
+				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = app;
@@ -576,7 +576,7 @@
 				);
 				INFOPLIST_FILE = "UebersichtTests/UebersichtTests-Info.plist";
 				PRODUCT_NAME = UebersichtTests;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Uebersicht.app/Contents/MacOS/Uebersicht";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
@@ -594,7 +594,7 @@
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "UebersichtTests/UebersichtTests-Info.plist";
 				PRODUCT_NAME = UebersichtTests;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Uebersicht.app/Contents/MacOS/Uebersicht";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -602,7 +602,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Uebersicht" */ = {
+		DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Übersicht" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DC43ADAB17EC2D9500241CC2 /* Debug */,
@@ -611,7 +611,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Uebersicht" */ = {
+		DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Übersicht" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DC43ADAE17EC2D9500241CC2 /* Debug */,
