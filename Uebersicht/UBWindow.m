@@ -163,12 +163,12 @@
 }
 
 
-- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+- (void)webView:(WebView *)theWebView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
                                                            request:(NSURLRequest *)request
                                                              frame:(WebFrame *)frame
                                                    decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-    if (frame != webView.mainFrame) {
+    if (frame != theWebView.mainFrame) {
         [listener use];
     } else if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
