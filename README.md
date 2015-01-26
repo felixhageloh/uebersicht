@@ -13,8 +13,6 @@ The following properties and methods are currently supported:
 
 
 ### command
-> _required_
-
 
 A **string** containing the shell command to be executed, for example:
 
@@ -37,7 +35,7 @@ An **integer** specifying how often the above command is executed. It defines th
 refreshFrequency: 10000
 ```
 
-the default is 1000 (1s).
+the default is 1000 (1s). If set to `false` the widget won't refresh automatically.
 
 ### style
 
@@ -97,6 +95,26 @@ update: (output, domEl) ->
 ```
 
 This will set the height of .bar every time this widget refreshes. As you can see, jQuery is available.
+
+## Widget Internals
+
+For writing more advanced widgets you might not want to rely on the standard 'run command, then redraw' cycle and instead manage some of the widget internals yourself. There are a few methods you can use from within `render`, `afterRender` and `update`
+
+### @stop()
+
+Stop the widget from updating if a `refreshFrequency` is set. The widget won't update until `@start` is called.
+
+### @start()
+
+Start updating a previously stopped widget again. Does nothing if `refeshFrequency` is set to `false`.
+
+### @refresh()
+
+Runs the command and redraws the widget as it normally would as part of a refresh cycle. If no command is set, the widget will only redraw.
+
+### @run(command, callback)
+
+Runs a shell command and calls callback with the result. Command is a string containing the shell command, just like the `command` property of a widget. Callback is called with err (if any) and stdout, in standard node fashion.
 
 ## Hosted Functionality
 

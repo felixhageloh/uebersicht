@@ -45,7 +45,7 @@
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(wakeFromSleep:)
                                                      name:NSWorkspaceDidWakeNotification
@@ -77,7 +77,7 @@
             [self notifyWebviewOfWallaperChange];
         }];
     }
-    
+
     widgetsUrl    = url;
     webviewLoaded = NO;
     [webView setMainFrameURL:url];
@@ -103,7 +103,7 @@
 {
     NSRect fullscreen = [self toQuartzCoordinates:CGDisplayBounds(screenId)];
     int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-    
+
     fullscreen.size.height = fullscreen.size.height - menuBarHeight;
     [self setFrame:fullscreen display:YES];
 }
@@ -116,7 +116,7 @@
 - (void)comeToFront
 {
     if (self.isInFront) return;
-    
+
     [self setLevel:kCGNormalWindowLevel-1];
     [NSApp activateIgnoringOtherApps:NO];
     [self makeKeyAndOrderFront:self];
@@ -130,10 +130,10 @@
 - (NSRect)toQuartzCoordinates:(NSRect)screenRect
 {
     CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
-    
+
     screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height -
                                 mainScreenRect.size.height);
-    
+
     return screenRect;
 }
 
@@ -143,8 +143,8 @@
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
-    NSLog(@"loaded %@", webView.mainFrameURL);
-    if (frame == [frame findFrameNamed:@"_top"]) {
+    if (frame == webView.mainFrame) {
+        NSLog(@"loaded %@", webView.mainFrameURL);
         JSContextRef jsContext = [frame globalContext];
         UBLocation* location   = [[UBLocation alloc] initWithContext:jsContext];
         
@@ -166,12 +166,14 @@
 }
 
 
-- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+- (void)webView:(WebView *)theWebView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
                                                            request:(NSURLRequest *)request
                                                              frame:(WebFrame *)frame
                                                    decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-    if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
+    if (frame != theWebView.mainFrame) {
+        [listener use];
+    } else if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
         [listener ignore];
     } else if ([request.URL.absoluteString isEqualToString:widgetsUrl]) {
@@ -185,10 +187,12 @@
 - (void)handleWebviewLoadError:(NSError *)error
 {
     NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
-    NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
-    
-    [self performSelector:@selector(loadUrl:) withObject:url.absoluteString
-               afterDelay:5.0];
+    if ([url.absoluteString isEqualToString:widgetsUrl]) {
+        NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
+
+        [self performSelector:@selector(loadUrl:) withObject:widgetsUrl
+                   afterDelay:5.0];
+    }
 }
 
 

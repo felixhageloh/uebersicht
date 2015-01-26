@@ -34,7 +34,8 @@ module.exports = (implementation) ->
 
     api
 
-  # defaults
+  # == defaults
+
   api.id = 'widget'
 
   api.refreshFrequency = 1000
@@ -46,6 +47,8 @@ module.exports = (implementation) ->
       "warning: no render method"
 
   api.afterRender = ->
+
+  # == /defaults
 
   # renders and returns the widget's dom element
   api.create  = ->
@@ -66,11 +69,14 @@ module.exports = (implementation) ->
 
   # starts the widget refresh cycle
   api.start = ->
+    return if started
     started = true
     clearTimeout timer if timer?
     refresh()
 
+  # stops the widget refresh cycle
   api.stop = ->
+    return unless started
     started  = false
     rendered = false
     clearTimeout timer if timer?
@@ -81,8 +87,9 @@ module.exports = (implementation) ->
 
     childProc.kill "SIGKILL" if childProc?
     childProc = exec command, options, (err, stdout, stderr) ->
-      callback(err, stdout, stderr)
       childProc = null
+      return if err and err.killed
+      callback(err, stdout, stderr)
 
   api.domEl = -> el
 
@@ -92,6 +99,7 @@ module.exports = (implementation) ->
   api.serialize = ->
     toSource implementation
 
+  # run widget command and redraw the widget
   api.refresh = refresh = ->
     return redraw() unless api.command?
 
@@ -103,6 +111,7 @@ module.exports = (implementation) ->
       return if api.refreshFrequency == false
       timer = setTimeout refresh, api.refreshFrequency
 
+  # runs command in the shell and calls callback with the result (err, stdout)
   api.run = (command, callback) ->
     $.ajax(
       url    : "/widgets/#{api.id}?cachebuster=#{new Date().getTime()}"

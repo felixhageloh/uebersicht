@@ -20,7 +20,7 @@
 
 - (id) initWithContext:(JSContextRef)context {
     self = [super init];
-    
+
     if (self) {
         jsContext        = context;
         currentLocation  = nil;
@@ -28,26 +28,26 @@
         pendingCallbacks = [[NSMutableArray alloc] init];
         listeners        = [[NSMutableDictionary alloc] init];
         currListenerId   = @1;
-        
+
         locationManager = [[CLLocationManager alloc] init];
         locationManager.delegate = self;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     }
-    
+
     return self;
 }
 
 - (void)startService {
     if (serviceStarted) { return; }
-    
+
     [locationManager startUpdatingLocation];
-    
+
     serviceStarted = YES;
 }
 
 - (void)stopService {
     if (!serviceStarted) { return; }
-    
+
     [locationManager stopUpdatingLocation];
     currentLocation = nil;
     serviceStarted  = NO;
@@ -65,7 +65,7 @@
     CLLocationAccuracy altitudeAccuracy = location.verticalAccuracy;
     // Position.timestamp
     NSDate *timestamp = location.timestamp;
-    
+
     NSString* format = @"{ \
         \"position\": { \
             \"timestamp\": %f, \
@@ -80,7 +80,7 @@
             } \
         } \
     }";
-    
+
     return [NSString stringWithFormat:format,
           (timestamp.timeIntervalSince1970 * 1000),
           latitude,
@@ -97,7 +97,7 @@
 {
     JSStringRef json = JSStringCreateWithCFString((__bridge CFStringRef)[self toJSString:location]);
     JSValueRef obj   = JSValueMakeFromJSONString(jsContext, json);
-    
+
     JSObjectCallAsFunction(jsContext, [function JSObject], NULL, 1, &obj, NULL);
 }
 
@@ -107,25 +107,25 @@
 #
 
 - (void)getCurrentPosition:(WebScriptObject *)callback {
-    
+
     if (!serviceStarted) [self startService];
     [pendingCallbacks addObject:callback];
 
 }
 
 - (NSNumber*)watchPosition:(WebScriptObject *)callback {
-    
+
     if (!serviceStarted) [self startService];
 
     currListenerId = [NSNumber numberWithInt:currListenerId.intValue + 1];
     listeners[currListenerId] = callback;
-    
+
     if (currentLocation) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self callJSFunction:callback withLocation:currentLocation];
         });
     }
-    
+
     return currListenerId;
 }
 
@@ -141,7 +141,7 @@
         aSelector == @selector(clearWatch:)) {
         return NO;
     }
-    
+
     return YES;
 }
 
@@ -153,7 +153,7 @@
         return @"watchPosition";
     else if (sel == @selector(clearWatch:))
         return @"clearWatch";
-    
+
     return nil;
 }
 
@@ -166,16 +166,16 @@
      didUpdateLocations:(NSArray *)locations
 {
     currentLocation = [locations lastObject];
-    
+
     for (id callback in pendingCallbacks) {
         [self callJSFunction:callback withLocation:currentLocation];
     }
     for (id key in listeners) {
         [self callJSFunction:listeners[key] withLocation:currentLocation];
     }
-    
+
     [pendingCallbacks removeAllObjects];
-    
+
     if (listeners.count == 0) [self stopService];
 }
 

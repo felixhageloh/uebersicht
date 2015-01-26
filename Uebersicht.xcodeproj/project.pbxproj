@@ -65,18 +65,18 @@
 		DC43AD8217EC2D9500241CC2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		DC43AD8317EC2D9500241CC2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		DC43AD8417EC2D9500241CC2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		DC43AD8717EC2D9500241CC2 /* Übersicht-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Übersicht-Info.plist"; sourceTree = "<group>"; };
+		DC43AD8717EC2D9500241CC2 /* Uebersicht-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Uebersicht-Info.plist"; sourceTree = "<group>"; };
 		DC43AD8917EC2D9500241CC2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DC43AD8B17EC2D9500241CC2 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		DC43AD8D17EC2D9500241CC2 /* Übersicht-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Übersicht-Prefix.pch"; sourceTree = "<group>"; };
+		DC43AD8D17EC2D9500241CC2 /* Uebersicht-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Uebersicht-Prefix.pch"; sourceTree = "<group>"; };
 		DC43AD8F17EC2D9500241CC2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		DC43AD9117EC2D9500241CC2 /* UBAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBAppDelegate.h; sourceTree = "<group>"; };
 		DC43AD9217EC2D9500241CC2 /* UBAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBAppDelegate.m; sourceTree = "<group>"; };
 		DC43AD9517EC2D9500241CC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		DC43AD9717EC2D9500241CC2 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		DC43AD9D17EC2D9500241CC2 /* ÜbersichtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ÜbersichtTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC43AD9D17EC2D9500241CC2 /* UebersichtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UebersichtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC43AD9E17EC2D9500241CC2 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		DC43ADA517EC2D9500241CC2 /* ÜbersichtTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ÜbersichtTests-Info.plist"; sourceTree = "<group>"; };
+		DC43ADA517EC2D9500241CC2 /* UebersichtTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "UebersichtTests-Info.plist"; sourceTree = "<group>"; };
 		DC43ADA717EC2D9500241CC2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
 		DC43ADB317EC31EB00241CC2 /* UBWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindow.h; sourceTree = "<group>"; };
@@ -130,9 +130,9 @@
 		DC43AD7317EC2D9500241CC2 = {
 			isa = PBXGroup;
 			children = (
-				DC43AD8517EC2D9500241CC2 /* Übersicht */,
+				DC43AD8517EC2D9500241CC2 /* Uebersicht */,
 				DCECA1C21893F1C300C0CA32 /* server */,
-				DC43ADA317EC2D9500241CC2 /* ÜbersichtTests */,
+				DC43ADA317EC2D9500241CC2 /* UebersichtTests */,
 				DC43AD7E17EC2D9500241CC2 /* Frameworks */,
 				DC43AD7D17EC2D9500241CC2 /* Products */,
 			);
@@ -142,7 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				DC43AD7C17EC2D9500241CC2 /* Übersicht.app */,
-				DC43AD9D17EC2D9500241CC2 /* ÜbersichtTests.xctest */,
+				DC43AD9D17EC2D9500241CC2 /* UebersichtTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -170,7 +170,7 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		DC43AD8517EC2D9500241CC2 /* Übersicht */ = {
+		DC43AD8517EC2D9500241CC2 /* Uebersicht */ = {
 			isa = PBXGroup;
 			children = (
 				DC99A7C418DC41A600E61222 /* Übersicht.entitlements */,
@@ -190,7 +190,7 @@
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,
 			);
-			path = "Übersicht";
+			path = Uebersicht;
 			sourceTree = "<group>";
 		};
 		DC43AD8617EC2D9500241CC2 /* Supporting Files */ = {
@@ -200,28 +200,28 @@
 				DCAAAF9518DF0B050097677F /* getting-started.coffee */,
 				DC4F43F1189E90DD00937925 /* status-icon.png */,
 				DC4F43F2189E90DD00937925 /* status-icon@2x.png */,
-				DC43AD8717EC2D9500241CC2 /* Übersicht-Info.plist */,
+				DC43AD8717EC2D9500241CC2 /* Uebersicht-Info.plist */,
 				DC43AD8817EC2D9500241CC2 /* InfoPlist.strings */,
 				DC43AD8B17EC2D9500241CC2 /* main.m */,
-				DC43AD8D17EC2D9500241CC2 /* Übersicht-Prefix.pch */,
+				DC43AD8D17EC2D9500241CC2 /* Uebersicht-Prefix.pch */,
 				DC43AD8E17EC2D9500241CC2 /* Credits.rtf */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		DC43ADA317EC2D9500241CC2 /* ÜbersichtTests */ = {
+		DC43ADA317EC2D9500241CC2 /* UebersichtTests */ = {
 			isa = PBXGroup;
 			children = (
 				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
 				DC43ADA417EC2D9500241CC2 /* Supporting Files */,
 			);
-			path = "ÜbersichtTests";
+			path = UebersichtTests;
 			sourceTree = "<group>";
 		};
 		DC43ADA417EC2D9500241CC2 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				DC43ADA517EC2D9500241CC2 /* ÜbersichtTests-Info.plist */,
+				DC43ADA517EC2D9500241CC2 /* UebersichtTests-Info.plist */,
 				DC43ADA617EC2D9500241CC2 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -256,14 +256,14 @@
 			);
 			dependencies = (
 			);
-			name = "Übersicht";
+			name = "Übersicht";
 			productName = "Übersicht";
 			productReference = DC43AD7C17EC2D9500241CC2 /* Übersicht.app */;
 			productType = "com.apple.product-type.application";
 		};
-		DC43AD9C17EC2D9500241CC2 /* ÜbersichtTests */ = {
+		DC43AD9C17EC2D9500241CC2 /* UebersichtTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DC43ADB017EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "ÜbersichtTests" */;
+			buildConfigurationList = DC43ADB017EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "UebersichtTests" */;
 			buildPhases = (
 				DC43AD9917EC2D9500241CC2 /* Sources */,
 				DC43AD9A17EC2D9500241CC2 /* Frameworks */,
@@ -274,9 +274,9 @@
 			dependencies = (
 				DC43ADA217EC2D9500241CC2 /* PBXTargetDependency */,
 			);
-			name = "ÜbersichtTests";
+			name = UebersichtTests;
 			productName = "ÜbersichtTests";
-			productReference = DC43AD9D17EC2D9500241CC2 /* ÜbersichtTests.xctest */;
+			productReference = DC43AD9D17EC2D9500241CC2 /* UebersichtTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -302,7 +302,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Übersicht" */;
+			buildConfigurationList = DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Uebersicht" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -316,7 +316,7 @@
 			projectRoot = "";
 			targets = (
 				DC43AD7B17EC2D9500241CC2 /* Übersicht */,
-				DC43AD9C17EC2D9500241CC2 /* ÜbersichtTests */,
+				DC43AD9C17EC2D9500241CC2 /* UebersichtTests */,
 			);
 		};
 /* End PBXProject section */
@@ -533,10 +533,10 @@
 					"$(SRCROOT)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Übersicht/Übersicht-Prefix.pch";
-				INFOPLIST_FILE = "Übersicht/Übersicht-Info.plist";
+				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = app;
@@ -555,10 +555,10 @@
 					"$(SRCROOT)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Übersicht/Übersicht-Prefix.pch";
-				INFOPLIST_FILE = "Übersicht/Übersicht-Info.plist";
+				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				OTHER_CODE_SIGN_FLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = app;
@@ -568,21 +568,21 @@
 		DC43ADB117EC2D9500241CC2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Übersicht/Übersicht-Prefix.pch";
+				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "ÜbersichtTests/ÜbersichtTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
+				INFOPLIST_FILE = "UebersichtTests/UebersichtTests-Info.plist";
+				PRODUCT_NAME = UebersichtTests;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
@@ -590,17 +590,17 @@
 		DC43ADB217EC2D9500241CC2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Übersicht/Übersicht-Prefix.pch";
-				INFOPLIST_FILE = "ÜbersichtTests/ÜbersichtTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
+				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
+				INFOPLIST_FILE = "UebersichtTests/UebersichtTests-Info.plist";
+				PRODUCT_NAME = UebersichtTests;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -608,7 +608,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Übersicht" */ = {
+		DC43AD7717EC2D9500241CC2 /* Build configuration list for PBXProject "Uebersicht" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DC43ADAB17EC2D9500241CC2 /* Debug */,
@@ -626,7 +626,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DC43ADB017EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "ÜbersichtTests" */ = {
+		DC43ADB017EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "UebersichtTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DC43ADB117EC2D9500241CC2 /* Debug */,

@@ -47,6 +47,23 @@ describe 'a widget', ->
     server.respond()
     expect(callback).toHaveBeenCalledWith null, 'some output'
 
+  it 'exposes a refresh method to trigger manual refresh', ->
+    widget = Widget
+      id     : 'bar'
+      command: 'refresh me'
+      css    : ''
+      refreshFrequency: false
+
+    domEl = widget.create()
+    widget.start()
+    server.respondToWidget 'bar', 'some output'
+
+    widget.refresh()
+    expect(server.requests[0].requestBody).toEqual 'refresh me'
+
+    server.respond()
+    expect($(domEl).text().replace(/^\s+/g, '')).toEqual 'some output'
+
   describe 'without a render method', ->
 
     beforeEach ->
@@ -126,6 +143,68 @@ describe 'a widget', ->
       expect($(domEl).find('.widget').text()).toEqual 'stuff'
       expect(update).toHaveBeenCalledWith 'stuff', $(domEl).find('.widget')[0]
 
+  describe 'with a refreshFrequency', ->
+    beforeEach ->
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo',
+        refreshFrequency: 100
+      widget.create()
+
+    it 'refreshes with that frequency', ->
+      jasmine.clock().install()
+      server.respondToWidget "foo", 'stuff'
+      server.autoRespond = true
+
+      spyOn(widget, 'run').and.callThrough()
+      spyOn(widget, 'render').and.callThrough()
+
+      widget.start()
+      jasmine.clock().tick 250
+      expect(widget.run.calls.count()).toBe 3
+      expect(widget.render.calls.count()).toBe 3
+
+  describe 'without a refreshFrequency', ->
+    beforeEach ->
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo'
+      widget.create()
+
+    it 'is uses a default of 1000ms', ->
+      jasmine.clock().install()
+      server.respondToWidget "foo", 'stuff'
+      server.autoRespond = true
+
+      spyOn(widget, 'run').and.callThrough()
+      spyOn(widget, 'render').and.callThrough()
+
+      widget.start()
+      jasmine.clock().tick 1050
+      expect(widget.run.calls.count()).toBe 2
+      expect(widget.render.calls.count()).toBe 2
+
+  describe 'when refreshFrequency is set to false', ->
+    beforeEach ->
+      widget = Widget
+        command: 'some-command',
+        id     : 'foo'
+        refreshFrequency: false
+      widget.create()
+
+    it "doesn't update automatically", ->
+      jasmine.clock().install()
+      server.respondToWidget "foo", 'stuff'
+      server.autoRespond = true
+
+      spyOn(widget, 'run').and.callThrough()
+      spyOn(widget, 'render').and.callThrough()
+
+      widget.start()
+      jasmine.clock().tick 1050
+      expect(widget.run.calls.count()).toBe 1
+      expect(widget.render.calls.count()).toBe 1
+
   describe 'when started', ->
     beforeEach ->
       widget = Widget
@@ -135,7 +214,7 @@ describe 'a widget', ->
         refreshFrequency: 100
       widget.create()
 
-    it 'should keep updating until stop() is called', ->
+    it 'keeps updating until stop() is called', ->
       jasmine.clock().install()
       server.respondToWidget "foo", 'stuff'
       server.autoRespond = true
@@ -146,6 +225,16 @@ describe 'a widget', ->
       widget.stop()
       jasmine.clock().tick 1000
       expect(widget.render.calls.count()).toBe 3
+
+    it "doesn't re-run when start is called again", ->
+      spyOn(widget, 'run').and.callThrough()
+
+      widget.start()
+      expect(widget.run.calls.count()).toBe 1
+
+      widget.start()
+      expect(widget.run.calls.count()).toBe 1
+
 
   describe 'when stopped', ->
     beforeEach ->
