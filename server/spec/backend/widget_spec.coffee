@@ -43,31 +43,3 @@ describe 'widget', ->
       expect( -> Widget({foo: 'bar'}) ).toThrow new Error("no command given")
       expect( -> Widget("garbage") ).toThrow new Error("no command given")
 
-  describe 'command excecution', ->
-    pendingCmd = null
-    childProcess = exec: (cmd, callback) ->
-      pendingCmd = {}
-      pendingCmd[cmd] = callback
-
-    mockery.registerMock('child_process', childProcess)
-    mockery.registerAllowable '../../src/widget.coffee'
-    # make sure that Widget is re-required
-    delete require.cache[path.resolve(__dirname, '../../src/widget.coffee')]
-    mockery.enable()
-    Widget = require '../../src/widget.coffee'
-    mockery.disable()
-    mockery.deregisterMock('child_process')
-
-
-    it 'should call its command and return html when refreshed', ->
-      widget   = Widget command: 'bar'
-      callback = jasmine.createSpy('callback')
-
-      widget.exec callback
-      expect(pendingCmd).toEqual 'bar': jasmine.any(Function)
-      expect(callback).not.toHaveBeenCalled()
-
-      pendingCmd['bar'](null, 'fishes')
-      expect(callback).toHaveBeenCalledWith null, 'fishes'
-
-

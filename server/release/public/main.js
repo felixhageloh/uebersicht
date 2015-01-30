@@ -257,9 +257,7 @@ renderWallpaperSlice = function(wallpaper, canvas) {
 
 
 },{}],5:[function(require,module,exports){
-var exec, nib, stylus, toSource;
-
-exec = require('child_process').exec;
+var nib, stylus, toSource;
 
 toSource = require('tosource');
 
@@ -268,7 +266,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, childProc, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   cssId = null;
@@ -276,7 +274,6 @@ module.exports = function(implementation) {
   timer = null;
   started = false;
   rendered = false;
-  childProc = null;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
     var issues, k, v, _ref;
@@ -341,21 +338,6 @@ module.exports = function(implementation) {
     if (timer != null) {
       return clearTimeout(timer);
     }
-  };
-  api.exec = function(options, command, callback) {
-    if (command == null) {
-      command = api.command;
-    }
-    if (childProc != null) {
-      childProc.kill("SIGKILL");
-    }
-    return childProc = exec(command, options, function(err, stdout, stderr) {
-      childProc = null;
-      if (err && err.killed) {
-        return;
-      }
-      return callback(err, stdout, stderr);
-    });
   };
   api.domEl = function() {
     return el;
@@ -469,4 +451,4 @@ module.exports = function(implementation) {
 
 
 
-},{"child_process":2,"nib":2,"stylus":2,"tosource":3}]},{},[1]);
+},{"nib":2,"stylus":2,"tosource":3}]},{},[1]);

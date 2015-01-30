@@ -1,4 +1,3 @@
-exec     = require('child_process').exec
 toSource = require('tosource')
 stylus   = require('stylus')
 nib      = require('nib')
@@ -16,7 +15,6 @@ module.exports = (implementation) ->
   timer     = null
   started   = false
   rendered  = false
-  childProc = null
 
   defaultStyle = 'top: 30px; left: 10px'
 
@@ -80,16 +78,6 @@ module.exports = (implementation) ->
     started  = false
     rendered = false
     clearTimeout timer if timer?
-
-  # runs the widget command. This happens server side
-  api.exec = (options, command, callback) ->
-    command ?= api.command
-
-    childProc.kill "SIGKILL" if childProc?
-    childProc = exec command, options, (err, stdout, stderr) ->
-      childProc = null
-      return if err and err.killed
-      callback(err, stdout, stderr)
 
   api.domEl = -> el
 

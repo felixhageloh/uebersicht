@@ -1794,9 +1794,7 @@ module.exports = function(someWidgets) {
 
 
 },{}],12:[function(require,module,exports){
-var exec, nib, stylus, toSource;
-
-exec = require('child_process').exec;
+var nib, stylus, toSource;
 
 toSource = require('tosource');
 
@@ -1805,7 +1803,7 @@ stylus = require('stylus');
 nib = require('nib');
 
 module.exports = function(implementation) {
-  var api, childProc, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
   cssId = null;
@@ -1813,7 +1811,6 @@ module.exports = function(implementation) {
   timer = null;
   started = false;
   rendered = false;
-  childProc = null;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
     var issues, k, v, _ref;
@@ -1878,21 +1875,6 @@ module.exports = function(implementation) {
     if (timer != null) {
       return clearTimeout(timer);
     }
-  };
-  api.exec = function(options, command, callback) {
-    if (command == null) {
-      command = api.command;
-    }
-    if (childProc != null) {
-      childProc.kill("SIGKILL");
-    }
-    return childProc = exec(command, options, function(err, stdout, stderr) {
-      childProc = null;
-      if (err && err.killed) {
-        return;
-      }
-      return callback(err, stdout, stderr);
-    });
   };
   api.domEl = function() {
     return el;
@@ -2006,23 +1988,18 @@ module.exports = function(implementation) {
 
 
 
-},{"child_process":"child_process","nib":"nib","stylus":"stylus","tosource":7}],13:[function(require,module,exports){
-var BUFFER_SIZE, ID_REGEX, url;
+},{"nib":"nib","stylus":"stylus","tosource":7}],13:[function(require,module,exports){
+var ID_REGEX, spawn, url;
+
+spawn = require('child_process').spawn;
 
 url = require('url');
 
 ID_REGEX = /\/widgets\/([^\/]+)/i;
 
-BUFFER_SIZE = 500 * 1024;
-
 module.exports = function(widgetDir) {
-  var execOptions;
-  execOptions = {
-    cwd: widgetDir.path,
-    maxBuffer: BUFFER_SIZE
-  };
   return function(req, res, next) {
-    var command, parsed, widget, widgetId, _ref;
+    var command, parsed, shell, widget, widgetId, _ref;
     parsed = url.parse(req.url);
     widgetId = (_ref = parsed.pathname.match(ID_REGEX)) != null ? _ref[1] : void 0;
     if (widgetId != null) {
@@ -2031,28 +2008,46 @@ module.exports = function(widgetDir) {
     if (widget == null) {
       return next();
     }
+    shell = spawn('bash', [], {
+      cwd: widgetDir.path
+    });
     command = '';
     req.on('data', function(chunk) {
       return command += chunk;
     });
     return req.on('end', function() {
+      var setStatus;
       command || (command = widget.command);
-      return widget.exec(execOptions, command, function(err, data, stderr) {
-        if (err || stderr) {
-          res.writeHead(500);
-          return res.end(stderr || ((typeof err.toString === "function" ? err.toString() : void 0) || err.message));
-        } else {
-          res.writeHead(200);
-          return res.end(data);
-        }
+      setStatus = function(status) {
+        res.writeHead(status);
+        return setStatus = function() {};
+      };
+      shell.stderr.on('data', function(d) {
+        setStatus(500);
+        return res.write(d);
       });
+      shell.stdout.on('data', function(d) {
+        setStatus(200);
+        return res.write(d);
+      });
+      shell.on('error', function(err) {
+        setStatus(500);
+        return res.write(err.message);
+      });
+      shell.on('close', function() {
+        setStatus(200);
+        return res.end();
+      });
+      shell.stdin.write(command != null ? command : '');
+      shell.stdin.write('\n');
+      return shell.stdin.end();
     });
   };
 };
 
 
 
-},{"url":5}],14:[function(require,module,exports){
+},{"child_process":"child_process","url":5}],14:[function(require,module,exports){
 var Widget, fs, loader, paths;
 
 Widget = require('./widget.coffee');
