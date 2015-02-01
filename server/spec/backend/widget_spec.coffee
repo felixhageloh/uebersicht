@@ -1,4 +1,3 @@
-mockery = require 'mockery'
 Widget  = require '../../src/widget.coffee'
 path    = require 'path'
 

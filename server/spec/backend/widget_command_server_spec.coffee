@@ -1,3 +1,6 @@
+mockery = require 'mockery'
+path    = require 'path'
+
 describe 'widget command server', ->
   http      = require 'http'
   connect   = require 'connect'
@@ -8,8 +11,6 @@ describe 'widget command server', ->
   fakeWidgets =
     mathew:
       command: "echo 'command output'"
-    john:
-      exec: (opts, cmd, callback) -> callback({toString: -> 'command error'}, '', '')
     billy:
       command: "echo 'std error' 1>&2"
     'kevin spacey':
@@ -38,8 +39,6 @@ describe 'widget command server', ->
           expect(responseText).toEqual 'command output\n'
           done()
 
-      setTimeout server.push, 100
-
     it "doesn't brake for widgets with spaces in their name", (done) ->
       http.get "http://localhost:8887/widgets/kevin%20spacey", (response) ->
         expect(response.statusCode).toBe(200)
@@ -49,11 +48,20 @@ describe 'widget command server', ->
           expect(responseText).toEqual 'foo\n'
           done()
 
-      setTimeout server.push, 100
 
+    # it 'responds with error in case spawning the shell fails', (done) ->
+    #   childProcess = spawn: -> throw 'up'
+    #   modulePath   = '../../src/widget_command_server.coffee'
 
-    # it 'responds with error in case widget command fails', (done) ->
-    #   http.get "http://localhost:8887/widgets/john", (response) ->
+    #   mockery.registerMock('child_process', childProcess)
+    #   mockery.registerAllowable modulePath
+    #   delete require.cache[path.resolve(__dirname, modulePath)]
+    #   mockery.enable()
+    #   server = require modulePath
+    #   mockery.disable()
+    #   mockery.deregisterMock('child_process')
+
+    #   http.get "http://localhost:8887/widgets/mathew", (response) ->
     #     expect(response.statusCode).toBe(500)
 
     #     response.setEncoding('utf8')
@@ -72,8 +80,6 @@ describe 'widget command server', ->
           expect(responseText).toEqual 'std error\n'
           done()
 
-      setTimeout server.push, 100
-
   describe 'when a widget does not exist in the widget dir', ->
 
     it 'returns a 404', (done) ->
@@ -82,29 +88,3 @@ describe 'widget command server', ->
 
         done()
 
- # describe 'command excecution', ->
- #    pendingCmd = null
- #    childProcess = exec: (cmd, callback) ->
- #      pendingCmd = {}
- #      pendingCmd[cmd] = callback
-
- #    mockery.registerMock('child_process', childProcess)
- #    mockery.registerAllowable '../../src/widget.coffee'
- #    # make sure that Widget is re-required
- #    delete require.cache[path.resolve(__dirname, '../../src/widget.coffee')]
- #    mockery.enable()
- #    Widget = require '../../src/widget.coffee'
- #    mockery.disable()
- #    mockery.deregisterMock('child_process')
-
-
- #    it 'should call its command and return html when refreshed', ->
- #      widget   = Widget command: 'bar'
- #      callback = jasmine.createSpy('callback')
-
- #      widget.exec callback
- #      expect(pendingCmd).toEqual 'bar': jasmine.any(Function)
- #      expect(callback).not.toHaveBeenCalled()
-
- #      pendingCmd['bar'](null, 'fishes')
- #      expect(callback).toHaveBeenCalledWith null, 'fishes'
