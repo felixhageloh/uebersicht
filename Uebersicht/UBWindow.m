@@ -14,7 +14,6 @@
 //
 
 #import "UBWindow.h"
-#import "UBWallperServer.h"
 
 @implementation UBWindow {
     NSString *widgetsUrl;
@@ -46,7 +45,7 @@
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(wakeFromSleep:)
                                                      name:NSWorkspaceDidWakeNotification
@@ -78,7 +77,7 @@
             [self notifyWebviewOfWallaperChange];
         }];
     }
-    
+
     widgetsUrl    = url;
     webviewLoaded = NO;
     [webView setMainFrameURL:url];
@@ -104,7 +103,7 @@
 {
     NSRect fullscreen = [self toQuartzCoordinates:CGDisplayBounds(screenId)];
     int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-    
+
     fullscreen.size.height = fullscreen.size.height - menuBarHeight;
     [self setFrame:fullscreen display:YES];
 }
@@ -117,7 +116,7 @@
 - (void)comeToFront
 {
     if (self.isInFront) return;
-    
+
     [self setLevel:kCGNormalWindowLevel-1];
     [NSApp activateIgnoringOtherApps:NO];
     [self makeKeyAndOrderFront:self];
@@ -131,10 +130,10 @@
 - (NSRect)toQuartzCoordinates:(NSRect)screenRect
 {
     CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
-    
+
     screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height -
                                 mainScreenRect.size.height);
-    
+
     return screenRect;
 }
 
@@ -146,7 +145,11 @@
 {
     if (frame == webView.mainFrame) {
         NSLog(@"loaded %@", webView.mainFrameURL);
+        JSContextRef jsContext = [frame globalContext];
+        UBLocation* location   = [[UBLocation alloc] initWithContext:jsContext];
+        
         [[webView windowScriptObject] setValue:self forKey:@"os"];
+        [[webView windowScriptObject] setValue:location forKey:@"geolocation"];
         [self notifyWebviewOfWallaperChange];
     }
 }
@@ -186,7 +189,7 @@
     NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
     if ([url.absoluteString isEqualToString:widgetsUrl]) {
         NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
-        
+
         [self performSelector:@selector(loadUrl:) withObject:widgetsUrl
                    afterDelay:5.0];
     }

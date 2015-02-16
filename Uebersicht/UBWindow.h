@@ -14,6 +14,9 @@
 #import <WebKit/WebKit.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
+#import "UBLocation.h"
+#import "UBWallperServer.h"
+
 @interface UBWindow : NSWindow
 
 @property (weak) IBOutlet WebView *webView;
