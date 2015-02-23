@@ -128,12 +128,19 @@
     
     JSStringRelease(json);
     
-    // TODO: find a way to raise exceptions inside the WebView/jsContext. Right now
-    // callbacks fail silently
-    if (!res) {
-        //JSStringRef resultStringJS = JSValueToStringCopy(jsContext, err, NULL);
-        //NSLog(@"%@", (__bridge NSString*)JSStringCopyCFString(kCFAllocatorDefault, resultStringJS));
-        //JSStringRelease(resultStringJS);
+    if (res == NULL && err != NULL) {
+        
+        // TODO: this seems like a roundabout way to log an exception. Also, line numbers, stack etc
+        // are lost
+        JSStringRef errorString = JSValueToStringCopy(jsContext, err, NULL);
+        NSString *message = (__bridge NSString*)JSStringCopyCFString(kCFAllocatorDefault, errorString);
+        NSString *log     = [NSString stringWithFormat:@"console.error(\"%@\")", message];
+
+        JSStringRef script = JSStringCreateWithCFString((__bridge CFStringRef)log);
+        JSEvaluateScript(jsContext, script, NULL, NULL, 0, NULL);
+        
+        JSStringRelease(errorString);
+        JSStringRelease(script);
     }
 
 }
