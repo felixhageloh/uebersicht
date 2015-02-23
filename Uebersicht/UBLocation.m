@@ -14,8 +14,11 @@
     NSMutableDictionary* listeners;
     NSMutableArray* pendingCallbacks;
     CLLocationManager* locationManager;
-    CLLocation * currentLocation;
+    CLGeocoder *geoCoder;
     NSNumber* currListenerId;
+    
+    CLLocation  *currentLocation;
+    CLPlacemark *currentPlaceMark;
 }
 
 - (id) initWithContext:(JSContextRef)context {
@@ -24,6 +27,7 @@
     if (self) {
         jsContext        = context;
         currentLocation  = nil;
+        currentPlaceMark = nil;
         serviceStarted   = NO;
         pendingCallbacks = [[NSMutableArray alloc] init];
         listeners        = [[NSMutableDictionary alloc] init];
@@ -32,6 +36,8 @@
         locationManager = [[CLLocationManager alloc] init];
         locationManager.delegate = self;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        
+        geoCoder = [[CLGeocoder alloc] init];
     }
 
     return self;
@@ -53,7 +59,7 @@
     serviceStarted  = NO;
 }
 
-- (NSString*)toJSString:(CLLocation *)location
+- (NSString*)toJSString:(CLLocation *)location placeMark:(CLPlacemark*)placeMark
 {
     // Coordinates properties (Position.coords)
     CLLocationDegrees latitude = location.coordinate.latitude;
@@ -63,9 +69,10 @@
     CLLocationDirection heading = location.course;
     CLLocationAccuracy accuracy = location.horizontalAccuracy;
     CLLocationAccuracy altitudeAccuracy = location.verticalAccuracy;
-    // Position.timestamp
-    NSDate *timestamp = location.timestamp;
-
+    
+    NSDate *timestamp     = location.timestamp;
+    NSDictionary *address = placeMark.addressDictionary;
+    
     NSString* format = @"{ \
         \"position\": { \
             \"timestamp\": %f, \
@@ -78,8 +85,17 @@
                 \"heading\": %f, \
                 \"speed\": %f \
             } \
+        }, \
+        \"address\": { \
+            \"street\": \"%@\", \
+            \"city\": \"%@\", \
+            \"zip\": \"%@\", \
+            \"country\": \"%@\", \
+            \"state\": \"%@\", \
+            \"CountryCode\": \"%@\" \
         } \
     }";
+    
 
     return [NSString stringWithFormat:format,
           (timestamp.timeIntervalSince1970 * 1000),
@@ -89,16 +105,37 @@
           accuracy,
           altitudeAccuracy,
           heading,
-          speed];
+          speed,
+          address[@"Street"],
+          address[@"City"],
+          address[@"ZIP"],
+          address[@"Country"],
+          address[@"State"],
+          address[@"CountryCode"]];
 
 }
 
-- (void)callJSFunction:(WebScriptObject*)function withLocation:(CLLocation *)location
+- (void)callJSFunction:(WebScriptObject*)function
+          withLocation:(CLLocation *)location
+             placeMark:(CLPlacemark *)placeMark
 {
-    JSStringRef json = JSStringCreateWithCFString((__bridge CFStringRef)[self toJSString:location]);
-    JSValueRef obj   = JSValueMakeFromJSONString(jsContext, json);
+    JSStringRef json = JSStringCreateWithCFString(
+      (__bridge CFStringRef)[self toJSString:location placeMark:placeMark]
+    );
+    JSValueRef err, res;
+    JSValueRef obj = JSValueMakeFromJSONString(jsContext, json);
+    res = JSObjectCallAsFunction(jsContext, [function JSObject], NULL, 1, &obj, &err);
+    
+    JSStringRelease(json);
+    
+    // TODO: find a way to raise exceptions inside the WebView/jsContext. Right now
+    // callbacks fail silently
+    if (!res) {
+        //JSStringRef resultStringJS = JSValueToStringCopy(jsContext, err, NULL);
+        //NSLog(@"%@", (__bridge NSString*)JSStringCopyCFString(kCFAllocatorDefault, resultStringJS));
+        //JSStringRelease(resultStringJS);
+    }
 
-    JSObjectCallAsFunction(jsContext, [function JSObject], NULL, 1, &obj, NULL);
 }
 
 
@@ -120,9 +157,10 @@
     currListenerId = [NSNumber numberWithInt:currListenerId.intValue + 1];
     listeners[currListenerId] = callback;
 
-    if (currentLocation) {
+    if (currentLocation && currentPlaceMark) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self callJSFunction:callback withLocation:currentLocation];
+            [self callJSFunction:callback withLocation:currentLocation
+                                             placeMark:currentPlaceMark];
         });
     }
 
@@ -165,16 +203,27 @@
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray *)locations
 {
-    currentLocation = [locations lastObject];
+    currentLocation  = [locations lastObject];
+    currentPlaceMark = nil;
+    [geoCoder reverseGeocodeLocation:currentLocation
+                   completionHandler:^(NSArray *placemarks, NSError *error) {
+        
+        if (!error)
+            currentPlaceMark = ((CLPlacemark*)placemarks[0]);
+        
+        for (id callback in pendingCallbacks) {
+            [self callJSFunction:callback withLocation:currentLocation
+                                             placeMark:currentPlaceMark];
+        }
+        for (id key in listeners) {
+            [self callJSFunction:listeners[key] withLocation:currentLocation
+                                                   placeMark:currentPlaceMark];
+        }
+        
+        [pendingCallbacks removeAllObjects];
+    }];
+    
 
-    for (id callback in pendingCallbacks) {
-        [self callJSFunction:callback withLocation:currentLocation];
-    }
-    for (id key in listeners) {
-        [self callJSFunction:listeners[key] withLocation:currentLocation];
-    }
-
-    [pendingCallbacks removeAllObjects];
 
     if (listeners.count == 0) [self stopService];
 }
