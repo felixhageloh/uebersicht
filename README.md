@@ -116,6 +116,34 @@ Runs the command and redraws the widget as it normally would as part of a refres
 
 Runs a shell command and calls callback with the result. Command is a string containing the shell command, just like the `command` property of a widget. Callback is called with err (if any) and stdout, in standard node fashion.
 
+## Geolocation API
+
+While the WebView used by Übersicht seems to provide the standard HTML5 geolocation API, it is not functional and there seems to be no way to enable it. Übersicht now provides a custom implementeation, which tries to follow the standard implementation as closely as possible. However, so far it provides only the basics and might still be somewehat unstable. The api can be found under `window.geolocation` (instead of `window.navigator.geolocation`). And supports the following methods
+
+```coffeescript
+geolocation.getCurrentPosition(callback)
+```
+
+```coffeescript
+geolocation.watchPosition(callback)
+```
+
+```coffeescript
+geolocation.clearWatch(watchId)
+```
+
+Check the [documentation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) for details on how to use these methods. The main difference to the standard API is that none of them accept options (the accuracy for position data is always set to the highest) and error reporting has not be implemented yet.
+
+However, in a adition to the standard `Position` object provided by the standard API, Übersicht provides an extra `address` property with the following fields:
+
+  - Street
+  - City
+  - ZIP
+  - Country
+  - State
+  - CountryCode
+
+
 ## Hosted Functionality
 
 A global object called `uebersicht` exists which exposes extra functionality that is typically not available in a browser. At the moment it is very limited:
