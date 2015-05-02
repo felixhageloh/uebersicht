@@ -106,7 +106,7 @@ Stop the widget from updating if a `refreshFrequency` is set. The widget won't u
 
 ### @start()
 
-Start updating a previously stopped widget again. Does nothing if `refeshFrequency` is set to `false`.
+Start updating a previously stopped widget again. Does nothing if `refreshFrequency` is set to `false`.
 
 ### @refresh()
 
