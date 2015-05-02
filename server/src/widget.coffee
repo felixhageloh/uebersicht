@@ -1,6 +1,7 @@
 toSource = require('tosource')
 stylus   = require('stylus')
 nib      = require('nib')
+ms       = require('ms')
 
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
@@ -22,6 +23,9 @@ module.exports = (implementation) ->
   init = ->
     if (issues = validate(implementation)).length != 0
       throw new Error(issues.join(', '))
+
+    unless typeof implementation.refreshFrequency is 'number'
+      implementation.refreshFrequency = ms(implementation.refreshFrequency)
 
     api[k] = v for k, v of implementation
 
