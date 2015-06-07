@@ -24,7 +24,7 @@ module.exports = (implementation) ->
     if (issues = validate(implementation)).length != 0
       throw new Error(issues.join(', '))
 
-    unless typeof implementation.refreshFrequency is 'number'
+    if typeof implementation.refreshFrequency is 'string'
       implementation.refreshFrequency = ms(implementation.refreshFrequency)
 
     api[k] = v for k, v of implementation
