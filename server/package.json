@@ -20,6 +20,7 @@
     "nib": "~1.0.2"
   },
   "dependencies": {
+    "babel-core": "^5.8.21",
     "coffee-script": "~1.7.1",
     "connect": "~2.9.0",
     "fsevents": "^0.3.0",
