@@ -118,7 +118,7 @@ Runs a shell command and calls callback with the result. Command is a string con
 
 ## Geolocation API
 
-While the WebView used by Übersicht seems to provide the standard HTML5 geolocation API, it is not functional and there seems to be no way to enable it. Übersicht now provides a custom implementeation, which tries to follow the standard implementation as closely as possible. However, so far it provides only the basics and might still be somewehat unstable. The api can be found under `window.geolocation` (instead of `window.navigator.geolocation`). And supports the following methods
+While the WebView used by Übersicht seems to provide the standard HTML5 geolocation API, it is not functional and there seems to be no way to enable it. Übersicht now provides a custom implementation, which tries to follow the standard implementation as closely as possible. However, so far it provides only the basics and might still be somewehat unstable. The api can be found under `window.geolocation` (instead of `window.navigator.geolocation`). And supports the following methods
 
 ```coffeescript
 geolocation.getCurrentPosition(callback)
