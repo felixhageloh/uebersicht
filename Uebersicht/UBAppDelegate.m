@@ -113,6 +113,8 @@ int const PORT         = 41416;
 {
     keepServerAlive = NO;
     [widgetServer terminate];
+    [[NSStatusBar systemStatusBar] removeStatusItem:statusBarItem];
+    
 }
 
 - (NSStatusItem*)addStatusItemToMenu:(NSMenu*)aMenu
