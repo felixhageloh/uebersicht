@@ -70,23 +70,13 @@ int const PORT         = 41416;
     // enable the web inspector
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    // events to detect web inspector opening/closing
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(aWindowClosed:)
-                                                 name:NSWindowWillCloseNotification object:nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(frameChanged:)
-                                                 name:NSViewFrameDidChangeNotification
-                                               object:nil];
-    
     // listen to command key changes
     CFMachPortRef eventTap = CGEventTapCreate(kCGHIDEventTap,
                                               kCGHeadInsertEventTap,
                                               kCGEventTapOptionListenOnly,
-                                              CGEventMaskBit(kCGEventFlagsChanged),
-                                              &cmdKeyChange,
+                                              CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseUp),
+                                              &mouseClicked,
                                               (__bridge void *)(self));
     CFRunLoopSourceRef runLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, eventTap, 0);
     CFRelease(eventTap);
@@ -178,14 +168,12 @@ int const PORT         = 41416;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
-CGEventRef cmdKeyChange (CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* self) {
+CGEventRef mouseClicked(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* self) {
     
     UBAppDelegate* this = (__bridge UBAppDelegate*)self;
-    if((CGEventGetFlags(event) & this.interactionShortcutKey) == 0) {
-        [this.window sendToDesktop];
-    } else {
-        [this.window comeToFront];
-    }
+    
+    [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
+
     return event;
 }
 
@@ -454,35 +442,9 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
         inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
     
-    [window comeToFront];
     [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
 }
 
-#
-# pragma mark debug console handling
-#
-
-- (void)aWindowClosed:(NSNotification *)notification
-{
-    // WebInspcetor might have closed
-    if ([@"WebInspectorWindow" isEqual:NSStringFromClass ([[notification object] class])]) {
-        [window sendToDesktop];
-    }
-}
-
-// the inspector might be attached to the webview, in which case we can detect frame changes
-- (void)frameChanged:(NSNotification *)notification
-{
-    if ([notification object] != window.webView.mainFrame.frameView)
-        return;
-
-    // make sure the inspector is clickable if attached
-    if (CGRectEqualToRect(window.webView.mainFrame.frameView.frame, window.webView.frame)) {
-         [window sendToDesktop];
-    } else {
-         [window comeToFront];
-    }
-}
 
 @end
