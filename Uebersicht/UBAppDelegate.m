@@ -72,6 +72,8 @@ int const PORT = 41416;
 
     // enable the web inspector
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO
+                                            forKey:@"WebKit Web Inspector Setting - inspectorStartsAttached"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     // listen to command key changes
