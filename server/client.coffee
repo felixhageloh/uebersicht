@@ -6,8 +6,14 @@ contentEl = null
 init = ->
   window.uebersicht = require './src/os_bridge.coffee'
   widgets = {}
-  contentEl = document.getElementsByClassName('content')[0]
+  contentEl = document.getElementById('__uebersicht')
   contentEl.innerHTML = ''
+
+  window.addEventListener 'onwallpaperchange', ->
+    # force a redraw of backdrop filters
+    contentEl.style.transform = 'translateZ(1px)'
+    requestAnimationFrame -> contentEl.style.transform = ''
+
   getWidgets (err, widgetSettings) ->
     console.log err if err?
     return setTimeout bail, 10000 if err?
