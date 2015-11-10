@@ -179,12 +179,8 @@ CGEventRef mouseClicked(CGEventTapProxy proxy, CGEventType type, CGEventRef even
     
     [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
 
-    return event;
-}
 
-- (CGEventFlags)interactionShortcutKey
-{
-    return preferences.interactionShortcut;
+    return event;
 }
 
 
