@@ -177,8 +177,9 @@ CGEventRef mouseClicked(CGEventTapProxy proxy, CGEventType type, CGEventRef even
     
     UBAppDelegate* this = (__bridge UBAppDelegate*)self;
     
-    [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
-
+    if (![NSApp isActive]) {
+        [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
+    }
 
     return event;
 }
