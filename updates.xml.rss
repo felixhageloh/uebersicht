@@ -8,6 +8,18 @@
         <item>
             <title>Version 0.6</title>
             <sparkle:releaseNotesLink>
+              http://tracesof.net/uebersicht/releases/0.6.19.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sat, Nov 14 2015 16:00:00 +0200</pubDate>
+            <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.6.app.zip"
+                       sparkle:version="10408"
+                       sparkle:shortVersionString="0.6.19"
+                       length="10392"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.6</title>
+            <sparkle:releaseNotesLink>
               http://tracesof.net/uebersicht/releases/0.6.html
             </sparkle:releaseNotesLink>
             <pubDate>Fri, Nov 13 2015 20:46:00 +0200</pubDate>
