@@ -27,6 +27,7 @@ int const PORT = 41416;
     BOOL keepServerAlive;
     WebInspector *inspector;
     int portOffset;
+    BOOL forwardingEvents;
 }
 
 @synthesize window;
@@ -76,13 +77,18 @@ int const PORT = 41416;
                                             forKey:@"WebKit Web Inspector Setting - inspectorStartsAttached"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    // listen to command key changes
-    CFMachPortRef eventTap = CGEventTapCreate(kCGHIDEventTap,
-                                              kCGHeadInsertEventTap,
-                                              kCGEventTapOptionListenOnly,
-                                              CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseUp),
-                                              &mouseClicked,
-                                              (__bridge void *)(self));
+    // listen to mouse events
+    forwardingEvents = NO;
+    CFMachPortRef eventTap = CGEventTapCreate(
+        kCGHIDEventTap,
+        kCGHeadInsertEventTap,
+        kCGEventTapOptionListenOnly,
+        CGEventMaskBit(kCGEventLeftMouseDown) |
+            CGEventMaskBit(kCGEventLeftMouseUp) |
+            CGEventMaskBit(kCGEventLeftMouseDragged),
+        &onGlobalMouseEvent,
+        (__bridge void *)(self)
+    );
     CFRunLoopSourceRef runLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, eventTap, 0);
     CFRelease(eventTap);
     CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSourceRef, kCFRunLoopDefaultMode);
@@ -173,12 +179,69 @@ int const PORT = 41416;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
-CGEventRef mouseClicked(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* self) {
+- (BOOL)isForwardingEvents
+{
+    return forwardingEvents;
+}
+
+- (void)startForwardingEvents
+{
+    forwardingEvents = YES;
+}
+
+- (void)stopForwardingEvents
+{
+    forwardingEvents = NO;
+}
+
+
+CGEventRef onGlobalMouseEvent(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* self)
+{
     
     UBAppDelegate* this = (__bridge UBAppDelegate*)self;
     
-    if (![NSApp isActive]) {
+    
+    if ([this isForwardingEvents]) {
+    
         [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
+        if (type == kCGEventLeftMouseUp) {
+            [this stopForwardingEvents];
+        }
+    } else if (type == kCGEventLeftMouseDown) {
+    
+        CGPoint mouseLocation = CGEventGetLocation(event);
+        CFArrayRef windowList = CGWindowListCopyWindowInfo(
+            kCGWindowListOptionOnScreenAboveWindow | kCGWindowListExcludeDesktopElements,
+            (CGWindowID)[this.window windowNumber]
+        );
+        
+        CFDictionaryRef window;
+        CGRect windowBounds;
+        BOOL isOccluded = NO;
+        NSString *windowName;
+
+        for (int i = 0 ; i < CFArrayGetCount(windowList); i++) {
+            window = CFArrayGetValueAtIndex(windowList, i);
+            CGRectMakeWithDictionaryRepresentation(
+                CFDictionaryGetValue(window, kCGWindowBounds),
+                &windowBounds
+            );
+            
+            windowName = CFDictionaryGetValue(window, kCGWindowName);
+            if (CGRectContainsPoint(windowBounds, mouseLocation) &&
+                ![windowName isEqualToString:@"Dock"]) {
+                
+                isOccluded = YES;
+                break;
+            }
+        }
+        
+        if (!isOccluded) {
+            [this startForwardingEvents];
+            [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
+        }
+
+        CFRelease(windowList);
     }
 
     return event;
