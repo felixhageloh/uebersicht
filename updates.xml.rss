@@ -12,7 +12,7 @@
             </sparkle:releaseNotesLink>
             <pubDate>Sat, Nov 14 2015 16:00:00 +0200</pubDate>
             <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.6.19.app.zip"
-                       sparkle:version="10408"
+                       sparkle:version="19"
                        sparkle:shortVersionString="0.6.19"
                        length="10384"
                        type="application/octet-stream" />
