@@ -18,6 +18,9 @@ init = function() {
       return contentEl.style.transform = '';
     });
   });
+  window.addEventListener('contextmenu', function(e) {
+    return e.preventDefault();
+  });
   return getWidgets(function(err, widgetSettings) {
     if (err != null) {
       console.log(err);

@@ -14,6 +14,9 @@ init = ->
     contentEl.style.transform = 'translateZ(1px)'
     requestAnimationFrame -> contentEl.style.transform = ''
 
+  window.addEventListener 'contextmenu', (e) ->
+    e.preventDefault()
+
   getWidgets (err, widgetSettings) ->
     console.log err if err?
     return setTimeout bail, 10000 if err?
