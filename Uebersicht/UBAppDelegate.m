@@ -203,7 +203,7 @@ CGEventRef onGlobalMouseEvent(CGEventTapProxy proxy, CGEventType type, CGEventRe
     
     if ([this isForwardingEvents]) {
     
-        [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
+        [this.window sendEvent:[this convertToWindow:event]];
         if (type == kCGEventLeftMouseUp) {
             [this stopForwardingEvents];
         }
@@ -238,13 +238,31 @@ CGEventRef onGlobalMouseEvent(CGEventTapProxy proxy, CGEventType type, CGEventRe
         
         if (!isOccluded) {
             [this startForwardingEvents];
-            [this.window sendEvent:[NSEvent eventWithCGEvent:event]];
+            [this.window sendEvent:[this convertToWindow:event]];
         }
+        
+       
 
         CFRelease(windowList);
     }
 
     return event;
+}
+
+- (NSEvent*)convertToWindow:(CGEventRef)event
+{
+    NSRect windowFrame = [window frame];
+    
+    CGPoint locationInScreen = CGEventGetLocation(event);
+    CGPoint locationInWindow = CGPointMake(
+        locationInScreen.x - windowFrame.origin.x,
+        locationInScreen.y + windowFrame.origin.y
+    );
+    
+    CGEventRef convertedEvent = CGEventCreateCopy(event);
+    CGEventSetLocation(convertedEvent, locationInWindow);
+    
+    return [NSEvent eventWithCGEvent:convertedEvent];
 }
 
 
