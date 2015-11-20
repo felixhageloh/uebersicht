@@ -218,7 +218,7 @@ CGEventRef onGlobalMouseEvent(CGEventTapProxy proxy, CGEventType type, CGEventRe
         CFDictionaryRef window;
         CGRect windowBounds;
         BOOL isOccluded = NO;
-        NSString *windowName;
+        NSString *windowOwner;
 
         for (int i = 0 ; i < CFArrayGetCount(windowList); i++) {
             window = CFArrayGetValueAtIndex(windowList, i);
@@ -227,10 +227,8 @@ CGEventRef onGlobalMouseEvent(CGEventTapProxy proxy, CGEventType type, CGEventRe
                 &windowBounds
             );
             
-            windowName = CFDictionaryGetValue(window, kCGWindowName);
-            if (CGRectContainsPoint(windowBounds, mouseLocation) &&
-                ![windowName isEqualToString:@"Dock"]) {
-                
+            windowOwner = CFDictionaryGetValue(window, kCGWindowOwnerName);
+            if (CGRectContainsPoint(windowBounds, mouseLocation) && ![windowOwner isEqualToString:@"Dock"]) {
                 isOccluded = YES;
                 break;
             }
