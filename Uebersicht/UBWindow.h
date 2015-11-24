@@ -25,7 +25,5 @@
 - (void)reload;
 - (void)fillScreen:(CGDirectDisplayID)screenId;
 - (void)sendToDesktop;
-- (void)comeToFront;
-- (BOOL)isInFront;
 
 @end

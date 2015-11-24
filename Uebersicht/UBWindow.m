@@ -110,22 +110,10 @@
 
 - (void)sendToDesktop
 {
-    [self setLevel:kCGDesktopWindowLevel];
-}
-
-- (void)comeToFront
-{
-    if (self.isInFront) return;
-
-    [self setLevel:kCGNormalWindowLevel-1];
-    [NSApp activateIgnoringOtherApps:NO];
+    [self setLevel:kCGDesktopIconWindowLevel];
     [self makeKeyAndOrderFront:self];
 }
 
-- (BOOL)isInFront
-{
-    return self.level == kCGNormalWindowLevel-1;
-}
 
 - (NSRect)toQuartzCoordinates:(NSRect)screenRect
 {
@@ -221,13 +209,15 @@
     return YES;
 }
 
-#
-#pragma mark flags
-#
+- (void)sendEvent:(NSEvent *)theEvent
+{
+    if ([theEvent type] == NSLeftMouseDown) {
+        NSLog(@"mouse");
+        [self makeFirstResponder:webView];
+        [super sendEvent:theEvent];
+    }
 
-- (BOOL)canBecomeKeyWindow      { return [self isInFront]; }
-- (BOOL)canBecomeMainWindow     { return [self isInFront]; }
-- (BOOL)acceptsFirstResponder   { return [self isInFront]; }
-- (BOOL)acceptsMouseMovedEvents { return [self isInFront]; }
+    [super sendEvent:theEvent];
+}
 
 @end

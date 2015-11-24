@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6249" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="15C40a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6249"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -651,16 +651,17 @@
             <windowStyleMask key="styleMask" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="361" y="443" width="217" height="179"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" canDrawConcurrently="YES" id="372" customClass="WebView">
                 <rect key="frame" x="0.0" y="0.0" width="217" height="179"/>
                 <autoresizingMask key="autoresizingMask"/>
+                <animations/>
                 <connections>
                     <outlet property="UIDelegate" destination="494" id="bzM-jf-iDe"/>
                 </connections>
             </view>
             <connections>
-                <outlet property="webView" destination="372" id="8XL-nP-x0w"/>
+                <outlet property="webView" destination="372" id="F6m-V7-f5D"/>
             </connections>
         </window>
         <customObject id="494" customClass="UBAppDelegate">

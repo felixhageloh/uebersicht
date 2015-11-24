@@ -15,6 +15,7 @@
 #import "UBPreferencesController.m"
 #import "UBScreensMenuController.h"
 #import "WebInspector.h"
+#import "UBMouseHandler.h"
 
 int const MAX_DISPLAYS = 42;
 int const PORT = 41416;
@@ -27,7 +28,7 @@ int const PORT = 41416;
     BOOL keepServerAlive;
     WebInspector *inspector;
     int portOffset;
-    BOOL forwardingEvents;
+    UBMouseHandler* mouseHandler;
 }
 
 @synthesize window;
@@ -76,23 +77,10 @@ int const PORT = 41416;
     [[NSUserDefaults standardUserDefaults] setBool:NO
                                             forKey:@"WebKit Web Inspector Setting - inspectorStartsAttached"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    // listen for mouse events
+    mouseHandler = [[UBMouseHandler alloc] initWithWindow:window];
 
-    // listen to mouse events
-    forwardingEvents = NO;
-    CFMachPortRef eventTap = CGEventTapCreate(
-        kCGHIDEventTap,
-        kCGHeadInsertEventTap,
-        kCGEventTapOptionListenOnly,
-        CGEventMaskBit(kCGEventLeftMouseDown) |
-            CGEventMaskBit(kCGEventLeftMouseUp) |
-            CGEventMaskBit(kCGEventLeftMouseDragged),
-        &onGlobalMouseEvent,
-        (__bridge void *)(self)
-    );
-    CFRunLoopSourceRef runLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, eventTap, 0);
-    CFRelease(eventTap);
-    CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSourceRef, kCFRunLoopDefaultMode);
-    CFRelease(runLoopSourceRef);
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -177,90 +165,6 @@ int const PORT = 41416;
     notification.informativeText = message;
     
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-}
-
-- (BOOL)isForwardingEvents
-{
-    return forwardingEvents;
-}
-
-- (void)startForwardingEvents
-{
-    forwardingEvents = YES;
-}
-
-- (void)stopForwardingEvents
-{
-    forwardingEvents = NO;
-}
-
-
-CGEventRef onGlobalMouseEvent(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* self)
-{
-    
-    UBAppDelegate* this = (__bridge UBAppDelegate*)self;
-    
-    
-    if ([this isForwardingEvents]) {
-    
-        [this.window sendEvent:[this convertToWindow:event]];
-        if (type == kCGEventLeftMouseUp) {
-            [this stopForwardingEvents];
-        }
-    } else if (type == kCGEventLeftMouseDown) {
-    
-        CGPoint mouseLocation = CGEventGetLocation(event);
-        CFArrayRef windowList = CGWindowListCopyWindowInfo(
-            kCGWindowListOptionOnScreenAboveWindow | kCGWindowListExcludeDesktopElements,
-            (CGWindowID)[this.window windowNumber]
-        );
-        
-        CFDictionaryRef window;
-        CGRect windowBounds;
-        BOOL isOccluded = NO;
-        NSString *windowOwner;
-
-        for (int i = 0 ; i < CFArrayGetCount(windowList); i++) {
-            window = CFArrayGetValueAtIndex(windowList, i);
-            CGRectMakeWithDictionaryRepresentation(
-                CFDictionaryGetValue(window, kCGWindowBounds),
-                &windowBounds
-            );
-            
-            windowOwner = CFDictionaryGetValue(window, kCGWindowOwnerName);
-            if (CGRectContainsPoint(windowBounds, mouseLocation) && ![windowOwner isEqualToString:@"Dock"]) {
-                isOccluded = YES;
-                break;
-            }
-        }
-        
-        if (!isOccluded) {
-            [this startForwardingEvents];
-            [this.window sendEvent:[this convertToWindow:event]];
-        }
-        
-       
-
-        CFRelease(windowList);
-    }
-
-    return event;
-}
-
-- (NSEvent*)convertToWindow:(CGEventRef)event
-{
-    NSRect windowFrame = [window frame];
-    
-    CGPoint locationInScreen = CGEventGetLocation(event);
-    CGPoint locationInWindow = CGPointMake(
-        locationInScreen.x - windowFrame.origin.x,
-        locationInScreen.y + windowFrame.origin.y
-    );
-    
-    CGEventRef convertedEvent = CGEventCreateCopy(event);
-    CGEventSetLocation(convertedEvent, locationInWindow);
-    
-    return [NSEvent eventWithCGEvent:convertedEvent];
 }
 
 
