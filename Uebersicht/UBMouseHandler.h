@@ -7,9 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+@class UBWindow;
+@class UBPreferencesController;
+
 
 @interface UBMouseHandler : NSObject
 
-- (id) initWithWindow:(NSWindow*)aWindow;
+- (id)initWithWindow:(UBWindow*)aWindow andPreferences:(UBPreferencesController*)thePreferences;
 
 @end

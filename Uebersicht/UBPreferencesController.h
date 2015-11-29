@@ -12,15 +12,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-NSString *const kPreferenceGlobalShortcut = @"keyboardShortcutBringToFront";
-
 @interface UBPreferencesController : NSWindowController
 
 @property (weak) IBOutlet NSToolbar* toolbar;
 @property (weak) IBOutlet NSPopUpButton *filePicker;
+@property (weak) IBOutlet NSMatrix *interactionShortcutRadio;
 @property BOOL startAtLogin;
 @property NSURL* widgetDir;
 
 - (IBAction)showFilePicker:(id)sender;
+- (IBAction)shortcutKeyChanged:(id)sender;
+
+- (CGEventFlags)interactionShortcut;
 
 @end
