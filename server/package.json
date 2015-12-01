@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.coffee",
   "scripts": {
-    "test": "node_modules/jasmine-node/bin/jasmine-node --coffee --captureExceptions --forceexit spec/backend",
-    "start": "coffee server.coffee"
+    "start": "coffee server.coffee",
+    "test": "node_modules/jasmine-node/bin/jasmine-node --coffee --captureExceptions --forceexit spec/backend"
   },
   "author": "Felix Hageloh",
   "license": "GPL v3 <http://www.gnu.org/licenses/>",
@@ -20,6 +20,7 @@
     "nib": "~1.0.2"
   },
   "dependencies": {
+    "babel-core": "5.8.22",
     "coffee-script": "~1.7.1",
     "connect": "~2.9.0",
     "fsevents": "^0.3.0",
