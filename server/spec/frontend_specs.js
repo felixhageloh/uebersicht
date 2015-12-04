@@ -10,8 +10,17 @@ contentEl = null;
 init = function() {
   window.uebersicht = require('./src/os_bridge.coffee');
   widgets = {};
-  contentEl = document.getElementsByClassName('content')[0];
+  contentEl = document.getElementById('__uebersicht');
   contentEl.innerHTML = '';
+  window.addEventListener('onwallpaperchange', function() {
+    contentEl.style.transform = 'translateZ(1px)';
+    return requestAnimationFrame(function() {
+      return contentEl.style.transform = '';
+    });
+  });
+  window.addEventListener('contextmenu', function(e) {
+    return e.preventDefault();
+  });
   return getWidgets(function(err, widgetSettings) {
     if (err != null) {
       console.log(err);

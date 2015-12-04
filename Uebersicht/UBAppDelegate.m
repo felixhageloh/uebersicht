@@ -16,6 +16,7 @@
 #import "UBScreensMenuController.h"
 #import "WebInspector.h"
 #import "UBMouseHandler.h"
+#import "UBWidgetsController.h"
 
 int const MAX_DISPLAYS = 42;
 int const PORT = 41416;
@@ -29,6 +30,7 @@ int const PORT = 41416;
     WebInspector *inspector;
     int portOffset;
     UBMouseHandler* mouseHandler;
+    UBWidgetsController* widgetsController;
 }
 
 @synthesize window;
@@ -38,7 +40,8 @@ int const PORT = 41416;
 {
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     preferences = [[UBPreferencesController alloc] initWithWindowNibName:@"UBPreferencesController"];
-    screensMenu = [[UBScreensMenuController alloc] initWithMaxDisplays:MAX_DISPLAYS];
+    //screensMenu = [[UBScreensMenuController alloc] initWithMaxDisplays:MAX_DISPLAYS];
+    widgetsController = [[UBWidgetsController alloc] initWithMenu:statusBarMenu];
     
     // Handles the screen entries in the menu, and will send the window to the user's preferred screen
     [self screensChanged:self];
@@ -64,6 +67,16 @@ int const PORT = 41416;
             }
         } else if ([output rangeOfString:@"error"].location != NSNotFound) {
             [self notifyUser:output withTitle:@"Error"];
+        } else if ([output rangeOfString:@"registering widget"].location != NSNotFound) {
+            [widgetsController
+                addWidget:[output
+                    stringByReplacingOccurrencesOfString:@"registering widget "
+                    withString:@""]];
+        } else if ([output rangeOfString:@"deleting widget"].location != NSNotFound) {
+             [widgetsController
+                removeWidget:[output
+                    stringByReplacingOccurrencesOfString:@"deleting widget "
+                    withString:@""]];
         };
     }];
     
@@ -81,7 +94,6 @@ int const PORT = 41416;
         initWithWindow:window
         andPreferences:preferences
     ];
-
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -182,13 +194,13 @@ int const PORT = 41416;
     
     CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
 
-    [screensMenu removeScreensFromMenu:statusBarMenu];
+    //[screensMenu removeScreensFromMenu:statusBarMenu];
     
-    if (numDisplays > 1) {
-        [screensMenu addScreensToMenu:statusBarMenu
-                               action:@selector(screenWasSelected:)
-                               target:self];
-    }
+//    if (numDisplays > 1) {
+//        [screensMenu addScreensToMenu:statusBarMenu
+//                               action:@selector(screenWasSelected:)
+//                               target:self];
+//    }
     
     // Most recently preferred screens will be listed first,
     // so the first match we found will be the preferred screen.
@@ -213,7 +225,7 @@ int const PORT = 41416;
 - (void)sendWindowToScreen:(CGDirectDisplayID)screenId
 {
     [window fillScreen:screenId];
-    [screensMenu markScreen:screenId inMenu:statusBarMenu];
+    //[screensMenu markScreen:screenId inMenu:statusBarMenu];
 }
 
 - (NSMutableArray*)getPreferredScreens
