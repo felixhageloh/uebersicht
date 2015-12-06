@@ -9,36 +9,29 @@
 #import "UBScreensMenuController.h"
 
 
-@implementation UBScreensMenuController {
-    int maxDisplays;
-}
+int const MAX_DISPLAYS = 42;
 
-- (id)initWithMaxDisplays:(int)max
-{
-    self = [super init];
-    if (self) {
-        maxDisplays = max;
-    }
-    
-    return self;
-}
+@implementation UBScreensMenuController
 
-- (void)addScreensToMenu:(NSMenu*)menu action:(SEL)action target:(id)target
+- (void)addScreensToMenu:(NSMenu*)menu
+                 atIndex:(NSInteger)index
+              withAction:(SEL)action
+               andTarget:(id)target
 {
     NSString *title;
     NSMenuItem *newItem;
     NSString *name;
-    NSMutableDictionary *nameList = [[NSMutableDictionary alloc] initWithCapacity:maxDisplays];
+    NSMutableDictionary *nameList = [[NSMutableDictionary alloc]
+        initWithCapacity:MAX_DISPLAYS];
     
-    NSInteger index = [self indexOfScreenMenuItems:menu];
     newItem = [NSMenuItem separatorItem];
     [newItem setRepresentedObject:@"screen"];
     [menu insertItem:newItem atIndex:index];
     
-    CGDirectDisplayID displays[maxDisplays];
+    CGDirectDisplayID displays[MAX_DISPLAYS];
     uint32_t numDisplays;
     
-    CGGetActiveDisplayList(maxDisplays, displays, &numDisplays);
+    CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
     
     for(int i = 0; i < numDisplays; i++) {
         if (CGDisplayIsInMirrorSet(displays[i]))

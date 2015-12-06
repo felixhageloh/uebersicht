@@ -10,8 +10,7 @@
 
 @interface UBScreensMenuController : NSObject
 
-- (id)initWithMaxDisplays:(int)max;
-- (void)addScreensToMenu:(NSMenu*)aMenu action:(SEL)selectAction target:(id)target;
+- (void)addScreensToMenu:(NSMenu*)menu atIndex:(NSInteger)index withAction:(SEL)action andTarget:(id)target;
 - (void)removeScreensFromMenu:(NSMenu*)aMenu;
 - (void)markScreen:(CGDirectDisplayID)screenId inMenu:(NSMenu*)menu;
 

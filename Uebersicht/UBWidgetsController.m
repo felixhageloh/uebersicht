@@ -7,8 +7,10 @@
 //
 
 #import "UBWidgetsController.h"
+#import "UBScreensMenuController.h"
 
 @implementation UBWidgetsController {
+    UBScreensMenuController* screensController;
     NSMenu* mainMenu;
     NSInteger currentIndex;
 }
@@ -20,14 +22,13 @@
     
     if (self) {
         mainMenu = menu;
+        screensController = [[UBScreensMenuController alloc] init];
         
         currentIndex = [self indexOfWidgetMenuItems:menu];
         NSMenuItem* newItem = [NSMenuItem separatorItem];
-        [newItem setRepresentedObject:@"widget"];
         [menu insertItem:newItem atIndex:currentIndex];
         currentIndex++;
         newItem = [NSMenuItem separatorItem];
-        [newItem setRepresentedObject:@"widget"];
         [menu insertItem:newItem atIndex:currentIndex];
         
     }
@@ -37,7 +38,7 @@
 
 - (void)addWidget:(NSString*)widget
 {
-    [self addWidget:widget ToMenu:mainMenu action:nil target:self];
+    [self addWidget:widget toMenu:mainMenu];
 }
 
 
@@ -47,20 +48,40 @@
 }
 
 
-- (void)addWidget:(NSString*)widget ToMenu:(NSMenu*)menu action:(SEL)action target:(id)target
+- (void)addWidget:(NSString*)widget toMenu:(NSMenu*)menu
 {
-    NSMenuItem* newItem = [[NSMenuItem alloc]
-        initWithTitle:widget
-        action:action
-        keyEquivalent:@""];
+    NSMenuItem* newItem = [[NSMenuItem alloc] init];
     
+    [newItem setTitle:widget];
     [newItem setRepresentedObject:@"widget"];
+    
+    NSMenu* widgetMenu = [[NSMenu alloc] init];
+    [screensController
+        addScreensToMenu:widgetMenu
+                 atIndex:0
+              withAction:nil
+               andTarget:self];
+    [newItem setSubmenu:widgetMenu];
     [menu insertItem:newItem atIndex:currentIndex];
 }
 
 - (void)removeWidget:(NSString*)widget FromMenu:(NSMenu*)menu
 {
     [menu removeItem:[menu itemWithTitle:widget]];
+}
+
+- (void)screensChanged:(id)sender
+{
+    for (NSMenuItem *item in [mainMenu itemArray]){
+        if ([item.representedObject isEqualToString:@"widget"]) {
+            [screensController removeScreensFromMenu:item.submenu];
+            [screensController
+                addScreensToMenu:item.submenu
+                         atIndex:0
+                      withAction:nil
+                       andTarget:self];
+        }
+    }
 }
 
 -(NSInteger)indexOfWidgetMenuItems:(NSMenu*)menu

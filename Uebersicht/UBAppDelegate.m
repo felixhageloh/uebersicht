@@ -18,7 +18,6 @@
 #import "UBMouseHandler.h"
 #import "UBWidgetsController.h"
 
-int const MAX_DISPLAYS = 42;
 int const PORT = 41416;
 
 @implementation UBAppDelegate {
@@ -58,7 +57,9 @@ int const PORT = 41416;
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
             // trailing slash required for load policy in UBWindow
-            [window loadUrl:[NSString stringWithFormat:@"http://127.0.0.1:%d/", PORT+portOffset]];
+            [window
+                loadUrl:[NSString
+                    stringWithFormat:@"http://127.0.0.1:%d/", PORT+portOffset]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
             if (portOffset >= 20) {
@@ -80,10 +81,11 @@ int const PORT = 41416;
         };
     }];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(screensChanged:)
-                                                 name:NSApplicationDidChangeScreenParametersNotification
-                                               object:nil];
+    [[NSNotificationCenter defaultCenter]
+        addObserver:self
+           selector:@selector(screensChanged:)
+               name:NSApplicationDidChangeScreenParametersNotification
+             object:nil];
 
     // enable the web inspector
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
@@ -188,11 +190,13 @@ int const PORT = 41416;
 
 - (void)screensChanged:(id)sender
 {
-    CGDirectDisplayID displays[MAX_DISPLAYS];
+    [widgetsController screensChanged:self];
+
+    CGDirectDisplayID displays[42];
     uint32_t numDisplays;
     uint32 screenId;
     
-    CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
+    CGGetActiveDisplayList(42, displays, &numDisplays);
 
     //[screensMenu removeScreensFromMenu:statusBarMenu];
     
