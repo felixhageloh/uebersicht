@@ -1634,7 +1634,7 @@ function legalKey(string) {
 }
 
 },{}],8:[function(require,module,exports){
-var UebersichtServer, args, e, handleError, parseArgs, port, server, widgetPath, _ref, _ref1, _ref2, _ref3;
+var UebersichtServer, args, e, handleError, parseArgs, port, prefencesDir, server, widgetPath, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
 
 parseArgs = require('minimist');
 
@@ -1648,6 +1648,7 @@ try {
   args = parseArgs(process.argv.slice(2));
   widgetPath = (_ref = (_ref1 = args.d) != null ? _ref1 : args.dir) != null ? _ref : './widgets';
   port = (_ref2 = (_ref3 = args.p) != null ? _ref3 : args.port) != null ? _ref2 : 41416;
+  prefencesDir = (_ref4 = (_ref5 = args.s) != null ? _ref5 : args.settings) != null ? _ref4 : './settings';
   server = UebersichtServer(Number(port), widgetPath);
   server.on('error', handleError);
 } catch (_error) {

@@ -1,16 +1,16 @@
 # middleware to serve the results of widget commands
 # Listens to /widgets/<id>
-{spawn}  = require('child_process')
-url      = require 'url'
+{spawn} = require('child_process')
+url = require 'url'
 ID_REGEX = /\/widgets\/([^\/]+)/i
 
 module.exports = (widgetDir) ->
 
   # the Connect middleware
   (req, res, next) ->
-    parsed   = url.parse(req.url)
+    parsed = url.parse(req.url)
     widgetId = parsed.pathname.match(ID_REGEX)?[1]
-    widget   = widgetDir.get decodeURI(widgetId) if widgetId?
+    widget = widgetDir.get decodeURI(widgetId) if widgetId?
 
     return next() unless widget?
     shell = spawn 'bash', [], cwd: widgetDir.path

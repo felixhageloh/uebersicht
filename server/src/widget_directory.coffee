@@ -1,13 +1,13 @@
-Widget   = require './widget.coffee'
-loader   = require './widget_loader.coffee'
-paths    = require 'path'
-fs       = require 'fs'
+Widget = require './widget.coffee'
+loader = require './widget_loader.coffee'
+paths = require 'path'
+fs = require 'fs'
 
 module.exports = (directoryPath) ->
   api = {}
 
   fsevents = require('fsevents')
-  widgets  = {}
+  widgets = {}
   changeCallback = ->
 
   init = ->
@@ -17,8 +17,8 @@ module.exports = (directoryPath) ->
       #return if info.type  == 'directory' and !isWidgetDirPath(info.path)
 
       switch info.event
-        when 'modified'             then addWidget filePath
-        when 'moved-in',  'created' then checkWidgetAdded filePath, info.type
+        when 'modified' then addWidget filePath
+        when 'moved-in', 'created' then checkWidgetAdded filePath, info.type
         when 'moved-out', 'deleted' then checkWidgetRemoved filePath, info.type
 
     watcher.start()
@@ -73,7 +73,7 @@ module.exports = (directoryPath) ->
     id = widgetId filePath
 
     try
-      definition    = loader.loadWidget(filePath)
+      definition = loader.loadWidget(filePath)
       definition.id = id if definition?
       Widget definition
     catch e

@@ -1,4 +1,4 @@
-fs     = require 'fs'
+fs = require 'fs'
 coffee = require 'coffee-script'
 
 # throws error if something goes wrong

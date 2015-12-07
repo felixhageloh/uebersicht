@@ -1,6 +1,5 @@
 # middleware to 'push' changes to the client, using long-polling.
 # Listens to /widget-changes
-# TODO; use websockets
 
 serialize = require './serialize.coffee'
 
