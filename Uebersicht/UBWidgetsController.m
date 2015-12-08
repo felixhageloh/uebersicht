@@ -13,6 +13,7 @@
     UBScreensMenuController* screensController;
     NSMenu* mainMenu;
     NSInteger currentIndex;
+    NSURL* backendUrl;
 }
 
 - (id)initWithMenu:(NSMenu*)menu
@@ -31,6 +32,8 @@
         newItem = [NSMenuItem separatorItem];
         [menu insertItem:newItem atIndex:currentIndex];
         
+        
+        backendUrl = [NSURL URLWithString:@"http://127.0.0.1:41416/widget/"];
     }
     
     return self;
@@ -48,14 +51,23 @@
 }
 
 
-- (void)addWidget:(NSString*)widget toMenu:(NSMenu*)menu
+- (void)addWidget:(NSString*)widgetId toMenu:(NSMenu*)menu
 {
     NSMenuItem* newItem = [[NSMenuItem alloc] init];
     
-    [newItem setTitle:widget];
+    [newItem setTitle:widgetId];
     [newItem setRepresentedObject:@"widget"];
     
     NSMenu* widgetMenu = [[NSMenu alloc] init];
+    NSMenuItem* hide = [[NSMenuItem alloc]
+        initWithTitle:@"hide"
+        action:@selector(hideWidget:)
+        keyEquivalent:@""
+    ];
+    [hide setRepresentedObject:widgetId];
+    [hide setTarget:self];
+    [widgetMenu insertItem:hide atIndex:0];
+    
     [screensController
         addScreensToMenu:widgetMenu
                  atIndex:0
@@ -65,9 +77,9 @@
     [menu insertItem:newItem atIndex:currentIndex];
 }
 
-- (void)removeWidget:(NSString*)widget FromMenu:(NSMenu*)menu
+- (void)removeWidget:(NSString*)widgetId FromMenu:(NSMenu*)menu
 {
-    [menu removeItem:[menu itemWithTitle:widget]];
+    [menu removeItem:[menu itemWithTitle:widgetId]];
 }
 
 - (void)screensChanged:(id)sender
@@ -89,36 +101,33 @@
     return [menu indexOfItem:[menu itemWithTitle:@"Check for Updates..."]] + 2;
 }
 
-- (void)fetchWidgets:(NSURLRequest*)request
+- (void)updateWidget:(NSString*)widgetId
 {
-    [[[NSURLSession sharedSession]
+    NSMutableURLRequest* request = [NSMutableURLRequest
+        requestWithURL: [backendUrl URLByAppendingPathComponent:widgetId]
+    ];
+    
+    [request setHTTPMethod:@"PUT"];
+    
+    NSURLSessionDataTask* task = [[NSURLSession sharedSession]
         dataTaskWithRequest:request
         completionHandler:^(NSData* data, NSURLResponse* res, NSError* err){
-            
             if (err) {
                 return NSLog(
-                    @"Error requesting widgets json: %@",
+                    @"Error updating widget: %@",
                     err.localizedDescription
                 );
             }
-            
-            NSError* parseError = nil;
-            NSDictionary *dictionary = [NSJSONSerialization
-                JSONObjectWithData:data
-                           options:0
-                             error:&parseError];
-            
-            
-            if (parseError) {
-                NSLog(
-                    @"Error parsing widgets json: %@",
-                    parseError.localizedDescription
-                );
-            } else {
-                NSLog(@"Response: %@", dictionary);
-            }
+        }
+    ];
+    
+    [task resume];
+}
 
-        }] resume];
+
+- (void)hideWidget:(id)sender
+{
+    [self updateWidget:[(NSMenuItem*)sender representedObject]];
 }
 
 @end

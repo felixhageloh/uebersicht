@@ -1685,22 +1685,34 @@ try {
 // Listens to /widget
 
 module.exports = function WidgetServer(widgetsController) {
+  const handle = {
+    put(id, data) {
+      console.log(id, data);
+      return 200;
+    }
+  };
 
   return function WidgetServerMiddleWare(req, res, next) {
     const parts = req.url.replace(/^\//, '').split('/');
 
-    console.log(parts);
-
-    if (parts[0] != 'widget') {
+    if (parts[0] !== 'widget') {
       return next();
     }
 
-    const verb = req.method;
-    console.log(verb);
+    const verb = req.method.toLowerCase();
+    const id = parts[1].trim();
+    const data = {};
+
+    const handler = handle[verb];
+    if (handler) {
+      res.statusCode = handler(id, data);
+    } else {
+      res.statusCode = 400;
+    }
+
     res.end();
   };
 };
-
 
 },{}],10:[function(require,module,exports){
 module.exports = function WidgetsController(widgetDir, settingsPath) {

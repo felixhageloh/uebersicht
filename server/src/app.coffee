@@ -1,25 +1,32 @@
-connect    = require 'connect'
-path       = require 'path'
+connect = require 'connect'
+path = require 'path'
 
-WidgetDir           = require('./widget_directory.coffee')
-WidgetsServer       = require('./widgets_server.coffee')
+WidgetsController = require('./WidgetsController')
+WidgetDir = require('./widget_directory.coffee')
+WidgetServer = require('./WidgetServer')
+WidgetsServer = require('./widgets_server.coffee')
 WidgetCommandServer = require('./widget_command_server.coffee')
-ChangesServer       = require('./changes_server.coffee')
+ChangesServer = require('./changes_server.coffee')
 
-module.exports = (port, widgetPath) ->
-  widgetPath    = path.resolve(__dirname, widgetPath)
-  widgetDir     = WidgetDir widgetPath
+module.exports = (port, widgetPath, settingsPath) ->
+  widgetPath = path.resolve(__dirname, widgetPath)
+  widgetDir = WidgetDir widgetPath
   changesServer = ChangesServer()
+
+  settingsPath = path.resolve(__dirname, settingsPath)
+  widgetsController = WidgetsController(widgetDir, settingsPath)
 
   server = connect()
     .use(connect.static(path.resolve(__dirname, './public')))
     .use(WidgetCommandServer(widgetDir))
     .use(WidgetsServer(widgetDir))
+    .use(WidgetServer(widgetDir))
     .use(changesServer.middleware)
     .use(connect.static(widgetPath))
     .listen port, ->
       console.log 'server started on port', port
-      widgetDir.watch changesServer.push
+      widgetDir.watch (changes) ->
+        changesServer.push changes
 
   server
 

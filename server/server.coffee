@@ -8,8 +8,9 @@ try
   args = parseArgs process.argv.slice(2)
   widgetPath = args.d ? args.dir  ? './widgets'
   port = args.p ? args.port ? 41416
+  settingsPath = args.s ? args.settings ? './settings'
 
-  server = UebersichtServer Number(port), widgetPath
+  server = UebersichtServer Number(port), widgetPath, settingsPath
   server.on 'error', handleError
 catch e
   handleError e

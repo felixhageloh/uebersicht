@@ -54,7 +54,10 @@ int const PORT = 41416;
     // start server and load webview
     portOffset      = 0;
     keepServerAlive = YES;
+    
     [self startServer: ^(NSString* output) {
+        NSRange match;
+        
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
             // trailing slash required for load policy in UBWindow
             [window
@@ -68,16 +71,14 @@ int const PORT = 41416;
             }
         } else if ([output rangeOfString:@"error"].location != NSNotFound) {
             [self notifyUser:output withTitle:@"Error"];
-        } else if ([output rangeOfString:@"registering widget"].location != NSNotFound) {
+        } else if ((match = [output rangeOfString:@"registering widget"]).location != NSNotFound) {
             [widgetsController
-                addWidget:[output
-                    stringByReplacingOccurrencesOfString:@"registering widget "
-                    withString:@""]];
-        } else if ([output rangeOfString:@"deleting widget"].location != NSNotFound) {
+                addWidget:[self getWidgetId:output outsideRange:match]
+            ];
+        } else if ((match =[output rangeOfString:@"deleting widget"]).location != NSNotFound) {
              [widgetsController
-                removeWidget:[output
-                    stringByReplacingOccurrencesOfString:@"deleting widget "
-                    withString:@""]];
+                removeWidget:[self getWidgetId:output outsideRange:match]
+            ];
         };
     }];
     
@@ -167,8 +168,14 @@ int const PORT = 41416;
     };
     
     [task setLaunchPath:nodePath];
-    [task setArguments:@[serverPath, @"-d", widgetPath,
-                         @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset]]];
+    [task setArguments:@[
+        serverPath,
+        @"-d", widgetPath,
+        @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset],
+        @"-s", [[self getPreferencesDir] path]
+        
+    ]];
+    
     [task launch];
     return task;
 }
@@ -182,6 +189,30 @@ int const PORT = 41416;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
+
+- (NSURL*)getPreferencesDir
+{
+    NSArray* urls = [[NSFileManager defaultManager]
+        URLsForDirectory:NSApplicationSupportDirectory
+               inDomains:NSUserDomainMask
+    ];
+    
+    return [urls[0]
+        URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]
+                        isDirectory:YES
+    ];
+}
+
+- (NSString*)getWidgetId:(NSString*)output outsideRange:(NSRange)range
+{
+    NSString* widgetId = [output
+        stringByReplacingCharactersInRange:range withString:@""
+    ];
+
+    return [widgetId
+        stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
+    ];
+}
 
 #
 #pragma mark Screen Handling
@@ -306,8 +337,10 @@ int const PORT = 41416;
     if (!inspector) {
         inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
-    [[NSUserDefaults standardUserDefaults] setBool:NO
-                                        forKey:@"WebKit Web Inspector Setting - inspectorStartsAttached"];
+    [[NSUserDefaults standardUserDefaults]
+        setBool:NO
+         forKey:@"WebKit Web Inspector Setting - inspectorStartsAttached"
+    ];
     
     [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
