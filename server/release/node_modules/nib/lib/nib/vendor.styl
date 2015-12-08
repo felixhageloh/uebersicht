@@ -268,13 +268,17 @@ perspective-origin()
 opacity(n, args...)
   opacity: n args
   if support-for-ie
-    val = round(n * 100)
-    if val == 100
-      -ms-filter: none
-      filter: none
+    if n == inherit or n == initial
+      -ms-filter: n args
+      filter: n args
     else
-      -ms-filter: '"progid:DXImageTransform.Microsoft.Alpha(Opacity=%s)"' % val args
-      filter: 'alpha(opacity=%s)' % val args
+      val = round(n * 100)
+      if val == 100
+        -ms-filter: none
+        filter: none
+      else
+        -ms-filter: '"progid:DXImageTransform.Microsoft.Alpha(Opacity=%s)"' % val args
+        filter: 'alpha(opacity=%s)' % val args
 
 /*
  * Vendor "text-size-adjust"

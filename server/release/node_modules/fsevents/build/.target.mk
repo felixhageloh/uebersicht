@@ -4,25 +4,28 @@ TOOLSET := target
 TARGET := 
 ### Rules for final target.
 LDFLAGS_Debug := \
+	-undefined dynamic_lookup \
 	-Wl,-search_paths_first \
 	-mmacosx-version-min=10.5 \
 	-arch x86_64 \
 	-L$(builddir)
 
 LIBTOOLFLAGS_Debug := \
+	-undefined dynamic_lookup \
 	-Wl,-search_paths_first
 
 LDFLAGS_Release := \
+	-undefined dynamic_lookup \
 	-Wl,-search_paths_first \
 	-mmacosx-version-min=10.5 \
 	-arch x86_64 \
 	-L$(builddir)
 
 LIBTOOLFLAGS_Release := \
+	-undefined dynamic_lookup \
 	-Wl,-search_paths_first
 
-LIBS := \
-	-undefined dynamic_lookup
+LIBS :=
 
 $(builddir)/.node: GYP_LDFLAGS := $(LDFLAGS_$(BUILDTYPE))
 $(builddir)/.node: LIBS := $(LIBS)

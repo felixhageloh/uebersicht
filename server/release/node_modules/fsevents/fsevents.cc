@@ -10,12 +10,13 @@
 #include "CoreFoundation/CoreFoundation.h"
 #include "CoreServices/CoreServices.h"
 #include <iostream>
+#include <vector>
 
 #include "src/storage.cc"
 namespace fse {
   class FSEvents : public node::ObjectWrap {
   public:
-    FSEvents(const char *path, NanCallback *handler);
+    FSEvents(const char *path, Nan::Callback *handler);
     ~FSEvents();
 
     // locking.cc
@@ -40,12 +41,12 @@ namespace fse {
     void threadStop();
 
     // methods.cc - internal
-    NanCallback *handler;
+    Nan::Callback *handler;
     void emitEvent(const char *path, UInt32 flags, UInt64 id);
 
     // Common
     CFArrayRef paths;
-    CFMutableArrayRef events;
+    std::vector<fse_event*> events;
     static void Initialize(v8::Handle<v8::Object> exports);
 
     // methods.cc - exposed
@@ -58,10 +59,9 @@ namespace fse {
 
 using namespace fse;
 
-FSEvents::FSEvents(const char *path, NanCallback *handler): handler(handler) {
+FSEvents::FSEvents(const char *path, Nan::Callback *handler): handler(handler) {
   CFStringRef dirs[] = { CFStringCreateWithCString(NULL, path, kCFStringEncodingUTF8) };
   paths = CFArrayCreate(NULL, (const void **)&dirs, 1, NULL);
-  events = CFArrayCreateMutable(NULL, 0,  &FSEventArrayCallBacks);
   threadloop = NULL;
   lockingStart();
 }
@@ -72,7 +72,6 @@ FSEvents::~FSEvents() {
   handler = NULL;
 
   CFRelease(paths);
-  CFRelease(events);
 }
 
 #ifndef kFSEventStreamEventFlagItemCreated
@@ -86,15 +85,18 @@ FSEvents::~FSEvents() {
 #include "src/methods.cc"
 
 void FSEvents::Initialize(v8::Handle<v8::Object> exports) {
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(FSEvents::New);
-  tpl->SetClassName(NanNew<v8::String>("FSEvents"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(FSEvents::New);
+  tpl->SetClassName(Nan::New<v8::String>("FSEvents").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
-
-  NODE_SET_PROTOTYPE_METHOD(tpl, "stop", FSEvents::Stop);
-  NODE_SET_PROTOTYPE_METHOD(tpl, "start", FSEvents::Start);
-
-  exports->Set(NanNew<v8::String>("Constants"), Constants());
-  exports->Set(NanNew<v8::String>("FSEvents"), tpl->GetFunction());
+  tpl->PrototypeTemplate()->Set(
+           Nan::New<v8::String>("start").ToLocalChecked(),
+           Nan::New<v8::FunctionTemplate>(FSEvents::Start)->GetFunction());
+  tpl->PrototypeTemplate()->Set(
+           Nan::New<v8::String>("stop").ToLocalChecked(),
+           Nan::New<v8::FunctionTemplate>(FSEvents::Stop)->GetFunction());
+  exports->Set(Nan::New<v8::String>("Constants").ToLocalChecked(), Constants());
+  exports->Set(Nan::New<v8::String>("FSEvents").ToLocalChecked(),
+               tpl->GetFunction());
 }
 
 NODE_MODULE(fse, FSEvents::Initialize)

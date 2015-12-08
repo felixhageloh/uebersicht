@@ -1,12 +1,11 @@
-
 /**
  * Module dependencies.
  */
 
-var stylus = require('stylus')
-  , Canvas = require('canvas')
-  , nodes = stylus.nodes
-  , utils = stylus.utils
+var stylus = require('stylus'),
+    Canvas = require('canvas'),
+    nodes = stylus.nodes,
+    utils = stylus.utils;
 
 /**
  * Expose `ColorImage`.
@@ -53,7 +52,7 @@ function ColorImage(color) {
   this.ctx = this.canvas.getContext('2d');
   this.ctx.fillStyle = color.toString();
   this.ctx.fillRect(0, 0, 1, 1);
-};
+}
 
 /**
  * Inherit from `nodes.Node.prototype`.

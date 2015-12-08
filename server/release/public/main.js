@@ -63,22 +63,22 @@ getChanges = function() {
 };
 
 initWidgets = function(widgetSettings) {
-  var id, settings, widget, _results;
-  _results = [];
+  var id, results, settings, widget;
+  results = [];
   for (id in widgetSettings) {
     settings = widgetSettings[id];
     if (widgets[id] != null) {
       widgets[id].destroy();
     }
     if (settings === 'deleted') {
-      _results.push(delete widgets[id]);
+      results.push(delete widgets[id]);
     } else {
       widget = Widget(settings);
       widgets[widget.id] = widget;
-      _results.push(initWidget(widget));
+      results.push(initWidget(widget));
     }
   }
-  return _results;
+  return results;
 };
 
 initWidget = function(widget) {
@@ -87,15 +87,15 @@ initWidget = function(widget) {
 };
 
 deserializeWidgets = function(data) {
-  var deserialized, e;
+  var deserialized, e, error;
   if (!data) {
     return;
   }
   deserialized = null;
   try {
     deserialized = eval(data);
-  } catch (_error) {
-    e = _error;
+  } catch (error) {
+    e = error;
     console.error(e);
   }
   return deserialized;
@@ -106,23 +106,22 @@ bail = function() {
 };
 
 logError = function(serialized) {
-  var e, err, errors, _i, _len, _results;
+  var e, err, error, errors, i, len, results;
   try {
     errors = JSON.parse(serialized);
-    _results = [];
-    for (_i = 0, _len = errors.length; _i < _len; _i++) {
-      err = errors[_i];
-      _results.push(console.error(err));
+    results = [];
+    for (i = 0, len = errors.length; i < len; i++) {
+      err = errors[i];
+      results.push(console.error(err));
     }
-    return _results;
-  } catch (_error) {
-    e = _error;
+    return results;
+  } catch (error) {
+    e = error;
     return console.error(serialized);
   }
 };
 
 window.onload = init;
-
 
 
 },{"./src/os_bridge.coffee":4,"./src/widget.coffee":5}],2:[function(require,module,exports){
@@ -193,9 +192,9 @@ window.addEventListener('onwallpaperchange', function() {
 });
 
 exports.makeBgSlice = function(canvas) {
-  var _ref;
+  var ref;
   canvas = $(canvas);
-  if (!((_ref = canvas[0]) != null ? _ref.getContext : void 0)) {
+  if (!((ref = canvas[0]) != null ? ref.getContext : void 0)) {
     throw new Error('no canvas element provided');
   }
   canvas.attr('data-bg-slice', true);
@@ -217,10 +216,10 @@ getWallpaper = function(callback) {
   }
   cachedWallpaper.loading = true;
   return loadWallpaper(function(wallpaper) {
-    var _i, _len, _ref;
-    _ref = getWallpaper.callbacks;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      callback = _ref[_i];
+    var i, len, ref;
+    ref = getWallpaper.callbacks;
+    for (i = 0, len = ref.length; i < len; i++) {
+      callback = ref[i];
       callback(wallpaper);
     }
     getWallpaper.callbacks.length = 0;
@@ -240,13 +239,13 @@ getWallpaperSlices = function() {
 };
 
 renderWallpaperSlices = function(wallpaper, slices) {
-  var canvas, _i, _len, _results;
-  _results = [];
-  for (_i = 0, _len = slices.length; _i < _len; _i++) {
-    canvas = slices[_i];
-    _results.push(renderWallpaperSlice(wallpaper, canvas));
+  var canvas, i, len, results;
+  results = [];
+  for (i = 0, len = slices.length; i < len; i++) {
+    canvas = slices[i];
+    results.push(renderWallpaperSlice(wallpaper, canvas));
   }
-  return _results;
+  return results;
 };
 
 renderWallpaperSlice = function(wallpaper, canvas) {
@@ -262,7 +261,6 @@ renderWallpaperSlice = function(wallpaper, canvas) {
   height = Math.min(canvas.height, wallpaper.height - top);
   return ctx.drawImage(wallpaper, Math.round(left), Math.round(top), Math.round(width), Math.round(height), 0, 0, canvas.width, canvas.height);
 };
-
 
 
 },{}],5:[function(require,module,exports){
@@ -285,7 +283,7 @@ module.exports = function(implementation) {
   rendered = false;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
-    var issues, k, v, _ref;
+    var issues, k, ref, v;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
     }
@@ -295,7 +293,7 @@ module.exports = function(implementation) {
     }
     cssId = api.id.replace(/\s/g, '_space_');
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
-      implementation.css = parseStyle((_ref = implementation.style) != null ? _ref : defaultStyle);
+      implementation.css = parseStyle((ref = implementation.style) != null ? ref : defaultStyle);
       delete implementation.style;
     }
     return api;
@@ -389,16 +387,16 @@ module.exports = function(implementation) {
     });
   };
   redraw = function(error, output) {
-    var e;
+    var e, error1;
     if (error) {
       contentEl.innerHTML = error;
-      console.error("" + api.id + ":", error);
+      console.error(api.id + ":", error);
       return rendered = false;
     }
     try {
       return renderOutput(output);
-    } catch (_error) {
-      e = _error;
+    } catch (error1) {
+      e = error1;
       contentEl.innerHTML = e.message;
       return console.error(errorToString(e));
     }
@@ -417,16 +415,16 @@ module.exports = function(implementation) {
     }
   };
   loadScripts = function(domEl) {
-    var s, script, _i, _len, _ref, _results;
-    _ref = domEl.getElementsByTagName('script');
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      script = _ref[_i];
+    var i, len, ref, results, s, script;
+    ref = domEl.getElementsByTagName('script');
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      script = ref[i];
       s = document.createElement('script');
       s.src = script.src;
-      _results.push(domEl.replaceChild(s, script));
+      results.push(domEl.replaceChild(s, script));
     }
-    return _results;
+    return results;
   };
   parseStyle = function(style) {
     var scopedStyle;
@@ -457,7 +455,6 @@ module.exports = function(implementation) {
   };
   return init();
 };
-
 
 
 },{"nib":2,"stylus":2,"tosource":3}]},{},[1]);

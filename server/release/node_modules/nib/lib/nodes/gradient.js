@@ -1,12 +1,11 @@
-
 /**
  * Module dependencies.
  */
 
-var stylus = require('stylus')
-  , Canvas = require('canvas')
-  , nodes = stylus.nodes
-  , utils = stylus.utils;
+var stylus = require('stylus'),
+    Canvas = require('canvas'),
+    nodes = stylus.nodes,
+    utils = stylus.utils;
 
 /**
  * Expose `Gradient`.
@@ -76,9 +75,9 @@ function Gradient(size, start) {
   this.setStartPosition(start);
   this.ctx = this.canvas.getContext('2d');
   this.grad = this.ctx.createLinearGradient(
-      this.from[0], this.from[1]
-    , this.to[0], this.to[1]);
-};
+      this.from[0], this.from[1],
+      this.to[0], this.to[1]);
+}
 
 /**
  * Inspect the gradient.
@@ -88,8 +87,7 @@ function Gradient(size, start) {
  */
 
 Gradient.prototype.toString = function(){
-  return 'Gradient(' + this.size + 'px '
-    + this.stops.map(function(stop){
+  return 'Gradient(' + this.size + 'px ' + this.stops.map(function(stop){
     return stop[0] + ' ' + stop[1];
   }).join(', ') + ')';
 };
@@ -102,8 +100,8 @@ Gradient.prototype.toString = function(){
  */
 
 Gradient.prototype.setStartPosition = function(start){
-  var size = this.size
-    , canvas = this.canvas;
+  var size = this.size,
+      canvas = this.canvas;
 
   switch (start) {
     case 'top':
@@ -151,8 +149,8 @@ Gradient.prototype.addColorStop = function(pos, color){
  */
 
 Gradient.prototype.toDataURL = function(){
-  var canvas = this.canvas
-    , ctx = this.ctx;
+  var canvas = this.canvas,
+      ctx = this.ctx;
   ctx.fillStyle = this.grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   return canvas.toDataURL();

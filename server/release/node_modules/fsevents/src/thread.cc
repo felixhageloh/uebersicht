@@ -37,12 +37,13 @@ void HandleStreamEvents(ConstFSEventStreamRef stream, void *ctx, size_t numEvent
   FSEvents * fse = (FSEvents *)ctx;
   size_t idx;
   fse->lock();
-  fse_event event;
   for (idx=0; idx < numEvents; idx++) {
-    event.path = (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx);
-    event.flags = eventFlags[idx];
-    event.id = eventIds[idx];
-    CFArrayAppendValue(fse->events, &event);
+    fse_event *event = new fse_event(
+        (CFStringRef)CFArrayGetValueAtIndex((CFArrayRef)eventPaths, idx),
+        eventFlags[idx],
+        eventIds[idx]
+      );
+    fse->events.push_back(event);
   }
   fse->asyncTrigger();
   fse->unlock();

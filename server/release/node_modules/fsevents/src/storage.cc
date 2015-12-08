@@ -7,23 +7,21 @@ struct fse_event {
   UInt64 id;
   UInt32 flags;
   CFStringRef path;
-};
-typedef struct fse_event fse_event;
+  
+  fse_event(CFStringRef eventPath, UInt32 eventFlag, UInt64 eventId) {
+    this->path = eventPath;
+    this->flags = eventFlag;
+    this->id = eventId;
+    if (this->path != NULL)
+      CFRetain(this->path);
+  }
+  
+  ~fse_event() {
+    if (this->path != NULL)
+      CFRelease(this->path);
+  }
 
-const void * FSEventRetain(CFAllocatorRef allocator, const void * ptr) {
-  fse_event * orig = (fse_event * ) ptr;
-  fse_event * copy = (fse_event * ) CFAllocatorAllocate(allocator, sizeof(fse_event), 0);
-  copy->id = orig->id;
-  copy->flags = orig->flags;
-  copy->path = orig->path;
-  CFRetain(copy->path);
-  return copy;
-}
-void FSEventRelease(CFAllocatorRef allocator, const void * ptr) {
-  fse_event * evt = (fse_event * ) ptr;
-  CFRelease(evt->path);
-  CFAllocatorDeallocate(allocator, evt);
-}
-const CFArrayCallBacks FSEventArrayCallBacks = {
-  0, FSEventRetain, FSEventRelease, 0, 0
+private:
+  fse_event(const fse_event&);
+  void operator=(const fse_event&);
 };

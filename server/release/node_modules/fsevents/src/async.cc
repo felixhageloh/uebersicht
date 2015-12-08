@@ -12,14 +12,16 @@ void async_propagate(uv_async_t *async) {
   char pathbuf[1024];
   const char *pathptr = NULL;
   fse->lock();
-  cnt = CFArrayGetCount(fse->events);
+  cnt = fse->events.size();
   for (idx=0; idx<cnt; idx++) {
-    event = (fse_event *)CFArrayGetValueAtIndex(fse->events, idx);
+    event = fse->events.at(idx);
+    if (event == NULL) continue;
     pathptr = CFStringGetCStringPtr(event->path, kCFStringEncodingUTF8);
     if (!pathptr) CFStringGetCString(event->path, pathbuf, 1024, kCFStringEncodingUTF8);
     fse->emitEvent(pathptr ? pathptr : pathbuf, event->flags, event->id);
+    delete event;
   }
-  if (cnt>0) CFArrayRemoveAllValues(fse->events);
+  if (cnt>0) fse->events.clear();
   fse->unlock();
 }
 

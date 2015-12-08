@@ -1,8 +1,8 @@
-var RE_GRADIENT_STOPS = /([\(\,]\s*)(-?(?:\d*\.)?\d+(?:%|px|em))(\s+)((hsl|rgb)a?\([^\)]+\)|#[^\)\,]+)/g
-  , RE_GRADIENT_VAL = /(\(\s*)(?:(-?(\d*\.)?\d+)deg|((to )?(top|bottom|left|right)( (top|bottom|left|right))?))/g
-  , RE_GRADIENT_TYPE = /((repeating-)?(linear|radial)-gradient\()/g
-  , RE_TRANSFORM = /\b(transform)\b/g
-  , RE_FILL_KEYWORD = /\s*\b(fill)\b\s*/g;
+var RE_GRADIENT_STOPS = /([\(\,]\s*)(-?(?:\d*\.)?\d+(?:%|px|em))(\s+)((hsl|rgb)a?\([^\)]+\)|#[^\)\,]+)/g,
+    RE_GRADIENT_VAL = /(\(\s*)(?:(-?(\d*\.)?\d+)deg|((to )?(top|bottom|left|right)( (top|bottom|left|right))?))/g,
+    RE_GRADIENT_TYPE = /((repeating-)?(linear|radial)-gradient\()/g,
+    RE_TRANSFORM = /\b(transform)\b/g,
+    RE_FILL_KEYWORD = /\s*\b(fill)\b\s*/g;
 
 var DIRECTIONS = { top: 'bottom', bottom: 'top', left: 'right', right:'left' };
 
@@ -11,8 +11,8 @@ var DIRECTIONS = { top: 'bottom', bottom: 'top', left: 'right', right:'left' };
  */
 
 function normalize(property, value, prefix){
-  var result = value.toString()
-    , args;
+  var result = value.toString(),
+      args;
 
   /* Fixing the gradients */
   if (~result.indexOf('gradient(')) {

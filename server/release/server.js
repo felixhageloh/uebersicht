@@ -1,13 +1,207 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/*! http://mths.be/punycode v1.2.4 by @mathias */
+module.exports = function (args, opts) {
+    if (!opts) opts = {};
+    
+    var flags = { bools : {}, strings : {} };
+    
+    [].concat(opts['boolean']).filter(Boolean).forEach(function (key) {
+        flags.bools[key] = true;
+    });
+    
+    [].concat(opts.string).filter(Boolean).forEach(function (key) {
+        flags.strings[key] = true;
+    });
+    
+    var aliases = {};
+    Object.keys(opts.alias || {}).forEach(function (key) {
+        aliases[key] = [].concat(opts.alias[key]);
+        aliases[key].forEach(function (x) {
+            aliases[x] = [key].concat(aliases[key].filter(function (y) {
+                return x !== y;
+            }));
+        });
+    });
+    
+    var defaults = opts['default'] || {};
+    
+    var argv = { _ : [] };
+    Object.keys(flags.bools).forEach(function (key) {
+        setArg(key, defaults[key] === undefined ? false : defaults[key]);
+    });
+    
+    var notFlags = [];
+
+    if (args.indexOf('--') !== -1) {
+        notFlags = args.slice(args.indexOf('--')+1);
+        args = args.slice(0, args.indexOf('--'));
+    }
+
+    function setArg (key, val) {
+        var value = !flags.strings[key] && isNumber(val)
+            ? Number(val) : val
+        ;
+        setKey(argv, key.split('.'), value);
+        
+        (aliases[key] || []).forEach(function (x) {
+            setKey(argv, x.split('.'), value);
+        });
+    }
+    
+    for (var i = 0; i < args.length; i++) {
+        var arg = args[i];
+        
+        if (/^--.+=/.test(arg)) {
+            // Using [\s\S] instead of . because js doesn't support the
+            // 'dotall' regex modifier. See:
+            // http://stackoverflow.com/a/1068308/13216
+            var m = arg.match(/^--([^=]+)=([\s\S]*)$/);
+            setArg(m[1], m[2]);
+        }
+        else if (/^--no-.+/.test(arg)) {
+            var key = arg.match(/^--no-(.+)/)[1];
+            setArg(key, false);
+        }
+        else if (/^--.+/.test(arg)) {
+            var key = arg.match(/^--(.+)/)[1];
+            var next = args[i + 1];
+            if (next !== undefined && !/^-/.test(next)
+            && !flags.bools[key]
+            && (aliases[key] ? !flags.bools[aliases[key]] : true)) {
+                setArg(key, next);
+                i++;
+            }
+            else if (/^(true|false)$/.test(next)) {
+                setArg(key, next === 'true');
+                i++;
+            }
+            else {
+                setArg(key, flags.strings[key] ? '' : true);
+            }
+        }
+        else if (/^-[^-]+/.test(arg)) {
+            var letters = arg.slice(1,-1).split('');
+            
+            var broken = false;
+            for (var j = 0; j < letters.length; j++) {
+                var next = arg.slice(j+2);
+                
+                if (next === '-') {
+                    setArg(letters[j], next)
+                    continue;
+                }
+                
+                if (/[A-Za-z]/.test(letters[j])
+                && /-?\d+(\.\d*)?(e-?\d+)?$/.test(next)) {
+                    setArg(letters[j], next);
+                    broken = true;
+                    break;
+                }
+                
+                if (letters[j+1] && letters[j+1].match(/\W/)) {
+                    setArg(letters[j], arg.slice(j+2));
+                    broken = true;
+                    break;
+                }
+                else {
+                    setArg(letters[j], flags.strings[letters[j]] ? '' : true);
+                }
+            }
+            
+            var key = arg.slice(-1)[0];
+            if (!broken && key !== '-') {
+                if (args[i+1] && !/^(-|--)[^-]/.test(args[i+1])
+                && !flags.bools[key]
+                && (aliases[key] ? !flags.bools[aliases[key]] : true)) {
+                    setArg(key, args[i+1]);
+                    i++;
+                }
+                else if (args[i+1] && /true|false/.test(args[i+1])) {
+                    setArg(key, args[i+1] === 'true');
+                    i++;
+                }
+                else {
+                    setArg(key, flags.strings[key] ? '' : true);
+                }
+            }
+        }
+        else {
+            argv._.push(
+                flags.strings['_'] || !isNumber(arg) ? arg : Number(arg)
+            );
+        }
+    }
+    
+    Object.keys(defaults).forEach(function (key) {
+        if (!hasKey(argv, key.split('.'))) {
+            setKey(argv, key.split('.'), defaults[key]);
+            
+            (aliases[key] || []).forEach(function (x) {
+                setKey(argv, x.split('.'), defaults[key]);
+            });
+        }
+    });
+    
+    notFlags.forEach(function(key) {
+        argv._.push(key);
+    });
+
+    return argv;
+};
+
+function hasKey (obj, keys) {
+    var o = obj;
+    keys.slice(0,-1).forEach(function (key) {
+        o = (o[key] || {});
+    });
+
+    var key = keys[keys.length - 1];
+    return key in o;
+}
+
+function setKey (obj, keys, value) {
+    var o = obj;
+    keys.slice(0,-1).forEach(function (key) {
+        if (o[key] === undefined) o[key] = {};
+        o = o[key];
+    });
+    
+    var key = keys[keys.length - 1];
+    if (o[key] === undefined || typeof o[key] === 'boolean') {
+        o[key] = value;
+    }
+    else if (Array.isArray(o[key])) {
+        o[key].push(value);
+    }
+    else {
+        o[key] = [ o[key], value ];
+    }
+}
+
+function isNumber (x) {
+    if (typeof x === 'number') return true;
+    if (/^0x[0-9a-f]+$/i.test(x)) return true;
+    return /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(e[-+]?\d+)?$/.test(x);
+}
+
+function longest (xs) {
+    return Math.max.apply(null, xs.map(function (x) { return x.length }));
+}
+
+},{}],2:[function(require,module,exports){
+/*! https://mths.be/punycode v1.3.2 by @mathias */
 ;(function(root) {
 
 	/** Detect free variables */
-	var freeExports = typeof exports == 'object' && exports;
+	var freeExports = typeof exports == 'object' && exports &&
+		!exports.nodeType && exports;
 	var freeModule = typeof module == 'object' && module &&
-		module.exports == freeExports && module;
+		!module.nodeType && module;
 	var freeGlobal = typeof global == 'object' && global;
-	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+	if (
+		freeGlobal.global === freeGlobal ||
+		freeGlobal.window === freeGlobal ||
+		freeGlobal.self === freeGlobal
+	) {
 		root = freeGlobal;
 	}
 
@@ -33,8 +227,8 @@
 
 	/** Regular expressions */
 	regexPunycode = /^xn--/,
-	regexNonASCII = /[^ -~]/, // unprintable ASCII chars + non-ASCII chars
-	regexSeparators = /\x2E|\u3002|\uFF0E|\uFF61/g, // RFC 3490 separators
+	regexNonASCII = /[^\x20-\x7E]/, // unprintable ASCII chars + non-ASCII chars
+	regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g, // RFC 3490 separators
 
 	/** Error messages */
 	errors = {
@@ -73,23 +267,37 @@
 	 */
 	function map(array, fn) {
 		var length = array.length;
+		var result = [];
 		while (length--) {
-			array[length] = fn(array[length]);
+			result[length] = fn(array[length]);
 		}
-		return array;
+		return result;
 	}
 
 	/**
-	 * A simple `Array#map`-like wrapper to work with domain name strings.
+	 * A simple `Array#map`-like wrapper to work with domain name strings or email
+	 * addresses.
 	 * @private
-	 * @param {String} domain The domain name.
+	 * @param {String} domain The domain name or email address.
 	 * @param {Function} callback The function that gets called for every
 	 * character.
 	 * @returns {Array} A new string of characters returned by the callback
 	 * function.
 	 */
 	function mapDomain(string, fn) {
-		return map(string.split(regexSeparators), fn).join('.');
+		var parts = string.split('@');
+		var result = '';
+		if (parts.length > 1) {
+			// In email addresses, only the domain name should be punycoded. Leave
+			// the local part (i.e. everything up to `@`) intact.
+			result = parts[0] + '@';
+			string = parts[1];
+		}
+		// Avoid `split(regex)` for IE8 compatibility. See #17.
+		string = string.replace(regexSeparators, '\x2E');
+		var labels = string.split('.');
+		var encoded = map(labels, fn).join('.');
+		return result + encoded;
 	}
 
 	/**
@@ -99,7 +307,7 @@
 	 * UCS-2 exposes as separate characters) into a single code point,
 	 * matching UTF-16.
 	 * @see `punycode.ucs2.encode`
-	 * @see <http://mathiasbynens.be/notes/javascript-encoding>
+	 * @see <https://mathiasbynens.be/notes/javascript-encoding>
 	 * @memberOf punycode.ucs2
 	 * @name decode
 	 * @param {String} string The Unicode input string (UCS-2).
@@ -308,8 +516,8 @@
 	}
 
 	/**
-	 * Converts a string of Unicode symbols to a Punycode string of ASCII-only
-	 * symbols.
+	 * Converts a string of Unicode symbols (e.g. a domain name label) to a
+	 * Punycode string of ASCII-only symbols.
 	 * @memberOf punycode
 	 * @param {String} input The string of Unicode symbols.
 	 * @returns {String} The resulting Punycode string of ASCII-only symbols.
@@ -422,17 +630,18 @@
 	}
 
 	/**
-	 * Converts a Punycode string representing a domain name to Unicode. Only the
-	 * Punycoded parts of the domain name will be converted, i.e. it doesn't
-	 * matter if you call it on a string that has already been converted to
-	 * Unicode.
+	 * Converts a Punycode string representing a domain name or an email address
+	 * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
+	 * it doesn't matter if you call it on a string that has already been
+	 * converted to Unicode.
 	 * @memberOf punycode
-	 * @param {String} domain The Punycode domain name to convert to Unicode.
+	 * @param {String} input The Punycoded domain name or email address to
+	 * convert to Unicode.
 	 * @returns {String} The Unicode representation of the given Punycode
 	 * string.
 	 */
-	function toUnicode(domain) {
-		return mapDomain(domain, function(string) {
+	function toUnicode(input) {
+		return mapDomain(input, function(string) {
 			return regexPunycode.test(string)
 				? decode(string.slice(4).toLowerCase())
 				: string;
@@ -440,15 +649,18 @@
 	}
 
 	/**
-	 * Converts a Unicode string representing a domain name to Punycode. Only the
-	 * non-ASCII parts of the domain name will be converted, i.e. it doesn't
-	 * matter if you call it with a domain that's already in ASCII.
+	 * Converts a Unicode string representing a domain name or an email address to
+	 * Punycode. Only the non-ASCII parts of the domain name will be converted,
+	 * i.e. it doesn't matter if you call it with a domain that's already in
+	 * ASCII.
 	 * @memberOf punycode
-	 * @param {String} domain The domain name to convert, as a Unicode string.
-	 * @returns {String} The Punycode representation of the given domain name.
+	 * @param {String} input The domain name or email address to convert, as a
+	 * Unicode string.
+	 * @returns {String} The Punycode representation of the given domain name or
+	 * email address.
 	 */
-	function toASCII(domain) {
-		return mapDomain(domain, function(string) {
+	function toASCII(input) {
+		return mapDomain(input, function(string) {
 			return regexNonASCII.test(string)
 				? 'xn--' + encode(string)
 				: string;
@@ -464,11 +676,11 @@
 		 * @memberOf punycode
 		 * @type String
 		 */
-		'version': '1.2.4',
+		'version': '1.3.2',
 		/**
 		 * An object of methods to convert from JavaScript's internal character
 		 * representation (UCS-2) to Unicode code points, and back.
-		 * @see <http://mathiasbynens.be/notes/javascript-encoding>
+		 * @see <https://mathiasbynens.be/notes/javascript-encoding>
 		 * @memberOf punycode
 		 * @type Object
 		 */
@@ -493,8 +705,8 @@
 		define('punycode', function() {
 			return punycode;
 		});
-	} else if (freeExports && !freeExports.nodeType) {
-		if (freeModule) { // in Node.js or RingoJS v0.8.0+
+	} else if (freeExports && freeModule) {
+		if (module.exports == freeExports) { // in Node.js or RingoJS v0.8.0+
 			freeModule.exports = punycode;
 		} else { // in Narwhal or RingoJS v0.7.0-
 			for (key in punycode) {
@@ -507,7 +719,7 @@
 
 }(this));
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -593,7 +805,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -680,13 +892,62 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":2,"./encode":3}],5:[function(require,module,exports){
+},{"./decode":3,"./encode":4}],6:[function(require,module,exports){
+/* toSource by Marcello Bastea-Forte - zlib license */
+module.exports = function(object, filter, indent, startingIndent) {
+    var seen = []
+    return walk(object, filter, indent === undefined ? '  ' : (indent || ''), startingIndent || '', seen)
+
+    function walk(object, filter, indent, currentIndent, seen) {
+        var nextIndent = currentIndent + indent
+        object = filter ? filter(object) : object
+        switch (typeof object) {
+            case 'string':
+                return JSON.stringify(object)
+            case 'boolean':
+            case 'number':
+            case 'undefined':
+                return ''+object
+            case 'function':
+                return object.toString()
+        }
+
+        if (object === null) return 'null'
+        if (object instanceof RegExp) return object.toString()
+        if (object instanceof Date) return 'new Date('+object.getTime()+')'
+
+        if (seen.indexOf(object) >= 0) return '{$circularReference:1}'
+        seen.push(object)
+
+        function join(elements) {
+            return indent.slice(1) + elements.join(','+(indent&&'\n')+nextIndent) + (indent ? ' ' : '');
+        }
+
+        if (Array.isArray(object)) {
+            return '[' + join(object.map(function(element){
+                return walk(element, filter, indent, nextIndent, seen.slice())
+            })) + ']'
+        }
+        var keys = Object.keys(object)
+        return keys.length ? '{' + join(keys.map(function (key) {
+            return (legalKey(key) ? key : JSON.stringify(key)) + ':' + walk(object[key], filter, indent, nextIndent, seen.slice())
+        })) + '}' : '{}'
+    }
+}
+
+var KEYWORD_REGEXP = /^(abstract|boolean|break|byte|case|catch|char|class|const|continue|debugger|default|delete|do|double|else|enum|export|extends|false|final|finally|float|for|function|goto|if|implements|import|in|instanceof|int|interface|long|native|new|null|package|private|protected|public|return|short|static|super|switch|synchronized|this|throw|throws|transient|true|try|typeof|undefined|var|void|volatile|while|with)$/
+
+function legalKey(string) {
+    return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
+}
+
+},{}],7:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1395,246 +1656,8 @@ function isNullOrUndefined(arg) {
   return  arg == null;
 }
 
-},{"punycode":1,"querystring":4}],6:[function(require,module,exports){
-module.exports = function (args, opts) {
-    if (!opts) opts = {};
-    
-    var flags = { bools : {}, strings : {} };
-    
-    [].concat(opts['boolean']).filter(Boolean).forEach(function (key) {
-        flags.bools[key] = true;
-    });
-    
-    [].concat(opts.string).filter(Boolean).forEach(function (key) {
-        flags.strings[key] = true;
-    });
-    
-    var aliases = {};
-    Object.keys(opts.alias || {}).forEach(function (key) {
-        aliases[key] = [].concat(opts.alias[key]);
-        aliases[key].forEach(function (x) {
-            aliases[x] = [key].concat(aliases[key].filter(function (y) {
-                return x !== y;
-            }));
-        });
-    });
-    
-    var defaults = opts['default'] || {};
-    
-    var argv = { _ : [] };
-    Object.keys(flags.bools).forEach(function (key) {
-        setArg(key, defaults[key] === undefined ? false : defaults[key]);
-    });
-    
-    var notFlags = [];
-
-    if (args.indexOf('--') !== -1) {
-        notFlags = args.slice(args.indexOf('--')+1);
-        args = args.slice(0, args.indexOf('--'));
-    }
-
-    function setArg (key, val) {
-        var value = !flags.strings[key] && isNumber(val)
-            ? Number(val) : val
-        ;
-        setKey(argv, key.split('.'), value);
-        
-        (aliases[key] || []).forEach(function (x) {
-            setKey(argv, x.split('.'), value);
-        });
-    }
-    
-    for (var i = 0; i < args.length; i++) {
-        var arg = args[i];
-        
-        if (/^--.+=/.test(arg)) {
-            // Using [\s\S] instead of . because js doesn't support the
-            // 'dotall' regex modifier. See:
-            // http://stackoverflow.com/a/1068308/13216
-            var m = arg.match(/^--([^=]+)=([\s\S]*)$/);
-            setArg(m[1], m[2]);
-        }
-        else if (/^--no-.+/.test(arg)) {
-            var key = arg.match(/^--no-(.+)/)[1];
-            setArg(key, false);
-        }
-        else if (/^--.+/.test(arg)) {
-            var key = arg.match(/^--(.+)/)[1];
-            var next = args[i + 1];
-            if (next !== undefined && !/^-/.test(next)
-            && !flags.bools[key]
-            && (aliases[key] ? !flags.bools[aliases[key]] : true)) {
-                setArg(key, next);
-                i++;
-            }
-            else if (/^(true|false)$/.test(next)) {
-                setArg(key, next === 'true');
-                i++;
-            }
-            else {
-                setArg(key, flags.strings[key] ? '' : true);
-            }
-        }
-        else if (/^-[^-]+/.test(arg)) {
-            var letters = arg.slice(1,-1).split('');
-            
-            var broken = false;
-            for (var j = 0; j < letters.length; j++) {
-                var next = arg.slice(j+2);
-                
-                if (next === '-') {
-                    setArg(letters[j], next)
-                    continue;
-                }
-                
-                if (/[A-Za-z]/.test(letters[j])
-                && /-?\d+(\.\d*)?(e-?\d+)?$/.test(next)) {
-                    setArg(letters[j], next);
-                    broken = true;
-                    break;
-                }
-                
-                if (letters[j+1] && letters[j+1].match(/\W/)) {
-                    setArg(letters[j], arg.slice(j+2));
-                    broken = true;
-                    break;
-                }
-                else {
-                    setArg(letters[j], flags.strings[letters[j]] ? '' : true);
-                }
-            }
-            
-            var key = arg.slice(-1)[0];
-            if (!broken && key !== '-') {
-                if (args[i+1] && !/^(-|--)[^-]/.test(args[i+1])
-                && !flags.bools[key]
-                && (aliases[key] ? !flags.bools[aliases[key]] : true)) {
-                    setArg(key, args[i+1]);
-                    i++;
-                }
-                else if (args[i+1] && /true|false/.test(args[i+1])) {
-                    setArg(key, args[i+1] === 'true');
-                    i++;
-                }
-                else {
-                    setArg(key, flags.strings[key] ? '' : true);
-                }
-            }
-        }
-        else {
-            argv._.push(
-                flags.strings['_'] || !isNumber(arg) ? arg : Number(arg)
-            );
-        }
-    }
-    
-    Object.keys(defaults).forEach(function (key) {
-        if (!hasKey(argv, key.split('.'))) {
-            setKey(argv, key.split('.'), defaults[key]);
-            
-            (aliases[key] || []).forEach(function (x) {
-                setKey(argv, x.split('.'), defaults[key]);
-            });
-        }
-    });
-    
-    notFlags.forEach(function(key) {
-        argv._.push(key);
-    });
-
-    return argv;
-};
-
-function hasKey (obj, keys) {
-    var o = obj;
-    keys.slice(0,-1).forEach(function (key) {
-        o = (o[key] || {});
-    });
-
-    var key = keys[keys.length - 1];
-    return key in o;
-}
-
-function setKey (obj, keys, value) {
-    var o = obj;
-    keys.slice(0,-1).forEach(function (key) {
-        if (o[key] === undefined) o[key] = {};
-        o = o[key];
-    });
-    
-    var key = keys[keys.length - 1];
-    if (o[key] === undefined || typeof o[key] === 'boolean') {
-        o[key] = value;
-    }
-    else if (Array.isArray(o[key])) {
-        o[key].push(value);
-    }
-    else {
-        o[key] = [ o[key], value ];
-    }
-}
-
-function isNumber (x) {
-    if (typeof x === 'number') return true;
-    if (/^0x[0-9a-f]+$/i.test(x)) return true;
-    return /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(e[-+]?\d+)?$/.test(x);
-}
-
-function longest (xs) {
-    return Math.max.apply(null, xs.map(function (x) { return x.length }));
-}
-
-},{}],7:[function(require,module,exports){
-/* toSource by Marcello Bastea-Forte - zlib license */
-module.exports = function(object, filter, indent, startingIndent) {
-    var seen = []
-    return walk(object, filter, indent === undefined ? '  ' : (indent || ''), startingIndent || '', seen)
-
-    function walk(object, filter, indent, currentIndent, seen) {
-        var nextIndent = currentIndent + indent
-        object = filter ? filter(object) : object
-        switch (typeof object) {
-            case 'string':
-                return JSON.stringify(object)
-            case 'boolean':
-            case 'number':
-            case 'undefined':
-                return ''+object
-            case 'function':
-                return object.toString()
-        }
-
-        if (object === null) return 'null'
-        if (object instanceof RegExp) return object.toString()
-        if (object instanceof Date) return 'new Date('+object.getTime()+')'
-
-        if (seen.indexOf(object) >= 0) return '{$circularReference:1}'
-        seen.push(object)
-
-        function join(elements) {
-            return indent.slice(1) + elements.join(','+(indent&&'\n')+nextIndent) + (indent ? ' ' : '');
-        }
-
-        if (Array.isArray(object)) {
-            return '[' + join(object.map(function(element){
-                return walk(element, filter, indent, nextIndent, seen.slice())
-            })) + ']'
-        }
-        var keys = Object.keys(object)
-        return keys.length ? '{' + join(keys.map(function (key) {
-            return (legalKey(key) ? key : JSON.stringify(key)) + ':' + walk(object[key], filter, indent, nextIndent, seen.slice())
-        })) + '}' : '{}'
-    }
-}
-
-var KEYWORD_REGEXP = /^(abstract|boolean|break|byte|case|catch|char|class|const|continue|debugger|default|delete|do|double|else|enum|export|extends|false|final|finally|float|for|function|goto|if|implements|import|in|instanceof|int|interface|long|native|new|null|package|private|protected|public|return|short|static|super|switch|synchronized|this|throw|throws|transient|true|try|typeof|undefined|var|void|volatile|while|with)$/
-
-function legalKey(string) {
-    return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
-}
-
-},{}],8:[function(require,module,exports){
-var UebersichtServer, args, e, handleError, parseArgs, port, prefencesDir, server, widgetPath, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+},{"punycode":2,"querystring":5}],8:[function(require,module,exports){
+var UebersichtServer, args, e, error, handleError, parseArgs, port, ref, ref1, ref2, ref3, ref4, ref5, server, settingsPath, widgetPath;
 
 parseArgs = require('minimist');
 
@@ -1646,26 +1669,62 @@ handleError = function(e) {
 
 try {
   args = parseArgs(process.argv.slice(2));
-  widgetPath = (_ref = (_ref1 = args.d) != null ? _ref1 : args.dir) != null ? _ref : './widgets';
-  port = (_ref2 = (_ref3 = args.p) != null ? _ref3 : args.port) != null ? _ref2 : 41416;
-  prefencesDir = (_ref4 = (_ref5 = args.s) != null ? _ref5 : args.settings) != null ? _ref4 : './settings';
-  server = UebersichtServer(Number(port), widgetPath);
+  widgetPath = (ref = (ref1 = args.d) != null ? ref1 : args.dir) != null ? ref : './widgets';
+  port = (ref2 = (ref3 = args.p) != null ? ref3 : args.port) != null ? ref2 : 41416;
+  settingsPath = (ref4 = (ref5 = args.s) != null ? ref5 : args.settings) != null ? ref4 : './settings';
+  server = UebersichtServer(Number(port), widgetPath, settingsPath);
   server.on('error', handleError);
-} catch (_error) {
-  e = _error;
+} catch (error) {
+  e = error;
   handleError(e);
 }
 
 
+},{"./src/app.coffee":11,"minimist":1}],9:[function(require,module,exports){
+// REST api for individual widgets
+// Listens to /widget
 
-},{"./src/app.coffee":9,"minimist":6}],9:[function(require,module,exports){
-var ChangesServer, WidgetCommandServer, WidgetDir, WidgetsServer, connect, path;
+module.exports = function WidgetServer(widgetsController) {
+
+  return function WidgetServerMiddleWare(req, res, next) {
+    const parts = req.url.replace(/^\//, '').split('/');
+
+    console.log(parts);
+
+    if (parts[0] != 'widget') {
+      return next();
+    }
+
+    const verb = req.method;
+    console.log(verb);
+    res.end();
+  };
+};
+
+
+},{}],10:[function(require,module,exports){
+module.exports = function WidgetsController(widgetDir, settingsPath) {
+  const api = {};
+
+  api.widgets = function widgets() {
+    return widgetDir.widgets();
+  }
+
+  return api;
+}
+
+},{}],11:[function(require,module,exports){
+var ChangesServer, WidgetCommandServer, WidgetDir, WidgetServer, WidgetsController, WidgetsServer, connect, path;
 
 connect = require('connect');
 
 path = require('path');
 
+WidgetsController = require('./WidgetsController');
+
 WidgetDir = require('./widget_directory.coffee');
+
+WidgetServer = require('./WidgetServer');
 
 WidgetsServer = require('./widgets_server.coffee');
 
@@ -1673,21 +1732,24 @@ WidgetCommandServer = require('./widget_command_server.coffee');
 
 ChangesServer = require('./changes_server.coffee');
 
-module.exports = function(port, widgetPath) {
-  var changesServer, server, widgetDir;
+module.exports = function(port, widgetPath, settingsPath) {
+  var changesServer, server, widgetDir, widgetsController;
   widgetPath = path.resolve(__dirname, widgetPath);
   widgetDir = WidgetDir(widgetPath);
   changesServer = ChangesServer();
-  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port, function() {
+  settingsPath = path.resolve(__dirname, settingsPath);
+  widgetsController = WidgetsController(widgetDir, settingsPath);
+  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(WidgetServer(widgetDir)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port, function() {
     console.log('server started on port', port);
-    return widgetDir.watch(changesServer.push);
+    return widgetDir.watch(function(changes) {
+      return changesServer.push(changes);
+    });
   });
   return server;
 };
 
 
-
-},{"./changes_server.coffee":10,"./widget_command_server.coffee":13,"./widget_directory.coffee":14,"./widgets_server.coffee":16,"connect":"connect","path":"path"}],10:[function(require,module,exports){
+},{"./WidgetServer":9,"./WidgetsController":10,"./changes_server.coffee":12,"./widget_command_server.coffee":15,"./widget_directory.coffee":16,"./widgets_server.coffee":18,"connect":"connect","path":"path"}],12:[function(require,module,exports){
 var serialize;
 
 serialize = require('./serialize.coffee');
@@ -1700,10 +1762,10 @@ module.exports = function() {
   currentErrors = [];
   timer = null;
   api.push = function(changes, errorString) {
-    var id, val, _ref;
-    _ref = changes != null ? changes : {};
-    for (id in _ref) {
-      val = _ref[id];
+    var id, ref, val;
+    ref = changes != null ? changes : {};
+    for (id in ref) {
+      val = ref[id];
       currentChanges[id] = val;
     }
     if (errorString) {
@@ -1761,12 +1823,12 @@ module.exports = function() {
     return currentErrors.length = 0;
   };
   sendResponse = function(body, status) {
-    var client, _i, _len;
+    var client, i, len;
     if (status == null) {
       status = 200;
     }
-    for (_i = 0, _len = clients.length; _i < _len; _i++) {
-      client = clients[_i];
+    for (i = 0, len = clients.length; i < len; i++) {
+      client = clients[i];
       client.response.writeHead(status);
       client.response.end(body);
     }
@@ -1776,8 +1838,7 @@ module.exports = function() {
 };
 
 
-
-},{"./serialize.coffee":11}],11:[function(require,module,exports){
+},{"./serialize.coffee":13}],13:[function(require,module,exports){
 module.exports = function(someWidgets) {
   var id, serialized, widget;
   serialized = "({";
@@ -1793,8 +1854,7 @@ module.exports = function(someWidgets) {
 };
 
 
-
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var nib, stylus, toSource;
 
 toSource = require('tosource');
@@ -1814,7 +1874,7 @@ module.exports = function(implementation) {
   rendered = false;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
-    var issues, k, v, _ref;
+    var issues, k, ref, v;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
     }
@@ -1824,7 +1884,7 @@ module.exports = function(implementation) {
     }
     cssId = api.id.replace(/\s/g, '_space_');
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
-      implementation.css = parseStyle((_ref = implementation.style) != null ? _ref : defaultStyle);
+      implementation.css = parseStyle((ref = implementation.style) != null ? ref : defaultStyle);
       delete implementation.style;
     }
     return api;
@@ -1918,16 +1978,16 @@ module.exports = function(implementation) {
     });
   };
   redraw = function(error, output) {
-    var e;
+    var e, error1;
     if (error) {
       contentEl.innerHTML = error;
-      console.error("" + api.id + ":", error);
+      console.error(api.id + ":", error);
       return rendered = false;
     }
     try {
       return renderOutput(output);
-    } catch (_error) {
-      e = _error;
+    } catch (error1) {
+      e = error1;
       contentEl.innerHTML = e.message;
       return console.error(errorToString(e));
     }
@@ -1946,16 +2006,16 @@ module.exports = function(implementation) {
     }
   };
   loadScripts = function(domEl) {
-    var s, script, _i, _len, _ref, _results;
-    _ref = domEl.getElementsByTagName('script');
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      script = _ref[_i];
+    var i, len, ref, results, s, script;
+    ref = domEl.getElementsByTagName('script');
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      script = ref[i];
       s = document.createElement('script');
       s.src = script.src;
-      _results.push(domEl.replaceChild(s, script));
+      results.push(domEl.replaceChild(s, script));
     }
-    return _results;
+    return results;
   };
   parseStyle = function(style) {
     var scopedStyle;
@@ -1988,8 +2048,7 @@ module.exports = function(implementation) {
 };
 
 
-
-},{"nib":"nib","stylus":"stylus","tosource":7}],13:[function(require,module,exports){
+},{"nib":"nib","stylus":"stylus","tosource":6}],15:[function(require,module,exports){
 var ID_REGEX, spawn, url;
 
 spawn = require('child_process').spawn;
@@ -2000,9 +2059,9 @@ ID_REGEX = /\/widgets\/([^\/]+)/i;
 
 module.exports = function(widgetDir) {
   return function(req, res, next) {
-    var command, parsed, shell, widget, widgetId, _ref;
+    var command, parsed, ref, shell, widget, widgetId;
     parsed = url.parse(req.url);
-    widgetId = (_ref = parsed.pathname.match(ID_REGEX)) != null ? _ref[1] : void 0;
+    widgetId = (ref = parsed.pathname.match(ID_REGEX)) != null ? ref[1] : void 0;
     if (widgetId != null) {
       widget = widgetDir.get(decodeURI(widgetId));
     }
@@ -2047,8 +2106,7 @@ module.exports = function(widgetDir) {
 };
 
 
-
-},{"child_process":"child_process","url":5}],14:[function(require,module,exports){
+},{"child_process":"child_process","url":7}],16:[function(require,module,exports){
 var Widget, fs, loader, paths;
 
 Widget = require('./widget.coffee');
@@ -2107,29 +2165,29 @@ module.exports = function(directoryPath) {
       return addWidget(path);
     }
     return fs.readdir(path, function(err, subPaths) {
-      var fullPath, subPath, _i, _len, _results;
+      var fullPath, i, len, results, subPath;
       if (err) {
         return console.log(err);
       }
-      _results = [];
-      for (_i = 0, _len = subPaths.length; _i < _len; _i++) {
-        subPath = subPaths[_i];
+      results = [];
+      for (i = 0, len = subPaths.length; i < len; i++) {
+        subPath = subPaths[i];
         fullPath = paths.join(path, subPath);
-        _results.push(getPathType(fullPath, checkWidgetAdded));
+        results.push(getPathType(fullPath, checkWidgetAdded));
       }
-      return _results;
+      return results;
     });
   };
   checkWidgetRemoved = function(path, type) {
-    var id, widget, _results;
-    _results = [];
+    var id, results, widget;
+    results = [];
     for (id in widgets) {
       widget = widgets[id];
       if (widget.filePath.indexOf(path) === 0) {
-        _results.push(deleteWidget(id));
+        results.push(deleteWidget(id));
       }
     }
-    return _results;
+    return results;
   };
   getPathType = function(path, callback) {
     return fs.stat(path, function(err, stat) {
@@ -2142,7 +2200,7 @@ module.exports = function(directoryPath) {
     });
   };
   loadWidget = function(filePath) {
-    var definition, e, id;
+    var definition, e, error1, id;
     id = widgetId(filePath);
     try {
       definition = loader.loadWidget(filePath);
@@ -2150,8 +2208,8 @@ module.exports = function(directoryPath) {
         definition.id = id;
       }
       return Widget(definition);
-    } catch (_error) {
-      e = _error;
+    } catch (error1) {
+      e = error1;
       if (e.code === 'ENOENT') {
         return;
       }
@@ -2198,15 +2256,15 @@ module.exports = function(directoryPath) {
     var fileParts, part;
     fileParts = filePath.replace(directoryPath, '').split(/\/+/);
     fileParts = (function() {
-      var _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = fileParts.length; _i < _len; _i++) {
-        part = fileParts[_i];
+      var i, len, results;
+      results = [];
+      for (i = 0, len = fileParts.length; i < len; i++) {
+        part = fileParts[i];
         if (part) {
-          _results.push(part);
+          results.push(part);
         }
       }
-      return _results;
+      return results;
     })();
     return fileParts.join('-').replace(/\./g, '-');
   };
@@ -2220,8 +2278,7 @@ module.exports = function(directoryPath) {
 };
 
 
-
-},{"./widget.coffee":12,"./widget_loader.coffee":15,"fs":"fs","fsevents":"fsevents","path":"path"}],15:[function(require,module,exports){
+},{"./widget.coffee":14,"./widget_loader.coffee":17,"fs":"fs","fsevents":"fsevents","path":"path"}],17:[function(require,module,exports){
 var coffee, fs, loadWidget;
 
 fs = require('fs');
@@ -2243,23 +2300,21 @@ exports.loadWidget = loadWidget = function(filePath) {
 };
 
 
-
-},{"coffee-script":"coffee-script","fs":"fs"}],16:[function(require,module,exports){
+},{"coffee-script":"coffee-script","fs":"fs"}],18:[function(require,module,exports){
 var serialize;
 
 serialize = require('./serialize.coffee');
 
-module.exports = function(widgetDir) {
+module.exports = function(widgetsController) {
   return function(req, res, next) {
     var parts;
     parts = req.url.replace(/^\//, '').split('/');
     if (!(parts.length === 1 && parts[0] === 'widgets')) {
       return next();
     }
-    return res.end(serialize(widgetDir.widgets()));
+    return res.end(serialize(widgetsController.widgets()));
   };
 };
 
 
-
-},{"./serialize.coffee":11}]},{},[8]);
+},{"./serialize.coffee":13}]},{},[8]);

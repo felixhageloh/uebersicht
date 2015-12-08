@@ -43,6 +43,9 @@ test('functionality testing', function(t) {
     t.ok(name === info.path, 'matched path');
     switch (info.event) {
       case 'created':
+      case 'modified':
+        // NOTE(bajtos) The recent versions apparently report `modified` event
+        // instead of `created`.
         t.ok(path.basename(name) === 'created-fsevent', 'file created: ' + path.basename(name));
         break;
       case 'moved-out':
@@ -54,6 +57,9 @@ test('functionality testing', function(t) {
       case 'deleted':
         t.ok(path.basename(name) === 'moved-fsevent', 'file deleted: ' + path.basename(name));
         break;
+      default:
+        t.ok(false, 'Uknown event type: ' + info.event);
+        break;
     }
   });
 
@@ -63,7 +69,7 @@ test('functionality testing', function(t) {
     fs.writeFileSync(__dirname + '/temp/created-fsevent', 'created-fsevent');
 
     console.error("===========================================================================");
-  }, 5000);
+  }, 500);
   setTimeout(function() {
     console.error("===========================================================================");
     console.error("\trenameSync(__dirname + '/temp/created-fsevent', __dirname + '/temp/moved-fsevent');");
@@ -71,17 +77,17 @@ test('functionality testing', function(t) {
 
     console.error("===========================================================================");
 
-  }, 10000);
+  }, 1000);
   setTimeout(function() {
     console.error("===========================================================================");
     console.error("\tunlinkSync(__dirname + '/temp/moved-fsevent');");
     fs.unlinkSync(__dirname + '/temp/moved-fsevent');
     console.error("===========================================================================");
-  }, 15000);
+  }, 1500);
   setTimeout(function() {
     console.error("===========================================================================");
     console.error("\trmdirSync(__dirname + '/temp');");
     fs.rmdirSync(__dirname + '/temp');
     console.error("===========================================================================");
-  }, 20000);
+  }, 2000);
 });
