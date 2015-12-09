@@ -14,6 +14,7 @@
     NSMenu* mainMenu;
     NSInteger currentIndex;
     NSURL* backendUrl;
+    NSMutableDictionary* widgets;
 }
 
 - (id)initWithMenu:(NSMenu*)menu
@@ -22,6 +23,8 @@
     
     
     if (self) {
+        widgets = [[NSMutableDictionary alloc] init];
+    
         mainMenu = menu;
         screensController = [[UBScreensMenuController alloc] init];
         
@@ -39,15 +42,21 @@
     return self;
 }
 
-- (void)addWidget:(NSString*)widget
+- (void)addWidget:(NSString*)widgetId
 {
-    [self addWidget:widget toMenu:mainMenu];
+    if (!widgets[widgetId]) {
+        widgets[widgetId] = [[NSMutableDictionary alloc] init];
+        [self addWidget:widgetId toMenu:mainMenu];
+    }
 }
 
 
-- (void)removeWidget:(NSString*)widget
+- (void)removeWidget:(NSString*)widgetId
 {
-    [self removeWidget:widget FromMenu:mainMenu];
+    if (widgets[widgetId]) {
+        [widgets removeObjectForKey:widgetId];
+        [self removeWidget:widgetId FromMenu:mainMenu];
+    }
 }
 
 
@@ -57,15 +66,33 @@
     
     [newItem setTitle:widgetId];
     [newItem setRepresentedObject:@"widget"];
+    [newItem bind:@"value"
+         toObject:widgets[widgetId]
+      withKeyPath:@"hidden"
+          options:@{
+            NSValueTransformerNameBindingOption: NSNegateBooleanTransformerName
+          }
+    ];
+    
+    NSRect imageAlignment = NSMakeRect(0, -1, 22, 22);
+    NSImage* statusImage = [NSImage imageNamed:NSImageNameStatusAvailable];
+    [statusImage setAlignmentRect:imageAlignment];
+    [newItem setOnStateImage:statusImage];
+    
+    statusImage = [NSImage imageNamed:NSImageNameStatusNone];
+    [statusImage setAlignmentRect:imageAlignment];
+    [newItem setOffStateImage:statusImage];
     
     NSMenu* widgetMenu = [[NSMenu alloc] init];
     NSMenuItem* hide = [[NSMenuItem alloc]
-        initWithTitle:@"hide"
+        initWithTitle:@"Hidden"
         action:@selector(hideWidget:)
         keyEquivalent:@""
     ];
     [hide setRepresentedObject:widgetId];
     [hide setTarget:self];
+    [hide bind:@"value" toObject:widgets[widgetId] withKeyPath:@"hidden" options:nil];
+    
     [widgetMenu insertItem:hide atIndex:0];
     
     [screensController
@@ -101,33 +128,58 @@
     return [menu indexOfItem:[menu itemWithTitle:@"Check for Updates..."]] + 2;
 }
 
-- (void)updateWidget:(NSString*)widgetId
+- (void)syncWidget:(NSString*)widgetId updates:(NSDictionary*)updates
 {
-    NSMutableURLRequest* request = [NSMutableURLRequest
-        requestWithURL: [backendUrl URLByAppendingPathComponent:widgetId]
-    ];
+    NSMutableDictionary* newState = [[NSMutableDictionary alloc] init];
+    [newState addEntriesFromDictionary:widgets[widgetId]];
+    [newState addEntriesFromDictionary:updates];
     
-    [request setHTTPMethod:@"PUT"];
+    NSMutableURLRequest* request = [self
+        buildSyncRequest:widgetId
+               widthData:newState
+    ];
     
     NSURLSessionDataTask* task = [[NSURLSession sharedSession]
         dataTaskWithRequest:request
         completionHandler:^(NSData* data, NSURLResponse* res, NSError* err){
             if (err) {
                 return NSLog(
-                    @"Error updating widget: %@",
+                    @"Error syncing widget: %@",
                     err.localizedDescription
                 );
             }
+            
+            [widgets[widgetId] addEntriesFromDictionary:updates];
         }
     ];
     
     [task resume];
 }
 
+- (NSMutableURLRequest*)buildSyncRequest:(NSString*)widgetId widthData:(NSDictionary*)data
+{
+    NSMutableURLRequest* request = [NSMutableURLRequest
+        requestWithURL: [backendUrl URLByAppendingPathComponent:widgetId]
+    ];
+    
+    NSString* jsonBody = [NSString
+        stringWithFormat:@"{\"hidden\": %@}",
+        [data[@"hidden"] boolValue] ? @"true" : @"false"
+    ];
+    
+    [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"PUT"];
+    [request setHTTPBody:[jsonBody dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    return request;
+}
+
 
 - (void)hideWidget:(id)sender
 {
-    [self updateWidget:[(NSMenuItem*)sender representedObject]];
+    NSString* widgetId = [(NSMenuItem*)sender representedObject];
+    [self syncWidget:widgetId
+             updates:@{ @"hidden": @(![widgets[widgetId][@"hidden"] boolValue]) }];
 }
 
 @end

@@ -1685,12 +1685,31 @@ try {
 // Listens to /widget
 
 module.exports = function WidgetServer(widgetsController) {
-  const handle = {
+  const handlers = {
     put(id, data) {
-      console.log(id, data);
+      widgetsController.updateWidget(id, data);
       return 200;
     }
   };
+
+  function handleRequest(req, id, verb, callback) {
+    const handler = handlers[verb];
+    if (!handler) {
+      return callback(400);
+    }
+
+    getJsonBody(req, (err, body) => {
+      var code;
+      if (err) {
+        console.log(err);
+        code = 500;
+      } else {
+        code = handler(id, body);
+      }
+
+      callback(code);
+    });
+  }
 
   return function WidgetServerMiddleWare(req, res, next) {
     const parts = req.url.replace(/^\//, '').split('/');
@@ -1701,29 +1720,69 @@ module.exports = function WidgetServer(widgetsController) {
 
     const verb = req.method.toLowerCase();
     const id = parts[1].trim();
-    const data = {};
 
-    const handler = handle[verb];
-    if (handler) {
-      res.statusCode = handler(id, data);
-    } else {
-      res.statusCode = 400;
-    }
-
-    res.end();
+    handleRequest(req, id, verb, (statusCode) => {
+      res.statusCode = statusCode;
+      res.end();
+    });
   };
 };
+
+function getJsonBody(req, callback) {
+  var data = '';
+  req.on('data', (chunk) => data += chunk.toString());
+  req.on('end', () => {
+    try {
+      json = JSON.parse(data) || {};
+      callback(null, json);
+    } catch (e) {
+      callback(e);
+    }
+  });
+}
 
 },{}],10:[function(require,module,exports){
 module.exports = function WidgetsController(widgetDir, settingsPath) {
   const api = {};
+  const settings = {};
+  const trigger = {
+    change() {}
+  };
+
+  api.init = function init(callbacks) {
+    Object.assign(trigger, callbacks);
+    widgetDir.watch((changes) => trigger.change(changes));
+  };
 
   api.widgets = function widgets() {
-    return widgetDir.widgets();
-  }
+    const allWidgets = widgetDir.widgets();
+    const widgetsForScreen = {};
+
+    Object.keys(allWidgets).forEach((id) => {
+      var widgetSettings = settings[id] || {};
+      if (!widgetSettings.hidden) {
+        widgetsForScreen[id] = allWidgets[id];
+      }
+    });
+
+    return widgetsForScreen;
+  };
+
+  api.updateWidget = function updateWidget(id, data) {
+    settings[id] = Object.assign(
+      settings[id] || {},
+      data
+    );
+
+    if (settings[id].hidden) {
+      trigger.change({ [id]: 'deleted' });
+    } else {
+      trigger.change({ [id]: widgetDir.get(id) });
+    }
+  };
 
   return api;
-}
+};
 
 },{}],11:[function(require,module,exports){
 var ChangesServer, WidgetCommandServer, WidgetDir, WidgetServer, WidgetsController, WidgetsServer, connect, path;
@@ -1751,10 +1810,12 @@ module.exports = function(port, widgetPath, settingsPath) {
   changesServer = ChangesServer();
   settingsPath = path.resolve(__dirname, settingsPath);
   widgetsController = WidgetsController(widgetDir, settingsPath);
-  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetDir)).use(WidgetServer(widgetDir)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port, function() {
+  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(WidgetCommandServer(widgetDir)).use(WidgetsServer(widgetsController)).use(WidgetServer(widgetsController)).use(changesServer.middleware).use(connect["static"](widgetPath)).listen(port, function() {
     console.log('server started on port', port);
-    return widgetDir.watch(function(changes) {
-      return changesServer.push(changes);
+    return widgetsController.init({
+      change: function(changes) {
+        return changesServer.push(changes);
+      }
     });
   });
   return server;

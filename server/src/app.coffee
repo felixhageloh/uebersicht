@@ -19,14 +19,15 @@ module.exports = (port, widgetPath, settingsPath) ->
   server = connect()
     .use(connect.static(path.resolve(__dirname, './public')))
     .use(WidgetCommandServer(widgetDir))
-    .use(WidgetsServer(widgetDir))
-    .use(WidgetServer(widgetDir))
+    .use(WidgetsServer(widgetsController))
+    .use(WidgetServer(widgetsController))
     .use(changesServer.middleware)
     .use(connect.static(widgetPath))
     .listen port, ->
       console.log 'server started on port', port
-      widgetDir.watch (changes) ->
-        changesServer.push changes
+      widgetsController.init
+        change: (changes) -> changesServer.push changes
+
 
   server
 
