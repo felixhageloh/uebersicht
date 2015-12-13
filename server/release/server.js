@@ -1742,12 +1742,19 @@ function getJsonBody(req, callback) {
 }
 
 },{}],10:[function(require,module,exports){
-module.exports = function WidgetsController(widgetDir, settingsPath) {
+'use strict'
+
+const fs = require('fs');
+const path = require('path')
+
+module.exports = function WidgetsController(widgetDir, settingsDirPath) {
   const api = {};
-  const settings = {};
   const trigger = {
     change() {}
   };
+
+  const settingsPath = initSettingsFile(settingsDirPath);
+  const settings = fs.existsSync(settingsPath) ? require(settingsPath) : {};
 
   api.init = function init(callbacks) {
     Object.assign(trigger, callbacks);
@@ -1774,6 +1781,8 @@ module.exports = function WidgetsController(widgetDir, settingsPath) {
       data
     );
 
+    storeSettings(settings, settingsPath);
+
     if (settings[id].hidden) {
       trigger.change({ [id]: 'deleted' });
     } else {
@@ -1781,10 +1790,26 @@ module.exports = function WidgetsController(widgetDir, settingsPath) {
     }
   };
 
+  function storeSettings(data, path) {
+    fs.writeFile(path, JSON.stringify(data), (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
+
+  function initSettingsFile(dirPath) {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath);
+    }
+
+    return path.join(dirPath, 'WidgetSettings.json');
+  }
+
   return api;
 };
 
-},{}],11:[function(require,module,exports){
+},{"fs":"fs","path":"path"}],11:[function(require,module,exports){
 var ChangesServer, WidgetCommandServer, WidgetDir, WidgetServer, WidgetsController, WidgetsServer, connect, path;
 
 connect = require('connect');

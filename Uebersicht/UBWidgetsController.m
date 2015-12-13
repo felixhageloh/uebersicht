@@ -17,13 +17,15 @@
     NSMutableDictionary* widgets;
 }
 
-- (id)initWithMenu:(NSMenu*)menu
+- (id)initWithMenu:(NSMenu*)menu andSettingsPath:(NSURL*)settingsPath
 {
     self = [super init];
     
     
     if (self) {
-        widgets = [[NSMutableDictionary alloc] init];
+        widgets = [self readSettings:
+            [settingsPath URLByAppendingPathComponent:@"WidgetSettings.json"]
+        ];
     
         mainMenu = menu;
         screensController = [[UBScreensMenuController alloc] init];
@@ -46,8 +48,8 @@
 {
     if (!widgets[widgetId]) {
         widgets[widgetId] = [[NSMutableDictionary alloc] init];
-        [self addWidget:widgetId toMenu:mainMenu];
     }
+    [self addWidget:widgetId toMenu:mainMenu];
 }
 
 
@@ -55,8 +57,8 @@
 {
     if (widgets[widgetId]) {
         [widgets removeObjectForKey:widgetId];
-        [self removeWidget:widgetId FromMenu:mainMenu];
     }
+    [self removeWidget:widgetId FromMenu:mainMenu];
 }
 
 
@@ -180,6 +182,29 @@
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
     [self syncWidget:widgetId
              updates:@{ @"hidden": @(![widgets[widgetId][@"hidden"] boolValue]) }];
+}
+
+- (NSMutableDictionary*)readSettings:(NSURL*)file
+{
+    NSMutableDictionary* settings;
+    NSError* err;
+    NSString *jsonString = [[NSString alloc]
+        initWithContentsOfFile:[file path]
+                      encoding:NSUTF8StringEncoding
+                         error:&err
+    ];
+    
+    if (!err) {
+        settings = [NSJSONSerialization
+            JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
+                       options:NSJSONReadingMutableContainers
+                         error:&err
+        ];
+    } else {
+        settings = [[NSMutableDictionary alloc] init];
+    }
+    
+    return settings;
 }
 
 @end

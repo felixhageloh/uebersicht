@@ -40,7 +40,10 @@ int const PORT = 41416;
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     preferences = [[UBPreferencesController alloc] initWithWindowNibName:@"UBPreferencesController"];
     //screensMenu = [[UBScreensMenuController alloc] initWithMaxDisplays:MAX_DISPLAYS];
-    widgetsController = [[UBWidgetsController alloc] initWithMenu:statusBarMenu];
+    widgetsController = [[UBWidgetsController alloc]
+           initWithMenu:statusBarMenu
+        andSettingsPath:[self getPreferencesDir]
+    ];
     
     // Handles the screen entries in the menu, and will send the window to the user's preferred screen
     [self screensChanged:self];
