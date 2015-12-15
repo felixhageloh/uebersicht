@@ -7,17 +7,20 @@
 //
 
 #import "UBWidgetsController.h"
-#import "UBScreensMenuController.h"
+#import "UBScreensController.h"
 
 @implementation UBWidgetsController {
-    UBScreensMenuController* screensController;
+    UBScreensController* screensController;
     NSMenu* mainMenu;
     NSInteger currentIndex;
     NSURL* backendUrl;
     NSMutableDictionary* widgets;
 }
 
-- (id)initWithMenu:(NSMenu*)menu andSettingsPath:(NSURL*)settingsPath
+- (id)initWithMenu:(NSMenu*)menu
+           screens:(UBScreensController*)screens
+      settingsPath:(NSURL*)settingsPath
+           baseUrl:(NSString*)url
 {
     self = [super init];
     
@@ -28,7 +31,7 @@
         ];
     
         mainMenu = menu;
-        screensController = [[UBScreensMenuController alloc] init];
+        screensController = screens;
         
         currentIndex = [self indexOfWidgetMenuItems:menu];
         NSMenuItem* newItem = [NSMenuItem separatorItem];
@@ -38,7 +41,9 @@
         [menu insertItem:newItem atIndex:currentIndex];
         
         
-        backendUrl = [NSURL URLWithString:@"http://127.0.0.1:41416/widget/"];
+        backendUrl = [[NSURL URLWithString:url]
+            URLByAppendingPathComponent:@"widget"
+        ];
     }
     
     return self;
@@ -96,12 +101,8 @@
     [hide bind:@"value" toObject:widgets[widgetId] withKeyPath:@"hidden" options:nil];
     
     [widgetMenu insertItem:hide atIndex:0];
+    [self addScreens:[screensController screens] toWidgetMenu:widgetMenu];
     
-    [screensController
-        addScreensToMenu:widgetMenu
-                 atIndex:0
-              withAction:nil
-               andTarget:self];
     [newItem setSubmenu:widgetMenu];
     [menu insertItem:newItem atIndex:currentIndex];
 }
@@ -111,17 +112,63 @@
     [menu removeItem:[menu itemWithTitle:widgetId]];
 }
 
-- (void)screensChanged:(id)sender
+- (void)screensChanged:(NSDictionary*)screens
 {
-    for (NSMenuItem *item in [mainMenu itemArray]){
+    for (NSMenuItem *item in [mainMenu itemArray]) {
+    
         if ([item.representedObject isEqualToString:@"widget"]) {
-            [screensController removeScreensFromMenu:item.submenu];
-            [screensController
-                addScreensToMenu:item.submenu
-                         atIndex:0
-                      withAction:nil
-                       andTarget:self];
+            [self removeScreensFromMenu:item.submenu];
+            [self addScreens:screens toWidgetMenu:item.submenu];
         }
+    }
+}
+
+- (void)addScreens:(NSDictionary*)screens toWidgetMenu:(NSMenu*)menu
+{
+    NSString *title;
+    NSMenuItem *newItem;
+    NSString *name;
+    
+    newItem = [NSMenuItem separatorItem];
+    [newItem setRepresentedObject:@"screen"];
+    [menu insertItem:newItem atIndex:0];
+
+    
+    int i = 0;
+    for(NSNumber* screenId in screens) {
+        name = screens[screenId];
+        title = [NSString stringWithFormat:@"Show on %@", name];
+        newItem = [[NSMenuItem alloc]
+            initWithTitle:title
+                   action:@selector(screenWasSelected:)
+            keyEquivalent:@""
+        ];
+        [newItem setTarget:self];
+        [newItem setTag:[screenId unsignedIntValue]];
+        [newItem setRepresentedObject:@"screen"];
+        [menu insertItem:newItem atIndex:i];
+        i++;
+    }
+}
+
+
+- (void)removeScreensFromMenu:(NSMenu*)menu
+{
+    for (NSMenuItem *item in [menu itemArray]){
+        if ([item.representedObject isEqualToString:@"screen"]) {
+            [menu removeItem:item];
+        }
+    }
+}
+
+// could probably use bindings for this
+- (void)markScreen:(CGDirectDisplayID)screenId inMenu:(NSMenu*)menu
+{
+    for (NSMenuItem *item in [menu itemArray]){
+        if (![item.representedObject isEqualToString:@"screen"])
+            continue;
+        
+        [item setState:(item.tag == screenId ? NSOnState : NSOffState)];
     }
 }
 
@@ -205,6 +252,11 @@
     }
     
     return settings;
+}
+
+- (void)screenWasSelected:(id)sender
+{
+    
 }
 
 @end

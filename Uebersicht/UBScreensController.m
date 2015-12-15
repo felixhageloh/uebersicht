@@ -6,32 +6,51 @@
 //
 //
 
-#import "UBScreensMenuController.h"
+#import "UBScreensController.h"
 
 
 int const MAX_DISPLAYS = 42;
 
-@implementation UBScreensMenuController
+@implementation UBScreensController {
+    id listener;
+}
 
-- (void)addScreensToMenu:(NSMenu*)menu
-                 atIndex:(NSInteger)index
-              withAction:(SEL)action
-               andTarget:(id)target
+@synthesize screens;
+
+- (id)initWithChangeListener:(id)target;
 {
-    NSString *title;
-    NSMenuItem *newItem;
+    self = [super init];
+    if (self) {
+        screens = [[NSMutableDictionary alloc] initWithCapacity:MAX_DISPLAYS];
+        listener = target;
+        [self updateScreens];
+        
+        [[NSNotificationCenter defaultCenter]
+            addObserver:self
+               selector:@selector(screensChanged:)
+                   name:NSApplicationDidChangeScreenParametersNotification
+                 object:nil
+        ];
+
+    }
+    
+    return self;
+}
+
+
+- (void)updateScreens
+{
     NSString *name;
     NSMutableDictionary *nameList = [[NSMutableDictionary alloc]
-        initWithCapacity:MAX_DISPLAYS];
-    
-    newItem = [NSMenuItem separatorItem];
-    [newItem setRepresentedObject:@"screen"];
-    [menu insertItem:newItem atIndex:index];
+        initWithCapacity:MAX_DISPLAYS
+    ];
     
     CGDirectDisplayID displays[MAX_DISPLAYS];
     uint32_t numDisplays;
     
     CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
+    
+    [screens removeAllObjects];
     
     for(int i = 0; i < numDisplays; i++) {
         if (CGDisplayIsInMirrorSet(displays[i]))
@@ -44,38 +63,23 @@ int const MAX_DISPLAYS = 42;
         NSNumber *count;
         if ((count = nameList[name])) {
             nameList[name] = [NSNumber numberWithInt:count.intValue+1];
-            name = [name stringByAppendingString:[NSString stringWithFormat:@" (%i)", count.intValue+1]];
+            name = [name stringByAppendingString:[NSString
+                stringWithFormat:@" (%i)", count.intValue+1]
+            ];
         } else {
             nameList[name] = [NSNumber numberWithInt:1];
         }
         
-        title = [NSString stringWithFormat:@"Show on %@", name];
-        newItem = [[NSMenuItem alloc] initWithTitle:title action:action keyEquivalent:@""];
-        [newItem setTarget:target];
-        [newItem setTag:displays[i]];
-        [newItem setRepresentedObject:@"screen"];
-        [menu insertItem:newItem atIndex:index+i];
+        NSNumber* screenId = @(displays[i]);
+        screens[screenId] = name;
     }
+
 }
 
-- (void)removeScreensFromMenu:(NSMenu*)menu
+- (void)screensChanged:(id)sender
 {
-    for (NSMenuItem *item in [menu itemArray]){
-        if ([item.representedObject isEqualToString:@"screen"]) {
-            [menu removeItem:item];
-        }
-    }
-}
-
-// could probably use bindings for this
-- (void)markScreen:(CGDirectDisplayID)screenId inMenu:(NSMenu*)menu
-{
-    for (NSMenuItem *item in [menu itemArray]){
-        if (![item.representedObject isEqualToString:@"screen"])
-            continue;
-        
-        [item setState:(item.tag == screenId ? NSOnState : NSOffState)];
-    }
+    [self updateScreens];
+    [listener screensChanged:screens];
 }
 
 
@@ -93,9 +97,12 @@ int const MAX_DISPLAYS = 42;
     
     NSString *name = nil;
     NSDictionary *localizedNames = [(__bridge NSDictionary *)deviceInfo
-                                    objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
+        objectForKey:[NSString stringWithUTF8String:kDisplayProductName]
+    ];
     if ([localizedNames count] > 0) {
-        name = [localizedNames objectForKey:[[localizedNames allKeys] objectAtIndex:0]];
+        name = [localizedNames
+            objectForKey:[[localizedNames allKeys] objectAtIndex:0]
+        ];
     }
     CFRelease(deviceInfo);
     return name;
@@ -117,7 +124,11 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
     CFMutableDictionaryRef matching = IOServiceMatching("IODisplayConnect");
     
     // releases matching for us
-    kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &iter);
+    kern_return_t err = IOServiceGetMatchingServices(
+        kIOMasterPortDefault,
+        matching,
+        &iter
+    );
     if (err) return nil;
     
     while ((serv = IOIteratorNext(iter)) != 0)
@@ -129,11 +140,20 @@ static CFDictionaryRef getDisplayInfoDictionary(CGDirectDisplayID displayID)
         
         info = IODisplayCreateInfoDictionary(serv,kIODisplayOnlyPreferredName);
         
-        vendorIDRef  = CFDictionaryGetValue(info, CFSTR(kDisplayVendorID));
+        vendorIDRef = CFDictionaryGetValue(info, CFSTR(kDisplayVendorID));
         productIDRef = CFDictionaryGetValue(info, CFSTR(kDisplayProductID));
         
-        success  = CFNumberGetValue(vendorIDRef, kCFNumberCFIndexType, &vendorID);
-        success &= CFNumberGetValue(productIDRef, kCFNumberCFIndexType, &productID);
+        success = CFNumberGetValue(
+            vendorIDRef,
+            kCFNumberCFIndexType,
+            &vendorID
+        );
+        
+        success &= CFNumberGetValue(
+            productIDRef,
+            kCFNumberCFIndexType,
+            &productID
+        );
         
         if (!success || CGDisplayVendorNumber(displayID) != vendorID ||
             CGDisplayModelNumber(displayID)  != productID) {
