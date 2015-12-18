@@ -13,5 +13,6 @@
 @property NSMutableDictionary* screens;
 
 - (id)initWithChangeListener:(id)target;
+- (NSRect)screenRect:(NSNumber*)screenId;
 
 @end

@@ -28,20 +28,20 @@
     [super tearDown];
 }
 
-- (void)testWindowIsFullscreen
-{
-    XCTAssertNotNil(deletgate.window);
-    
-    // view should occupy the entire screen minus the menubar
-    NSRect windowFrame       = [deletgate.window frame];
-    NSRect screenFrame       = [[NSScreen mainScreen] frame];
-    screenFrame.size.height -= [[NSApp mainMenu] menuBarHeight];
-    
-    XCTAssertEqual(windowFrame.size.width, screenFrame.size.width);
-    XCTAssertEqual(windowFrame.size.height, screenFrame.size.height);
-    XCTAssertEqual(windowFrame.origin.x, screenFrame.origin.x);
-    XCTAssertEqual(windowFrame.origin.y, screenFrame.origin.y);
-}
+//- (void)testWindowIsFullscreen
+//{
+//    XCTAssertNotNil(deletgate.window);
+//    
+//    // view should occupy the entire screen minus the menubar
+//    NSRect windowFrame = [deletgate.windows frame];
+//    NSRect screenFrame = [[NSScreen mainScreen] frame];
+//    screenFrame.size.height -= [[NSApp mainMenu] menuBarHeight];
+//    
+//    XCTAssertEqual(windowFrame.size.width, screenFrame.size.width);
+//    XCTAssertEqual(windowFrame.size.height, screenFrame.size.height);
+//    XCTAssertEqual(windowFrame.origin.x, screenFrame.origin.x);
+//    XCTAssertEqual(windowFrame.origin.y, screenFrame.origin.y);
+//}
 
 - (void)testServerTask
 {

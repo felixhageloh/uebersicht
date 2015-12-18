@@ -20,7 +20,7 @@
 		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
 		DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADB417EC31EB00241CC2 /* UBWindow.m */; };
 		DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43ADB617EC38D300241CC2 /* WebKit.framework */; };
-		DC443E321C0305E500AA31C7 /* UBMouseHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = DC443E311C0305E500AA31C7 /* UBMouseHandler.m */; };
+		DC443E321C0305E500AA31C7 /* UBKeyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = DC443E311C0305E500AA31C7 /* UBKeyHandler.m */; };
 		DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4913951BEF9A75003E76EF /* UBScreensController.m */; };
 		DC4F43F3189E90DD00937925 /* status-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F1189E90DD00937925 /* status-icon.png */; };
 		DC4F43F4189E90DD00937925 /* status-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F2189E90DD00937925 /* status-icon@2x.png */; };
@@ -87,8 +87,8 @@
 		DC43ADB317EC31EB00241CC2 /* UBWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindow.h; sourceTree = "<group>"; };
 		DC43ADB417EC31EB00241CC2 /* UBWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWindow.m; sourceTree = "<group>"; };
 		DC43ADB617EC38D300241CC2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		DC443E301C0305E500AA31C7 /* UBMouseHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBMouseHandler.h; sourceTree = "<group>"; };
-		DC443E311C0305E500AA31C7 /* UBMouseHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBMouseHandler.m; sourceTree = "<group>"; };
+		DC443E301C0305E500AA31C7 /* UBKeyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBKeyHandler.h; sourceTree = "<group>"; };
+		DC443E311C0305E500AA31C7 /* UBKeyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBKeyHandler.m; sourceTree = "<group>"; };
 		DC4913941BEF9A75003E76EF /* UBScreensController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBScreensController.h; sourceTree = "<group>"; };
 		DC4913951BEF9A75003E76EF /* UBScreensController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBScreensController.m; sourceTree = "<group>"; };
 		DC4F43F1189E90DD00937925 /* status-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "status-icon.png"; sourceTree = "<group>"; };
@@ -198,8 +198,8 @@
 				DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */,
 				DCE7E3BF1A376AD400A12516 /* UBLocation.h */,
 				DCE7E3C01A376AD400A12516 /* UBLocation.m */,
-				DC443E301C0305E500AA31C7 /* UBMouseHandler.h */,
-				DC443E311C0305E500AA31C7 /* UBMouseHandler.m */,
+				DC443E301C0305E500AA31C7 /* UBKeyHandler.h */,
+				DC443E311C0305E500AA31C7 /* UBKeyHandler.m */,
 				DC314A1E1C0EE024000A56D2 /* UBWidgetsController.h */,
 				DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
@@ -411,7 +411,7 @@
 				DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
 				DC43AD9317EC2D9500241CC2 /* UBAppDelegate.m in Sources */,
-				DC443E321C0305E500AA31C7 /* UBMouseHandler.m in Sources */,
+				DC443E321C0305E500AA31C7 /* UBKeyHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -30,13 +30,14 @@ int const PORT = 41416;
     int portOffset;
     UBKeyHandler* keyHandler;
     UBWidgetsController* widgetsController;
+    NSMutableDictionary* windows;
 }
 
-@synthesize window;
 @synthesize statusBarMenu;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    windows = [[NSMutableDictionary alloc] initWithCapacity:42];
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     screensController = [[UBScreensController alloc]
         initWithChangeListener:self
@@ -66,7 +67,7 @@ int const PORT = 41416;
                      baseUrl:[self baseUrl]
             ];
         
-            [self renderOnScreens];
+            [self renderOnScreens:[screensController screens]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
             if (portOffset >= 20) {
@@ -226,20 +227,40 @@ int const PORT = 41416;
 #pragma mark Screen Handling
 #
 
-- (void)sreensChanged:(NSDictionary*)screens
+- (void)screensChanged:(NSDictionary*)screens
 {
     if (widgetsController) {
         [widgetsController screensChanged:screens];
-        [self renderOnScreens];
+        [self renderOnScreens:screens];
     }
 }
 
-- (void)renderOnScreens
+- (void)renderOnScreens:(NSDictionary*)screens
 {
-    for(id key in [screensController screens]) {
-        [window fillScreen:[(NSNumber*)key unsignedIntValue]];
+    NSMutableArray* obsoleteScreens = [[windows allKeys] mutableCopy];
+    UBWindow* window;
+    
+    for(NSNumber* screenId in screens) {
+        if (![windows objectForKey:screenId]) {
+            window = [[UBWindow alloc] init];
+            [windows setObject:window forKey:screenId];
+        } else {
+            window = windows[screenId];
+        }
+        
+        [window setFrame:[screensController screenRect:screenId] display:YES];
+        [window makeKeyAndOrderFront:self];
         [window loadUrl:[self baseUrl]];
+        
+        [obsoleteScreens removeObject:screenId];
     }
+    
+    for (NSNumber* screenId in obsoleteScreens) {
+        [windows[screenId] close];
+        [windows removeObjectForKey:screenId];
+    }
+    
+    NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 
 #
@@ -285,13 +306,15 @@ int const PORT = 41416;
 
 - (IBAction)refreshWidgets:(id)sender
 {
-    [window reload];
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] reload];
+    }
 }
 
 - (IBAction)showDebugConsole:(id)sender
 {
     if (!inspector) {
-        inspector = [WebInspector.alloc initWithWebView:window.webView];
+        //inspector = [WebInspector.alloc initWithWebView:window.webView];
     }
     [[NSUserDefaults standardUserDefaults]
         setBool:NO

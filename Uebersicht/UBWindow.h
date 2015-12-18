@@ -14,16 +14,11 @@
 #import <WebKit/WebKit.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
-#import "UBLocation.h"
-#import "UBWallperServer.h"
-
 @interface UBWindow : NSWindow
 
-@property (weak) IBOutlet WebView *webView;
-
+- (id)init;
 - (void)loadUrl:(NSString*)url;
 - (void)reload;
-- (void)fillScreen:(CGDirectDisplayID)screenId;
 - (void)sendToDesktop;
 - (void)comeToFront;
 - (BOOL)isInFront;
