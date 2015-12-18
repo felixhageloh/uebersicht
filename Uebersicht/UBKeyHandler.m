@@ -6,25 +6,25 @@
 //
 //
 
-#import "UBMouseHandler.h"
+#import "UBKeyHandler.h"
 #import "UBWindow.h"
 #import "UBPreferencesController.h"
 
-@implementation UBMouseHandler {
-    UBWindow* window;
+@implementation UBKeyHandler {
     UBPreferencesController* preferences;
+    id listener;
 }
 
-- (id)initWithWindow:(UBWindow*)aWindow
-      andPreferences:(UBPreferencesController*)thePreferences
+- (id)initWithPreferences:(UBPreferencesController*)thePreferences
+                 listener:(id)aListener
 {
     self = [super init];
     
     if (self) {
-        window = aWindow;
         preferences = thePreferences;
+        listener = aListener;
         
-        // listen to mouse events
+        // listen to keyboard events
         CFMachPortRef eventTap = CGEventTapCreate(
             kCGHIDEventTap,
             kCGHeadInsertEventTap,
@@ -33,9 +33,17 @@
             &onModifierKeyChange,
             (__bridge void *)(self)
         );
-        CFRunLoopSourceRef runLoopSourceRef = CFMachPortCreateRunLoopSource(NULL, eventTap, 0);
+        CFRunLoopSourceRef runLoopSourceRef = CFMachPortCreateRunLoopSource(
+            NULL,
+            eventTap,
+            0
+        );
         CFRelease(eventTap);
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSourceRef, kCFRunLoopDefaultMode);
+        CFRunLoopAddSource(
+            CFRunLoopGetCurrent(),
+            runLoopSourceRef,
+            kCFRunLoopDefaultMode
+        );
         CFRelease(runLoopSourceRef);
     }
     
@@ -47,19 +55,25 @@
     return preferences;
 }
 
-- (UBWindow*)window
+- (void)modifierKeyReleased
 {
-    return window;
+    [listener modifierKeyReleased];
+}
+
+
+- (void)modifierKeyPressed
+{
+    [listener modifierKeyPressed];
 }
 
 CGEventRef onModifierKeyChange(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* self)
 {
     
-    UBMouseHandler* this = (__bridge UBMouseHandler*)self;
+    UBKeyHandler* this = (__bridge UBKeyHandler*)self;
     if((CGEventGetFlags(event) & [this.preferences interactionShortcut]) == 0) {
-        [this.window sendToDesktop];
+        [this modifierKeyReleased];
     } else {
-        [this.window comeToFront];
+        [this modifierKeyPressed];
     }
 
     return event;

@@ -15,7 +15,7 @@
 #import "UBPreferencesController.m"
 #import "UBScreensController.h"
 #import "WebInspector.h"
-#import "UBMouseHandler.h"
+#import "UBKeyHandler.h"
 #import "UBWidgetsController.h"
 
 int const PORT = 41416;
@@ -28,7 +28,7 @@ int const PORT = 41416;
     BOOL keepServerAlive;
     WebInspector *inspector;
     int portOffset;
-    UBMouseHandler* mouseHandler;
+    UBKeyHandler* keyHandler;
     UBWidgetsController* widgetsController;
 }
 
@@ -91,9 +91,9 @@ int const PORT = 41416;
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // listen for keyboard events
-    mouseHandler = [[UBMouseHandler alloc]
-        initWithWindow:window
-        andPreferences:preferences
+    keyHandler = [[UBKeyHandler alloc]
+        initWithPreferences: preferences
+        listener: self
     ];
 }
 
@@ -245,6 +245,16 @@ int const PORT = 41416;
 #
 # pragma mark received actions
 #
+
+- (void)modifierKeyReleased
+{
+}
+
+
+- (void)modifierKeyPressed
+{
+   
+}
 
 - (void)widgetDirDidChange
 {

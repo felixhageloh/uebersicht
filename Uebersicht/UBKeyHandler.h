@@ -11,8 +11,9 @@
 @class UBPreferencesController;
 
 
-@interface UBMouseHandler : NSObject
+@interface UBKeyHandler : NSObject
 
-- (id)initWithWindow:(UBWindow*)aWindow andPreferences:(UBPreferencesController*)thePreferences;
+- (id)initWithPreferences:(UBPreferencesController*)thePreferences
+                 listener:(id)aListener;
 
 @end
