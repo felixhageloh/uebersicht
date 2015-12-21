@@ -7,6 +7,7 @@ WidgetServer = require('./WidgetServer')
 WidgetsServer = require('./widgets_server.coffee')
 WidgetCommandServer = require('./widget_command_server.coffee')
 ChangesServer = require('./changes_server.coffee')
+serveClient = require('./serveClient')
 
 module.exports = (port, widgetPath, settingsPath) ->
   widgetPath = path.resolve(__dirname, widgetPath)
@@ -23,6 +24,7 @@ module.exports = (port, widgetPath, settingsPath) ->
     .use(WidgetServer(widgetsController))
     .use(changesServer.middleware)
     .use(connect.static(widgetPath))
+    .use(serveClient)
     .listen port, ->
       console.log 'server started on port', port
       widgetsController.init

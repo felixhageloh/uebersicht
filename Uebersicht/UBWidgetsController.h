@@ -14,7 +14,7 @@
 - (id)initWithMenu:(NSMenu*)menu
            screens:(UBScreensController*)screens
       settingsPath:(NSURL*)settingsPath
-           baseUrl:(NSString*)url;
+           baseUrl:(NSURL*)url;
 
 - (void)addWidget:(NSString*)widget;
 - (void)removeWidget:(NSString*)widget;

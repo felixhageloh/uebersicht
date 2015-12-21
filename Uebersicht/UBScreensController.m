@@ -26,10 +26,10 @@ int const MAX_DISPLAYS = 42;
         [self updateScreens];
         
         [[NSNotificationCenter defaultCenter]
-            addObserver:self
-               selector:@selector(screensChanged:)
-                   name:NSApplicationDidChangeScreenParametersNotification
-                 object:nil
+            addObserver: self
+            selector: @selector(screensChanged:)
+            name: NSApplicationDidChangeScreenParametersNotification
+            object: nil
         ];
 
     }

@@ -18,7 +18,7 @@
 #import "UBWallperServer.h"
 
 @implementation UBWindow {
-    NSString *widgetsUrl;
+    NSURL *widgetsUrl;
     UBWallperServer* wallpaperServer;
     BOOL webviewLoaded;
     WebView* webView;
@@ -84,7 +84,7 @@
     [view setPolicyDelegate:nil];
 }
 
-- (void)loadUrl:(NSString*)url
+- (void)loadUrl:(NSURL*)url
 {
     if (!wallpaperServer) {
         wallpaperServer = [[UBWallperServer alloc] initWithWindow:self];
@@ -93,9 +93,9 @@
         }];
     }
 
-    widgetsUrl    = url;
+    widgetsUrl = url;
     webviewLoaded = NO;
-    [webView setMainFrameURL:url];
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL: url]];
 }
 
 - (void)reload
@@ -180,7 +180,7 @@
     } else if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
         [listener ignore];
-    } else if ([request.URL.absoluteString isEqualToString:widgetsUrl]) {
+    } else if ([request.URL isEqualTo: widgetsUrl]) {
         [listener use];
     } else {
         [listener ignore];
@@ -191,7 +191,7 @@
 - (void)handleWebviewLoadError:(NSError *)error
 {
     NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
-    if ([url.absoluteString isEqualToString:widgetsUrl]) {
+    if ([url isEqualTo: widgetsUrl]) {
         NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
 
         [self performSelector:@selector(loadUrl:) withObject:widgetsUrl

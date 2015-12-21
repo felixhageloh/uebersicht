@@ -17,7 +17,7 @@
 @interface UBWindow : NSWindow
 
 - (id)init;
-- (void)loadUrl:(NSString*)url;
+- (void)loadUrl:(NSURL*)url;
 - (void)reload;
 - (void)sendToDesktop;
 - (void)comeToFront;

@@ -20,7 +20,7 @@
 - (id)initWithMenu:(NSMenu*)menu
            screens:(UBScreensController*)screens
       settingsPath:(NSURL*)settingsPath
-           baseUrl:(NSString*)url
+           baseUrl:(NSURL*)url
 {
     self = [super init];
     
@@ -41,7 +41,7 @@
         [menu insertItem:newItem atIndex:currentIndex];
         
         
-        backendUrl = [[NSURL URLWithString:url]
+        backendUrl = [url
             URLByAppendingPathComponent:@"widget"
         ];
     }
@@ -205,7 +205,8 @@
     [task resume];
 }
 
-- (NSMutableURLRequest*)buildSyncRequest:(NSString*)widgetId widthData:(NSDictionary*)data
+- (NSMutableURLRequest*)buildSyncRequest:(NSString*)widgetId
+    widthData:(NSDictionary*)data
 {
     NSMutableURLRequest* request = [NSMutableURLRequest
         requestWithURL: [backendUrl URLByAppendingPathComponent:widgetId]
@@ -237,15 +238,17 @@
     NSError* err;
     NSString *jsonString = [[NSString alloc]
         initWithContentsOfFile:[file path]
-                      encoding:NSUTF8StringEncoding
-                         error:&err
+        encoding: NSUTF8StringEncoding
+        error: &err
     ];
     
     if (!err) {
         settings = [NSJSONSerialization
-            JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
-                       options:NSJSONReadingMutableContainers
-                         error:&err
+            JSONObjectWithData:[jsonString
+                dataUsingEncoding: NSUTF8StringEncoding
+            ]
+            options: NSJSONReadingMutableContainers
+            error: &err
         ];
     } else {
         settings = [[NSMutableDictionary alloc] init];

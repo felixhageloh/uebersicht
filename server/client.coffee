@@ -1,9 +1,11 @@
-Widget   = require './src/widget.coffee'
+Widget = require './src/widget.coffee'
 
-widgets   = {}
+widgets = {}
 contentEl = null
+screenId = null
 
 init = ->
+  screenId = window.location.pathname.replace(/\//g, '')
   window.uebersicht = require './src/os_bridge.coffee'
   widgets = {}
   contentEl = document.getElementById('__uebersicht')
@@ -24,7 +26,7 @@ init = ->
     setTimeout getChanges
 
 getWidgets = (callback) ->
-  $.get('/widgets')
+  $.get("/widgets/#{screenId}")
     .done((response) -> callback null, eval(response))
     .fail -> callback response, null
 

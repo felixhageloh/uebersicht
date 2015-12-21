@@ -26,7 +26,6 @@ int const PORT = 41416;
     UBPreferencesController* preferences;
     UBScreensController* screensController;
     BOOL keepServerAlive;
-    WebInspector *inspector;
     int portOffset;
     UBKeyHandler* keyHandler;
     UBWidgetsController* widgetsController;
@@ -215,11 +214,13 @@ int const PORT = 41416;
     ];
 }
 
-- (NSString*)baseUrl
+- (NSURL*)baseUrl
 {
     // trailing slash required for load policy in UBWindow
-   return [NSString
-        stringWithFormat:@"http://127.0.0.1:%d/", PORT+portOffset
+    return [NSURL
+        URLWithString:[NSString
+            stringWithFormat:@"http://127.0.0.1:%d/", PORT+portOffset
+        ]
     ];
 }
 
@@ -250,7 +251,14 @@ int const PORT = 41416;
         
         [window setFrame:[screensController screenRect:screenId] display:YES];
         [window makeKeyAndOrderFront:self];
-        [window loadUrl:[self baseUrl]];
+        [window loadUrl:[
+            [self baseUrl]
+                URLByAppendingPathComponent:[NSString
+                    stringWithFormat:@"%@",
+                    screenId
+                ]
+            ]
+        ];
         
         [obsoleteScreens removeObject:screenId];
     }
@@ -313,12 +321,19 @@ int const PORT = 41416;
 
 - (IBAction)showDebugConsole:(id)sender
 {
-    if (!inspector) {
-        //inspector = [WebInspector.alloc initWithWebView:window.webView];
-    }
+
+    NSNumber* currentScreen = [[NSScreen mainScreen]
+        deviceDescription
+    ][@"NSScreenNumber"];
+    
+    NSWindow* window = windows[currentScreen];
+    WebInspector *inspector= [WebInspector.alloc
+        initWithWebView: window.contentView
+    ];
+
     [[NSUserDefaults standardUserDefaults]
-        setBool:NO
-         forKey:@"WebKit Web Inspector Setting - inspectorStartsAttached"
+        setBool: NO
+        forKey: @"WebKit Web Inspector Setting - inspectorStartsAttached"
     ];
     
     [NSApp activateIgnoringOtherApps:YES];
