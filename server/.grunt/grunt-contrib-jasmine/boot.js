@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008-2014 Pivotal Labs
+Copyright (c) 2008-2015 Pivotal Labs
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -57,13 +57,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   var jasmineInterface = jasmineRequire.interface(jasmine, env);
 
   /**
-   * Add all of the Jasmine global/public interface to the proper global, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
+   * Add all of the Jasmine global/public interface to the global scope, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
    */
-  if (typeof window == "undefined" && typeof exports == "object") {
-    extend(exports, jasmineInterface);
-  } else {
-    extend(window, jasmineInterface);
-  }
+  extend(window, jasmineInterface);
 
   /**
    * ## Runner Parameters
@@ -78,13 +74,27 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   var catchingExceptions = queryString.getParam("catch");
   env.catchExceptions(typeof catchingExceptions === "undefined" ? true : catchingExceptions);
 
+  var throwingExpectationFailures = queryString.getParam("throwFailures");
+  env.throwOnExpectationFailure(throwingExpectationFailures);
+
+  var random = queryString.getParam("random");
+  env.randomizeTests(random);
+
+  var seed = queryString.getParam("seed");
+  if (seed) {
+    env.seed(seed);
+  }
+
   /**
    * ## Reporters
    * The `HtmlReporter` builds all of the HTML UI for the runner page. This reporter paints the dots, stars, and x's for specs, as well as all spec names and all failures (if any).
    */
   var htmlReporter = new jasmine.HtmlReporter({
     env: env,
-    onRaiseExceptionsClick: function() { queryString.setParam("catch", !env.catchingExceptions()); },
+    onRaiseExceptionsClick: function() { queryString.navigateWithNewParam("catch", !env.catchingExceptions()); },
+    onThrowExpectationsClick: function() { queryString.navigateWithNewParam("throwFailures", !env.throwingExpectationFailures()); },
+    onRandomClick: function() { queryString.navigateWithNewParam("random", !env.randomTests()); },
+    addToExistingQueryString: function(key, value) { return queryString.fullStringWithNewParam(key, value); },
     getContainer: function() { return document.body; },
     createElement: function() { return document.createElement.apply(document, arguments); },
     createTextNode: function() { return document.createTextNode.apply(document, arguments); },

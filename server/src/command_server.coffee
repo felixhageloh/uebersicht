@@ -1,25 +1,16 @@
-# middleware to serve the results of widget commands
-# Listens to /widgets/<id>
+# middleware to serve the results of shell commands
+# Listens to POST /run/
 {spawn} = require('child_process')
-url = require 'url'
-ID_REGEX = /\/widgets\/([^\/]+)/i
-
-module.exports = (widgetDir) ->
+module.exports = (workingDir) ->
 
   # the Connect middleware
   (req, res, next) ->
-    parsed = url.parse(req.url)
-    widgetId = parsed.pathname.match(ID_REGEX)?[1]
-    widget = widgetDir.get decodeURI(widgetId) if widgetId?
-
-    return next() unless widget?
-    shell = spawn 'bash', [], cwd: widgetDir.path
+    return next() unless req.method == 'POST' and req.url == '/run/'
+    shell = spawn 'bash', [], cwd: workingDir
 
     command = ''
     req.on 'data', (chunk) -> command += chunk
     req.on 'end', ->
-      command ||= widget.command
-
       setStatus = (status) ->
         res.writeHead status
         setStatus = ->

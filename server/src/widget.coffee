@@ -1,7 +1,3 @@
-toSource = require('tosource')
-stylus   = require('stylus')
-nib      = require('nib')
-
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
 # A widgets mostly lives client side, in the DOM. However, the
@@ -10,13 +6,10 @@ module.exports = (implementation) ->
   api = {}
 
   el        = null
-  cssId     = null
   contentEl = null
   timer     = null
   started   = false
   rendered  = false
-
-  defaultStyle = 'top: 30px; left: 10px'
 
   # throws errors
   init = ->
@@ -24,11 +17,6 @@ module.exports = (implementation) ->
       throw new Error(issues.join(', '))
 
     api[k] = v for k, v of implementation
-
-    cssId = api.id.replace(/\s/g, '_space_')
-    unless implementation.css? or window? # we are client side
-      implementation.css = parseStyle(implementation.style ? defaultStyle)
-      delete implementation.style
 
     api
 
@@ -52,7 +40,7 @@ module.exports = (implementation) ->
   api.create  = ->
     el        = document.createElement 'div'
     contentEl = document.createElement 'div'
-    contentEl.id        = cssId
+    contentEl.id        = api.id
     contentEl.className = 'widget'
     el.innerHTML = "<style>#{implementation.css}</style>\n"
     el.appendChild(contentEl)
@@ -81,12 +69,6 @@ module.exports = (implementation) ->
 
   api.domEl = -> el
 
-  # used by the backend to send a serialized version of the
-  # widget to the client. JSON wont't work here, because we
-  # need functions as well
-  api.serialize = ->
-    toSource implementation
-
   # run widget command and redraw the widget
   api.refresh = refresh = ->
     return redraw() unless api.command?
@@ -102,7 +84,7 @@ module.exports = (implementation) ->
   # runs command in the shell and calls callback with the result (err, stdout)
   api.run = (command, callback) ->
     $.ajax(
-      url    : "/widgets/#{api.id}?cachebuster=#{new Date().getTime()}"
+      url    : "/run/"
       method : 'POST'
       data   : command
       timeout: api.refreshFrequency
@@ -138,15 +120,6 @@ module.exports = (implementation) ->
       s = document.createElement('script')
       s.src = script.src
       domEl.replaceChild s, script
-
-  parseStyle = (style) ->
-    return "" unless style
-
-    scopedStyle = "##{cssId}\n  " + style.replace(/\n/g, "\n  ")
-    stylus(scopedStyle)
-      .import('nib')
-      .use(nib())
-      .render()
 
   validate = (impl) ->
     issues = []

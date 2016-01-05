@@ -16,7 +16,7 @@ module.exports = (grunt) ->
         options:
           #debug: true
           transform: ['coffeeify']
-          external: ['fs', 'path', 'child_process', 'connect', 'coffee-script', 'stylus', 'nib', 'fsevents']
+          external: ['fs', 'path', 'child_process', 'connect', 'coffee-script', 'stylus', 'nib', 'fsevents', 'ws']
           browserifyOptions:
             detectGlobals: false
       client:
@@ -24,8 +24,8 @@ module.exports = (grunt) ->
           '<%=config.releaseDir%>/public/main.js': ['client.coffee']
         options:
           #debug: true
-          ignore: ['connect', 'fs', 'path', 'child_process', 'fsevents', 'coffee-script', 'stylus', 'nib', 'minimist']
-          transform: ['coffeeify']
+          ignore: ['connect', 'fs', 'path', 'child_process', 'fsevents', 'coffee-script', 'stylus', 'nib', 'minimist', 'ws']
+          transform: ['coffeeify',  ["babelify", presets: "es2015"]]
           browserifyOptions:
             detectGlobals: false
       specs:

@@ -10,6 +10,8 @@
   "author": "Felix Hageloh",
   "license": "GPL v3 <http://www.gnu.org/licenses/>",
   "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babelify": "^7.2.0",
     "coffeeify": "^1.0.0",
     "grunt": "~0.4.1",
     "grunt-browserify": "^3.2.0",
@@ -24,8 +26,9 @@
     "connect": "~2.9.0",
     "fsevents": "^0.3.0",
     "minimist": "0.0.8",
+    "nib": "~1.0.2",
     "stylus": "~0.42.2",
     "tosource": "~0.1.1",
-    "nib": "~1.0.2"
+    "ws": "^1.0.0"
   }
 }

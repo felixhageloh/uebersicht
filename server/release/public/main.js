@@ -1,7 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, bail, contentEl, deserializeWidgets, getChanges, getWidgets, init, initWidget, initWidgets, logError, screenId, widgets;
+var Widget, addWidget, bail, contentEl, deserialize, getWidgets, init, initWidgets, listen, logError, removeWidget, renderWidget, screenId, widgets;
 
 Widget = require('./src/widget.coffee');
+
+listen = require('./src/listen');
 
 widgets = {};
 
@@ -12,7 +14,6 @@ screenId = null;
 init = function() {
   screenId = window.location.pathname.replace(/\//g, '');
   window.uebersicht = require('./src/os_bridge.coffee');
-  widgets = {};
   contentEl = document.getElementById('__uebersicht');
   contentEl.innerHTML = '';
   window.addEventListener('onwallpaperchange', function() {
@@ -24,6 +25,7 @@ init = function() {
   window.addEventListener('contextmenu', function(e) {
     return e.preventDefault();
   });
+  widgets = {};
   return getWidgets(function(err, widgetSettings) {
     if (err != null) {
       console.log(err);
@@ -32,76 +34,63 @@ init = function() {
       return setTimeout(bail, 10000);
     }
     initWidgets(widgetSettings);
-    return setTimeout(getChanges);
+    listen('WIDGET_ADDED', function(details) {
+      return renderWidget(addWidget(details.id, deserialize(details.body)));
+    });
+    listen('WIDGET_REMOVED', function(id) {
+      return removeWidget(id);
+    });
+    return listen('WIDGET_UPDATED', function(details) {
+      removeWidget(details.id);
+      return renderWidget(addWidget(details.id, deserialize(details.body)));
+    });
   });
 };
 
 getWidgets = function(callback) {
   return $.get("/widgets/" + screenId).done(function(response) {
-    return callback(null, eval(response));
+    return callback(null, JSON.parse(response));
   }).fail(function() {
     return callback(response, null);
   });
 };
 
-getChanges = function() {
-  return $.get('/widget-changes').done(function(response, _, xhr) {
-    var widgetUpdates;
-    switch (xhr.status) {
-      case 200:
-        if (response) {
-          logError(response);
-        }
-        break;
-      case 201:
-        widgetUpdates = deserializeWidgets(response);
-        if (widgetUpdates) {
-          initWidgets(widgetUpdates);
-        }
-    }
-    return getChanges();
-  }).fail(function() {
-    return bail();
-  });
-};
-
 initWidgets = function(widgetSettings) {
-  var id, results, settings, widget;
+  var details, id, results, widget;
   results = [];
   for (id in widgetSettings) {
-    settings = widgetSettings[id];
-    if (widgets[id] != null) {
-      widgets[id].destroy();
-    }
-    if (settings === 'deleted') {
-      results.push(delete widgets[id]);
-    } else {
-      widget = Widget(settings);
-      widgets[widget.id] = widget;
-      results.push(initWidget(widget));
-    }
+    details = widgetSettings[id];
+    widget = addWidget(id, deserialize(details.body));
+    results.push(renderWidget(widget));
   }
   return results;
 };
 
-initWidget = function(widget) {
+addWidget = function(id, widgetSettings) {
+  var widget;
+  if (widgets[id]) {
+    return widgets[id];
+  }
+  widget = Widget(widgetSettings);
+  widgets[widget.id] = widget;
+  return widget;
+};
+
+removeWidget = function(id) {
+  if (!widgets[id]) {
+    return;
+  }
+  widgets[id].destroy();
+  return widgets[id] = void 0;
+};
+
+renderWidget = function(widget) {
   contentEl.appendChild(widget.create());
   return widget.start();
 };
 
-deserializeWidgets = function(data) {
-  var deserialized, e, error;
-  if (!data) {
-    return;
-  }
-  deserialized = null;
-  try {
-    deserialized = eval(data);
-  } catch (error) {
-    e = error;
-    console.error(e);
-  }
-  return deserialized;
+deserialize = function(serializedWidget) {
+  return eval(serializedWidget);
 };
 
 bail = function() {
@@ -127,58 +116,41 @@ logError = function(serialized) {
 window.onload = init;
 
 
-},{"./src/os_bridge.coffee":4,"./src/widget.coffee":5}],2:[function(require,module,exports){
+},{"./src/listen":3,"./src/os_bridge.coffee":4,"./src/widget.coffee":5}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
-/* toSource by Marcello Bastea-Forte - zlib license */
-module.exports = function(object, filter, indent, startingIndent) {
-    var seen = []
-    return walk(object, filter, indent === undefined ? '  ' : (indent || ''), startingIndent || '', seen)
+'use strict';
 
-    function walk(object, filter, indent, currentIndent, seen) {
-        var nextIndent = currentIndent + indent
-        object = filter ? filter(object) : object
-        switch (typeof object) {
-            case 'string':
-                return JSON.stringify(object)
-            case 'boolean':
-            case 'number':
-            case 'undefined':
-                return ''+object
-            case 'function':
-                return object.toString()
-        }
+var WebSocket = typeof window !== 'undefined' ? window.WebSocket : require('ws');
 
-        if (object === null) return 'null'
-        if (object instanceof RegExp) return object.toString()
-        if (object instanceof Date) return 'new Date('+object.getTime()+')'
+var ws = new WebSocket('ws://localhost:8080');
+var listeners = {};
 
-        if (seen.indexOf(object) >= 0) return '{$circularReference:1}'
-        seen.push(object)
-
-        function join(elements) {
-            return indent.slice(1) + elements.join(','+(indent&&'\n')+nextIndent) + (indent ? ' ' : '');
-        }
-
-        if (Array.isArray(object)) {
-            return '[' + join(object.map(function(element){
-                return walk(element, filter, indent, nextIndent, seen.slice())
-            })) + ']'
-        }
-        var keys = Object.keys(object)
-        return keys.length ? '{' + join(keys.map(function (key) {
-            return (legalKey(key) ? key : JSON.stringify(key)) + ':' + walk(object[key], filter, indent, nextIndent, seen.slice())
-        })) + '}' : '{}'
-    }
+function handleMessage(data) {
+  var message = JSON.parse(data);
+  if (listeners[message.type]) {
+    listeners[message.type].forEach(function (f) {
+      return f(message.payload);
+    });
+  }
 }
 
-var KEYWORD_REGEXP = /^(abstract|boolean|break|byte|case|catch|char|class|const|continue|debugger|default|delete|do|double|else|enum|export|extends|false|final|finally|float|for|function|goto|if|implements|import|in|instanceof|int|interface|long|native|new|null|package|private|protected|public|return|short|static|super|switch|synchronized|this|throw|throws|transient|true|try|typeof|undefined|var|void|volatile|while|with)$/
-
-function legalKey(string) {
-    return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
+if (ws.on) {
+  ws.on('message', handleMessage);
+} else {
+  ws.onmessage = function (e) {
+    return handleMessage(e.data);
+  };
 }
 
-},{}],4:[function(require,module,exports){
+module.exports = function listen(eventType, callback) {
+  if (!listeners[eventType]) {
+    listeners[eventType] = [];
+  }
+  listeners[eventType].push(callback);
+};
+
+},{"ws":2}],4:[function(require,module,exports){
 var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
 cachedWallpaper = new Image();
@@ -267,37 +239,22 @@ renderWallpaperSlice = function(wallpaper, canvas) {
 
 
 },{}],5:[function(require,module,exports){
-var nib, stylus, toSource;
-
-toSource = require('tosource');
-
-stylus = require('stylus');
-
-nib = require('nib');
-
 module.exports = function(implementation) {
-  var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, el, errorToString, init, loadScripts, redraw, refresh, renderOutput, rendered, started, timer, validate;
   api = {};
   el = null;
-  cssId = null;
   contentEl = null;
   timer = null;
   started = false;
   rendered = false;
-  defaultStyle = 'top: 30px; left: 10px';
   init = function() {
-    var issues, k, ref, v;
+    var issues, k, v;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
     }
     for (k in implementation) {
       v = implementation[k];
       api[k] = v;
-    }
-    cssId = api.id.replace(/\s/g, '_space_');
-    if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
-      implementation.css = parseStyle((ref = implementation.style) != null ? ref : defaultStyle);
-      delete implementation.style;
     }
     return api;
   };
@@ -314,7 +271,7 @@ module.exports = function(implementation) {
   api.create = function() {
     el = document.createElement('div');
     contentEl = document.createElement('div');
-    contentEl.id = cssId;
+    contentEl.id = api.id;
     contentEl.className = 'widget';
     el.innerHTML = "<style>" + implementation.css + "</style>\n";
     el.appendChild(contentEl);
@@ -352,9 +309,6 @@ module.exports = function(implementation) {
   api.domEl = function() {
     return el;
   };
-  api.serialize = function() {
-    return toSource(implementation);
-  };
   api.refresh = refresh = function() {
     var request;
     if (api.command == null) {
@@ -377,7 +331,7 @@ module.exports = function(implementation) {
   };
   api.run = function(command, callback) {
     return $.ajax({
-      url: "/widgets/" + api.id + "?cachebuster=" + (new Date().getTime()),
+      url: "/run/",
       method: 'POST',
       data: command,
       timeout: api.refreshFrequency,
@@ -429,14 +383,6 @@ module.exports = function(implementation) {
     }
     return results;
   };
-  parseStyle = function(style) {
-    var scopedStyle;
-    if (!style) {
-      return "";
-    }
-    scopedStyle = ("#" + cssId + "\n  ") + style.replace(/\n/g, "\n  ");
-    return stylus(scopedStyle)["import"]('nib').use(nib()).render();
-  };
   validate = function(impl) {
     var issues;
     issues = [];
@@ -460,4 +406,4 @@ module.exports = function(implementation) {
 };
 
 
-},{"nib":2,"stylus":2,"tosource":3}]},{},[1]);
+},{}]},{},[1]);
