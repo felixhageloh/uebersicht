@@ -17,12 +17,19 @@ module.exports = function WidgetsStore(settingsDirPath) {
     listen('WIDGET_ADDED', (d) => handleAdded(d.id, d));
     listen('WIDGET_REMOVED', (id) => widgets[id] = undefined);
     listen('WIDGET_UPDATED', (d) => handleUpdate(d.id, d));
-    listen('WIDGET_SETTINGS_CHANGED', (s) => handleUpdate(s.id, s));
+    listen('WIDGET_DID_HIDE', (id) => handleSettingsChange(id, {hidden: true}));
+    listen('WIDGET_DID_UNHIDE', (id) => {
+      handleSettingsChange(id, {hidden: false});
+    });
 
     return api;
   }
 
-  api.getWidgets = function getWidgets(screenId) {
+  api.widgets = function getWidgets() {
+    return widgets;
+  };
+
+  api.widgetsForScreen = function getWidgetsForScreen(screenId) {
     const widgetsForScreen = {};
 
     Object.keys(widgets).forEach((id) => {
@@ -38,11 +45,12 @@ module.exports = function WidgetsStore(settingsDirPath) {
     return widgets[id];
   };
 
-  function handleAdded(id, defintion) {
-    if (!settings[id]) {
-      settings[id] = {};
-    }
+  api.settings = function getSettings() {
+    return settings;
+  };
 
+  function handleAdded(id, defintion) {
+    settings[id] = defintion.settings || {};
     widgets[id] = defintion;
   }
 
@@ -58,6 +66,8 @@ module.exports = function WidgetsStore(settingsDirPath) {
       settings[id],
       newSettings
     );
+
+    widgets[id].settings = settings[id];
     storeSettings(settings, settingsPath);
   }
 

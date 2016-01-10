@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, addWidget, bail, contentEl, deserialize, getWidgets, init, initWidgets, listen, logError, removeWidget, renderWidget, screenId, widgets;
+var Widget, addWidget, bail, contentEl, deserialize, getWidgets, init, initWidget, initWidgets, listen, logError, removeWidget, renderWidget, screenId, widgets;
 
 Widget = require('./src/widget.coffee');
 
@@ -35,14 +35,20 @@ init = function() {
     }
     initWidgets(widgetSettings);
     listen('WIDGET_ADDED', function(details) {
-      return renderWidget(addWidget(details.id, deserialize(details.body)));
+      return initWidget(details);
     });
     listen('WIDGET_REMOVED', function(id) {
       return removeWidget(id);
     });
-    return listen('WIDGET_UPDATED', function(details) {
+    listen('WIDGET_UPDATED', function(details) {
       removeWidget(details.id);
       return renderWidget(addWidget(details.id, deserialize(details.body)));
+    });
+    listen('WIDGET_DID_HIDE', function(id) {
+      return widgets[id].destroy();
+    });
+    return listen('WIDGET_DID_UNHIDE', function(id) {
+      return renderWidget(widgets[id]);
     });
   });
 };
@@ -56,22 +62,29 @@ getWidgets = function(callback) {
 };
 
 initWidgets = function(widgetSettings) {
-  var details, id, results, widget;
+  var _, details, results;
   results = [];
-  for (id in widgetSettings) {
-    details = widgetSettings[id];
-    widget = addWidget(id, deserialize(details.body));
-    results.push(renderWidget(widget));
+  for (_ in widgetSettings) {
+    details = widgetSettings[_];
+    results.push(initWidget(details));
   }
   return results;
 };
 
-addWidget = function(id, widgetSettings) {
+initWidget = function(details) {
+  var widget;
+  widget = addWidget(details.id, deserialize(details.body));
+  if (!details.settings.hidden) {
+    return renderWidget(widget);
+  }
+};
+
+addWidget = function(id, widgetImplementation) {
   var widget;
   if (widgets[id]) {
     return widgets[id];
   }
-  widget = Widget(widgetSettings);
+  widget = Widget(widgetImplementation);
   widgets[widget.id] = widget;
   return widget;
 };

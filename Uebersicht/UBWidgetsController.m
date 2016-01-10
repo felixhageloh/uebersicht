@@ -8,6 +8,7 @@
 
 #import "UBWidgetsController.h"
 #import "UBScreensController.h"
+#import <SocketRocket/SRWebSocket.h>
 
 @implementation UBWidgetsController {
     UBScreensController* screensController;
@@ -15,6 +16,7 @@
     NSInteger currentIndex;
     NSURL* backendUrl;
     NSMutableDictionary* widgets;
+    SRWebSocket* ws;
 }
 
 - (id)initWithMenu:(NSMenu*)menu
@@ -26,10 +28,7 @@
     
     
     if (self) {
-        widgets = [self readSettings:
-            [settingsPath URLByAppendingPathComponent:@"WidgetSettings.json"]
-        ];
-    
+        widgets = [[NSMutableDictionary alloc] init];
         mainMenu = menu;
         screensController = screens;
         
@@ -41,6 +40,13 @@
         [menu insertItem:newItem atIndex:currentIndex];
         
         
+        ws = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest
+            requestWithURL:[NSURL URLWithString:@"ws://127.0.0.1:8080"]]
+        ];
+        
+        ws.delegate = self;
+        [ws open];
+        
         backendUrl = [url
             URLByAppendingPathComponent:@"widget"
         ];
@@ -49,10 +55,13 @@
     return self;
 }
 
-- (void)addWidget:(NSString*)widgetId
+- (void)addWidget:(NSDictionary*)widget
 {
+    NSString* widgetId = widget[@"id"];
     if (!widgets[widgetId]) {
-        widgets[widgetId] = [[NSMutableDictionary alloc] init];
+        widgets[widgetId] = [[NSMutableDictionary alloc]
+            initWithDictionary:widget[@"settings"]
+        ];
     }
     [self addWidget:widgetId toMenu:mainMenu];
 }
@@ -93,7 +102,7 @@
     NSMenu* widgetMenu = [[NSMenu alloc] init];
     NSMenuItem* hide = [[NSMenuItem alloc]
         initWithTitle:@"Hidden"
-        action:@selector(hideWidget:)
+        action:@selector(toggleHidden:)
         keyEquivalent:@""
     ];
     [hide setRepresentedObject:widgetId];
@@ -177,89 +186,48 @@
     return [menu indexOfItem:[menu itemWithTitle:@"Check for Updates..."]] + 2;
 }
 
-- (void)syncWidget:(NSString*)widgetId updates:(NSDictionary*)updates
-{
-    NSMutableDictionary* newState = [[NSMutableDictionary alloc] init];
-    [newState addEntriesFromDictionary:widgets[widgetId]];
-    [newState addEntriesFromDictionary:updates];
-    
-    NSMutableURLRequest* request = [self
-        buildSyncRequest:widgetId
-               widthData:newState
-    ];
-    
-    NSURLSessionDataTask* task = [[NSURLSession sharedSession]
-        dataTaskWithRequest:request
-        completionHandler:^(NSData* data, NSURLResponse* res, NSError* err){
-            if (err) {
-                return NSLog(
-                    @"Error syncing widget: %@",
-                    err.localizedDescription
-                );
-            }
-            
-            [widgets[widgetId] addEntriesFromDictionary:updates];
-        }
-    ];
-    
-    [task resume];
-}
 
-- (NSMutableURLRequest*)buildSyncRequest:(NSString*)widgetId
-    widthData:(NSDictionary*)data
-{
-    NSMutableURLRequest* request = [NSMutableURLRequest
-        requestWithURL: [backendUrl URLByAppendingPathComponent:widgetId]
-    ];
-    
-    NSString* jsonBody = [NSString
-        stringWithFormat:@"{\"hidden\": %@}",
-        [data[@"hidden"] boolValue] ? @"true" : @"false"
-    ];
-    
-    [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setHTTPMethod:@"PUT"];
-    [request setHTTPBody:[jsonBody dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    return request;
-}
-
-
-- (void)hideWidget:(id)sender
+- (void)toggleHidden:(id)sender
 {
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
-    [self syncWidget:widgetId
-             updates:@{ @"hidden": @(![widgets[widgetId][@"hidden"] boolValue]) }];
+    BOOL isHidden = ![widgets[widgetId][@"hidden"] boolValue];
+    
+    [ws send: [NSString
+            stringWithFormat:@"{\"type\": \"%@\", \"payload\": \"%@\"}",
+            isHidden ? @"WIDGET_DID_HIDE" : @"WIDGET_DID_UNHIDE",
+            widgetId
+        ]
+    ];
 }
 
-- (NSMutableDictionary*)readSettings:(NSURL*)file
-{
-    NSMutableDictionary* settings;
-    NSError* err;
-    NSString *jsonString = [[NSString alloc]
-        initWithContentsOfFile:[file path]
-        encoding: NSUTF8StringEncoding
-        error: &err
-    ];
-    
-    if (!err) {
-        settings = [NSJSONSerialization
-            JSONObjectWithData:[jsonString
-                dataUsingEncoding: NSUTF8StringEncoding
-            ]
-            options: NSJSONReadingMutableContainers
-            error: &err
-        ];
-    } else {
-        settings = [[NSMutableDictionary alloc] init];
-    }
-    
-    return settings;
-}
+
 
 - (void)screenWasSelected:(id)sender
 {
     
+}
+
+- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message
+{
+
+    NSDictionary* parsedMessage = [NSJSONSerialization
+        JSONObjectWithData: [message dataUsingEncoding:NSUTF8StringEncoding]
+        options: 0
+        error: nil
+    ];
+    
+    if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_ADDED"]) {
+        [self addWidget:parsedMessage[@"payload"]];
+    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_REMOVED"]) {
+        [self removeWidget:parsedMessage[@"payload"]];
+    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_DID_HIDE"]) {
+        [widgets[parsedMessage[@"payload"]] setObject:@YES forKey:@"hidden"];
+    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_DID_UNHIDE"]) {
+        [widgets[parsedMessage[@"payload"]] setObject:@NO forKey:@"hidden"];
+    } else {
+        NSLog(@"unhandled event: %@", parsedMessage[@"type"]);
+    }
+
 }
 
 @end

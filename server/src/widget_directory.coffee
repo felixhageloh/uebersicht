@@ -4,10 +4,8 @@ fs = require 'fs'
 
 dispatch = require('./dispatch')
 
-module.exports = (directoryPath) ->
+module.exports = (directoryPath, store) ->
   api = {}
-  widgetFiles = {}
-
   fsevents = require('fsevents')
 
   init = ->
@@ -31,18 +29,14 @@ module.exports = (directoryPath) ->
 
   addWidget = (filePath) ->
     widget = readWidget(filePath)
-    console.log 'registering widget', widget.id
-    widgetFiles[widget.id] = widget.filePath
+    widget.settings = store.settings()[widget.id] || {}
     dispatch('WIDGET_ADDED', widget)
 
   updateWidget = (filePath) ->
     widget = readWidget(filePath)
-    console.log 'updating widget', widget.id
     dispatch('WIDGET_UPDATED', widget)
 
   removeWidget = (id) ->
-    console.log 'deleting widget', id
-    widgetFiles[id] = undefined
     dispatch('WIDGET_REMOVED', id)
 
   # calls itself recursively for every directory and calls addWidget on every
@@ -60,7 +54,7 @@ module.exports = (directoryPath) ->
   # removes all widgets where path is the root path or is identical to the
   # widget path
   checkWidgetRemoved = (path, type) ->
-    for id, filePath of widgetFiles when filePath.indexOf(path) == 0
+    for id, w of store.widgets() when w.filePath.indexOf(path) == 0
       removeWidget id
 
   # get type of path as either 'file' or 'directory'
@@ -80,7 +74,6 @@ module.exports = (directoryPath) ->
       loadWidget(id, filePath)
     catch e
       return if e.code == 'ENOENT' # widget has been deleted
-      console.log 'error in widget', id+':', e.message
       dispatch('WIDGET_BROKE', prettyPrintError(filePath, e))
 
   prettyPrintError = (filePath, error) ->

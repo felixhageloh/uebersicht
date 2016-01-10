@@ -5,7 +5,6 @@ WSS = require('./MessageBus')
 
 WidgetsStore = require('./WidgetsStore')
 WidgetDir = require('./widget_directory.coffee')
-WidgetServer = require('./WidgetServer')
 WidgetsServer = require('./widgets_server.coffee')
 CommandServer = require('./command_server.coffee')
 serveClient = require('./serveClient')
@@ -15,13 +14,12 @@ module.exports = (port, widgetPath, settingsPath) ->
   widgetPath = path.resolve(__dirname, widgetPath)
 
   widgetsStore = WidgetsStore(settingsPath)
-  widgetDir = WidgetDir widgetPath
+  widgetDir = WidgetDir widgetPath, widgetsStore
 
   server = connect()
     .use(connect.static(path.resolve(__dirname, './public')))
     .use(CommandServer(widgetPath))
     .use(WidgetsServer(widgetsStore))
-    .use(WidgetServer(widgetsStore))
     .use(connect.static(widgetPath))
     .use(serveClient)
     .listen port, ->

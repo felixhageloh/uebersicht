@@ -75,14 +75,6 @@ int const PORT = 41416;
             }
         } else if ([output rangeOfString:@"error"].location != NSNotFound) {
             [self notifyUser:output withTitle:@"Error"];
-        } else if ((match = [output rangeOfString:@"registering widget"]).location != NSNotFound) {
-            [widgetsController
-                addWidget:[self getWidgetId:output outsideRange:match]
-            ];
-        } else if ((match =[output rangeOfString:@"deleting widget"]).location != NSNotFound) {
-             [widgetsController
-                removeWidget:[self getWidgetId:output outsideRange:match]
-            ];
         };
     }];
     
@@ -200,17 +192,6 @@ int const PORT = 41416;
     return [urls[0]
         URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]
                         isDirectory:YES
-    ];
-}
-
-- (NSString*)getWidgetId:(NSString*)output outsideRange:(NSRange)range
-{
-    NSString* widgetId = [output
-        stringByReplacingCharactersInRange:range withString:@""
-    ];
-
-    return [widgetId
-        stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]
     ];
 }
 

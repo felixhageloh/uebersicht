@@ -16,7 +16,7 @@
       settingsPath:(NSURL*)settingsPath
            baseUrl:(NSURL*)url;
 
-- (void)addWidget:(NSString*)widget;
+- (void)addWidget:(NSDictionary*)widget;
 - (void)removeWidget:(NSString*)widget;
 - (void)screensChanged:(id)sender;
 @end

@@ -5,6 +5,7 @@ const wss = new WebSocketServer({ port: 8080 });
 
 function broadcast(data) {
   wss.clients.forEach((client) => client.send(data));
+  //console.log(data);
 }
 
 wss.on('connection', function connection(ws) {

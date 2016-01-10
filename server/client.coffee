@@ -26,7 +26,7 @@ init = ->
     initWidgets widgetSettings
 
     listen 'WIDGET_ADDED', (details) ->
-      renderWidget addWidget(details.id, deserialize(details.body))
+      initWidget(details)
 
     listen 'WIDGET_REMOVED', (id) ->
       removeWidget(id)
@@ -35,19 +35,27 @@ init = ->
       removeWidget(details.id)
       renderWidget addWidget(details.id, deserialize(details.body))
 
+    listen 'WIDGET_DID_HIDE', (id) ->
+      widgets[id].destroy()
+
+    listen 'WIDGET_DID_UNHIDE', (id) ->
+      renderWidget widgets[id]
+
 getWidgets = (callback) ->
   $.get("/widgets/#{screenId}")
     .done((response) -> callback null, JSON.parse(response))
     .fail -> callback response, null
 
 initWidgets = (widgetSettings) ->
-  for id, details of widgetSettings
-    widget = addWidget(id, deserialize(details.body))
-    renderWidget(widget)
+  initWidget(details) for _, details of widgetSettings
 
-addWidget = (id, widgetSettings) ->
+initWidget = (details) ->
+  widget = addWidget(details.id, deserialize(details.body))
+  renderWidget(widget) unless details.settings.hidden
+
+addWidget = (id, widgetImplementation) ->
   return widgets[id] if widgets[id]
-  widget = Widget widgetSettings
+  widget = Widget widgetImplementation
   widgets[widget.id] = widget
   widget
 
@@ -62,18 +70,6 @@ renderWidget = (widget) ->
 
 deserialize = (serializedWidget) ->
   eval serializedWidget
-
-
-# deserializeWidgets = (data) ->
-#   return unless data
-
-#   deserialized = null
-#   try
-#     deserialized = eval(data)
-#   catch e
-#     console.error e
-
-#   deserialized
 
 bail = ->
   window.location.reload(true)

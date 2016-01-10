@@ -6,5 +6,5 @@ module.exports = (widgetsStore) -> (req, res, next) ->
   return next() unless route == 'widgets' and screenId?
 
   res.end JSON.stringify(
-    widgetsStore.getWidgets(screenId)
+    widgetsStore.widgetsForScreen(screenId)
   )
