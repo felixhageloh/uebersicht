@@ -63,22 +63,22 @@ getChanges = function() {
 };
 
 initWidgets = function(widgetSettings) {
-  var id, settings, widget, _results;
-  _results = [];
+  var id, results, settings, widget;
+  results = [];
   for (id in widgetSettings) {
     settings = widgetSettings[id];
     if (widgets[id] != null) {
       widgets[id].destroy();
     }
     if (settings === 'deleted') {
-      _results.push(delete widgets[id]);
+      results.push(delete widgets[id]);
     } else {
       widget = Widget(settings);
       widgets[widget.id] = widget;
-      _results.push(initWidget(widget));
+      results.push(initWidget(widget));
     }
   }
-  return _results;
+  return results;
 };
 
 initWidget = function(widget) {
@@ -87,15 +87,15 @@ initWidget = function(widget) {
 };
 
 deserializeWidgets = function(data) {
-  var deserialized, e;
+  var deserialized, e, error;
   if (!data) {
     return;
   }
   deserialized = null;
   try {
     deserialized = eval(data);
-  } catch (_error) {
-    e = _error;
+  } catch (error) {
+    e = error;
     console.error(e);
   }
   return deserialized;
@@ -106,17 +106,17 @@ bail = function() {
 };
 
 logError = function(serialized) {
-  var e, err, errors, _i, _len, _results;
+  var e, err, error, errors, i, len, results;
   try {
     errors = JSON.parse(serialized);
-    _results = [];
-    for (_i = 0, _len = errors.length; _i < _len; _i++) {
-      err = errors[_i];
-      _results.push(console.error(err));
+    results = [];
+    for (i = 0, len = errors.length; i < len; i++) {
+      err = errors[i];
+      results.push(console.error(err));
     }
-    return _results;
-  } catch (_error) {
-    e = _error;
+    return results;
+  } catch (error) {
+    e = error;
     return console.error(serialized);
   }
 };
@@ -124,10 +124,136 @@ logError = function(serialized) {
 window.onload = init;
 
 
-
-},{"./src/os_bridge.coffee":4,"./src/widget.coffee":5}],2:[function(require,module,exports){
+},{"./src/os_bridge.coffee":5,"./src/widget.coffee":6}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} options
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options){
+  options = options || {};
+  if ('string' == typeof val) return parse(val);
+  return options.long
+    ? long(val)
+    : short(val);
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = '' + str;
+  if (str.length > 10000) return;
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
+  if (!match) return;
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function short(ms) {
+  if (ms >= d) return Math.round(ms / d) + 'd';
+  if (ms >= h) return Math.round(ms / h) + 'h';
+  if (ms >= m) return Math.round(ms / m) + 'm';
+  if (ms >= s) return Math.round(ms / s) + 's';
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function long(ms) {
+  return plural(ms, d, 'day')
+    || plural(ms, h, 'hour')
+    || plural(ms, m, 'minute')
+    || plural(ms, s, 'second')
+    || ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) return;
+  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+},{}],4:[function(require,module,exports){
 /* toSource by Marcello Bastea-Forte - zlib license */
 module.exports = function(object, filter, indent, startingIndent) {
     var seen = []
@@ -176,7 +302,7 @@ function legalKey(string) {
     return /^[a-z_$][0-9a-z_$]*$/gi.test(string) && !KEYWORD_REGEXP.test(string)
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
 cachedWallpaper = new Image();
@@ -193,9 +319,9 @@ window.addEventListener('onwallpaperchange', function() {
 });
 
 exports.makeBgSlice = function(canvas) {
-  var _ref;
+  var ref;
   canvas = $(canvas);
-  if (!((_ref = canvas[0]) != null ? _ref.getContext : void 0)) {
+  if (!((ref = canvas[0]) != null ? ref.getContext : void 0)) {
     throw new Error('no canvas element provided');
   }
   canvas.attr('data-bg-slice', true);
@@ -217,10 +343,10 @@ getWallpaper = function(callback) {
   }
   cachedWallpaper.loading = true;
   return loadWallpaper(function(wallpaper) {
-    var _i, _len, _ref;
-    _ref = getWallpaper.callbacks;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      callback = _ref[_i];
+    var i, len, ref;
+    ref = getWallpaper.callbacks;
+    for (i = 0, len = ref.length; i < len; i++) {
+      callback = ref[i];
       callback(wallpaper);
     }
     getWallpaper.callbacks.length = 0;
@@ -240,13 +366,13 @@ getWallpaperSlices = function() {
 };
 
 renderWallpaperSlices = function(wallpaper, slices) {
-  var canvas, _i, _len, _results;
-  _results = [];
-  for (_i = 0, _len = slices.length; _i < _len; _i++) {
-    canvas = slices[_i];
-    _results.push(renderWallpaperSlice(wallpaper, canvas));
+  var canvas, i, len, results;
+  results = [];
+  for (i = 0, len = slices.length; i < len; i++) {
+    canvas = slices[i];
+    results.push(renderWallpaperSlice(wallpaper, canvas));
   }
-  return _results;
+  return results;
 };
 
 renderWallpaperSlice = function(wallpaper, canvas) {
@@ -264,15 +390,16 @@ renderWallpaperSlice = function(wallpaper, canvas) {
 };
 
 
-
-},{}],5:[function(require,module,exports){
-var nib, stylus, toSource;
+},{}],6:[function(require,module,exports){
+var ms, nib, stylus, toSource;
 
 toSource = require('tosource');
 
 stylus = require('stylus');
 
 nib = require('nib');
+
+ms = require('ms');
 
 module.exports = function(implementation) {
   var api, contentEl, cssId, defaultStyle, el, errorToString, init, loadScripts, parseStyle, redraw, refresh, renderOutput, rendered, started, timer, validate;
@@ -285,9 +412,12 @@ module.exports = function(implementation) {
   rendered = false;
   defaultStyle = 'top: 30px; left: 10px';
   init = function() {
-    var issues, k, v, _ref;
+    var issues, k, ref, v;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
+    }
+    if (typeof implementation.refreshFrequency === 'string') {
+      implementation.refreshFrequency = ms(implementation.refreshFrequency);
     }
     for (k in implementation) {
       v = implementation[k];
@@ -295,7 +425,7 @@ module.exports = function(implementation) {
     }
     cssId = api.id.replace(/\s/g, '_space_');
     if (!((implementation.css != null) || (typeof window !== "undefined" && window !== null))) {
-      implementation.css = parseStyle((_ref = implementation.style) != null ? _ref : defaultStyle);
+      implementation.css = parseStyle((ref = implementation.style) != null ? ref : defaultStyle);
       delete implementation.style;
     }
     return api;
@@ -359,6 +489,9 @@ module.exports = function(implementation) {
     if (api.command == null) {
       return redraw();
     }
+    if (timer != null) {
+      clearTimeout(timer);
+    }
     request = api.run(api.command, function(err, output) {
       if (started) {
         return redraw(err, output);
@@ -389,16 +522,16 @@ module.exports = function(implementation) {
     });
   };
   redraw = function(error, output) {
-    var e;
+    var e, error1;
     if (error) {
       contentEl.innerHTML = error;
-      console.error("" + api.id + ":", error);
+      console.error(api.id + ":", error);
       return rendered = false;
     }
     try {
       return renderOutput(output);
-    } catch (_error) {
-      e = _error;
+    } catch (error1) {
+      e = error1;
       contentEl.innerHTML = e.message;
       return console.error(errorToString(e));
     }
@@ -417,16 +550,16 @@ module.exports = function(implementation) {
     }
   };
   loadScripts = function(domEl) {
-    var s, script, _i, _len, _ref, _results;
-    _ref = domEl.getElementsByTagName('script');
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      script = _ref[_i];
+    var i, len, ref, results, s, script;
+    ref = domEl.getElementsByTagName('script');
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      script = ref[i];
       s = document.createElement('script');
       s.src = script.src;
-      _results.push(domEl.replaceChild(s, script));
+      results.push(domEl.replaceChild(s, script));
     }
-    return _results;
+    return results;
   };
   parseStyle = function(style) {
     var scopedStyle;
@@ -459,5 +592,4 @@ module.exports = function(implementation) {
 };
 
 
-
-},{"nib":2,"stylus":2,"tosource":3}]},{},[1]);
+},{"ms":3,"nib":2,"stylus":2,"tosource":4}]},{},[1]);
