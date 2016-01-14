@@ -24,6 +24,7 @@
     "connect": "~2.9.0",
     "fsevents": "^0.3.0",
     "minimist": "0.0.8",
+    "ms": "^0.7.1",
     "stylus": "~0.42.2",
     "tosource": "~0.1.1"
   }

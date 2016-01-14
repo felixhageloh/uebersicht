@@ -35,7 +35,13 @@ An **integer** specifying how often the above command is executed. It defines th
 refreshFrequency: 10000
 ```
 
-the default is 1000 (1s). If set to `false` the widget won't refresh automatically.
+You can also specify `refreshFrequency` as a string, like '2 days', '1d', '10h', '2.5 hrs', '2h', '1m', or '5s'.
+
+```coffeescript
+refreshFrequency: '10s'  # equates to 10000
+```
+
+The default is 1000 (1s). If set to `false` the widget won't refresh automatically.
 
 ### style
 
