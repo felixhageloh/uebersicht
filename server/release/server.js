@@ -4708,6 +4708,9 @@ module.exports = function WidgetsStore(settingsDirPath) {
     listen('WIDGET_DID_UNHIDE', (id) => {
       handleSettingsChange(id, {hidden: false});
     });
+    listen('WIDGET_DID_CHANGE_SCREEN', (d) => {
+      handleSettingsChange(d.id, {screenId: d.screenId});
+    });
 
     return api;
   }
