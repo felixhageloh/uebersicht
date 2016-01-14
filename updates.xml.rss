@@ -6,6 +6,18 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 0.7.23</title>
+            <sparkle:releaseNotesLink>
+              http://tracesof.net/uebersicht/releases/0.7.23.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Thu, Jan 14 2016 10:00:00 +0200</pubDate>
+            <enclosure url="http://tracesof.net/uebersicht/releases/Uebersicht-0.7.23.app.zip"
+                       sparkle:version="23"
+                       sparkle:shortVersionString="0.7.23"
+                       length="10600"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.7</title>
             <sparkle:releaseNotesLink>
               http://tracesof.net/uebersicht/releases/0.7.html
@@ -17,9 +29,6 @@
                        length="10400"
                        type="application/octet-stream" />
         </item>
-      <link>http://tracesof.net/uebersicht/updates.xml.rss</link>
-      <description>Most recent changes with links to updates.</description>
-      <language>en</language>
         <item>
             <title>Version 0.6.20</title>
             <sparkle:releaseNotesLink>
