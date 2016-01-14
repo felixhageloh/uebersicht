@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, addWidget, bail, contentEl, deserialize, getScreens, getWidgets, hideWidget, init, initWidget, initWidgets, isMainScreen, isVisibleOnScreen, listen, logError, reRenderWidgets, removeWidget, renderWidget, screenId, screens, unHideWidget, widgets;
+var Widget, addWidget, bail, contentEl, deserialize, getScreens, getWidgets, hideWidget, init, initWidget, initWidgets, isMainScreen, isVisibleOnScreen, listen, logError, reRenderWidgets, removeWidget, renderWidget, screenId, screens, unHideWidget, updateWidget, widgets;
 
 Widget = require('./src/widget.coffee');
 
@@ -52,8 +52,7 @@ init = function() {
         return removeWidget(id);
       });
       listen('WIDGET_UPDATED', function(details) {
-        removeWidget(details.id);
-        return renderWidget(addWidget(details.id, deserialize(details.body)));
+        return updateWidget(details);
       });
       listen('WIDGET_DID_HIDE', function(id) {
         return hideWidget(widgets[id]);
@@ -122,6 +121,19 @@ removeWidget = function(id) {
   return widgets[id] = void 0;
 };
 
+updateWidget = function(updates) {
+  var widget;
+  widget = widgets[updates.id];
+  if (!widget) {
+    return;
+  }
+  widget.instance.destroy();
+  widget.instance = Widget(deserialize(updates.body));
+  if (isVisibleOnScreen(widget, screenId)) {
+    return renderWidget(widget);
+  }
+};
+
 renderWidget = function(widget) {
   return contentEl.appendChild(widget.instance.render());
 };
@@ -150,8 +162,8 @@ hideWidget = function(widget) {
 
 unHideWidget = function(widget) {
   widget.settings.hidden = false;
-  if (isVisibleOnScreen(widgets[id], screenId)) {
-    return renderWidget(widgets[id]);
+  if (isVisibleOnScreen(widget, screenId)) {
+    return renderWidget(widget);
   }
 };
 

@@ -39,8 +39,7 @@ init = ->
         removeWidget(id)
 
       listen 'WIDGET_UPDATED', (details) ->
-        removeWidget(details.id)
-        renderWidget addWidget(details.id, deserialize(details.body))
+        updateWidget(details)
 
       listen 'WIDGET_DID_HIDE', (id) ->
         hideWidget(widgets[id])
@@ -83,6 +82,13 @@ removeWidget = (id) ->
   widgets[id].instance.destroy()
   widgets[id] = undefined
 
+updateWidget = (updates) ->
+  widget = widgets[updates.id]
+  return unless widget
+  widget.instance.destroy()
+  widget.instance = Widget deserialize(updates.body)
+  renderWidget(widget) if isVisibleOnScreen(widget, screenId)
+
 renderWidget = (widget) ->
   contentEl.appendChild widget.instance.render()
 
@@ -100,7 +106,7 @@ hideWidget = (widget) ->
 
 unHideWidget = (widget) ->
   widget.settings.hidden = false
-  renderWidget widgets[id] if isVisibleOnScreen(widgets[id], screenId)
+  renderWidget widget if isVisibleOnScreen(widget, screenId)
 
 deserialize = (serializedWidget) ->
   eval serializedWidget

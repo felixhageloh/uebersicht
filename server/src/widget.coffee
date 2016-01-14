@@ -83,11 +83,11 @@ module.exports = (implementation) ->
   # runs command in the shell and calls callback with the result (err, stdout)
   publicApi.run = run = (command, callback) ->
     $.ajax(
-      url    : "/run/"
-      method : 'POST'
-      data   : command
+      url: "/run/"
+      method: 'POST'
+      data: command
       timeout: implementation.refreshFrequency
-      error  : (xhr)    -> callback(xhr.responseText || 'error running command')
+      error: (xhr) -> callback(xhr.responseText || 'error running command')
       success: (output) -> callback(null, output)
     )
 
