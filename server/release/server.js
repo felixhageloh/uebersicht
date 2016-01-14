@@ -4617,7 +4617,7 @@ try {
 }
 
 
-},{"./src/app.coffee":26,"minimist":9}],24:[function(require,module,exports){
+},{"./src/app.coffee":28,"minimist":9}],24:[function(require,module,exports){
 'use strict';
 
 const WebSocketServer = require('ws').Server;
@@ -4625,7 +4625,7 @@ const wss = new WebSocketServer({ port: 8080 });
 
 function broadcast(data) {
   wss.clients.forEach((client) => client.send(data));
-  //console.log(data);
+  //console.log("\n", data, "\n");
 }
 
 wss.on('connection', function connection(ws) {
@@ -4635,6 +4635,45 @@ wss.on('connection', function connection(ws) {
 
 
 },{"ws":"ws"}],25:[function(require,module,exports){
+// middleware to serve all screens as json.
+// Listens to /screens
+
+module.exports = function(screensStore) {
+  return function ScreensServer(req, res, next) {
+    if (req.url === '/screens/') {
+      res.end(
+        JSON.stringify({screens: screensStore.screens()})
+      );
+    } else {
+      next();
+    }
+  };
+};
+
+
+
+},{}],26:[function(require,module,exports){
+'use strict';
+
+const listen = require('./listen');
+
+module.exports = function ScreensStore() {
+  const api = {};
+  let screens = [];
+
+  function init() {
+    listen('SCREENS_DID_CHANGE', (newScreens) => screens = newScreens);
+    return api;
+  }
+
+  api.screens = function getScreens() {
+    return screens;
+  };
+
+  return init();
+};
+
+},{"./listen":31}],27:[function(require,module,exports){
 'use strict';
 
 const fs = require('fs');
@@ -4664,18 +4703,6 @@ module.exports = function WidgetsStore(settingsDirPath) {
 
   api.widgets = function getWidgets() {
     return widgets;
-  };
-
-  api.widgetsForScreen = function getWidgetsForScreen(screenId) {
-    const widgetsForScreen = {};
-
-    Object.keys(widgets).forEach((id) => {
-      if (widgetOnScreen(id, screenId)) {
-        widgetsForScreen[id] = widgets[id];
-      }
-    });
-
-    return widgetsForScreen;
   };
 
   api.get = function get(id) {
@@ -4732,8 +4759,8 @@ module.exports = function WidgetsStore(settingsDirPath) {
   return init();
 };
 
-},{"./listen":29,"./widget.coffee":32,"fs":"fs","path":"path"}],26:[function(require,module,exports){
-var CommandServer, WSS, WidgetDir, WidgetsServer, WidgetsStore, connect, path, serveClient;
+},{"./listen":31,"./widget.coffee":34,"fs":"fs","path":"path"}],28:[function(require,module,exports){
+var CommandServer, ScreensServer, ScreensStore, WSS, WidgetDir, WidgetsServer, WidgetsStore, connect, path, serveClient;
 
 connect = require('connect');
 
@@ -4743,28 +4770,33 @@ WSS = require('./MessageBus');
 
 WidgetsStore = require('./WidgetsStore');
 
+ScreensStore = require('./ScreensStore');
+
 WidgetDir = require('./widget_directory.coffee');
 
 WidgetsServer = require('./widgets_server.coffee');
+
+ScreensServer = require('./ScreensServer');
 
 CommandServer = require('./command_server.coffee');
 
 serveClient = require('./serveClient');
 
 module.exports = function(port, widgetPath, settingsPath) {
-  var server, widgetDir, widgetsStore;
+  var screensStore, server, widgetDir, widgetsStore;
   settingsPath = path.resolve(__dirname, settingsPath);
   widgetPath = path.resolve(__dirname, widgetPath);
+  screensStore = ScreensStore();
   widgetsStore = WidgetsStore(settingsPath);
   widgetDir = WidgetDir(widgetPath, widgetsStore);
-  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(CommandServer(widgetPath)).use(WidgetsServer(widgetsStore)).use(connect["static"](widgetPath)).use(serveClient).listen(port, function() {
+  server = connect().use(connect["static"](path.resolve(__dirname, './public'))).use(CommandServer(widgetPath)).use(WidgetsServer(widgetsStore)).use(ScreensServer(screensStore)).use(connect["static"](widgetPath)).use(serveClient).listen(port, function() {
     return console.log('server started on port', port);
   });
   return server;
 };
 
 
-},{"./MessageBus":24,"./WidgetsStore":25,"./command_server.coffee":27,"./serveClient":31,"./widget_directory.coffee":33,"./widgets_server.coffee":34,"connect":"connect","path":"path"}],27:[function(require,module,exports){
+},{"./MessageBus":24,"./ScreensServer":25,"./ScreensStore":26,"./WidgetsStore":27,"./command_server.coffee":29,"./serveClient":33,"./widget_directory.coffee":35,"./widgets_server.coffee":36,"connect":"connect","path":"path"}],29:[function(require,module,exports){
 var spawn;
 
 spawn = require('child_process').spawn;
@@ -4812,7 +4844,7 @@ module.exports = function(workingDir) {
 };
 
 
-},{"child_process":"child_process"}],28:[function(require,module,exports){
+},{"child_process":"child_process"}],30:[function(require,module,exports){
 'use strict';
 
 const WebSocket = this.WebSocket || require('ws');
@@ -4849,7 +4881,7 @@ module.exports = function dispatch(eventType, payload) {
   }
 };
 
-},{"ws":"ws"}],29:[function(require,module,exports){
+},{"ws":"ws"}],31:[function(require,module,exports){
 'use strict';
 
 const WebSocket = typeof window !== 'undefined'
@@ -4879,7 +4911,7 @@ module.exports = function listen(eventType, callback) {
   listeners[eventType].push(callback);
 };
 
-},{"ws":"ws"}],30:[function(require,module,exports){
+},{"ws":"ws"}],32:[function(require,module,exports){
 var coffee, fs, loadWidget, nib, parseStyle, stylus, toSource;
 
 fs = require('fs');
@@ -4924,7 +4956,7 @@ module.exports = loadWidget = function(id, filePath) {
 };
 
 
-},{"coffee-script":"coffee-script","fs":"fs","nib":"nib","stylus":"stylus","tosource":22}],31:[function(require,module,exports){
+},{"coffee-script":"coffee-script","fs":"fs","nib":"nib","stylus":"stylus","tosource":22}],33:[function(require,module,exports){
 'use strict';
 
 const fs = require('fs');
@@ -4944,47 +4976,56 @@ module.exports = function serveClient(req, res, next) {
   bufferStream.end(indexHTML);
 };
 
-},{"fs":"fs","path":"path","stream":20}],32:[function(require,module,exports){
+},{"fs":"fs","path":"path","stream":20}],34:[function(require,module,exports){
 module.exports = function(implementation) {
-  var api, contentEl, el, errorToString, init, loadScripts, redraw, refresh, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, defaults, el, errorToString, init, loadScripts, mounted, publicApi, redraw, refresh, renderOutput, rendered, run, start, started, stop, timer, validate;
   api = {};
+  publicApi = {};
   el = null;
   contentEl = null;
   timer = null;
   started = false;
   rendered = false;
+  mounted = false;
+  defaults = {
+    id: 'widget',
+    refreshFrequency: 1000,
+    render: function(output) {
+      if (implementation.command && output) {
+        return output;
+      } else {
+        return "warning: no render method";
+      }
+    },
+    afterRender: function() {}
+  };
   init = function() {
     var issues, k, v;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
     }
-    for (k in implementation) {
-      v = implementation[k];
-      api[k] = v;
+    for (k in defaults) {
+      v = defaults[k];
+      implementation[k] || (implementation[k] = v);
+    }
+    for (k in publicApi) {
+      v = publicApi[k];
+      implementation[k] || (implementation[k] = v);
     }
     return api;
   };
-  api.id = 'widget';
-  api.refreshFrequency = 1000;
-  api.render = function(output) {
-    if (api.command && output) {
-      return output;
-    } else {
-      return "warning: no render method";
-    }
-  };
-  api.afterRender = function() {};
-  api.create = function() {
+  api.render = function() {
     el = document.createElement('div');
     contentEl = document.createElement('div');
-    contentEl.id = api.id;
+    contentEl.id = implementation.id;
     contentEl.className = 'widget';
     el.innerHTML = "<style>" + implementation.css + "</style>\n";
     el.appendChild(contentEl);
+    start();
     return el;
   };
   api.destroy = function() {
-    api.stop();
+    stop();
     if (el == null) {
       return;
     }
@@ -4992,7 +5033,13 @@ module.exports = function(implementation) {
     el = null;
     return contentEl = null;
   };
-  api.start = function() {
+  api.domEl = function() {
+    return el;
+  };
+  api.isRendered = function() {
+    return !!el;
+  };
+  publicApi.start = start = function() {
     if (started) {
       return;
     }
@@ -5002,7 +5049,7 @@ module.exports = function(implementation) {
     }
     return refresh();
   };
-  api.stop = function() {
+  publicApi.stop = stop = function() {
     if (!started) {
       return;
     }
@@ -5012,15 +5059,12 @@ module.exports = function(implementation) {
       return clearTimeout(timer);
     }
   };
-  api.domEl = function() {
-    return el;
-  };
-  api.refresh = refresh = function() {
+  publicApi.refresh = refresh = function() {
     var request;
-    if (api.command == null) {
+    if (implementation.command == null) {
       return redraw();
     }
-    request = api.run(api.command, function(err, output) {
+    request = run(implementation.command, function(err, output) {
       if (started) {
         return redraw(err, output);
       }
@@ -5029,18 +5073,18 @@ module.exports = function(implementation) {
       if (!started) {
         return;
       }
-      if (api.refreshFrequency === false) {
+      if (implementation.refreshFrequency === false) {
         return;
       }
-      return timer = setTimeout(refresh, api.refreshFrequency);
+      return timer = setTimeout(refresh, implementation.refreshFrequency);
     });
   };
-  api.run = function(command, callback) {
+  publicApi.run = run = function(command, callback) {
     return $.ajax({
       url: "/run/",
       method: 'POST',
       data: command,
-      timeout: api.refreshFrequency,
+      timeout: implementation.refreshFrequency,
       error: function(xhr) {
         return callback(xhr.responseText || 'error running command');
       },
@@ -5053,7 +5097,7 @@ module.exports = function(implementation) {
     var e, error1;
     if (error) {
       contentEl.innerHTML = error;
-      console.error(api.id + ":", error);
+      console.error(implementation.id + ":", error);
       return rendered = false;
     }
     try {
@@ -5065,15 +5109,15 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((api.update != null) && rendered) {
-      return api.update(output, contentEl);
+    if ((implementation.update != null) && rendered) {
+      return implementation.update(output, contentEl);
     } else {
-      contentEl.innerHTML = api.render(output);
+      contentEl.innerHTML = implementation.render(output);
       loadScripts(contentEl);
-      api.afterRender(contentEl);
+      implementation.afterRender(contentEl);
       rendered = true;
-      if (api.update != null) {
-        return api.update(output, contentEl);
+      if (implementation.update != null) {
+        return implementation.update(output, contentEl);
       }
     }
   };
@@ -5102,7 +5146,7 @@ module.exports = function(implementation) {
   };
   errorToString = function(err) {
     var str;
-    str = "[" + api.id + "] " + ((typeof err.toString === "function" ? err.toString() : void 0) || err.message);
+    str = "[" + implementation.id + "] " + ((typeof err.toString === "function" ? err.toString() : void 0) || err.message);
     if (err.stack) {
       str += "\n  in " + (err.stack.split('\n')[0]) + "()";
     }
@@ -5112,7 +5156,7 @@ module.exports = function(implementation) {
 };
 
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var dispatch, fs, loadWidget, paths;
 
 loadWidget = require('./loadWidget.coffee');
@@ -5257,15 +5301,13 @@ module.exports = function(directoryPath, store) {
 };
 
 
-},{"./dispatch":28,"./loadWidget.coffee":30,"fs":"fs","fsevents":"fsevents","path":"path"}],34:[function(require,module,exports){
+},{"./dispatch":30,"./loadWidget.coffee":32,"fs":"fs","fsevents":"fsevents","path":"path"}],36:[function(require,module,exports){
 module.exports = function(widgetsStore) {
   return function(req, res, next) {
-    var ref, route, screenId;
-    ref = req.url.replace(/^\//, '').split('/'), route = ref[0], screenId = ref[1];
-    if (!(route === 'widgets' && (screenId != null))) {
+    if (req.url !== '/widgets/') {
       return next();
     }
-    return res.end(JSON.stringify(widgetsStore.widgetsForScreen(screenId)));
+    return res.end(JSON.stringify(widgetsStore.widgets()));
   };
 };
 

@@ -7,7 +7,7 @@
 //
 
 #import "UBScreensController.h"
-
+#import "UBDispatcher.h"
 
 int const MAX_DISPLAYS = 42;
 
@@ -31,7 +31,6 @@ int const MAX_DISPLAYS = 42;
             name: NSApplicationDidChangeScreenParametersNotification
             object: nil
         ];
-
     }
     
     return self;
@@ -45,12 +44,15 @@ int const MAX_DISPLAYS = 42;
         initWithCapacity:MAX_DISPLAYS
     ];
     
+    
+    
     CGDirectDisplayID displays[MAX_DISPLAYS];
     uint32_t numDisplays;
     
     CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
     
     [screens removeAllObjects];
+    NSMutableArray *ids = [[NSMutableArray alloc] initWithCapacity:numDisplays];
     
     for(int i = 0; i < numDisplays; i++) {
         if (CGDisplayIsInMirrorSet(displays[i]))
@@ -69,11 +71,16 @@ int const MAX_DISPLAYS = 42;
         } else {
             nameList[name] = [NSNumber numberWithInt:1];
         }
-        
+    
         NSNumber* screenId = @(displays[i]);
         screens[screenId] = name;
+        [ids addObject: screenId];
     }
-
+    
+    [[UBDispatcher sharedDispatcher]
+        dispatch: @"SCREENS_DID_CHANGE"
+        withPayload: ids
+    ];
 }
 
 - (void)screensChanged:(id)sender

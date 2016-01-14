@@ -29,18 +29,6 @@ module.exports = function WidgetsStore(settingsDirPath) {
     return widgets;
   };
 
-  api.widgetsForScreen = function getWidgetsForScreen(screenId) {
-    const widgetsForScreen = {};
-
-    Object.keys(widgets).forEach((id) => {
-      if (widgetOnScreen(id, screenId)) {
-        widgetsForScreen[id] = widgets[id];
-      }
-    });
-
-    return widgetsForScreen;
-  };
-
   api.get = function get(id) {
     return widgets[id];
   };

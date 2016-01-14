@@ -2,11 +2,12 @@ Widget = require './src/widget.coffee'
 listen = require './src/listen'
 
 widgets = {}
+screens = []
 contentEl = null
 screenId = null
 
 init = ->
-  screenId = window.location.pathname.replace(/\//g, '')
+  screenId = Number(window.location.pathname.replace(/\//g, ''))
   window.uebersicht = require './src/os_bridge.coffee'
   contentEl = document.getElementById('__uebersicht')
   contentEl.innerHTML = ''
@@ -20,29 +21,47 @@ init = ->
     e.preventDefault()
 
   widgets = {}
-  getWidgets (err, widgetSettings) ->
+  screens = []
+  getScreens (err, data) ->
     console.log err if err?
     return setTimeout bail, 10000 if err?
-    initWidgets widgetSettings
 
-    listen 'WIDGET_ADDED', (details) ->
-      initWidget(details)
+    screens = data.screens
+    getWidgets (err, widgetSettings) ->
+      console.log err if err?
+      return setTimeout bail, 10000 if err?
+      initWidgets widgetSettings
 
-    listen 'WIDGET_REMOVED', (id) ->
-      removeWidget(id)
+      listen 'WIDGET_ADDED', (details) ->
+        initWidget(details)
 
-    listen 'WIDGET_UPDATED', (details) ->
-      removeWidget(details.id)
-      renderWidget addWidget(details.id, deserialize(details.body))
+      listen 'WIDGET_REMOVED', (id) ->
+        removeWidget(id)
 
-    listen 'WIDGET_DID_HIDE', (id) ->
-      widgets[id].destroy()
+      listen 'WIDGET_UPDATED', (details) ->
+        removeWidget(details.id)
+        renderWidget addWidget(details.id, deserialize(details.body))
 
-    listen 'WIDGET_DID_UNHIDE', (id) ->
-      renderWidget widgets[id]
+      listen 'WIDGET_DID_HIDE', (id) ->
+        hideWidget(widgets[id])
+
+      listen 'WIDGET_DID_UNHIDE', (id) ->
+        unHideWidget(widgets[id])
+
+      listen 'WIDGET_DID_CHANGE_SCREEN', (d) ->
+        widgets[d.id].settings.screenId = d.screenId
+        reRenderWidgets()
+
+      listen 'SCREENS_DID_CHANGE', (newScreens) ->
+        screens = newScreens
+
+getScreens = (callback) ->
+  $.get("/screens/")
+    .done((response) -> callback null, JSON.parse(response))
+    .fail -> callback response, null
 
 getWidgets = (callback) ->
-  $.get("/widgets/#{screenId}")
+  $.get("/widgets/")
     .done((response) -> callback null, JSON.parse(response))
     .fail -> callback response, null
 
@@ -50,26 +69,50 @@ initWidgets = (widgetSettings) ->
   initWidget(details) for _, details of widgetSettings
 
 initWidget = (details) ->
-  widget = addWidget(details.id, deserialize(details.body))
-  renderWidget(widget) unless details.settings.hidden
+  addWidget(details)
+  details.instance = Widget deserialize(details.body)
+  renderWidget(details) if isVisibleOnScreen(details, screenId)
 
-addWidget = (id, widgetImplementation) ->
-  return widgets[id] if widgets[id]
-  widget = Widget widgetImplementation
-  widgets[widget.id] = widget
-  widget
+addWidget = (details) ->
+  return widgets[details.id] if widgets[details.id]
+  widgets[details.id] = details
+  details
 
 removeWidget = (id) ->
   return unless widgets[id]
-  widgets[id].destroy()
+  widgets[id].instance.destroy()
   widgets[id] = undefined
 
 renderWidget = (widget) ->
-  contentEl.appendChild widget.create()
-  widget.start()
+  contentEl.appendChild widget.instance.render()
+
+reRenderWidgets = ->
+  for _, widget of widgets
+    shouldRender = isVisibleOnScreen(widget, screenId)
+    if shouldRender and !widget.instance.isRendered()
+      renderWidget(widget)
+    else if !shouldRender
+      widget.instance.destroy()
+
+hideWidget = (widget) ->
+  widget.settings.hidden = true
+  widget.instance.destroy()
+
+unHideWidget = (widget) ->
+  widget.settings.hidden = false
+  renderWidget widgets[id] if isVisibleOnScreen(widgets[id], screenId)
 
 deserialize = (serializedWidget) ->
   eval serializedWidget
+
+isVisibleOnScreen = (widgetDetails, theScreenId) ->
+  return false if widgetDetails.settings.hidden
+
+  widgetDetails.settings.screenId == theScreenId or
+  (!widgetDetails.settings.screenId and isMainScreen())
+
+isMainScreen = ->
+  screenId == screens[0]
 
 bail = ->
   window.location.reload(true)

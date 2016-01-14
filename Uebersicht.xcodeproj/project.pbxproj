@@ -31,6 +31,7 @@
 		DC6424401C3E569A00B69F9E /* SocketRocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC6424381C3E561200B69F9E /* SocketRocket.framework */; };
 		DC6424411C3E56AE00B69F9E /* SocketRocket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC6424381C3E561200B69F9E /* SocketRocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DC8B4AD119ACFD9700F177C2 /* UBWallperServer.m in Sources */ = {isa = PBXBuildFile; fileRef = DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */; };
+		DC9F7CE31C439CE50014E25B /* UBDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F7CE21C439CE50014E25B /* UBDispatcher.m */; };
 		DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* getting-started.coffee */; };
 		DCB5D9871948802C000D5C83 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */; };
 		DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E3C01A376AD400A12516 /* UBLocation.m */; };
@@ -140,6 +141,8 @@
 		DC8B4ACF19ACFD9700F177C2 /* UBWallperServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWallperServer.h; sourceTree = "<group>"; };
 		DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWallperServer.m; sourceTree = "<group>"; };
 		DC99A7C418DC41A600E61222 /* Übersicht.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Übersicht.entitlements"; sourceTree = "<group>"; };
+		DC9F7CE11C439CE50014E25B /* UBDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBDispatcher.h; sourceTree = "<group>"; };
+		DC9F7CE21C439CE50014E25B /* UBDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBDispatcher.m; sourceTree = "<group>"; };
 		DCAAAF9518DF0B050097677F /* getting-started.coffee */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "getting-started.coffee"; sourceTree = "<group>"; };
 		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		DCE2453D18ED864800C9FAE3 /* WebInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebInspector.h; sourceTree = "<group>"; };
@@ -243,6 +246,8 @@
 				DC443E311C0305E500AA31C7 /* UBKeyHandler.m */,
 				DC314A1E1C0EE024000A56D2 /* UBWidgetsController.h */,
 				DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */,
+				DC9F7CE11C439CE50014E25B /* UBDispatcher.h */,
+				DC9F7CE21C439CE50014E25B /* UBDispatcher.m */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,
 			);
@@ -501,6 +506,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC9F7CE31C439CE50014E25B /* UBDispatcher.m in Sources */,
 				DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */,
 				DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */,
 				DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */,

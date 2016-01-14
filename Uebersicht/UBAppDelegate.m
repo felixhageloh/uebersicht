@@ -38,9 +38,6 @@ int const PORT = 41416;
 {
     windows = [[NSMutableDictionary alloc] initWithCapacity:42];
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
-    screensController = [[UBScreensController alloc]
-        initWithChangeListener:self
-    ];
     preferences = [[UBPreferencesController alloc]
         initWithWindowNibName:@"UBPreferencesController"
     ];
@@ -56,9 +53,11 @@ int const PORT = 41416;
     keepServerAlive = YES;
     
     [self startServer: ^(NSString* output) {
-        NSRange match;
-        
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
+            screensController = [[UBScreensController alloc]
+                initWithChangeListener:self
+            ];
+            
             widgetsController = [[UBWidgetsController alloc]
                 initWithMenu:statusBarMenu
                      screens:screensController

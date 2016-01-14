@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, addWidget, bail, contentEl, deserialize, getWidgets, init, initWidget, initWidgets, listen, logError, removeWidget, renderWidget, screenId, widgets;
+var Widget, addWidget, bail, contentEl, deserialize, getScreens, getWidgets, hideWidget, init, initWidget, initWidgets, isMainScreen, isVisibleOnScreen, listen, logError, reRenderWidgets, removeWidget, renderWidget, screenId, screens, unHideWidget, widgets;
 
 Widget = require('./src/widget.coffee');
 
@@ -7,12 +7,14 @@ listen = require('./src/listen');
 
 widgets = {};
 
+screens = [];
+
 contentEl = null;
 
 screenId = null;
 
 init = function() {
-  screenId = window.location.pathname.replace(/\//g, '');
+  screenId = Number(window.location.pathname.replace(/\//g, ''));
   window.uebersicht = require('./src/os_bridge.coffee');
   contentEl = document.getElementById('__uebersicht');
   contentEl.innerHTML = '';
@@ -26,35 +28,60 @@ init = function() {
     return e.preventDefault();
   });
   widgets = {};
-  return getWidgets(function(err, widgetSettings) {
+  screens = [];
+  return getScreens(function(err, data) {
     if (err != null) {
       console.log(err);
     }
     if (err != null) {
       return setTimeout(bail, 10000);
     }
-    initWidgets(widgetSettings);
-    listen('WIDGET_ADDED', function(details) {
-      return initWidget(details);
-    });
-    listen('WIDGET_REMOVED', function(id) {
-      return removeWidget(id);
-    });
-    listen('WIDGET_UPDATED', function(details) {
-      removeWidget(details.id);
-      return renderWidget(addWidget(details.id, deserialize(details.body)));
-    });
-    listen('WIDGET_DID_HIDE', function(id) {
-      return widgets[id].destroy();
-    });
-    return listen('WIDGET_DID_UNHIDE', function(id) {
-      return renderWidget(widgets[id]);
+    screens = data.screens;
+    return getWidgets(function(err, widgetSettings) {
+      if (err != null) {
+        console.log(err);
+      }
+      if (err != null) {
+        return setTimeout(bail, 10000);
+      }
+      initWidgets(widgetSettings);
+      listen('WIDGET_ADDED', function(details) {
+        return initWidget(details);
+      });
+      listen('WIDGET_REMOVED', function(id) {
+        return removeWidget(id);
+      });
+      listen('WIDGET_UPDATED', function(details) {
+        removeWidget(details.id);
+        return renderWidget(addWidget(details.id, deserialize(details.body)));
+      });
+      listen('WIDGET_DID_HIDE', function(id) {
+        return hideWidget(widgets[id]);
+      });
+      listen('WIDGET_DID_UNHIDE', function(id) {
+        return unHideWidget(widgets[id]);
+      });
+      listen('WIDGET_DID_CHANGE_SCREEN', function(d) {
+        widgets[d.id].settings.screenId = d.screenId;
+        return reRenderWidgets();
+      });
+      return listen('SCREENS_DID_CHANGE', function(newScreens) {
+        return screens = newScreens;
+      });
     });
   });
 };
 
+getScreens = function(callback) {
+  return $.get("/screens/").done(function(response) {
+    return callback(null, JSON.parse(response));
+  }).fail(function() {
+    return callback(response, null);
+  });
+};
+
 getWidgets = function(callback) {
-  return $.get("/widgets/" + screenId).done(function(response) {
+  return $.get("/widgets/").done(function(response) {
     return callback(null, JSON.parse(response));
   }).fail(function() {
     return callback(response, null);
@@ -72,38 +99,75 @@ initWidgets = function(widgetSettings) {
 };
 
 initWidget = function(details) {
-  var widget;
-  widget = addWidget(details.id, deserialize(details.body));
-  if (!details.settings.hidden) {
-    return renderWidget(widget);
+  addWidget(details);
+  details.instance = Widget(deserialize(details.body));
+  if (isVisibleOnScreen(details, screenId)) {
+    return renderWidget(details);
   }
 };
 
-addWidget = function(id, widgetImplementation) {
-  var widget;
-  if (widgets[id]) {
-    return widgets[id];
+addWidget = function(details) {
+  if (widgets[details.id]) {
+    return widgets[details.id];
   }
-  widget = Widget(widgetImplementation);
-  widgets[widget.id] = widget;
-  return widget;
+  widgets[details.id] = details;
+  return details;
 };
 
 removeWidget = function(id) {
   if (!widgets[id]) {
     return;
   }
-  widgets[id].destroy();
+  widgets[id].instance.destroy();
   return widgets[id] = void 0;
 };
 
 renderWidget = function(widget) {
-  contentEl.appendChild(widget.create());
-  return widget.start();
+  return contentEl.appendChild(widget.instance.render());
+};
+
+reRenderWidgets = function() {
+  var _, results, shouldRender, widget;
+  results = [];
+  for (_ in widgets) {
+    widget = widgets[_];
+    shouldRender = isVisibleOnScreen(widget, screenId);
+    if (shouldRender && !widget.instance.isRendered()) {
+      results.push(renderWidget(widget));
+    } else if (!shouldRender) {
+      results.push(widget.instance.destroy());
+    } else {
+      results.push(void 0);
+    }
+  }
+  return results;
+};
+
+hideWidget = function(widget) {
+  widget.settings.hidden = true;
+  return widget.instance.destroy();
+};
+
+unHideWidget = function(widget) {
+  widget.settings.hidden = false;
+  if (isVisibleOnScreen(widgets[id], screenId)) {
+    return renderWidget(widgets[id]);
+  }
 };
 
 deserialize = function(serializedWidget) {
   return eval(serializedWidget);
+};
+
+isVisibleOnScreen = function(widgetDetails, theScreenId) {
+  if (widgetDetails.settings.hidden) {
+    return false;
+  }
+  return widgetDetails.settings.screenId === theScreenId || (!widgetDetails.settings.screenId && isMainScreen());
+};
+
+isMainScreen = function() {
+  return screenId === screens[0];
 };
 
 bail = function() {
@@ -253,45 +317,54 @@ renderWallpaperSlice = function(wallpaper, canvas) {
 
 },{}],5:[function(require,module,exports){
 module.exports = function(implementation) {
-  var api, contentEl, el, errorToString, init, loadScripts, redraw, refresh, renderOutput, rendered, started, timer, validate;
+  var api, contentEl, defaults, el, errorToString, init, loadScripts, mounted, publicApi, redraw, refresh, renderOutput, rendered, run, start, started, stop, timer, validate;
   api = {};
+  publicApi = {};
   el = null;
   contentEl = null;
   timer = null;
   started = false;
   rendered = false;
+  mounted = false;
+  defaults = {
+    id: 'widget',
+    refreshFrequency: 1000,
+    render: function(output) {
+      if (implementation.command && output) {
+        return output;
+      } else {
+        return "warning: no render method";
+      }
+    },
+    afterRender: function() {}
+  };
   init = function() {
     var issues, k, v;
     if ((issues = validate(implementation)).length !== 0) {
       throw new Error(issues.join(', '));
     }
-    for (k in implementation) {
-      v = implementation[k];
-      api[k] = v;
+    for (k in defaults) {
+      v = defaults[k];
+      implementation[k] || (implementation[k] = v);
+    }
+    for (k in publicApi) {
+      v = publicApi[k];
+      implementation[k] || (implementation[k] = v);
     }
     return api;
   };
-  api.id = 'widget';
-  api.refreshFrequency = 1000;
-  api.render = function(output) {
-    if (api.command && output) {
-      return output;
-    } else {
-      return "warning: no render method";
-    }
-  };
-  api.afterRender = function() {};
-  api.create = function() {
+  api.render = function() {
     el = document.createElement('div');
     contentEl = document.createElement('div');
-    contentEl.id = api.id;
+    contentEl.id = implementation.id;
     contentEl.className = 'widget';
     el.innerHTML = "<style>" + implementation.css + "</style>\n";
     el.appendChild(contentEl);
+    start();
     return el;
   };
   api.destroy = function() {
-    api.stop();
+    stop();
     if (el == null) {
       return;
     }
@@ -299,7 +372,13 @@ module.exports = function(implementation) {
     el = null;
     return contentEl = null;
   };
-  api.start = function() {
+  api.domEl = function() {
+    return el;
+  };
+  api.isRendered = function() {
+    return !!el;
+  };
+  publicApi.start = start = function() {
     if (started) {
       return;
     }
@@ -309,7 +388,7 @@ module.exports = function(implementation) {
     }
     return refresh();
   };
-  api.stop = function() {
+  publicApi.stop = stop = function() {
     if (!started) {
       return;
     }
@@ -319,15 +398,12 @@ module.exports = function(implementation) {
       return clearTimeout(timer);
     }
   };
-  api.domEl = function() {
-    return el;
-  };
-  api.refresh = refresh = function() {
+  publicApi.refresh = refresh = function() {
     var request;
-    if (api.command == null) {
+    if (implementation.command == null) {
       return redraw();
     }
-    request = api.run(api.command, function(err, output) {
+    request = run(implementation.command, function(err, output) {
       if (started) {
         return redraw(err, output);
       }
@@ -336,18 +412,18 @@ module.exports = function(implementation) {
       if (!started) {
         return;
       }
-      if (api.refreshFrequency === false) {
+      if (implementation.refreshFrequency === false) {
         return;
       }
-      return timer = setTimeout(refresh, api.refreshFrequency);
+      return timer = setTimeout(refresh, implementation.refreshFrequency);
     });
   };
-  api.run = function(command, callback) {
+  publicApi.run = run = function(command, callback) {
     return $.ajax({
       url: "/run/",
       method: 'POST',
       data: command,
-      timeout: api.refreshFrequency,
+      timeout: implementation.refreshFrequency,
       error: function(xhr) {
         return callback(xhr.responseText || 'error running command');
       },
@@ -360,7 +436,7 @@ module.exports = function(implementation) {
     var e, error1;
     if (error) {
       contentEl.innerHTML = error;
-      console.error(api.id + ":", error);
+      console.error(implementation.id + ":", error);
       return rendered = false;
     }
     try {
@@ -372,15 +448,15 @@ module.exports = function(implementation) {
     }
   };
   renderOutput = function(output) {
-    if ((api.update != null) && rendered) {
-      return api.update(output, contentEl);
+    if ((implementation.update != null) && rendered) {
+      return implementation.update(output, contentEl);
     } else {
-      contentEl.innerHTML = api.render(output);
+      contentEl.innerHTML = implementation.render(output);
       loadScripts(contentEl);
-      api.afterRender(contentEl);
+      implementation.afterRender(contentEl);
       rendered = true;
-      if (api.update != null) {
-        return api.update(output, contentEl);
+      if (implementation.update != null) {
+        return implementation.update(output, contentEl);
       }
     }
   };
@@ -409,7 +485,7 @@ module.exports = function(implementation) {
   };
   errorToString = function(err) {
     var str;
-    str = "[" + api.id + "] " + ((typeof err.toString === "function" ? err.toString() : void 0) || err.message);
+    str = "[" + implementation.id + "] " + ((typeof err.toString === "function" ? err.toString() : void 0) || err.message);
     if (err.stack) {
       str += "\n  in " + (err.stack.split('\n')[0]) + "()";
     }

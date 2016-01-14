@@ -8,6 +8,7 @@
 
 #import "UBWidgetsController.h"
 #import "UBScreensController.h"
+#import "UBDispatcher.h"
 #import <SocketRocket/SRWebSocket.h>
 
 @implementation UBWidgetsController {
@@ -18,6 +19,8 @@
     NSMutableDictionary* widgets;
     SRWebSocket* ws;
 }
+
+static NSInteger const SCREEN_MENU_ITEM_TAG = 42;
 
 - (id)initWithMenu:(NSMenu*)menu
            screens:(UBScreensController*)screens
@@ -82,12 +85,13 @@
     
     [newItem setTitle:widgetId];
     [newItem setRepresentedObject:@"widget"];
-    [newItem bind:@"value"
-         toObject:widgets[widgetId]
-      withKeyPath:@"hidden"
-          options:@{
+    [newItem
+        bind: @"value"
+        toObject: widgets[widgetId]
+        withKeyPath: @"hidden"
+        options: @{
             NSValueTransformerNameBindingOption: NSNegateBooleanTransformerName
-          }
+        }
     ];
     
     NSRect imageAlignment = NSMakeRect(0, -1, 22, 22);
@@ -110,7 +114,11 @@
     [hide bind:@"value" toObject:widgets[widgetId] withKeyPath:@"hidden" options:nil];
     
     [widgetMenu insertItem:hide atIndex:0];
-    [self addScreens:[screensController screens] toWidgetMenu:widgetMenu];
+    [self
+        addScreens: [screensController screens]
+        toWidgetMenu: widgetMenu
+        forWidget: widgetId
+    ];
     
     [newItem setSubmenu:widgetMenu];
     [menu insertItem:newItem atIndex:currentIndex];
@@ -127,19 +135,23 @@
     
         if ([item.representedObject isEqualToString:@"widget"]) {
             [self removeScreensFromMenu:item.submenu];
-            [self addScreens:screens toWidgetMenu:item.submenu];
+            //[self addScreens:screens toWidgetMenu:item.submenu];
         }
     }
+    
+    
 }
 
-- (void)addScreens:(NSDictionary*)screens toWidgetMenu:(NSMenu*)menu
+- (void)addScreens:(NSDictionary*)screens
+      toWidgetMenu:(NSMenu*)menu
+      forWidget:(NSString*)widgetId
 {
     NSString *title;
     NSMenuItem *newItem;
     NSString *name;
     
     newItem = [NSMenuItem separatorItem];
-    [newItem setRepresentedObject:@"screen"];
+    [newItem setTag:SCREEN_MENU_ITEM_TAG];
     [menu insertItem:newItem atIndex:0];
 
     
@@ -148,13 +160,20 @@
         name = screens[screenId];
         title = [NSString stringWithFormat:@"Show on %@", name];
         newItem = [[NSMenuItem alloc]
-            initWithTitle:title
-                   action:@selector(screenWasSelected:)
-            keyEquivalent:@""
+            initWithTitle: title
+            action: @selector(screenWasSelected:)
+            keyEquivalent: @""
         ];
+        
+        
         [newItem setTarget:self];
-        [newItem setTag:[screenId unsignedIntValue]];
-        [newItem setRepresentedObject:@"screen"];
+        [newItem setTag:SCREEN_MENU_ITEM_TAG];
+        [newItem
+            setRepresentedObject: @{
+                @"screenId": screenId,
+                @"widgetId": widgetId
+            }
+        ];
         [menu insertItem:newItem atIndex:i];
         i++;
     }
@@ -164,20 +183,21 @@
 - (void)removeScreensFromMenu:(NSMenu*)menu
 {
     for (NSMenuItem *item in [menu itemArray]){
-        if ([item.representedObject isEqualToString:@"screen"]) {
+        if (item.tag == SCREEN_MENU_ITEM_TAG) {
             [menu removeItem:item];
         }
     }
 }
 
 // could probably use bindings for this
-- (void)markScreen:(CGDirectDisplayID)screenId inMenu:(NSMenu*)menu
+- (void)markScreen:(NSNumber*)screenId inMenu:(NSMenu*)menu
 {
     for (NSMenuItem *item in [menu itemArray]){
-        if (![item.representedObject isEqualToString:@"screen"])
+        if (item.tag != SCREEN_MENU_ITEM_TAG)
             continue;
         
-        [item setState:(item.tag == screenId ? NSOnState : NSOffState)];
+        BOOL isSelected = [item.representedObject isEqualToNumber:screenId];
+        [item setState:(isSelected ? NSOnState : NSOffState)];
     }
 }
 
@@ -192,18 +212,27 @@
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
     BOOL isHidden = ![widgets[widgetId][@"hidden"] boolValue];
     
-    [ws send: [NSString
-            stringWithFormat:@"{\"type\": \"%@\", \"payload\": \"%@\"}",
-            isHidden ? @"WIDGET_DID_HIDE" : @"WIDGET_DID_UNHIDE",
-            widgetId
-        ]
+    [[UBDispatcher sharedDispatcher]
+        dispatch: isHidden ? @"WIDGET_DID_HIDE" : @"WIDGET_DID_UNHIDE"
+        withPayload: widgetId
     ];
 }
 
 
-
 - (void)screenWasSelected:(id)sender
 {
+    NSDictionary* data = [(NSMenuItem*)sender representedObject];
+    
+    widgets[data[@"widgetId"]][@"screenId"] = data[@"screenId"];
+    
+    [[UBDispatcher sharedDispatcher]
+        dispatch: @"WIDGET_DID_CHANGE_SCREEN"
+        withPayload: @{
+            @"id": data[@"widgetId"],
+            @"screenId": data[@"screenId"]
+        }
+    
+    ];
     
 }
 
@@ -224,8 +253,6 @@
         [widgets[parsedMessage[@"payload"]] setObject:@YES forKey:@"hidden"];
     } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_DID_UNHIDE"]) {
         [widgets[parsedMessage[@"payload"]] setObject:@NO forKey:@"hidden"];
-    } else {
-        NSLog(@"unhandled event: %@", parsedMessage[@"type"]);
     }
 
 }
