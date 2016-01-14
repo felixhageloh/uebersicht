@@ -91,6 +91,8 @@ module.exports = (implementation) ->
   api.refresh = refresh = ->
     return redraw() unless api.command?
 
+    clearTimeout timer if timer?
+
     request = api.run api.command, (err, output) ->
       redraw err, output if started
 
