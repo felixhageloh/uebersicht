@@ -58,7 +58,7 @@ style: """
 """
 ```
 
-For convenience, the [nib library](http://visionmedia.github.io/nib/) for Stylus is included, so mixins for CSS3 are available.
+For convenience, the [nib library](https://tj.github.io/nib/) for Stylus is included, so mixins for CSS3 are available.
 
 Note that widgets are positioned absolute in relation to the screen (minus the menu bar), so a widget with `top: 0` and `left: 0` will be positioned in the top left corner of the screen, just below the menu bar.
 
