@@ -4628,7 +4628,7 @@ try {
 }
 
 
-},{"./src/app.coffee":29,"minimist":10}],25:[function(require,module,exports){
+},{"./src/app.coffee":30,"minimist":10}],25:[function(require,module,exports){
 'use strict';
 
 const WebSocketServer = require('ws').Server;
@@ -4684,7 +4684,52 @@ module.exports = function ScreensStore() {
   return init();
 };
 
-},{"./listen":32}],28:[function(require,module,exports){
+},{"./listen":33}],28:[function(require,module,exports){
+'use strict';
+
+const WebSocket = typeof window !== 'undefined'
+  ? window.WebSocket
+  : require('ws');
+
+const ws = new WebSocket('ws://localhost:8080');
+const listeners = [];
+const queuedMessages = [];
+let open = false;
+
+function handleWSOpen() {
+  open = true;
+  queuedMessages.forEach(function(data) {
+    ws.send(data);
+  });
+
+  queuedMessages.length = 0;
+}
+
+function handleMessage(data) {
+  listeners.forEach((f) => f(data));
+}
+
+if (ws.on) {
+  ws.on('open', handleWSOpen);
+  ws.on('message', handleMessage);
+} else {
+  ws.onopen = handleWSOpen;
+  ws.onmessage = (e) => handleMessage(e.data);
+}
+
+exports.onMessage = function onMessage(listener) {
+  listeners.push(listener);
+};
+
+exports.send = function send(data) {
+  if (open) {
+    ws.send(data);
+  } else {
+    queuedMessages.push(data);
+  }
+}
+
+},{"ws":"ws"}],29:[function(require,module,exports){
 'use strict';
 
 const fs = require('fs');
@@ -4781,7 +4826,7 @@ module.exports = function WidgetsStore(settingsDirPath) {
   return init();
 };
 
-},{"./listen":32,"./widget.coffee":35,"fs":"fs","path":"path"}],29:[function(require,module,exports){
+},{"./listen":33,"./widget.coffee":36,"fs":"fs","path":"path"}],30:[function(require,module,exports){
 var CommandServer, ScreensServer, ScreensStore, WSS, WidgetDir, WidgetsServer, WidgetsStore, connect, path, serveClient;
 
 connect = require('connect');
@@ -4818,7 +4863,7 @@ module.exports = function(port, widgetPath, settingsPath) {
 };
 
 
-},{"./MessageBus":25,"./ScreensServer":26,"./ScreensStore":27,"./WidgetsStore":28,"./command_server.coffee":30,"./serveClient":34,"./widget_directory.coffee":36,"./widgets_server.coffee":37,"connect":"connect","path":"path"}],30:[function(require,module,exports){
+},{"./MessageBus":25,"./ScreensServer":26,"./ScreensStore":27,"./WidgetsStore":29,"./command_server.coffee":31,"./serveClient":35,"./widget_directory.coffee":37,"./widgets_server.coffee":38,"connect":"connect","path":"path"}],31:[function(require,module,exports){
 var spawn;
 
 spawn = require('child_process').spawn;
@@ -4866,65 +4911,29 @@ module.exports = function(workingDir) {
 };
 
 
-},{"child_process":"child_process"}],31:[function(require,module,exports){
+},{"child_process":"child_process"}],32:[function(require,module,exports){
 'use strict';
 
-const WebSocket = this.WebSocket || require('ws');
-const ws = new WebSocket('ws://localhost:8080');
-
-const queuedMessages = [];
-let open = false;
-
-function handleWSOpen() {
-  open = true;
-  queuedMessages.forEach(function(data) {
-    ws.send(data);
-  });
-
-  queuedMessages.length = 0;
-}
-
-if (ws.on) {
-  ws.on('open', handleWSOpen);
-} else {
-  ws.onopen = handleWSOpen;
-}
+const ws = require('./SharedSocket');
 
 module.exports = function dispatch(eventType, payload) {
-  const data = JSON.stringify({
-    type: eventType,
-    payload: payload
-  });
-
-  if (open) {
-    ws.send(data);
-  } else {
-    queuedMessages.push(data);
-  }
+  ws.send(
+    JSON.stringify({type: eventType, payload: payload})
+  );
 };
 
-},{"ws":"ws"}],32:[function(require,module,exports){
+},{"./SharedSocket":28}],33:[function(require,module,exports){
 'use strict';
 
-const WebSocket = typeof window !== 'undefined'
-  ? window.WebSocket
-  : require('ws');
-
-const ws = new WebSocket('ws://localhost:8080');
+const ws = require('./SharedSocket');
 const listeners = {};
 
-function handleMessage(data) {
+ws.onMessage(function handleMessage(data) {
   const message = JSON.parse(data);
   if (listeners[message.type]) {
     listeners[message.type].forEach((f) => f(message.payload));
   }
-}
-
-if (ws.on) {
-  ws.on('message', handleMessage);
-} else {
-  ws.onmessage = (e) => handleMessage(e.data);
-}
+});
 
 module.exports = function listen(eventType, callback) {
   if (!listeners[eventType]) {
@@ -4933,7 +4942,7 @@ module.exports = function listen(eventType, callback) {
   listeners[eventType].push(callback);
 };
 
-},{"ws":"ws"}],33:[function(require,module,exports){
+},{"./SharedSocket":28}],34:[function(require,module,exports){
 var coffee, fs, loadWidget, nib, parseStyle, stylus, toSource;
 
 fs = require('fs');
@@ -4978,7 +4987,7 @@ module.exports = loadWidget = function(id, filePath) {
 };
 
 
-},{"coffee-script":"coffee-script","fs":"fs","nib":"nib","stylus":"stylus","tosource":23}],34:[function(require,module,exports){
+},{"coffee-script":"coffee-script","fs":"fs","nib":"nib","stylus":"stylus","tosource":23}],35:[function(require,module,exports){
 'use strict';
 
 const fs = require('fs');
@@ -4998,7 +5007,7 @@ module.exports = function serveClient(req, res, next) {
   bufferStream.end(indexHTML);
 };
 
-},{"fs":"fs","path":"path","stream":21}],35:[function(require,module,exports){
+},{"fs":"fs","path":"path","stream":21}],36:[function(require,module,exports){
 module.exports = function(implementation) {
   var api, contentEl, defaults, el, errorToString, init, loadScripts, mounted, publicApi, redraw, refresh, renderOutput, rendered, run, start, started, stop, timer, validate;
   api = {};
@@ -5178,7 +5187,7 @@ module.exports = function(implementation) {
 };
 
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var dispatch, fs, loadWidget, paths;
 
 loadWidget = require('./loadWidget.coffee');
@@ -5323,7 +5332,7 @@ module.exports = function(directoryPath, store) {
 };
 
 
-},{"./dispatch":31,"./loadWidget.coffee":33,"fs":"fs","fsevents":"fsevents","path":"path"}],37:[function(require,module,exports){
+},{"./dispatch":32,"./loadWidget.coffee":34,"fs":"fs","fsevents":"fsevents","path":"path"}],38:[function(require,module,exports){
 module.exports = function(widgetsStore) {
   return function(req, res, next) {
     if (req.url !== '/widgets/') {

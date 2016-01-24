@@ -224,7 +224,7 @@ logError = function(serialized) {
 window.onload = init;
 
 
-},{"./src/listen":3,"./src/os_bridge.coffee":4,"./src/widget.coffee":5}],2:[function(require,module,exports){
+},{"./src/listen":4,"./src/os_bridge.coffee":5,"./src/widget.coffee":6}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 'use strict';
@@ -232,24 +232,61 @@ window.onload = init;
 var WebSocket = typeof window !== 'undefined' ? window.WebSocket : require('ws');
 
 var ws = new WebSocket('ws://localhost:8080');
-var listeners = {};
+var listeners = [];
+var queuedMessages = [];
+var open = false;
+
+function handleWSOpen() {
+  open = true;
+  queuedMessages.forEach(function (data) {
+    ws.send(data);
+  });
+
+  queuedMessages.length = 0;
+}
 
 function handleMessage(data) {
+  listeners.forEach(function (f) {
+    return f(data);
+  });
+}
+
+if (ws.on) {
+  ws.on('open', handleWSOpen);
+  ws.on('message', handleMessage);
+} else {
+  ws.onopen = handleWSOpen;
+  ws.onmessage = function (e) {
+    return handleMessage(e.data);
+  };
+}
+
+exports.onMessage = function onMessage(listener) {
+  listeners.push(listener);
+};
+
+exports.send = function send(data) {
+  if (open) {
+    ws.send(data);
+  } else {
+    queuedMessages.push(data);
+  }
+};
+
+},{"ws":2}],4:[function(require,module,exports){
+'use strict';
+
+var ws = require('./SharedSocket');
+var listeners = {};
+
+ws.onMessage(function handleMessage(data) {
   var message = JSON.parse(data);
   if (listeners[message.type]) {
     listeners[message.type].forEach(function (f) {
       return f(message.payload);
     });
   }
-}
-
-if (ws.on) {
-  ws.on('message', handleMessage);
-} else {
-  ws.onmessage = function (e) {
-    return handleMessage(e.data);
-  };
-}
+});
 
 module.exports = function listen(eventType, callback) {
   if (!listeners[eventType]) {
@@ -258,7 +295,7 @@ module.exports = function listen(eventType, callback) {
   listeners[eventType].push(callback);
 };
 
-},{"ws":2}],4:[function(require,module,exports){
+},{"./SharedSocket":3}],5:[function(require,module,exports){
 var cachedWallpaper, getWallpaper, getWallpaperSlices, loadWallpaper, renderWallpaperSlice, renderWallpaperSlices;
 
 cachedWallpaper = new Image();
@@ -346,7 +383,7 @@ renderWallpaperSlice = function(wallpaper, canvas) {
 };
 
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function(implementation) {
   var api, contentEl, defaults, el, errorToString, init, loadScripts, mounted, publicApi, redraw, refresh, renderOutput, rendered, run, start, started, stop, timer, validate;
   api = {};
