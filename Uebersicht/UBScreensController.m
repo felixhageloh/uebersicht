@@ -13,6 +13,7 @@ int const MAX_DISPLAYS = 42;
 
 @implementation UBScreensController {
     id listener;
+    UBDispatcher* dispatcher;
 }
 
 @synthesize screens;
@@ -24,6 +25,7 @@ int const MAX_DISPLAYS = 42;
     if (self) {
         screens = [[NSMutableDictionary alloc] initWithCapacity:MAX_DISPLAYS];
         listener = target;
+        dispatcher = [[UBDispatcher alloc] init];
         [self updateScreens];
         
         [[NSNotificationCenter defaultCenter]
@@ -80,7 +82,7 @@ int const MAX_DISPLAYS = 42;
     
     sortedScreens = ids;
     
-    [[UBDispatcher sharedDispatcher]
+    [dispatcher
         dispatch: @"SCREENS_DID_CHANGE"
         withPayload: sortedScreens
     ];

@@ -9,7 +9,7 @@
 #import "UBWidgetsController.h"
 #import "UBScreensController.h"
 #import "UBDispatcher.h"
-#import <SocketRocket/SRWebSocket.h>
+#import "UBListener.h"
 
 @implementation UBWidgetsController {
     UBScreensController* screensController;
@@ -17,9 +17,10 @@
     NSInteger currentIndex;
     NSMutableDictionary* widgets;
     NSArray* sortedWidgets;
-    SRWebSocket* ws;
     NSImage* statusIconVisible;
     NSImage* statusIconHidden;
+    UBDispatcher* dispatcher;
+    UBListener* listener;
 
 }
 
@@ -48,13 +49,49 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         currentIndex++;
         [menu insertItem:[NSMenuItem separatorItem] atIndex:currentIndex];
         
+        dispatcher = [[UBDispatcher alloc] init];
+        listener = [[UBListener alloc] init];
         
-        ws = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest
-            requestWithURL:[NSURL URLWithString:@"ws://127.0.0.1:8080"]]
-        ];
+        [listener on:@"WIDGET_ADDED" do:^(NSDictionary* widget) {
+            [self addWidget:widget];
+            [self renderWidgetMenu];
+        }];
         
-        ws.delegate = self;
-        [ws open];
+        [listener on:@"WIDGET_REMOVED" do:^(NSString* widgetId) {
+            [self removeWidget:widgetId];
+            [self renderWidgetMenu];
+        }];
+        
+        [listener on:@"WIDGET_DID_HIDE" do:^(NSString* widgetId) {
+            [widgets[widgetId] setObject:@YES forKey:@"hidden"];
+            [self renderWidgetMenu];
+        }];
+        
+        [listener on:@"WIDGET_DID_UNHIDE" do:^(NSString* widgetId) {
+            [widgets[widgetId] setObject:@NO forKey:@"hidden"];
+            [self renderWidgetMenu];
+        }];
+        
+        
+        [listener on:@"WIDGET_WAS_PINNED" do:^(NSString* widgetId) {
+            [widgets[widgetId] setObject:@YES forKey:@"pinned"];
+            [self renderWidgetMenu];
+        }];
+        
+        [listener on:@"WIDGET_WAS_PINNED" do:^(NSString* widgetId) {
+            [widgets[widgetId] setObject:@NO forKey:@"pinned"];
+            [self renderWidgetMenu];
+        }];
+        
+        [listener on:@"WIDGET_DID_CHANGE_SCREEN" do:^(NSDictionary* data) {
+            widgets[data[@"id"]][@"screenId"] = data[@"screenId"];
+            [self renderWidgetMenu];
+        }];
+        
+        [listener on:@"SCREENS_DID_CHANGE" do:^(NSDictionary* data) {
+            [self renderWidgetMenu];;
+        }];
+
         
         statusIconVisible = [[NSBundle mainBundle]
             imageForResource:@"widget-status-visible"
@@ -231,7 +268,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
     BOOL isHidden = ![widgets[widgetId][@"hidden"] boolValue];
     
-    [[UBDispatcher sharedDispatcher]
+    [dispatcher
         dispatch: isHidden ? @"WIDGET_DID_HIDE" : @"WIDGET_DID_UNHIDE"
         withPayload: widgetId
     ];
@@ -242,7 +279,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
     BOOL isPinned = ![widgets[widgetId][@"pinned"] boolValue];
     
-    [[UBDispatcher sharedDispatcher]
+    [dispatcher
         dispatch: isPinned ? @"WIDGET_WAS_PINNED" : @"WIDGET_WAS_UNPINNED"
         withPayload: widgetId
     ];
@@ -254,7 +291,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSDictionary* data = [menuItem representedObject];
     NSNumber* screenId = data[@"screenId"];
 
-    [[UBDispatcher sharedDispatcher]
+    [dispatcher
         dispatch: @"WIDGET_DID_CHANGE_SCREEN"
         withPayload: @{
             @"id": data[@"widgetId"],
@@ -262,42 +299,5 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         }
     ];
 }
-
-- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message
-{
-
-    NSDictionary* parsedMessage = [NSJSONSerialization
-        JSONObjectWithData: [message dataUsingEncoding:NSUTF8StringEncoding]
-        options: 0
-        error: nil
-    ];
-    
-    if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_ADDED"]) {
-        [self addWidget:parsedMessage[@"payload"]];
-        [self renderWidgetMenu];
-    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_REMOVED"]) {
-        [self removeWidget:parsedMessage[@"payload"]];
-        [self renderWidgetMenu];
-    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_DID_HIDE"]) {
-        [widgets[parsedMessage[@"payload"]] setObject:@YES forKey:@"hidden"];
-        [self renderWidgetMenu];
-    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_DID_UNHIDE"]) {
-        [widgets[parsedMessage[@"payload"]] setObject:@NO forKey:@"hidden"];
-        [self renderWidgetMenu];
-    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_WAS_PINNED"]) {
-        [widgets[parsedMessage[@"payload"]] setObject:@YES forKey:@"pinned"];
-        [self renderWidgetMenu];
-    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_WAS_UNPINNED"]) {
-        [widgets[parsedMessage[@"payload"]] setObject:@NO forKey:@"pinned"];
-        [self renderWidgetMenu];
-    } else if ([parsedMessage[@"type"] isEqualToString:@"WIDGET_DID_CHANGE_SCREEN"]) {
-        NSDictionary* data = parsedMessage[@"payload"];
-        widgets[data[@"id"]][@"screenId"] = data[@"screenId"];
-        [self renderWidgetMenu];
-    } else if ([parsedMessage[@"type"] isEqualToString:@"SCREENS_DID_CHANGE"]) {
-        [self renderWidgetMenu];
-    }
-}
-
 
 @end

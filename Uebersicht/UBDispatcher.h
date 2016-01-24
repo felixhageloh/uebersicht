@@ -7,11 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <SocketRocket/SRWebSocket.h>
 
-@interface UBDispatcher : NSObject <SRWebSocketDelegate>
 
-+ (id)sharedDispatcher;
+@interface UBDispatcher : NSObject
+
 - (void)dispatch:(NSString*)type withPayload:(id)payload;
 
 @end

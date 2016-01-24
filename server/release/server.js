@@ -4727,7 +4727,7 @@ exports.send = function send(data) {
   } else {
     queuedMessages.push(data);
   }
-}
+};
 
 },{"ws":"ws"}],29:[function(require,module,exports){
 'use strict';
