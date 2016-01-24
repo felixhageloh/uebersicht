@@ -11,6 +11,7 @@
 @interface UBScreensController : NSObject
 
 @property NSMutableDictionary* screens;
+@property NSArray* sortedScreens;
 
 - (id)initWithChangeListener:(id)target;
 - (NSRect)screenRect:(NSNumber*)screenId;

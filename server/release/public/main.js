@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Widget, addWidget, bail, contentEl, deserialize, getScreens, getWidgets, hideWidget, init, initWidget, initWidgets, isMainScreen, isVisibleOnScreen, listen, logError, reRenderWidgets, removeWidget, renderWidget, screenId, screens, unHideWidget, updateWidget, widgets;
+var Widget, addWidget, bail, contentEl, deserialize, getScreens, getWidgets, hideWidget, init, initWidget, initWidgets, isMainScreen, isVisibleOnScreen, listen, logError, pinWidget, reRenderWidgets, removeWidget, renderWidget, screenId, screens, unHideWidget, unPinWidget, updateWidget, widgets;
 
 Widget = require('./src/widget.coffee');
 
@@ -59,6 +59,12 @@ init = function() {
       });
       listen('WIDGET_DID_UNHIDE', function(id) {
         return unHideWidget(widgets[id]);
+      });
+      listen('WIDGET_WAS_PINNED', function(id) {
+        return pinWidget(widgets[id]);
+      });
+      listen('WIDGET_WAS_UNPINNED', function(id) {
+        return unPinWidget(widgets[id]);
       });
       listen('WIDGET_DID_CHANGE_SCREEN', function(d) {
         widgets[d.id].settings.screenId = d.screenId;
@@ -167,6 +173,16 @@ unHideWidget = function(widget) {
   }
 };
 
+pinWidget = function(widget) {
+  widget.settings.pinned = true;
+  return reRenderWidgets();
+};
+
+unPinWidget = function(widget) {
+  widget.settings.pinned = false;
+  return reRenderWidgets();
+};
+
 deserialize = function(serializedWidget) {
   return eval(serializedWidget);
 };
@@ -175,7 +191,10 @@ isVisibleOnScreen = function(widgetDetails, theScreenId) {
   if (widgetDetails.settings.hidden) {
     return false;
   }
-  return widgetDetails.settings.screenId === theScreenId || (!widgetDetails.settings.screenId && isMainScreen());
+  if (widgetDetails.settings.screenId === theScreenId) {
+    return true;
+  }
+  return isMainScreen() && (!widgetDetails.settings.screenId || (!widgetDetails.settings.pinned && screens.indexOf(widgetDetails.settings.screenId) === -1));
 };
 
 isMainScreen = function() {

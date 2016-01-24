@@ -17,9 +17,17 @@ module.exports = function WidgetsStore(settingsDirPath) {
     listen('WIDGET_ADDED', (d) => handleAdded(d.id, d));
     listen('WIDGET_REMOVED', (id) => widgets[id] = undefined);
     listen('WIDGET_UPDATED', (d) => handleUpdate(d.id, d));
-    listen('WIDGET_DID_HIDE', (id) => handleSettingsChange(id, {hidden: true}));
+    listen('WIDGET_DID_HIDE', (id) => {
+      handleSettingsChange(id, {hidden: true});
+    });
     listen('WIDGET_DID_UNHIDE', (id) => {
       handleSettingsChange(id, {hidden: false});
+    });
+    listen('WIDGET_WAS_PINNED', (id) => {
+      handleSettingsChange(id, {pinned: true});
+    });
+    listen('WIDGET_WAS_UNPINNED', (id) => {
+      handleSettingsChange(id, {pinned: false});
     });
     listen('WIDGET_DID_CHANGE_SCREEN', (d) => {
       handleSettingsChange(d.id, {screenId: d.screenId});

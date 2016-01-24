@@ -211,7 +211,6 @@ int const PORT = 41416;
 - (void)screensChanged:(NSDictionary*)screens
 {
     if (widgetsController) {
-        [widgetsController screensChanged:screens];
         [self renderOnScreens:screens];
     }
 }

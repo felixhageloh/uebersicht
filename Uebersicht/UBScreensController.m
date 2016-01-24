@@ -16,6 +16,7 @@ int const MAX_DISPLAYS = 42;
 }
 
 @synthesize screens;
+@synthesize sortedScreens;
 
 - (id)initWithChangeListener:(id)target;
 {
@@ -77,9 +78,11 @@ int const MAX_DISPLAYS = 42;
         [ids addObject: screenId];
     }
     
+    sortedScreens = ids;
+    
     [[UBDispatcher sharedDispatcher]
         dispatch: @"SCREENS_DID_CHANGE"
-        withPayload: ids
+        withPayload: sortedScreens
     ];
 }
 

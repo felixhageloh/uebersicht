@@ -47,6 +47,12 @@ init = ->
       listen 'WIDGET_DID_UNHIDE', (id) ->
         unHideWidget(widgets[id])
 
+      listen 'WIDGET_WAS_PINNED', (id) ->
+        pinWidget(widgets[id])
+
+      listen 'WIDGET_WAS_UNPINNED', (id) ->
+        unPinWidget(widgets[id])
+
       listen 'WIDGET_DID_CHANGE_SCREEN', (d) ->
         widgets[d.id].settings.screenId = d.screenId
         reRenderWidgets()
@@ -108,14 +114,26 @@ unHideWidget = (widget) ->
   widget.settings.hidden = false
   renderWidget widget if isVisibleOnScreen(widget, screenId)
 
+pinWidget = (widget) ->
+  widget.settings.pinned = true
+  reRenderWidgets()
+
+unPinWidget = (widget) ->
+  widget.settings.pinned = false
+  reRenderWidgets()
+
 deserialize = (serializedWidget) ->
   eval serializedWidget
 
 isVisibleOnScreen = (widgetDetails, theScreenId) ->
   return false if widgetDetails.settings.hidden
+  return true if widgetDetails.settings.screenId == theScreenId
 
-  widgetDetails.settings.screenId == theScreenId or
-  (!widgetDetails.settings.screenId and isMainScreen())
+  return isMainScreen() and (
+    !widgetDetails.settings.screenId or
+    (!widgetDetails.settings.pinned and
+      screens.indexOf(widgetDetails.settings.screenId) == -1)
+  )
 
 isMainScreen = ->
   screenId == screens[0]

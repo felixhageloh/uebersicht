@@ -18,5 +18,4 @@
 
 - (void)addWidget:(NSDictionary*)widget;
 - (void)removeWidget:(NSString*)widget;
-- (void)screensChanged:(id)sender;
 @end
