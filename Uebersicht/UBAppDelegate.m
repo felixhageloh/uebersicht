@@ -17,6 +17,7 @@
 #import "WebInspector.h"
 #import "UBKeyHandler.h"
 #import "UBWidgetsController.h"
+#import "UBWidgetsStore.h"
 
 int const PORT = 41416;
 
@@ -28,6 +29,7 @@ int const PORT = 41416;
     BOOL keepServerAlive;
     int portOffset;
     UBKeyHandler* keyHandler;
+    UBWidgetsStore* widgetsStore;
     UBWidgetsController* widgetsController;
     NSMutableDictionary* windows;
 }
@@ -42,7 +44,6 @@ int const PORT = 41416;
         initWithWindowNibName:@"UBPreferencesController"
     ];
     
-    
     // NSTask doesn't terminate when xcode stop is pressed. Other ways of
     // spawning the server, like system() or popen() have the same problem.
     // So, hit em with a hammer :(
@@ -54,16 +55,20 @@ int const PORT = 41416;
     
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
+            widgetsStore = [[UBWidgetsStore alloc] init];
+    
             screensController = [[UBScreensController alloc]
                 initWithChangeListener:self
             ];
             
             widgetsController = [[UBWidgetsController alloc]
-                initWithMenu:statusBarMenu
-                     screens:screensController
-                settingsPath:[self getPreferencesDir]
-                     baseUrl:[self baseUrl]
+                initWithMenu: statusBarMenu
+                widgets: widgetsStore
+                screens: screensController
             ];
+            [widgetsStore onChange: ^(NSDictionary* widgets) {
+                [widgetsController render];
+            }];
         
             [self renderOnScreens:[screensController screens]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {

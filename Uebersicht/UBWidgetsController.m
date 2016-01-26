@@ -7,36 +7,34 @@
 //
 
 #import "UBWidgetsController.h"
+#import "UBWidgetsStore.h"
 #import "UBScreensController.h"
 #import "UBDispatcher.h"
-#import "UBListener.h"
+
 
 @implementation UBWidgetsController {
+    UBWidgetsStore* widgets;
     UBScreensController* screensController;
     NSMenu* mainMenu;
     NSInteger currentIndex;
-    NSMutableDictionary* widgets;
-    NSArray* sortedWidgets;
     NSImage* statusIconVisible;
     NSImage* statusIconHidden;
     UBDispatcher* dispatcher;
-    UBListener* listener;
-
 }
 
 static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 
 - (id)initWithMenu:(NSMenu*)menu
+           widgets:(UBWidgetsStore*)theWidgets
            screens:(UBScreensController*)screens
-      settingsPath:(NSURL*)settingsPath
-           baseUrl:(NSURL*)url
 {
     self = [super init];
     
     
     if (self) {
-        widgets = [[NSMutableDictionary alloc] init];
+
         mainMenu = menu;
+        widgets = theWidgets;
         screensController = screens;
         
         currentIndex = [self indexOfWidgetMenuItems:menu];
@@ -50,48 +48,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         [menu insertItem:[NSMenuItem separatorItem] atIndex:currentIndex];
         
         dispatcher = [[UBDispatcher alloc] init];
-        listener = [[UBListener alloc] init];
-        
-        [listener on:@"WIDGET_ADDED" do:^(NSDictionary* widget) {
-            [self addWidget:widget];
-            [self renderWidgetMenu];
-        }];
-        
-        [listener on:@"WIDGET_REMOVED" do:^(NSString* widgetId) {
-            [self removeWidget:widgetId];
-            [self renderWidgetMenu];
-        }];
-        
-        [listener on:@"WIDGET_DID_HIDE" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@YES forKey:@"hidden"];
-            [self renderWidgetMenu];
-        }];
-        
-        [listener on:@"WIDGET_DID_UNHIDE" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@NO forKey:@"hidden"];
-            [self renderWidgetMenu];
-        }];
-        
-        
-        [listener on:@"WIDGET_WAS_PINNED" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@YES forKey:@"pinned"];
-            [self renderWidgetMenu];
-        }];
-        
-        [listener on:@"WIDGET_WAS_PINNED" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@NO forKey:@"pinned"];
-            [self renderWidgetMenu];
-        }];
-        
-        [listener on:@"WIDGET_DID_CHANGE_SCREEN" do:^(NSDictionary* data) {
-            widgets[data[@"id"]][@"screenId"] = data[@"screenId"];
-            [self renderWidgetMenu];
-        }];
-        
-        [listener on:@"SCREENS_DID_CHANGE" do:^(NSDictionary* data) {
-            [self renderWidgetMenu];;
-        }];
-
+       
         
         statusIconVisible = [[NSBundle mainBundle]
             imageForResource:@"widget-status-visible"
@@ -106,33 +63,8 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     return self;
 }
 
-- (void)addWidget:(NSDictionary*)widget
-{
-    NSString* widgetId = widget[@"id"];
-    if (!widgets[widgetId]) {
-        widgets[widgetId] = [[NSMutableDictionary alloc]
-            initWithDictionary:widget[@"settings"]
-        ];
-    }
-    
-    sortedWidgets = [widgets.allKeys
-        sortedArrayUsingSelector:@selector(compare:)
-    ];
-}
 
-
-- (void)removeWidget:(NSString*)widgetId
-{
-    if (widgets[widgetId]) {
-        [widgets removeObjectForKey:widgetId];
-    }
-    
-    sortedWidgets = [widgets.allKeys
-        sortedArrayUsingSelector:@selector(compare:)
-    ];
-}
-
-- (void)renderWidgetMenu
+- (void)render
 {
      for (NSMenuItem *item in [mainMenu itemArray]) {
         if (item.tag == WIDGET_MENU_ITEM_TAG) {
@@ -140,8 +72,8 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         }
     }
     
-    for (NSInteger i = sortedWidgets.count - 1; i >= 0; i--) {
-        [self renderWidget:sortedWidgets[i] inMenu:mainMenu];
+    for (NSInteger i = widgets.sortedWidgets.count - 1; i >= 0; i--) {
+        [self renderWidget:widgets.sortedWidgets[i] inMenu:mainMenu];
     }
 }
 
@@ -185,7 +117,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     ];
     [hide setRepresentedObject:widgetId];
     [hide setTarget:self];
-    [hide setState:[widgets[widgetId][@"hidden"] boolValue]];
+    [hide setState:[[widgets get:widgetId][@"hidden"] boolValue]];
     [menu insertItem:hide atIndex:0];
 }
 
@@ -198,7 +130,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     ];
     [pin setTarget:self];
     [pin setRepresentedObject:widgetId];
-    [pin setState:[widgets[widgetId][@"pinned"] boolValue]];
+    [pin setState:[[widgets get:widgetId][@"pinned"] boolValue]];
     [menu insertItem:pin atIndex:0];
 }
 
@@ -214,7 +146,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSString *title;
     NSMenuItem *newItem;
     NSString *name;
-    NSNumber* widgetScreenId = widgets[widgetId][@"screenId"];
+    NSNumber* widgetScreenId = [widgets get:widgetId][@"screenId"];
     
     newItem = [NSMenuItem separatorItem];
     [menu insertItem:newItem atIndex:0];
@@ -248,7 +180,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 
 - (BOOL)isWidgetVisible:(NSString*)widgetId
 {
-    NSDictionary* widget = widgets[widgetId];
+    NSDictionary* widget = [widgets get:widgetId];
     BOOL screenUnavailable = !screensController.screens[widget[@"screenId"]];
     return (
         ![widget[@"hidden"] boolValue] &&
@@ -266,7 +198,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 - (void)toggleHidden:(id)sender
 {
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
-    BOOL isHidden = ![widgets[widgetId][@"hidden"] boolValue];
+    BOOL isHidden = ![[widgets get:widgetId][@"hidden"] boolValue];
     
     [dispatcher
         dispatch: isHidden ? @"WIDGET_DID_HIDE" : @"WIDGET_DID_UNHIDE"
@@ -277,7 +209,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 - (void)togglePinned:(id)sender
 {
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
-    BOOL isPinned = ![widgets[widgetId][@"pinned"] boolValue];
+    BOOL isPinned = ![[widgets get:widgetId][@"pinned"] boolValue];
     
     [dispatcher
         dispatch: isPinned ? @"WIDGET_WAS_PINNED" : @"WIDGET_WAS_UNPINNED"

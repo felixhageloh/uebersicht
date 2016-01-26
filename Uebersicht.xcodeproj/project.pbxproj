@@ -40,6 +40,7 @@
 		DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78C91C550B810051E78B /* UBWebSocket.m */; };
 		DCAC78CD1C551D130051E78B /* UBListener.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78CC1C551D130051E78B /* UBListener.m */; };
 		DCB5D9871948802C000D5C83 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */; };
+		DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */; };
 		DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E3C01A376AD400A12516 /* UBLocation.m */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
 		DCECA1C81893F23200C0CA32 /* server.js in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C61893F23200C0CA32 /* server.js */; };
@@ -125,6 +126,8 @@
 		DCAC78CB1C551D130051E78B /* UBListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBListener.h; sourceTree = "<group>"; };
 		DCAC78CC1C551D130051E78B /* UBListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBListener.m; sourceTree = "<group>"; };
 		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsStore.h; sourceTree = "<group>"; };
+		DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsStore.m; sourceTree = "<group>"; };
 		DCE2453D18ED864800C9FAE3 /* WebInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebInspector.h; sourceTree = "<group>"; };
 		DCE7E3BF1A376AD400A12516 /* UBLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBLocation.h; sourceTree = "<group>"; };
 		DCE7E3C01A376AD400A12516 /* UBLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBLocation.m; sourceTree = "<group>"; };
@@ -227,6 +230,8 @@
 				DC443E311C0305E500AA31C7 /* UBKeyHandler.m */,
 				DC314A1E1C0EE024000A56D2 /* UBWidgetsController.h */,
 				DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */,
+				DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */,
+				DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */,
 				DCAC78C81C550B810051E78B /* UBWebSocket.h */,
 				DCAC78C91C550B810051E78B /* UBWebSocket.m */,
 				DC9F7CE11C439CE50014E25B /* UBDispatcher.h */,
@@ -449,6 +454,7 @@
 				DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */,
 				DC8B4AD119ACFD9700F177C2 /* UBWallperServer.m in Sources */,
 				DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */,
+				DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */,
 				DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
 				DCAC78CD1C551D130051E78B /* UBListener.m in Sources */,

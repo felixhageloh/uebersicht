@@ -8,14 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 @class UBScreensController;
+@class UBWidgetsStore;
 
 @interface UBWidgetsController : NSController
 
 - (id)initWithMenu:(NSMenu*)menu
-           screens:(UBScreensController*)screens
-      settingsPath:(NSURL*)settingsPath
-           baseUrl:(NSURL*)url;
-
-- (void)addWidget:(NSDictionary*)widget;
-- (void)removeWidget:(NSString*)widget;
+           widgets:(UBWidgetsStore*)theWidgets
+           screens:(UBScreensController*)screens;
+- (void)render;
 @end
