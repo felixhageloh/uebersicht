@@ -4632,11 +4632,10 @@ try {
 'use strict';
 
 const WebSocketServer = require('ws').Server;
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 41415 });
 
 function broadcast(data) {
   wss.clients.forEach((client) => client.send(data));
-  //console.log("\n", data, "\n");
 }
 
 wss.on('connection', function connection(ws) {
@@ -4691,7 +4690,7 @@ const WebSocket = typeof window !== 'undefined'
   ? window.WebSocket
   : require('ws');
 
-const ws = new WebSocket('ws://localhost:8080');
+const ws = new WebSocket('ws://127.0.0.1:41415');
 const listeners = [];
 const queuedMessages = [];
 let open = false;

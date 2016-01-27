@@ -4,7 +4,7 @@ const WebSocket = typeof window !== 'undefined'
   ? window.WebSocket
   : require('ws');
 
-const ws = new WebSocket('ws://localhost:8080');
+const ws = new WebSocket('ws://127.0.0.1:41415');
 const listeners = [];
 const queuedMessages = [];
 let open = false;

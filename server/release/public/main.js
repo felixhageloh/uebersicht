@@ -231,7 +231,7 @@ window.onload = init;
 
 var WebSocket = typeof window !== 'undefined' ? window.WebSocket : require('ws');
 
-var ws = new WebSocket('ws://localhost:8080');
+var ws = new WebSocket('ws://127.0.0.1:41415');
 var listeners = [];
 var queuedMessages = [];
 var open = false;
