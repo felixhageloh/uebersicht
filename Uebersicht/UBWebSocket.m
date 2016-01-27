@@ -27,14 +27,9 @@
 - (id)init {
 
     if (self = [super init]) {
-        ws = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest
-            requestWithURL:[NSURL URLWithString:@"ws://127.0.0.1:8080"]]
-        ];
-        ws.delegate = self;
-        [ws open];
-        
         listeners = [[NSMutableArray alloc] init];
         queuedMessages = [[NSMutableArray alloc] init];
+        [self openWebsocket];
     }
     return self;
 }
@@ -53,6 +48,15 @@
     [listeners addObject:listener];
 }
 
+- (void)openWebsocket
+{
+    ws = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest
+        requestWithURL:[NSURL URLWithString:@"ws://127.0.0.1:8888"]]
+    ];
+    ws.delegate = self;
+    [ws open];
+}
+
 - (void)webSocketDidOpen:(SRWebSocket *)webSocket
 {
     for (id message in queuedMessages) {
@@ -67,6 +71,29 @@
     for (void (^listener)(id) in listeners) {
         listener(message);
     }
+}
+
+- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error
+{
+    [webSocket close];
+    [self
+        performSelector:@selector(openWebsocket)
+        withObject:nil
+        afterDelay: 0.1
+    ];
+}
+
+- (void)webSocket:(SRWebSocket *)webSocket
+    didCloseWithCode:(NSInteger)code
+    reason:(NSString *)reason
+    wasClean:(BOOL)wasClean
+{
+
+    [self
+        performSelector:@selector(openWebsocket)
+        withObject:nil
+        afterDelay: 0.1
+    ];
 }
 
 @end
