@@ -55,21 +55,6 @@ int const PORT = 41416;
     
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            widgetsStore = [[UBWidgetsStore alloc] init];
-    
-            screensController = [[UBScreensController alloc]
-                initWithChangeListener:self
-            ];
-            
-            widgetsController = [[UBWidgetsController alloc]
-                initWithMenu: statusBarMenu
-                widgets: widgetsStore
-                screens: screensController
-            ];
-            [widgetsStore onChange: ^(NSDictionary* widgets) {
-                [widgetsController render];
-            }];
-        
             [self renderOnScreens:[screensController screens]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
@@ -91,6 +76,21 @@ int const PORT = 41416;
         initWithPreferences: preferences
         listener: self
     ];
+    
+    widgetsStore = [[UBWidgetsStore alloc] init];
+
+    screensController = [[UBScreensController alloc]
+        initWithChangeListener:self
+    ];
+    
+    widgetsController = [[UBWidgetsController alloc]
+        initWithMenu: statusBarMenu
+        widgets: widgetsStore
+        screens: screensController
+    ];
+    [widgetsStore onChange: ^(NSDictionary* widgets) {
+        [widgetsController render];
+    }];
 }
 
 - (void)startServer:(void (^)(NSString*))callback
