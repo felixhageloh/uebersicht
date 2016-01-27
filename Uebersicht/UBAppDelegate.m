@@ -261,12 +261,17 @@ int const PORT = 41416;
 
 - (void)modifierKeyReleased
 {
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] sendToDesktop];
+    }
 }
 
 
 - (void)modifierKeyPressed
 {
-   
+   for (NSNumber* screenId in windows) {
+        [windows[screenId] comeToFront];
+    }
 }
 
 - (void)widgetDirDidChange
