@@ -424,7 +424,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=$PATH:/usr/local/bin\ncd server && grunt release";
+			shellScript = "export PATH=$PATH:/usr/local/bin\ncd server && npm run-script release";
 		};
 		DC5E277C197034FF00CBDA8B /* Code Sign Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
