@@ -94,8 +94,6 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     
     
     NSMenu* widgetMenu = [[NSMenu alloc] init];
-    
-    [self addHideToggleToMenu:widgetMenu forWidget:widgetId];
     [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:0];
     [self addPinnedToggleToMenu:widgetMenu forWidget:widgetId];
     [self
@@ -126,18 +124,6 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 
 }
 
-- (void)addHideToggleToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
-{
-    NSMenuItem* hide = [[NSMenuItem alloc]
-        initWithTitle: @"Hidden"
-        action: @selector(toggleHidden:)
-        keyEquivalent: @""
-    ];
-    [hide setRepresentedObject:widgetId];
-    [hide setTarget:self];
-    [hide setState:[[widgets get:widgetId][@"hidden"] boolValue]];
-    [menu insertItem:hide atIndex:0];
-}
 
 - (void)addPinnedToggleToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
 {
