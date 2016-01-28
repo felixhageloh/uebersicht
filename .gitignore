@@ -20,3 +20,4 @@ DerivedData
 # manual
 
 server/node_modules
+server/release/node_modules
