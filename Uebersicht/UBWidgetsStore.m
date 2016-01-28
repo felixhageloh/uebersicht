@@ -99,6 +99,11 @@
         widgets[widgetId] = [[NSMutableDictionary alloc]
             initWithDictionary:widget[@"settings"]
         ];
+        
+        [widgets[widgetId]
+            setObject: widget[@"filePath"]
+            forKey: @"filePath"
+        ];
     }
     
     sortedWidgets = [widgets.allKeys

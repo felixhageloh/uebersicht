@@ -94,6 +94,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     
     
     NSMenu* widgetMenu = [[NSMenu alloc] init];
+    
     [self addHideToggleToMenu:widgetMenu forWidget:widgetId];
     [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:0];
     [self addPinnedToggleToMenu:widgetMenu forWidget:widgetId];
@@ -103,9 +104,26 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         forWidget: widgetId
     ];
     
+    [self addEditMenuItemToMenu:widgetMenu forWidget:widgetId];
+    [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:1];
+    
     
     [newItem setSubmenu:widgetMenu];
     [menu insertItem:newItem atIndex:currentIndex];
+}
+
+- (void)addEditMenuItemToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
+{
+    NSMenuItem* hide = [[NSMenuItem alloc]
+        initWithTitle: @"Edit..."
+        action: @selector(editWidget:)
+        keyEquivalent: @""
+    ];
+    [hide setRepresentedObject:widgetId];
+    [hide setTarget:self];
+    [hide setState:[[widgets get:widgetId][@"hidden"] boolValue]];
+    [menu insertItem:hide atIndex:0];
+
 }
 
 - (void)addHideToggleToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
@@ -230,6 +248,14 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
             @"screenId": screenId
         }
     ];
+}
+
+- (void)editWidget:(id)sender
+{
+    NSString* widgetId = [(NSMenuItem*)sender representedObject];
+    NSString* filePath = [widgets get:widgetId][@"filePath"];
+    
+    [[NSWorkspace sharedWorkspace] openFile:filePath];
 }
 
 @end
