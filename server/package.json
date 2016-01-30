@@ -20,6 +20,8 @@
     "nib": "~1.0.2"
   },
   "dependencies": {
+    "babel-core": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
     "coffee-script": "~1.7.1",
     "connect": "~2.9.0",
     "fsevents": "^0.3.0",
