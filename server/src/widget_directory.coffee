@@ -13,9 +13,11 @@ module.exports = (directoryPath, store) ->
     watcher.on 'change', (filePath, info) ->
       # can be enabled in the future to make the watcher more strict
       #return if info.type  == 'directory' and !isWidgetDirPath(info.path)
-
       switch info.event
-        when 'modified' then updateWidget(filePath) if isWidgetPath(filePath)
+        when 'modified'
+          return unless isWidgetPath(filePath)
+          id = widgetId(filePath)
+          if store.get(id)? then updateWidget(filePath) else addWidget(filePath)
         when 'moved-in', 'created' then checkWidgetAdded filePath, info.type
         when 'moved-out', 'deleted' then checkWidgetRemoved filePath, info.type
 

@@ -446,10 +446,17 @@ module.exports = function(directoryPath, store) {
     var watcher;
     watcher = fsevents(directoryPath);
     watcher.on('change', function(filePath, info) {
+      var id;
       switch (info.event) {
         case 'modified':
-          if (isWidgetPath(filePath)) {
+          if (!isWidgetPath(filePath)) {
+            return;
+          }
+          id = widgetId(filePath);
+          if (store.get(id) != null) {
             return updateWidget(filePath);
+          } else {
+            return addWidget(filePath);
           }
           break;
         case 'moved-in':
