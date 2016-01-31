@@ -28,13 +28,19 @@ module.exports = (directoryPath, store) ->
   api.path = directoryPath
 
   addWidget = (filePath) ->
-    widget = readWidget(filePath)
-    widget.settings = store.settings()[widget.id] || {}
-    dispatch('WIDGET_ADDED', widget)
+    readWidget(filePath)
+      .then (widget) ->
+        widget.settings = store.settings()[widget.id] || {}
+        dispatch('WIDGET_ADDED', widget)
+      .catch (widgetWithError) ->
+        widgetWithError.settings = store.settings()[widgetWithError.id] || {}
+        dispatch('WIDGET_ADDED', widgetWithError)
+        dispatch('WIDGET_BROKE', widgetWithError)
 
   updateWidget = (filePath) ->
-    widget = readWidget(filePath)
-    dispatch('WIDGET_UPDATED', widget)
+    readWidget(filePath)
+      .then (widget) -> dispatch('WIDGET_UPDATED', widget)
+      .catch (widgetWithError) -> dispatch('WIDGET_BROKE', widgetWithError)
 
   removeWidget = (id) ->
     dispatch('WIDGET_REMOVED', id)
@@ -67,26 +73,10 @@ module.exports = (directoryPath, store) ->
       type = if stat.isDirectory() then 'directory' else 'file'
       callback path, type
 
-  readWidget = (filePath) ->
+  readWidget = (filePath) -> new Promise (resolve, reject) ->
     id = widgetId filePath
-
-    try
-      loadWidget(id, filePath)
-    catch e
-      return if e.code == 'ENOENT' # widget has been deleted
-      dispatch('WIDGET_BROKE', prettyPrintError(filePath, e))
-
-  prettyPrintError = (filePath, error) ->
-    errStr = error.toString?() or String(error.message)
-
-    # coffeescipt errors will have [stdin] when prettyPrinted (because they are
-    # parsed from stdin). So lets replace that with the real file path
-    if errStr.indexOf("[stdin]") > -1
-      errStr = errStr.replace("[stdin]", filePath)
-    else
-      errStr = filePath + ': ' + errStr
-
-    errStr
+    loadWidget id, filePath, (err, widget) ->
+      if err then reject(err) else resolve(widget)
 
   widgetId = (filePath) ->
     fileParts = filePath.replace(directoryPath, '').split(/\/+/)

@@ -62,9 +62,7 @@ int const PORT = 41416;
                 keepServerAlive = NO;
                 NSLog(@"couldn't find an open port. Giving up...");
             }
-        } else if ([output rangeOfString:@"error"].location != NSNotFound) {
-            [self notifyUser:output withTitle:@"Error"];
-        };
+        }
     }];
     
     // enable the web inspector
@@ -172,17 +170,6 @@ int const PORT = 41416;
     
     [task launch];
     return task;
-}
-
-- (void)notifyUser:(NSString*)message withTitle:(NSString*)title
-{
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
-    notification.title = title;
-    notification.informativeText = message;
-    
-    [[NSUserNotificationCenter defaultUserNotificationCenter]
-        deliverNotification:notification
-    ];
 }
 
 

@@ -35,6 +35,16 @@
             [self notifyChange];
         }];
         
+        [listener on:@"WIDGET_BROKE" do:^(NSDictionary* widget) {
+            [widgets[widget[@"id"]] setObject:widget[@"error"] forKey:@"error"];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"WIDGET_UPDATED" do:^(NSDictionary* widget) {
+            [widgets[widget[@"id"]] removeObjectForKey:@"error"];
+            [self notifyChange];
+        }];
+        
         [listener on:@"WIDGET_DID_HIDE" do:^(NSString* widgetId) {
             [widgets[widgetId] setObject:@YES forKey:@"hidden"];
             [self notifyChange];

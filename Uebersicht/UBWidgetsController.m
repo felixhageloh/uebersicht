@@ -49,7 +49,6 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         
         dispatcher = [[UBDispatcher alloc] init];
        
-        
         statusIconVisible = [[NSBundle mainBundle]
             imageForResource:@"widget-status-visible"
         ];
@@ -72,8 +71,16 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         }
     }
     
+    NSString* widgetId;
+    NSString* error;
     for (NSInteger i = widgets.sortedWidgets.count - 1; i >= 0; i--) {
-        [self renderWidget:widgets.sortedWidgets[i] inMenu:mainMenu];
+        widgetId = widgets.sortedWidgets[i];
+        [self renderWidget:widgetId inMenu:mainMenu];
+        
+        error = [widgets get:widgetId][@"error"];
+        if (error) {
+            [self notifyUser:error withTitle:@"Error"];
+        }
     }
 }
 
@@ -243,5 +250,17 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     
     [[NSWorkspace sharedWorkspace] openFile:filePath];
 }
+
+- (void)notifyUser:(NSString*)message withTitle:(NSString*)title
+{
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
+    notification.title = title;
+    notification.informativeText = message;
+    
+    [[NSUserNotificationCenter defaultUserNotificationCenter]
+        deliverNotification:notification
+    ];
+}
+
 
 @end

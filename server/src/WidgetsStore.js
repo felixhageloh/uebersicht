@@ -2,8 +2,6 @@
 
 const fs = require('fs');
 const path = require('path');
-
-const Widget = require('./widget.coffee');
 const listen = require('./listen');
 
 module.exports = function WidgetsStore(settingsDirPath) {
@@ -49,15 +47,12 @@ module.exports = function WidgetsStore(settingsDirPath) {
   };
 
   function handleAdded(id, defintion) {
-    settings[id] = defintion.settings || {};
+    settings[id] = defintion.settings;
     widgets[id] = defintion;
   }
 
   function handleUpdate(id, defintion) {
-    widgets[id] = Object.assign(
-      widgets[id],
-      defintion
-    );
+    widgets[id] = defintion;
   }
 
   function handleSettingsChange(id, newSettings) {

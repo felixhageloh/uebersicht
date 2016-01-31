@@ -41,8 +41,8 @@ init = ->
       listen 'WIDGET_UPDATED', (details) ->
         updateWidget(details)
 
-      listen 'WIDGET_DID_HIDE', (id) ->
-        hideWidget(widgets[id])
+      listen 'WIDGET_BROKE', (details) ->
+        handleBrokenWidget(details.id, details)
 
       listen 'WIDGET_DID_UNHIDE', (id) ->
         unHideWidget(widgets[id])
@@ -75,6 +75,7 @@ initWidgets = (widgetSettings) ->
 
 initWidget = (details) ->
   addWidget(details)
+  return handleBrokenWidget(details.id, details.error) if details.error
   details.instance = Widget deserialize(details.body)
   renderWidget(details) if isVisibleOnScreen(details, screenId)
 
@@ -91,7 +92,7 @@ removeWidget = (id) ->
 updateWidget = (updates) ->
   widget = widgets[updates.id]
   return unless widget
-  widget.instance.destroy()
+  widget.instance?.destroy()
   widget.instance = Widget deserialize(updates.body)
   renderWidget(widget) if isVisibleOnScreen(widget, screenId)
 
@@ -113,6 +114,11 @@ hideWidget = (widget) ->
 unHideWidget = (widget) ->
   widget.settings.hidden = false
   renderWidget widget if isVisibleOnScreen(widget, screenId)
+
+handleBrokenWidget = (id, details) ->
+  widget = widgets[id]
+  widget.instance.destroy() if widget.instance
+  console.error(details.error)
 
 pinWidget = (widget) ->
   widget.settings.pinned = true
