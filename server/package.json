@@ -25,7 +25,7 @@
   "dependencies": {
     "coffee-script": "~1.7.1",
     "connect": "~2.9.0",
-    "fsevents": "^0.3.0",
+    "fsevents": "^1.0.6",
     "minimist": "0.0.8",
     "nib": "~1.0.2",
     "stylus": "~0.42.2",
