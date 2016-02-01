@@ -14,18 +14,10 @@ module.exports = (implementation) ->
   defaults =
     id: 'widget'
     refreshFrequency: 1000
-    render: (output) ->
-      if implementation.command and output
-        output
-      else
-        "warning: no render method"
+    render: (output) -> output
     afterRender: ->
 
-  # throws errors
   init = ->
-    if (issues = validate(implementation)).length != 0
-      throw new Error(issues.join(', '))
-
     implementation[k] ||= v for k, v of defaults
     implementation[k] ||= v for k, v of publicApi
 
@@ -119,13 +111,6 @@ module.exports = (implementation) ->
       s = document.createElement('script')
       s.src = script.src
       domEl.replaceChild s, script
-
-  validate = (impl) ->
-    issues = []
-    return ['empty implementation'] unless impl?
-    if not impl.command? and impl.refreshFrequency != false
-      issues.push 'no command given'
-    issues
 
   errorToString = (err) ->
     str = "[#{implementation.id}] #{err.toString?() or err.message}"

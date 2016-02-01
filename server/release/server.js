@@ -256,7 +256,7 @@ module.exports = function(port, widgetPath, settingsPath) {
 };
 
 
-},{"./MessageBus":2,"./ScreensServer":3,"./ScreensStore":4,"./WidgetsStore":6,"./command_server.coffee":8,"./serveClient":12,"./widget_directory.coffee":13,"./widgets_server.coffee":14,"connect":undefined,"path":undefined}],8:[function(require,module,exports){
+},{"./MessageBus":2,"./ScreensServer":3,"./ScreensStore":4,"./WidgetsStore":6,"./command_server.coffee":8,"./serveClient":12,"./widget_directory.coffee":14,"./widgets_server.coffee":15,"connect":undefined,"path":undefined}],8:[function(require,module,exports){
 var spawn;
 
 spawn = require('child_process').spawn;
@@ -336,7 +336,7 @@ module.exports = function listen(eventType, callback) {
 };
 
 },{"./SharedSocket":5}],11:[function(require,module,exports){
-var coffee, fs, loadWidget, nib, parseStyle, parseWidget, prettyPrintError, stylus, toSource;
+var coffee, fs, loadWidget, nib, parseStyle, parseWidget, prettyPrintError, stylus, toSource, validateWidget;
 
 fs = require('fs');
 
@@ -347,6 +347,8 @@ stylus = require('stylus');
 nib = require('nib');
 
 toSource = require('tosource');
+
+validateWidget = require('./validateWidget');
 
 parseStyle = function(id, style) {
   var scopedStyle;
@@ -368,7 +370,7 @@ parseWidget = function(id, filePath, body) {
     delete body.style;
   }
   body.id = id;
-  return '(' + toSource(body) + ')';
+  return body;
 };
 
 prettyPrintError = function(filePath, error) {
@@ -386,33 +388,43 @@ prettyPrintError = function(filePath, error) {
 };
 
 module.exports = loadWidget = function(id, filePath, callback) {
-  var result;
+  var respond, respondWithError, result;
   result = {
     id: id,
     filePath: filePath
   };
+  respond = function(widgetBody) {
+    result.body = '(' + toSource(widgetBody) + ')';
+    return callback(null, result);
+  };
+  respondWithError = function(error) {
+    result.error = prettyPrintError(filePath, error);
+    return callback(result);
+  };
   return fs.readFile(filePath, {
     encoding: 'utf8'
   }, function(err, data) {
-    var error1;
+    var body, error1, issues;
     if (err) {
-      result.error = prettyPrintError(filePath, err);
-      return callback(result);
+      return respondWithError(err);
+    }
+    try {
+      body = parseWidget(id, filePath, data);
+    } catch (error1) {
+      err = error1;
+      return respondWithError(err);
+    }
+    issues = validateWidget(body);
+    if (issues && issues.length > 0) {
+      return respondWithError(id + ': ' + issues.join(', '));
     } else {
-      try {
-        result.body = parseWidget(id, filePath, data);
-        return callback(null, result);
-      } catch (error1) {
-        err = error1;
-        result.error = prettyPrintError(filePath, err);
-        return callback(result);
-      }
+      return respond(body);
     }
   });
 };
 
 
-},{"coffee-script":undefined,"fs":undefined,"nib":undefined,"stylus":undefined,"tosource":undefined}],12:[function(require,module,exports){
+},{"./validateWidget":13,"coffee-script":undefined,"fs":undefined,"nib":undefined,"stylus":undefined,"tosource":undefined}],12:[function(require,module,exports){
 'use strict';
 
 var fs = require('fs');
@@ -428,6 +440,27 @@ module.exports = function serveClient(req, res, next) {
 };
 
 },{"fs":undefined,"path":undefined,"stream":undefined}],13:[function(require,module,exports){
+'use strict';
+
+function validateHasCommand(impl, issues, message) {
+  if (!impl.command && impl.refreshFrequency !== false) {
+    issues.push(message);
+  }
+}
+
+module.exports = function validateWidget(impl) {
+  var issues = [];
+
+  if (impl) {
+    validateHasCommand(impl, issues, 'no command given');
+  } else {
+    issues.push('empty implementation');
+  }
+
+  return issues;
+};
+
+},{}],14:[function(require,module,exports){
 var dispatch, fs, loadWidget, paths;
 
 loadWidget = require('./loadWidget.coffee');
@@ -540,9 +573,9 @@ module.exports = function(directoryPath, store) {
     return new Promise(function(resolve, reject) {
       var id;
       id = widgetId(filePath);
-      return loadWidget(id, filePath, function(err, widget) {
-        if (err) {
-          return reject(err);
+      return loadWidget(id, filePath, function(widgetWithError, widget) {
+        if (widgetWithError) {
+          return reject(widgetWithError);
         } else {
           return resolve(widget);
         }
@@ -575,7 +608,7 @@ module.exports = function(directoryPath, store) {
 };
 
 
-},{"./dispatch":9,"./loadWidget.coffee":11,"fs":undefined,"fsevents":undefined,"path":undefined}],14:[function(require,module,exports){
+},{"./dispatch":9,"./loadWidget.coffee":11,"fs":undefined,"fsevents":undefined,"path":undefined}],15:[function(require,module,exports){
 module.exports = function(widgetsStore) {
   return function(req, res, next) {
     if (req.url !== '/widgets/') {

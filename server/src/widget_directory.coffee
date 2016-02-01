@@ -77,8 +77,10 @@ module.exports = (directoryPath, store) ->
 
   readWidget = (filePath) -> new Promise (resolve, reject) ->
     id = widgetId filePath
-    loadWidget id, filePath, (err, widget) ->
-      if err then reject(err) else resolve(widget)
+
+    loadWidget id, filePath, (widgetWithError, widget) ->
+      if widgetWithError then reject(widgetWithError) else resolve(widget)
+
 
   widgetId = (filePath) ->
     fileParts = filePath.replace(directoryPath, '').split(/\/+/)

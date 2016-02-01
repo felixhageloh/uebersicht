@@ -3,6 +3,7 @@ coffee = require 'coffee-script'
 stylus = require('stylus')
 nib = require('nib')
 toSource = require('tosource')
+validateWidget = require './validateWidget'
 
 parseStyle = (id, style) ->
   return "" unless style
@@ -23,8 +24,7 @@ parseWidget = (id, filePath, body) ->
     delete body.style
 
   body.id = id
-
-  '(' + toSource(body) + ')'
+  body
 
 prettyPrintError = (filePath, error) ->
   return 'file not found' if error.code == 'ENOENT'
@@ -44,14 +44,23 @@ module.exports = loadWidget = (id, filePath, callback) ->
     id: id
     filePath: filePath
 
+  respond = (widgetBody) ->
+    result.body = '(' + toSource(widgetBody) + ')'
+    callback(null, result)
+
+  respondWithError = (error) ->
+    result.error = prettyPrintError(filePath, error)
+    callback(result)
+
   fs.readFile filePath, encoding: 'utf8', (err, data) ->
-    if err
-      result.error = prettyPrintError(filePath, err)
-      callback(result)
+    return respondWithError(err) if err
+    try
+      body = parseWidget(id, filePath, data)
+    catch err
+      return respondWithError(err)
+
+    issues = validateWidget(body)
+    if (issues and issues.length > 0)
+      respondWithError(id + ': ' + issues.join(', '))
     else
-      try
-        result.body = parseWidget(id, filePath, data)
-        callback(null, result)
-      catch err
-        result.error = prettyPrintError(filePath, err)
-        callback(result)
+      respond(body)
