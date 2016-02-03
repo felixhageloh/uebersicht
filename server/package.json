@@ -7,7 +7,7 @@
     "test": "node_modules/jasmine-node/bin/jasmine-node --coffee --captureExceptions --forceexit spec/backend",
     "start": "coffee server.coffee",
     "release": "npm run-script build-client && npm run-script build-server",
-    "build-client": "browserify -i ws -t coffeeify -t [babelify --presets es2015] client.coffee | uglifyjs -c --screw-ie8 > release/public/main.js",
+    "build-client": "browserify -i ws -t coffeeify -t [babelify --presets es2015] client.coffee | uglifyjs -c --screw-ie8 > release/public/client.js",
     "build-server": "browserify -t coffeeify -t [babelify --presets es2015] --node --detect-globals false --no-bundle-external server.coffee > release/server.js && cd release && npm install --production --no-progress"
   },
   "author": "Felix Hageloh",
