@@ -13,7 +13,7 @@ module.exports = function WidgetsStore(settingsDirPath) {
 
   function init() {
     listen('WIDGET_ADDED', (d) => handleAdded(d.id, d));
-    listen('WIDGET_REMOVED', (id) => widgets[id] = undefined);
+    listen('WIDGET_REMOVED', (id) => delete widgets[id]);
     listen('WIDGET_UPDATED', (d) => handleUpdate(d.id, d));
     listen('WIDGET_DID_HIDE', (id) => {
       handleSettingsChange(id, {hidden: true});
@@ -52,7 +52,10 @@ module.exports = function WidgetsStore(settingsDirPath) {
   }
 
   function handleUpdate(id, defintion) {
-    widgets[id] = defintion;
+    widgets[id] = Object.assign(
+      widgets[id],
+      defintion
+    );
   }
 
   function handleSettingsChange(id, newSettings) {

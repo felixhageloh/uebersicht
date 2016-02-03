@@ -36,6 +36,7 @@ init = ->
         initWidget(details)
 
       listen 'WIDGET_REMOVED', (id) ->
+        console.log id, 'removed'
         removeWidget(id)
 
       listen 'WIDGET_UPDATED', (details) ->
@@ -87,7 +88,7 @@ addWidget = (details) ->
 removeWidget = (id) ->
   return unless widgets[id]
   widgets[id].instance.destroy()
-  widgets[id] = undefined
+  delete widgets[id]
 
 updateWidget = (updates) ->
   widget = widgets[updates.id]
