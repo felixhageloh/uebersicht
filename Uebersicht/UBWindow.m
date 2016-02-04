@@ -46,7 +46,7 @@
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self
+        [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
                                                  selector:@selector(wakeFromSleep:)
                                                      name:NSWorkspaceDidWakeNotification
                                                    object:nil];
