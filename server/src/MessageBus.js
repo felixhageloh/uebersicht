@@ -1,14 +1,14 @@
 'use strict';
 
-const WebSocketServer = require('ws').Server;
-const wss = new WebSocketServer({ port: 41415 });
+const WebSocket = require('ws');
 
-function broadcast(data) {
-  wss.clients.forEach((client) => client.send(data));
-}
+module.exports = function MessageBus(options) {
+  const wss = new WebSocket.Server(options);
 
 wss.on('connection', function connection(ws) {
   ws.on('message', broadcast);
 });
 
 
+  return wss;
+};

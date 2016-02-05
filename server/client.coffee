@@ -1,5 +1,6 @@
 Widget = require './src/widget.coffee'
 listen = require './src/listen'
+sharedSocket = require './src/SharedSocket'
 
 widgets = {}
 screens = []
@@ -7,6 +8,8 @@ contentEl = null
 screenId = null
 
 init = ->
+  sharedSocket.open("ws://#{window.location.hostname}")
+
   screenId = Number(window.location.pathname.replace(/\//g, ''))
   window.uebersicht = require './src/os_bridge.coffee'
   contentEl = document.getElementById('__uebersicht')

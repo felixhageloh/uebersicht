@@ -12,6 +12,7 @@
     NSMutableArray* listeners;
     NSMutableArray* queuedMessages;
     SRWebSocket* ws;
+    NSURL* url;
 }
 
 
@@ -29,7 +30,6 @@
     if (self = [super init]) {
         listeners = [[NSMutableArray alloc] init];
         queuedMessages = [[NSMutableArray alloc] init];
-        [self openWebsocket];
     }
     return self;
 }
@@ -48,13 +48,21 @@
     [listeners addObject:listener];
 }
 
-- (void)openWebsocket
+- (void)open:(NSURL*)aUrl
 {
-    ws = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest
-        requestWithURL:[NSURL URLWithString:@"ws://127.0.0.1:41415"]]
+    url = aUrl;
+    ws = [[SRWebSocket alloc]
+        initWithURLRequest:[NSURLRequest requestWithURL:url]
     ];
     ws.delegate = self;
     [ws open];
+}
+
+- (void)reopen
+{
+    if (url) {
+        [self open:url];
+    }
 }
 
 - (void)webSocketDidOpen:(SRWebSocket *)webSocket
@@ -77,7 +85,7 @@
 {
     [webSocket close];
     [self
-        performSelector:@selector(openWebsocket)
+        performSelector:@selector(reopen)
         withObject:nil
         afterDelay: 0.1
     ];
@@ -90,7 +98,7 @@
 {
 
     [self
-        performSelector:@selector(openWebsocket)
+        performSelector:@selector(reopen)
         withObject:nil
         afterDelay: 0.1
     ];

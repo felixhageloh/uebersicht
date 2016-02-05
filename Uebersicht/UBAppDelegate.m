@@ -18,6 +18,7 @@
 #import "UBKeyHandler.h"
 #import "UBWidgetsController.h"
 #import "UBWidgetsStore.h"
+#import "UBWebSocket.h"
 
 int const PORT = 41416;
 
@@ -55,6 +56,9 @@ int const PORT = 41416;
     
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
+        
+            
+            [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
             [self renderOnScreens:[screensController screens]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
@@ -186,12 +190,12 @@ int const PORT = 41416;
     ];
 }
 
-- (NSURL*)baseUrl
+- (NSURL*)serverUrl:(NSString*)protocol
 {
     // trailing slash required for load policy in UBWindow
     return [NSURL
         URLWithString:[NSString
-            stringWithFormat:@"http://127.0.0.1:%d/", PORT+portOffset
+            stringWithFormat:@"%@://127.0.0.1:%d/", protocol, PORT+portOffset
         ]
     ];
 }
@@ -223,7 +227,7 @@ int const PORT = 41416;
         [window setFrame:[screensController screenRect:screenId] display:YES];
         [window makeKeyAndOrderFront:self];
         [window loadUrl:[
-            [self baseUrl]
+            [self serverUrl:@"http"]
                 URLByAppendingPathComponent:[NSString
                     stringWithFormat:@"%@",
                     screenId
