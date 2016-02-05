@@ -32,4 +32,10 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
       sharedSocket.open("ws://127.0.0.1:#{port}")
       callback?()
 
+  close: ->
+    widgetDir.close()
+    server.close()
+    messageBus.close()
 
+  on: (ev, handler) ->
+    server.on(ev, handler)

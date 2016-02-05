@@ -7,6 +7,7 @@ dispatch = require('./dispatch')
 module.exports = (directoryPath, store) ->
   api = {}
   fsevents = require('fsevents')
+  watcher = null
 
   init = ->
     watcher = fsevents directoryPath
@@ -28,6 +29,9 @@ module.exports = (directoryPath, store) ->
     api
 
   api.path = directoryPath
+
+  api.close = ->
+    watcher.stop()
 
   addWidget = (filePath) ->
     readWidget(filePath)
