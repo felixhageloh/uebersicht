@@ -8,7 +8,7 @@ contentEl = null
 screenId = null
 
 init = ->
-  sharedSocket.open("ws://#{window.location.hostname}")
+  sharedSocket.open("ws://#{window.location.host}")
 
   screenId = Number(window.location.pathname.replace(/\//g, ''))
   window.uebersicht = require './src/os_bridge.coffee'
