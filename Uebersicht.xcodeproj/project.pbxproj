@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */; };
+		DC3A31681C64A0A100722112 /* SocketRocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; };
+		DC3A31691C64A0D500722112 /* SocketRocket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
 		DC43AD8A17EC2D9500241CC2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC43AD8817EC2D9500241CC2 /* InfoPlist.strings */; };
 		DC43AD8C17EC2D9500241CC2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43AD8B17EC2D9500241CC2 /* main.m */; };
@@ -28,8 +30,6 @@
 		DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */; };
 		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
-		DC5E0F6A1C4E42EE00DB6AED /* SocketRocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5E0F691C4E42EE00DB6AED /* SocketRocket.framework */; };
-		DC5E0F6C1C4E430F00DB6AED /* SocketRocket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5E0F6B1C4E430F00DB6AED /* SocketRocket.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DC8B4AD119ACFD9700F177C2 /* UBWallperServer.m in Sources */ = {isa = PBXBuildFile; fileRef = DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */; };
 		DC9296A71C5017CF006E4267 /* widget-status-visible.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A51C5017CF006E4267 /* widget-status-visible.png */; };
 		DC9296A81C5017CF006E4267 /* widget-status-visible@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */; };
@@ -66,7 +66,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				DC5E0F6C1C4E430F00DB6AED /* SocketRocket.framework in CopyFiles */,
+				DC3A31691C64A0D500722112 /* SocketRocket.framework in CopyFiles */,
 				DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,6 +76,7 @@
 /* Begin PBXFileReference section */
 		DC314A1E1C0EE024000A56D2 /* UBWidgetsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsController.h; sourceTree = "<group>"; };
 		DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsController.m; sourceTree = "<group>"; };
+		DC3A31671C64A0A100722112 /* SocketRocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SocketRocket.framework; sourceTree = "<group>"; };
 		DC43AD7C17EC2D9500241CC2 /* Übersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Übersicht.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		DC43AD8217EC2D9500241CC2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -109,8 +110,6 @@
 		DC57ED2B18DB4EC900A24FDD /* UBPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBPreferencesController.m; sourceTree = "<group>"; };
 		DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UBPreferencesController.xib; sourceTree = "<group>"; };
 		DC5D25BB18FC46E0000078C4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
-		DC5E0F691C4E42EE00DB6AED /* SocketRocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocketRocket.framework; path = SocketRocket/SocketRocket/SocketRocket.framework; sourceTree = "<group>"; };
-		DC5E0F6B1C4E430F00DB6AED /* SocketRocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocketRocket.framework; path = SocketRocket/SocketRocket/SocketRocket.framework; sourceTree = "<group>"; };
 		DC8B4ACF19ACFD9700F177C2 /* UBWallperServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWallperServer.h; sourceTree = "<group>"; };
 		DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWallperServer.m; sourceTree = "<group>"; };
 		DC9296A51C5017CF006E4267 /* widget-status-visible.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible.png"; sourceTree = "<group>"; };
@@ -142,11 +141,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC5E0F6A1C4E42EE00DB6AED /* SocketRocket.framework in Frameworks */,
 				DCB5D9871948802C000D5C83 /* JavaScriptCore.framework in Frameworks */,
 				DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */,
 				DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */,
 				DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */,
+				DC3A31681C64A0A100722112 /* SocketRocket.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,7 +164,6 @@
 		DC43AD7317EC2D9500241CC2 = {
 			isa = PBXGroup;
 			children = (
-				DC5E0F6B1C4E430F00DB6AED /* SocketRocket.framework */,
 				DC43AD8517EC2D9500241CC2 /* Uebersicht */,
 				DCECA1C21893F1C300C0CA32 /* server */,
 				DC43ADA317EC2D9500241CC2 /* UebersichtTests */,
@@ -186,7 +184,7 @@
 		DC43AD7E17EC2D9500241CC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DC5E0F691C4E42EE00DB6AED /* SocketRocket.framework */,
+				DC3A31671C64A0A100722112 /* SocketRocket.framework */,
 				DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */,
 				DC5D25BB18FC46E0000078C4 /* Sparkle.framework */,
 				DC43ADB617EC38D300241CC2 /* WebKit.framework */,
@@ -598,6 +596,7 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)/SocketRocket/SocketRocket",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
@@ -621,6 +620,7 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(PROJECT_DIR)/SocketRocket/SocketRocket",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
