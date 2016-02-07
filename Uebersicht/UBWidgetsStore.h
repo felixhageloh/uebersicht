@@ -12,6 +12,7 @@
 
 - (void)onChange:(void (^)(NSDictionary*))aChangeHandler;
 - (NSDictionary*)get:(NSString*)widgetId;
+- (NSDictionary*)getSettings:(NSString*)widgetId;
 - (NSArray*)sortedWidgets;
 
 @end

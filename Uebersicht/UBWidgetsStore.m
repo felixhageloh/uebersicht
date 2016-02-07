@@ -12,6 +12,7 @@
 @implementation UBWidgetsStore {
     UBListener* listener;
     NSMutableDictionary* widgets;
+    NSMutableDictionary* settings;
     NSArray* sortedWidgets;
     void (^changeHandler)(NSDictionary*);
 }
@@ -23,51 +24,43 @@
     
     if (self) {
         widgets = [[NSMutableDictionary alloc] init];
+        settings = [[NSMutableDictionary alloc] init];
         listener = [[UBListener alloc] init];
         
-        [listener on:@"WIDGET_ADDED" do:^(NSDictionary* widget) {
-            [self addWidget:widget];
+        [listener on:@"WIDGET_ADDED" do:^(NSDictionary* data) {
+            NSMutableDictionary* widget = [self getOrAddWidget:data[@"id"]];
+            [widget addEntriesFromDictionary:data];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"WIDGET_SETTINGS_CHANGED" do:^(NSDictionary* details) {
+            NSMutableDictionary* sett = [self getOrAddSettings:details[@"id"]];
+            [sett addEntriesFromDictionary:details[@"settings"]];
             [self notifyChange];
         }];
         
         [listener on:@"WIDGET_REMOVED" do:^(NSString* widgetId) {
-            [self removeWidget:widgetId];
-            [self notifyChange];
-        }];
-        
-        [listener on:@"WIDGET_BROKE" do:^(NSDictionary* widget) {
-            [widgets[widget[@"id"]] setObject:widget[@"error"] forKey:@"error"];
-            [self notifyChange];
-        }];
-        
-        [listener on:@"WIDGET_UPDATED" do:^(NSDictionary* widget) {
-            [widgets[widget[@"id"]] removeObjectForKey:@"error"];
-            [self notifyChange];
-        }];
-        
-        [listener on:@"WIDGET_DID_HIDE" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@YES forKey:@"hidden"];
-            [self notifyChange];
-        }];
-        
-        [listener on:@"WIDGET_DID_UNHIDE" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@NO forKey:@"hidden"];
-            [self notifyChange];
-        }];
-        
-        
-        [listener on:@"WIDGET_WAS_PINNED" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@YES forKey:@"pinned"];
-            [self notifyChange];
+            if (widgets[widgetId]) {
+                [self removeWidget:widgetId];
+                [self notifyChange];
+            }
         }];
         
         [listener on:@"WIDGET_WAS_PINNED" do:^(NSString* widgetId) {
-            [widgets[widgetId] setObject:@NO forKey:@"pinned"];
+            NSMutableDictionary* sett = [self getOrAddSettings:widgetId];
+            [sett setObject:@YES forKey:@"pinned"];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"WIDGET_WAS_UNPINNED" do:^(NSString* widgetId) {
+            NSMutableDictionary* sett = [self getOrAddSettings:widgetId];
+            [sett setObject:@NO forKey:@"pinned"];
             [self notifyChange];
         }];
         
         [listener on:@"WIDGET_DID_CHANGE_SCREEN" do:^(NSDictionary* data) {
-            widgets[data[@"id"]][@"screenId"] = data[@"screenId"];
+            NSMutableDictionary* sett = [self getOrAddSettings:data[@"id"]];
+            sett[@"screenId"] = data[@"screenId"];
             [self notifyChange];
         }];
         
@@ -86,7 +79,22 @@
 
 - (NSDictionary*)get:(NSString*)widgetId
 {
-    return widgets[widgetId];
+    NSMutableDictionary* widget;
+    
+    if (widgets[widgetId]) {
+        widget = [[NSMutableDictionary alloc]
+            initWithDictionary:widgets[widgetId]
+        ];
+        
+        widget[@"settings"] = settings[widgetId];
+    }
+    
+    return widget;
+}
+
+- (NSDictionary*)getSettings:(NSString*)widgetId
+{
+    return widgets[widgetId] ? settings[widgetId] : NULL;
 }
 
 - (NSArray*)sortedWidgets
@@ -102,31 +110,30 @@
 }
 
 
-- (void)addWidget:(NSDictionary*)widget
+- (NSMutableDictionary*)getOrAddWidget:(NSString*)widgetId
 {
-    NSString* widgetId = widget[@"id"];
     if (!widgets[widgetId]) {
-        widgets[widgetId] = [[NSMutableDictionary alloc]
-            initWithDictionary:widget[@"settings"]
-        ];
-        
-        [widgets[widgetId]
-            setObject: widget[@"filePath"]
-            forKey: @"filePath"
+        widgets[widgetId] = [[NSMutableDictionary alloc] init];
+        sortedWidgets = [widgets.allKeys
+            sortedArrayUsingSelector:@selector(compare:)
         ];
     }
     
-    sortedWidgets = [widgets.allKeys
-        sortedArrayUsingSelector:@selector(compare:)
-    ];
+    return widgets[widgetId];
 }
 
+- (NSMutableDictionary*)getOrAddSettings:(NSString*)widgetId
+{
+    if (!settings[widgetId]) {
+        settings[widgetId] = [[NSMutableDictionary alloc] init];
+    }
+    
+    return settings[widgetId];
+}
 
 - (void)removeWidget:(NSString*)widgetId
 {
-    if (widgets[widgetId]) {
-        [widgets removeObjectForKey:widgetId];
-    }
+    [widgets removeObjectForKey:widgetId];
     
     sortedWidgets = [widgets.allKeys
         sortedArrayUsingSelector:@selector(compare:)

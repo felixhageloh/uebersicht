@@ -141,7 +141,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     ];
     [pin setTarget:self];
     [pin setRepresentedObject:widgetId];
-    [pin setState:[[widgets get:widgetId][@"pinned"] boolValue]];
+    [pin setState:[[widgets getSettings:widgetId][@"pinned"] boolValue]];
     [menu insertItem:pin atIndex:0];
 }
 
@@ -157,7 +157,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSString *title;
     NSMenuItem *newItem;
     NSString *name;
-    NSNumber* widgetScreenId = [widgets get:widgetId][@"screenId"];
+    NSNumber* widgetScreenId = [widgets getSettings:widgetId][@"screenId"];
     
     newItem = [NSMenuItem separatorItem];
     [menu insertItem:newItem atIndex:0];
@@ -191,7 +191,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 
 - (BOOL)isWidgetVisible:(NSString*)widgetId
 {
-    NSDictionary* widget = [widgets get:widgetId];
+    NSDictionary* widget = [widgets getSettings:widgetId];
     BOOL screenUnavailable = !screensController.screens[widget[@"screenId"]];
     return (
         ![widget[@"hidden"] boolValue] &&
@@ -206,21 +206,10 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 }
 
 
-- (void)toggleHidden:(id)sender
-{
-    NSString* widgetId = [(NSMenuItem*)sender representedObject];
-    BOOL isHidden = ![[widgets get:widgetId][@"hidden"] boolValue];
-    
-    [dispatcher
-        dispatch: isHidden ? @"WIDGET_DID_HIDE" : @"WIDGET_DID_UNHIDE"
-        withPayload: widgetId
-    ];
-}
-
 - (void)togglePinned:(id)sender
 {
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
-    BOOL isPinned = ![[widgets get:widgetId][@"pinned"] boolValue];
+    BOOL isPinned = ![[widgets getSettings:widgetId][@"pinned"] boolValue];
     
     [dispatcher
         dispatch: isPinned ? @"WIDGET_WAS_PINNED" : @"WIDGET_WAS_UNPINNED"

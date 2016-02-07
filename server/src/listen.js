@@ -1,18 +1,17 @@
 'use strict';
 
 const ws = require('./SharedSocket');
-const listeners = {};
+const listeners = [];
 
 ws.onMessage(function handleMessage(data) {
-  const message = JSON.parse(data);
-  if (listeners[message.type]) {
-    listeners[message.type].forEach((f) => f(message.payload));
+  let message;
+  try { message = JSON.parse(data); } catch (e) { null; }
+
+  if (message) {
+    listeners.forEach((f) => f(message));
   }
 });
 
-module.exports = function listen(eventType, callback) {
-  if (!listeners[eventType]) {
-    listeners[eventType] = [];
-  }
-  listeners[eventType].push(callback);
+module.exports = function listen(callback) {
+  listeners.push(callback);
 };

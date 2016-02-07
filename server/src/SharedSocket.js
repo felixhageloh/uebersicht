@@ -7,16 +7,12 @@ const WebSocket = typeof window !== 'undefined'
 let ws = null;
 let isOpen = false;
 
-const listeners = [];
-const queuedMessages = [];
+const messageListeners = [];
+const openListeners = [];
 
 function handleWSOpen() {
   isOpen = true;
-  queuedMessages.forEach(function(data) {
-    ws.send(data);
-  });
-
-  queuedMessages.length = 0;
+  openListeners.forEach((f) => f());
 }
 
 function handleWSCosed() {
@@ -24,7 +20,7 @@ function handleWSCosed() {
 }
 
 function handleMessage(data) {
-  listeners.forEach((f) => f(data));
+  messageListeners.forEach((f) => f(data));
 }
 
 exports.open = function open(url) {
@@ -46,15 +42,19 @@ exports.close = function close() {
   ws = null;
 };
 
+exports.isOpen = function() {
+  return ws && isOpen;
+};
+
 exports.onMessage = function onMessage(listener) {
-  listeners.push(listener);
+  messageListeners.push(listener);
+};
+
+exports.onOpen = function onOpen(listener) {
+  openListeners.push(listener);
 };
 
 exports.send = function send(data) {
-  if (isOpen) {
-    ws.send(data);
-  } else {
-    queuedMessages.push(data);
-  }
+  ws.send(data);
 };
 

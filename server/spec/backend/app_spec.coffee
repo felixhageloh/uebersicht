@@ -16,12 +16,8 @@ test 'dispatching events', (t) ->
 
   onMessagesReceived = ->
     t.equal(
-      messages['WIDGET_ADDED'].length, 4,
-      'it should dispatch 4 WIDGET_ADDED events'
-    )
-    t.equal(
-      messages['WIDGET_BROKE'].length, 1,
-      'it should dispatch 1 WIDGET_BROKE event'
+      messages['WIDGET_ADDED'].length, 5,
+      'it should dispatch 5 WIDGET_ADDED events'
     )
     t.end()
 
@@ -48,20 +44,19 @@ test 'serving the client', (t) ->
       'it serves the client html'
     )
 
-test 'serving widgets in the widget dir', (t) ->
-  httpGet "http://#{host}/widgets/", (res, body) ->
-    widgets = JSON.parse(body)
-    if (typeof widgets == 'object')
-      t.equal(Object.keys(widgets).length, 4, 'there should be 4 widgets')
-      t.end()
-    else
-      t.end('server did not respond with a JSON Object')
-
-test 'serving screen ids', (t) ->
-  httpGet "http://#{host}/screens/", (res, body) ->
-    data = JSON.parse(body)
-    if (typeof data == 'object')
-      t.looseEqual(data.screens, [], 'it returns an array of screen ids')
+test 'serving current state', (t) ->
+  httpGet "http://#{host}/state/", (res, body) ->
+    state = JSON.parse(body)
+    if (typeof state == 'object')
+      t.equal(
+        Object.keys(state.widgets).length, 5,
+        'there should be 5 widgets'
+      )
+      t.equal(
+        Object.keys(state.settings).length, 5,
+        'there should be 5 widget settings entries'
+      )
+      t.looseEqual(state.screens, [], 'screens should be an empty array')
       t.end()
     else
       t.end('server did not respond with a JSON Object')
@@ -73,7 +68,7 @@ test 'recording screen ids', (t) ->
   ))
 
   setTimeout ->
-    httpGet "http://#{host}/screens/", (res, body) ->
+    httpGet "http://#{host}/state/", (res, body) ->
       data = JSON.parse(body)
       t.deepEqual(
         data.screens, [123, 456, 789],

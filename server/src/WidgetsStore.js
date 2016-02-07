@@ -12,15 +12,8 @@ module.exports = function WidgetsStore(settingsDirPath) {
   const widgets = {};
 
   function init() {
-    listen('WIDGET_ADDED', (d) => handleAdded(d.id, d));
-    listen('WIDGET_REMOVED', (id) => delete widgets[id]);
-    listen('WIDGET_UPDATED', (d) => handleUpdate(d.id, d));
-    listen('WIDGET_DID_HIDE', (id) => {
-      handleSettingsChange(id, {hidden: true});
-    });
-    listen('WIDGET_DID_UNHIDE', (id) => {
-      handleSettingsChange(id, {hidden: false});
-    });
+    listen('WIDGET_LOADED', (widget) => handleLoaded(widget));
+    listen('WIDGET_REMOVED', (id) => handleRemoved(id));
     listen('WIDGET_WAS_PINNED', (id) => {
       handleSettingsChange(id, {pinned: true});
     });
@@ -42,19 +35,27 @@ module.exports = function WidgetsStore(settingsDirPath) {
     return widgets[id];
   };
 
-  api.settings = function getSettings() {
-    return settings;
+  api.settings = function getSettings(id) {
+    return settings[id];
   };
 
-  function handleAdded(id, defintion) {
-    settings[id] = defintion.settings;
-    widgets[id] = defintion;
+  function handleLoaded(widget) {
+    widgets[widget.id] ? update(widget) : add(widget);
   }
 
-  function handleUpdate(id, defintion) {
-    widgets[id] = Object.assign(
-      widgets[id],
-      defintion
+  function handleRemoved(id) {
+    delete widgets[id];
+  }
+
+  function add(widget) {
+    settings[widget.id] = widget.settings;
+    widgets[widget.id] = widget;
+  }
+
+  function update(widget) {
+    widgets[widget.id] = Object.assign(
+      widgets[widget.id],
+      widget
     );
   }
 

@@ -46,7 +46,7 @@ module.exports = loadWidget = (id, filePath, callback) ->
 
   respond = (widgetBody) ->
     result.body = '(' + toSource(widgetBody) + ')'
-    callback(null, result)
+    callback(result)
 
   respondWithError = (error) ->
     result.error = prettyPrintError(filePath, error)
