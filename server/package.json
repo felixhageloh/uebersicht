@@ -5,6 +5,7 @@
   "main": "server.coffee",
   "scripts": {
     "test": "tape -r coffee-script/register spec/backend/**/* | tap-spec",
+    "test-browser": "browserify -t coffeeify -t [babelify --presets es2015] spec/frontend/*.* | testling | tap-spec",
     "start": "coffee server.coffee",
     "release": "npm run-script build-client && npm run-script build-server",
     "build-client": "browserify -i ws -t coffeeify -t [babelify --presets es2015] client.coffee | uglifyjs -c --screw-ie8 > release/public/client.js",
@@ -18,10 +19,9 @@
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
     "coffeeify": "^1.0.0",
-    "jasmine-node": "~1.14.3",
-    "mockery": "~1.4.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.4.0",
+    "testling": "^1.7.1",
     "uglify-js": "^2.6.1"
   },
   "dependencies": {

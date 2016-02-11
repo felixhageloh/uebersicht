@@ -5,6 +5,7 @@ redux = require 'redux'
 
 MessageBus = require('./MessageBus')
 WidgetDirWatcher = require('./widget_directory_watcher.coffee')
+Settings = require('./Settings')
 StateServer = require('./StateServer')
 CommandServer = require('./command_server.coffee')
 serveClient = require('./serveClient')
@@ -41,16 +42,15 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
     dispatchToRemote(action)
 
   # load and replay settings
-  settingsFile = path.resolve(
-    __dirname,
-    path.join(settingsPath, 'WidgetSettings.json')
-  )
-  settings = if fs.existsSync(settingsFile) then require(settingsFile) else {};
+  settings = Settings(settingsPath)
 
-  for id, value of settings
+  for id, value of settings.load()
     action = actions.applyWidgetSettings(id, value)
     store.dispatch(action)
     dispatchToRemote(action)
+
+  store.subscribe ->
+    settings.persist(store.getState().settings)
 
   # set up the server
   messageBus = null
