@@ -28,8 +28,7 @@
         listener = [[UBListener alloc] init];
         
         [listener on:@"WIDGET_ADDED" do:^(NSDictionary* data) {
-            NSMutableDictionary* widget = [self getOrAddWidget:data[@"id"]];
-            [widget addEntriesFromDictionary:data];
+            [self addWidget:data];
             [self notifyChange];
         }];
         
@@ -110,16 +109,17 @@
 }
 
 
-- (NSMutableDictionary*)getOrAddWidget:(NSString*)widgetId
+- (NSDictionary*)addWidget:(NSDictionary*)widget
 {
-    if (!widgets[widgetId]) {
-        widgets[widgetId] = [[NSMutableDictionary alloc] init];
+    BOOL alreadyExists = !!widgets[@"id"];
+    widgets[widget[@"id"]] = widget;
+    if (!alreadyExists) {
         sortedWidgets = [widgets.allKeys
             sortedArrayUsingSelector:@selector(compare:)
         ];
     }
     
-    return widgets[widgetId];
+    return widget;
 }
 
 - (NSMutableDictionary*)getOrAddSettings:(NSString*)widgetId

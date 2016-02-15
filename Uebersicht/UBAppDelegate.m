@@ -56,8 +56,6 @@ int const PORT = 41416;
     
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-        
-            
             [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
             [self renderOnScreens:[screensController screens]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
@@ -70,7 +68,10 @@ int const PORT = 41416;
     }];
     
     // enable the web inspector
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
+    [[NSUserDefaults standardUserDefaults]
+        setBool: YES
+        forKey: @"WebKitDeveloperExtras"
+    ];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // listen for keyboard events
