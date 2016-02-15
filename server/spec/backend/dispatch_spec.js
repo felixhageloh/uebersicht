@@ -12,7 +12,11 @@ test('queuing up messages', (t) => {
   server.on('connection', (ws) => {
     ws.on('message', (message) => {
       parsed = JSON.parse(message);
-      expectedMessages.splice(expectedMessages.indexOf(parsed), 1);
+
+      var idx = expectedMessages.indexOf(parsed);
+      if (idx > -1) {
+        expectedMessages.splice(idx, 1);
+      }
 
       if (expectedMessages.length === 0) {
         t.pass('it queues up messages and sends them once the socket opens');

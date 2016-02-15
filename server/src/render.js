@@ -57,7 +57,11 @@ module.exports = function render(state, screen, domEl) {
 
     if (!widget.error && isVisibleOnScreen(id, screen, state)) {
       renderWidget(widget, domEl);
-      remaining.splice(remaining.indexOf(widget.id), 1);
+
+      var idx = remaining.indexOf(widget.id);
+      if (idx > -1) {
+        remaining.splice(idx, 1);
+      }
     } else if (widget.error) {
       console.error(widget.error);
     }
