@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */; };
+		DC3A31681C64A0A100722112 /* SocketRocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; };
+		DC3A31691C64A0D500722112 /* SocketRocket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
 		DC43AD8A17EC2D9500241CC2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC43AD8817EC2D9500241CC2 /* InfoPlist.strings */; };
 		DC43AD8C17EC2D9500241CC2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43AD8B17EC2D9500241CC2 /* main.m */; };
@@ -19,8 +22,8 @@
 		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
 		DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADB417EC31EB00241CC2 /* UBWindow.m */; };
 		DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43ADB617EC38D300241CC2 /* WebKit.framework */; };
-		DC443E321C0305E500AA31C7 /* UBMouseHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = DC443E311C0305E500AA31C7 /* UBMouseHandler.m */; };
-		DC4913961BEF9A75003E76EF /* UBScreensMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4913951BEF9A75003E76EF /* UBScreensMenuController.m */; };
+		DC443E321C0305E500AA31C7 /* UBKeyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = DC443E311C0305E500AA31C7 /* UBKeyHandler.m */; };
+		DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4913951BEF9A75003E76EF /* UBScreensController.m */; };
 		DC4F43F3189E90DD00937925 /* status-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F1189E90DD00937925 /* status-icon.png */; };
 		DC4F43F4189E90DD00937925 /* status-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F2189E90DD00937925 /* status-icon@2x.png */; };
 		DC4FC28118EAB1CA00B7FD79 /* übersicht-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4FC28018EAB1CA00B7FD79 /* übersicht-logo.png */; };
@@ -28,8 +31,16 @@
 		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DC8B4AD119ACFD9700F177C2 /* UBWallperServer.m in Sources */ = {isa = PBXBuildFile; fileRef = DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */; };
+		DC9296A71C5017CF006E4267 /* widget-status-visible.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A51C5017CF006E4267 /* widget-status-visible.png */; };
+		DC9296A81C5017CF006E4267 /* widget-status-visible@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */; };
+		DC9296AB1C501D34006E4267 /* widget-status-hidden.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A91C501D34006E4267 /* widget-status-hidden.png */; };
+		DC9296AC1C501D34006E4267 /* widget-status-hidden@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296AA1C501D34006E4267 /* widget-status-hidden@2x.png */; };
+		DC9F7CE31C439CE50014E25B /* UBDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F7CE21C439CE50014E25B /* UBDispatcher.m */; };
 		DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* getting-started.coffee */; };
+		DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78C91C550B810051E78B /* UBWebSocket.m */; };
+		DCAC78CD1C551D130051E78B /* UBListener.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78CC1C551D130051E78B /* UBListener.m */; };
 		DCB5D9871948802C000D5C83 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */; };
+		DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */; };
 		DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E3C01A376AD400A12516 /* UBLocation.m */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
 		DCECA1C81893F23200C0CA32 /* server.js in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C61893F23200C0CA32 /* server.js */; };
@@ -55,6 +66,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				DC3A31691C64A0D500722112 /* SocketRocket.framework in CopyFiles */,
 				DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,6 +74,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DC314A1E1C0EE024000A56D2 /* UBWidgetsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsController.h; sourceTree = "<group>"; };
+		DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsController.m; sourceTree = "<group>"; };
+		DC3A31671C64A0A100722112 /* SocketRocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SocketRocket.framework; sourceTree = "<group>"; };
 		DC43AD7C17EC2D9500241CC2 /* Übersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Übersicht.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		DC43AD8217EC2D9500241CC2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -84,10 +99,10 @@
 		DC43ADB317EC31EB00241CC2 /* UBWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindow.h; sourceTree = "<group>"; };
 		DC43ADB417EC31EB00241CC2 /* UBWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWindow.m; sourceTree = "<group>"; };
 		DC43ADB617EC38D300241CC2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		DC443E301C0305E500AA31C7 /* UBMouseHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBMouseHandler.h; sourceTree = "<group>"; };
-		DC443E311C0305E500AA31C7 /* UBMouseHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBMouseHandler.m; sourceTree = "<group>"; };
-		DC4913941BEF9A75003E76EF /* UBScreensMenuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBScreensMenuController.h; sourceTree = "<group>"; };
-		DC4913951BEF9A75003E76EF /* UBScreensMenuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBScreensMenuController.m; sourceTree = "<group>"; };
+		DC443E301C0305E500AA31C7 /* UBKeyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBKeyHandler.h; sourceTree = "<group>"; };
+		DC443E311C0305E500AA31C7 /* UBKeyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBKeyHandler.m; sourceTree = "<group>"; };
+		DC4913941BEF9A75003E76EF /* UBScreensController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBScreensController.h; sourceTree = "<group>"; };
+		DC4913951BEF9A75003E76EF /* UBScreensController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBScreensController.m; sourceTree = "<group>"; };
 		DC4F43F1189E90DD00937925 /* status-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "status-icon.png"; sourceTree = "<group>"; };
 		DC4F43F2189E90DD00937925 /* status-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "status-icon@2x.png"; sourceTree = "<group>"; };
 		DC4FC28018EAB1CA00B7FD79 /* übersicht-logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "übersicht-logo.png"; sourceTree = "<group>"; };
@@ -97,9 +112,21 @@
 		DC5D25BB18FC46E0000078C4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		DC8B4ACF19ACFD9700F177C2 /* UBWallperServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWallperServer.h; sourceTree = "<group>"; };
 		DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWallperServer.m; sourceTree = "<group>"; };
+		DC9296A51C5017CF006E4267 /* widget-status-visible.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible.png"; sourceTree = "<group>"; };
+		DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible@2x.png"; sourceTree = "<group>"; };
+		DC9296A91C501D34006E4267 /* widget-status-hidden.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-hidden.png"; sourceTree = "<group>"; };
+		DC9296AA1C501D34006E4267 /* widget-status-hidden@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-hidden@2x.png"; sourceTree = "<group>"; };
 		DC99A7C418DC41A600E61222 /* Übersicht.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Übersicht.entitlements"; sourceTree = "<group>"; };
+		DC9F7CE11C439CE50014E25B /* UBDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBDispatcher.h; sourceTree = "<group>"; };
+		DC9F7CE21C439CE50014E25B /* UBDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBDispatcher.m; sourceTree = "<group>"; };
 		DCAAAF9518DF0B050097677F /* getting-started.coffee */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "getting-started.coffee"; sourceTree = "<group>"; };
+		DCAC78C81C550B810051E78B /* UBWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWebSocket.h; sourceTree = "<group>"; };
+		DCAC78C91C550B810051E78B /* UBWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWebSocket.m; sourceTree = "<group>"; };
+		DCAC78CB1C551D130051E78B /* UBListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBListener.h; sourceTree = "<group>"; };
+		DCAC78CC1C551D130051E78B /* UBListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBListener.m; sourceTree = "<group>"; };
 		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsStore.h; sourceTree = "<group>"; };
+		DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsStore.m; sourceTree = "<group>"; };
 		DCE2453D18ED864800C9FAE3 /* WebInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebInspector.h; sourceTree = "<group>"; };
 		DCE7E3BF1A376AD400A12516 /* UBLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBLocation.h; sourceTree = "<group>"; };
 		DCE7E3C01A376AD400A12516 /* UBLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBLocation.m; sourceTree = "<group>"; };
@@ -118,6 +145,7 @@
 				DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */,
 				DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */,
 				DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */,
+				DC3A31681C64A0A100722112 /* SocketRocket.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,6 +184,7 @@
 		DC43AD7E17EC2D9500241CC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DC3A31671C64A0A100722112 /* SocketRocket.framework */,
 				DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */,
 				DC5D25BB18FC46E0000078C4 /* Sparkle.framework */,
 				DC43ADB617EC38D300241CC2 /* WebKit.framework */,
@@ -186,8 +215,8 @@
 				DCE2453D18ED864800C9FAE3 /* WebInspector.h */,
 				DC43ADB317EC31EB00241CC2 /* UBWindow.h */,
 				DC43ADB417EC31EB00241CC2 /* UBWindow.m */,
-				DC4913941BEF9A75003E76EF /* UBScreensMenuController.h */,
-				DC4913951BEF9A75003E76EF /* UBScreensMenuController.m */,
+				DC4913941BEF9A75003E76EF /* UBScreensController.h */,
+				DC4913951BEF9A75003E76EF /* UBScreensController.m */,
 				DC57ED2A18DB4EC900A24FDD /* UBPreferencesController.h */,
 				DC57ED2B18DB4EC900A24FDD /* UBPreferencesController.m */,
 				DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */,
@@ -195,8 +224,18 @@
 				DC8B4AD019ACFD9700F177C2 /* UBWallperServer.m */,
 				DCE7E3BF1A376AD400A12516 /* UBLocation.h */,
 				DCE7E3C01A376AD400A12516 /* UBLocation.m */,
-				DC443E301C0305E500AA31C7 /* UBMouseHandler.h */,
-				DC443E311C0305E500AA31C7 /* UBMouseHandler.m */,
+				DC443E301C0305E500AA31C7 /* UBKeyHandler.h */,
+				DC443E311C0305E500AA31C7 /* UBKeyHandler.m */,
+				DC314A1E1C0EE024000A56D2 /* UBWidgetsController.h */,
+				DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */,
+				DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */,
+				DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */,
+				DCAC78C81C550B810051E78B /* UBWebSocket.h */,
+				DCAC78C91C550B810051E78B /* UBWebSocket.m */,
+				DC9F7CE11C439CE50014E25B /* UBDispatcher.h */,
+				DC9F7CE21C439CE50014E25B /* UBDispatcher.m */,
+				DCAC78CB1C551D130051E78B /* UBListener.h */,
+				DCAC78CC1C551D130051E78B /* UBListener.m */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,
 			);
@@ -206,6 +245,10 @@
 		DC43AD8617EC2D9500241CC2 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				DC9296A91C501D34006E4267 /* widget-status-hidden.png */,
+				DC9296AA1C501D34006E4267 /* widget-status-hidden@2x.png */,
+				DC9296A51C5017CF006E4267 /* widget-status-visible.png */,
+				DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */,
 				DC4FC28018EAB1CA00B7FD79 /* übersicht-logo.png */,
 				DCAAAF9518DF0B050097677F /* getting-started.coffee */,
 				DC4F43F1189E90DD00937925 /* status-icon.png */,
@@ -338,11 +381,15 @@
 			files = (
 				DCECA1CF1894008800C0CA32 /* MainMenu.xib in Resources */,
 				DC43AD8A17EC2D9500241CC2 /* InfoPlist.strings in Resources */,
+				DC9296AC1C501D34006E4267 /* widget-status-hidden@2x.png in Resources */,
 				DC43AD9817EC2D9500241CC2 /* Images.xcassets in Resources */,
+				DC9296A71C5017CF006E4267 /* widget-status-visible.png in Resources */,
 				DC4F43F4189E90DD00937925 /* status-icon@2x.png in Resources */,
 				DC4FC28118EAB1CA00B7FD79 /* übersicht-logo.png in Resources */,
 				DC4F43F3189E90DD00937925 /* status-icon.png in Resources */,
+				DC9296A81C5017CF006E4267 /* widget-status-visible@2x.png in Resources */,
 				DC43AD9017EC2D9500241CC2 /* Credits.rtf in Resources */,
+				DC9296AB1C501D34006E4267 /* widget-status-hidden.png in Resources */,
 				DCECA1CE1893FE5500C0CA32 /* node_modules in Resources */,
 				DCECA1CA1893F4EF00C0CA32 /* public in Resources */,
 				DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */,
@@ -375,7 +422,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/usr/local/bin/:/usr/local/share/npm/bin/\"\ncd server && grunt release";
+			shellScript = "export PATH=$PATH:/usr/local/bin\ncd server && npm run-script release";
 		};
 		DC5E277C197034FF00CBDA8B /* Code Sign Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -389,7 +436,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Felix Hageloh\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"";
+			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Felix Hageloh\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/SocketRocket.framework\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -399,13 +446,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC9F7CE31C439CE50014E25B /* UBDispatcher.m in Sources */,
 				DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */,
 				DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */,
+				DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */,
 				DC8B4AD119ACFD9700F177C2 /* UBWallperServer.m in Sources */,
-				DC4913961BEF9A75003E76EF /* UBScreensMenuController.m in Sources */,
+				DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */,
+				DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */,
+				DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
+				DCAC78CD1C551D130051E78B /* UBListener.m in Sources */,
 				DC43AD9317EC2D9500241CC2 /* UBAppDelegate.m in Sources */,
-				DC443E321C0305E500AA31C7 /* UBMouseHandler.m in Sources */,
+				DC443E321C0305E500AA31C7 /* UBKeyHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,6 +595,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
+					"$(PROJECT_DIR)/SocketRocket/SocketRocket",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
@@ -565,6 +619,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
+					"$(PROJECT_DIR)/SocketRocket/SocketRocket",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";

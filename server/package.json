@@ -1,31 +1,42 @@
 {
   "name": "uebersicht-server",
   "version": "0.0.0",
-  "description": "",
+  "description": "Node.js backend for Übersicht",
   "main": "server.coffee",
   "scripts": {
-    "test": "node_modules/jasmine-node/bin/jasmine-node --coffee --captureExceptions --forceexit spec/backend",
-    "start": "coffee server.coffee"
+    "test": "npm run-script test-local && npm run-script test-browser",
+    "test-local": "tape -r coffee-script/register spec/backend/**/* | tap-spec",
+    "test-browser": "browserify -t coffeeify -t [babelify --presets es2015] spec/frontend/*.* | tape-run | tap-spec",
+    "start": "coffee server.coffee",
+    "release": "npm run-script build-client && npm run-script build-server",
+    "build-client": "browserify -i ws -t coffeeify -t [babelify --presets es2015] client.coffee | uglifyjs -c --screw-ie8 > release/public/client.js",
+    "build-server": "browserify -t coffeeify --node --detect-globals false --no-bundle-external server.coffee > release/server.js && cd release && npm install --production --no-progress"
   },
   "author": "Felix Hageloh",
   "license": "GPL v3 <http://www.gnu.org/licenses/>",
+  "private": true,
   "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babelify": "^7.2.0",
+    "browserify": "^13.0.0",
     "coffeeify": "^1.0.0",
-    "grunt": "~0.4.1",
-    "grunt-browserify": "^3.2.0",
-    "grunt-contrib-jasmine": "^0.8.1",
-    "grunt-contrib-watch": "~0.5.3",
-    "jasmine-node": "~1.14.3",
-    "mockery": "~1.4.0",
-    "nib": "~1.0.2"
+    "sinon": "^1.17.3",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.4.0",
+    "tape-run": "^2.1.3",
+    "uglify-js": "^2.6.1"
   },
   "dependencies": {
     "coffee-script": "~1.7.1",
     "connect": "~2.9.0",
-    "fsevents": "^0.3.0",
+    "fsevents": "^1.0.6",
+    "jquery": "^2.2.0",
     "minimist": "0.0.8",
     "ms": "^0.7.1",
+    "nib": "~1.0.2",
+    "redux": "^3.3.1",
     "stylus": "~0.42.2",
-    "tosource": "~0.1.1"
+    "tosource": "~0.1.1",
+    "ws": "^1.0.0"
   }
 }

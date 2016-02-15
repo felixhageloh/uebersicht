@@ -11,16 +11,13 @@
 //  details.
 
 #import <Cocoa/Cocoa.h>
-#import <WebKit/WebKit.h>
-
-@class UBWindow;
 
 @interface UBAppDelegate : NSObject <NSApplicationDelegate>
 
-@property (assign) IBOutlet UBWindow *window;
 @property (weak) IBOutlet NSMenu *statusBarMenu;
 
 - (void)widgetDirDidChange;
+- (void)screensChanged:(NSDictionary*)screens;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)openWidgetDir:(id)sender;
 - (IBAction)showDebugConsole:(id)sender;

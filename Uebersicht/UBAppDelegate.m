@@ -13,75 +13,87 @@
 #import "UBAppDelegate.h"
 #import "UBWindow.h"
 #import "UBPreferencesController.m"
-#import "UBScreensMenuController.h"
+#import "UBScreensController.h"
 #import "WebInspector.h"
-#import "UBMouseHandler.h"
+#import "UBKeyHandler.h"
+#import "UBWidgetsController.h"
+#import "UBWidgetsStore.h"
+#import "UBWebSocket.h"
 
-int const MAX_DISPLAYS = 42;
 int const PORT = 41416;
 
 @implementation UBAppDelegate {
     NSStatusItem* statusBarItem;
     NSTask* widgetServer;
     UBPreferencesController* preferences;
-    UBScreensMenuController* screensMenu;
+    UBScreensController* screensController;
     BOOL keepServerAlive;
-    WebInspector *inspector;
     int portOffset;
-    UBMouseHandler* mouseHandler;
+    UBKeyHandler* keyHandler;
+    UBWidgetsStore* widgetsStore;
+    UBWidgetsController* widgetsController;
+    NSMutableDictionary* windows;
 }
 
-@synthesize window;
 @synthesize statusBarMenu;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    windows = [[NSMutableDictionary alloc] initWithCapacity:42];
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
-    preferences = [[UBPreferencesController alloc] initWithWindowNibName:@"UBPreferencesController"];
-    screensMenu = [[UBScreensMenuController alloc] initWithMaxDisplays:MAX_DISPLAYS];
+    preferences = [[UBPreferencesController alloc]
+        initWithWindowNibName:@"UBPreferencesController"
+    ];
     
-    // Handles the screen entries in the menu, and will send the window to the user's preferred screen
-    [self screensChanged:self];
-    
-    
-    // NSTask doesn't terminate when xcode stop is pressed. Other ways of spawning
-    // the server, like system() or popen() have the same problem.
+    // NSTask doesn't terminate when xcode stop is pressed. Other ways of
+    // spawning the server, like system() or popen() have the same problem.
     // So, hit em with a hammer :(
     system("killall localnode");
     
     // start server and load webview
-    portOffset      = 0;
+    portOffset = 0;
     keepServerAlive = YES;
+    
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            // trailing slash required for load policy in UBWindow
-            [window loadUrl:[NSString stringWithFormat:@"http://127.0.0.1:%d/", PORT+portOffset]];
+            [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
+            [self renderOnScreens:[screensController screens]];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
             if (portOffset >= 20) {
                 keepServerAlive = NO;
                 NSLog(@"couldn't find an open port. Giving up...");
             }
-        } else if ([output rangeOfString:@"error"].location != NSNotFound) {
-            [self notifyUser:output withTitle:@"Error"];
-        };
+        }
     }];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(screensChanged:)
-                                                 name:NSApplicationDidChangeScreenParametersNotification
-                                               object:nil];
-
     // enable the web inspector
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"WebKitDeveloperExtras"];
+    [[NSUserDefaults standardUserDefaults]
+        setBool: YES
+        forKey: @"WebKitDeveloperExtras"
+    ];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     // listen for keyboard events
-    mouseHandler = [[UBMouseHandler alloc]
-        initWithWindow:window
-        andPreferences:preferences
+    keyHandler = [[UBKeyHandler alloc]
+        initWithPreferences: preferences
+        listener: self
     ];
+    
+    widgetsStore = [[UBWidgetsStore alloc] init];
 
+    screensController = [[UBScreensController alloc]
+        initWithChangeListener:self
+    ];
+    
+    widgetsController = [[UBWidgetsController alloc]
+        initWithMenu: statusBarMenu
+        widgets: widgetsStore
+        screens: screensController
+    ];
+    [widgetsStore onChange: ^(NSDictionary* widgets) {
+        [widgetsController render];
+    }];
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -153,106 +165,105 @@ int const PORT = 41416;
     };
     
     [task setLaunchPath:nodePath];
-    [task setArguments:@[serverPath, @"-d", widgetPath,
-                         @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset]]];
+    [task setArguments:@[
+        serverPath,
+        @"-d", widgetPath,
+        @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset],
+        @"-s", [[self getPreferencesDir] path]
+        
+    ]];
+    
     [task launch];
     return task;
 }
 
-- (void)notifyUser:(NSString*)message withTitle:(NSString*)title
+
+- (NSURL*)getPreferencesDir
 {
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
-    notification.title = title;
-    notification.informativeText = message;
+    NSArray* urls = [[NSFileManager defaultManager]
+        URLsForDirectory:NSApplicationSupportDirectory
+               inDomains:NSUserDomainMask
+    ];
     
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    return [urls[0]
+        URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]
+                        isDirectory:YES
+    ];
 }
 
+- (NSURL*)serverUrl:(NSString*)protocol
+{
+    // trailing slash required for load policy in UBWindow
+    return [NSURL
+        URLWithString:[NSString
+            stringWithFormat:@"%@://127.0.0.1:%d/", protocol, PORT+portOffset
+        ]
+    ];
+}
 
 #
 #pragma mark Screen Handling
 #
 
-
-- (void)screensChanged:(id)sender
+- (void)screensChanged:(NSDictionary*)screens
 {
-    CGDirectDisplayID displays[MAX_DISPLAYS];
-    uint32_t numDisplays;
-    uint32 screenId;
-    
-    CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
-
-    [screensMenu removeScreensFromMenu:statusBarMenu];
-    
-    if (numDisplays > 1) {
-        [screensMenu addScreensToMenu:statusBarMenu
-                               action:@selector(screenWasSelected:)
-                               target:self];
+    if (widgetsController) {
+        [self renderOnScreens:screens];
     }
+}
+
+- (void)renderOnScreens:(NSDictionary*)screens
+{
+    NSMutableArray* obsoleteScreens = [[windows allKeys] mutableCopy];
+    UBWindow* window;
     
-    // Most recently preferred screens will be listed first,
-    // so the first match we found will be the preferred screen.
-    NSArray* preferredScreens = [self getPreferredScreens];
-    for (int i = 0; i < preferredScreens.count; i++) {
-        NSInteger preferredScreenNumber = [preferredScreens[i] integerValue];
-        for (int j = 0; j < numDisplays; j++) {
-            screenId = displays[j];
-            if (CGDisplayIsInMirrorSet(screenId))
-                continue;
-            
-            if (preferredScreenNumber == CGDisplayUnitNumber(screenId)) {
-                [self sendWindowToScreen:screenId];
-                return;
-            }
+    for(NSNumber* screenId in screens) {
+        if (![windows objectForKey:screenId]) {
+            window = [[UBWindow alloc] init];
+            [windows setObject:window forKey:screenId];
+        } else {
+            window = windows[screenId];
         }
+        
+        [window setFrame:[screensController screenRect:screenId] display:YES];
+        [window makeKeyAndOrderFront:self];
+        [window loadUrl:[
+            [self serverUrl:@"http"]
+                URLByAppendingPathComponent:[NSString
+                    stringWithFormat:@"%@",
+                    screenId
+                ]
+            ]
+        ];
+        
+        [obsoleteScreens removeObject:screenId];
     }
-    // Couldn't find a preferred screen; use the primary display
-    [self sendWindowToScreen:CGMainDisplayID()];
-}
-
-- (void)sendWindowToScreen:(CGDirectDisplayID)screenId
-{
-    [window fillScreen:screenId];
-    [screensMenu markScreen:screenId inMenu:statusBarMenu];
-}
-
-- (NSMutableArray*)getPreferredScreens
-{
-    NSMutableArray* preferredScreens;
-    NSArray* preferredScreensPref = [[NSUserDefaults standardUserDefaults]
-                                     objectForKey:@"preferredScreens"];
-    if (!preferredScreensPref) {
-        preferredScreensPref = @[];
+    
+    for (NSNumber* screenId in obsoleteScreens) {
+        [windows[screenId] close];
+        [windows removeObjectForKey:screenId];
     }
-    preferredScreens = [NSMutableArray arrayWithArray:preferredScreensPref];
-    return preferredScreens;
-}
-
-- (void)setPreferredScreen:(CGDirectDisplayID)screenId
-{
-    NSNumber* displayNumber = @(CGDisplayUnitNumber(screenId));
     
-    // Add displayNumber to the preferredScreens user default array.
-    // Also make sure it's only in there once (i.e. remove it first)
-    
-    NSMutableArray* preferredScreens = [self getPreferredScreens];
-    [preferredScreens removeObject:displayNumber];
-    // Most recently preferred screens are at the beginning of the array
-    [preferredScreens insertObject:displayNumber atIndex:0];
-    
-    [[NSUserDefaults standardUserDefaults]
-     setObject:preferredScreens forKey:@"preferredScreens"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 
 #
 # pragma mark received actions
 #
 
-- (void)screenWasSelected:(id)sender
+- (void)modifierKeyReleased
 {
-    [self sendWindowToScreen:(CGDirectDisplayID)[sender tag]];
-    [self setPreferredScreen:(CGDirectDisplayID)[sender tag]];
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] sendToDesktop];
+    }
+}
+
+
+- (void)modifierKeyPressed
+{
+   for (NSNumber* screenId in windows) {
+        [windows[screenId] comeToFront];
+    }
 }
 
 - (void)widgetDirDidChange
@@ -277,21 +288,34 @@ int const PORT = 41416;
 
 - (IBAction)visitWidgetGallery:(id)sender
 {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://tracesof.net/uebersicht-widgets/"]];
+    [[NSWorkspace sharedWorkspace]
+        openURL:[NSURL URLWithString:@"http://tracesof.net/uebersicht-widgets/"]
+    ];
 }
 
 - (IBAction)refreshWidgets:(id)sender
 {
-    [window reload];
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] reload];
+    }
 }
 
 - (IBAction)showDebugConsole:(id)sender
 {
-    if (!inspector) {
-        inspector = [WebInspector.alloc initWithWebView:window.webView];
-    }
-    [[NSUserDefaults standardUserDefaults] setBool:NO
-                                        forKey:@"WebKit Web Inspector Setting - inspectorStartsAttached"];
+
+    NSNumber* currentScreen = [[NSScreen mainScreen]
+        deviceDescription
+    ][@"NSScreenNumber"];
+    
+    NSWindow* window = windows[currentScreen];
+    WebInspector *inspector= [WebInspector.alloc
+        initWithWebView: window.contentView
+    ];
+
+    [[NSUserDefaults standardUserDefaults]
+        setBool: NO
+        forKey: @"WebKit Web Inspector Setting - inspectorStartsAttached"
+    ];
     
     [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];

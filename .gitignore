@@ -17,6 +17,9 @@ profile
 DerivedData
 .idea/
 
-# manual
-
 server/node_modules
+
+# build files
+server/release/server.js
+server/release/public/client.js
+server/release/node_modules

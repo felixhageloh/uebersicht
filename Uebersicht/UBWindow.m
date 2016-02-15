@@ -14,26 +14,26 @@
 //
 
 #import "UBWindow.h"
+#import "UBLocation.h"
+#import "UBWallperServer.h"
 
 @implementation UBWindow {
-    NSString *widgetsUrl;
+    NSURL *widgetsUrl;
     UBWallperServer* wallpaperServer;
     BOOL webviewLoaded;
+    WebView* webView;
 }
 
-@synthesize webView;
-
-- (id) initWithContentRect:(NSRect)contentRect
-                 styleMask:(NSUInteger)aStyle
-                   backing:(NSBackingStoreType)bufferingType
-                     defer:(BOOL)flag
+- (id)init
 {
 
-    self = [super initWithContentRect:contentRect
-                            styleMask:NSBorderlessWindowMask
-                              backing:bufferingType
-                                defer:flag];
-
+    self = [super
+        initWithContentRect: NSMakeRect(0, 0, 0, 0)
+        styleMask: NSBorderlessWindowMask
+        backing: NSBackingStoreBuffered
+        defer: NO
+    ];
+    
     if (self) {
         [self setBackgroundColor:[NSColor clearColor]];
         [self setOpaque:NO];
@@ -45,31 +45,45 @@
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
-
-        [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-                                                 selector:@selector(wakeFromSleep:)
-                                                     name:NSWorkspaceDidWakeNotification
-                                                   object:nil];
+        
+        
+        webView = [self buildWebView];
+        
+        [self setContentView:webView];
+        [[[NSWorkspace sharedWorkspace] notificationCenter]
+            addObserver: self
+            selector: @selector(wakeFromSleep:)
+            name: NSWorkspaceDidWakeNotification
+            object: nil
+        ];
     }
-
 
     return self;
 }
 
-- (void)awakeFromNib
+
+- (WebView*)buildWebView
 {
-    [self initWebView];
+    WebView* view = [[WebView alloc]
+        initWithFrame: [self frame]
+        frameName: nil
+        groupName: nil
+    ];
+    [view setDrawsBackground:NO];
+    [view setMaintainsBackForwardList:NO];
+    [view setFrameLoadDelegate:self];
+    [view setPolicyDelegate:self];
+    
+    return view;
 }
 
-- (void)initWebView
+- (void)teardownWebview:(WebView*)view
 {
-    [webView setDrawsBackground:NO];
-    [webView setMaintainsBackForwardList:NO];
-    [webView setFrameLoadDelegate:self];
-    [webView setPolicyDelegate:self];
+    [view setFrameLoadDelegate:nil];
+    [view setPolicyDelegate:nil];
 }
 
-- (void)loadUrl:(NSString*)url
+- (void)loadUrl:(NSURL*)url
 {
     if (!wallpaperServer) {
         wallpaperServer = [[UBWallperServer alloc] initWithWindow:self];
@@ -78,9 +92,9 @@
         }];
     }
 
-    widgetsUrl    = url;
+    widgetsUrl = url;
     webviewLoaded = NO;
-    [webView setMainFrameURL:url];
+    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL: url]];
 }
 
 - (void)reload
@@ -95,18 +109,17 @@
     [webView reloadFromOrigin:self];
 }
 
+
+- (void)close
+{
+    [self teardownWebview:webView];
+    [super close];
+}
+
 #
 #pragma mark window control
 #
 
-- (void)fillScreen:(CGDirectDisplayID)screenId
-{
-    NSRect fullscreen = [self toQuartzCoordinates:CGDisplayBounds(screenId)];
-    int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-
-    fullscreen.size.height = fullscreen.size.height - menuBarHeight;
-    [self setFrame:fullscreen display:YES];
-}
 
 - (void)sendToDesktop
 {
@@ -125,16 +138,6 @@
 - (BOOL)isInFront
 {
     return self.level == kCGNormalWindowLevel-1;
-}
-
-- (NSRect)toQuartzCoordinates:(NSRect)screenRect
-{
-    CGRect mainScreenRect = CGDisplayBounds (CGMainDisplayID ());
-
-    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height -
-                                mainScreenRect.size.height);
-
-    return screenRect;
 }
 
 #
@@ -176,7 +179,7 @@
     } else if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
         [listener ignore];
-    } else if ([request.URL.absoluteString isEqualToString:widgetsUrl]) {
+    } else if ([request.URL isEqualTo: widgetsUrl]) {
         [listener use];
     } else {
         [listener ignore];
@@ -187,7 +190,7 @@
 - (void)handleWebviewLoadError:(NSError *)error
 {
     NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
-    if ([url.absoluteString isEqualToString:widgetsUrl]) {
+    if ([url isEqualTo: widgetsUrl]) {
         NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
 
         [self performSelector:@selector(loadUrl:) withObject:widgetsUrl
