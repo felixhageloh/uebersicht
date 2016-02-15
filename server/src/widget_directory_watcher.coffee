@@ -20,7 +20,7 @@ module.exports = (directoryPath) ->
             emitWidget(widgetPath)
         when 'moved-out', 'deleted'
           findRemovedWidgets filePath, (widgetPath) ->
-            eventEmitter.emit('widetRemoved', widgetId(widgetPath))
+            eventEmitter.emit('widgetRemoved', widgetId(widgetPath))
             delete widgetPaths[widgetPath]
 
     watcher.start()
@@ -33,10 +33,14 @@ module.exports = (directoryPath) ->
     api
 
   api.close = ->
+    eventEmitter.removeAllListeners()
     watcher.stop()
 
   api.on = (type, handler) ->
     eventEmitter.on(type, handler)
+
+  api.off = (type, handler) ->
+    eventEmitter.removeListener(type, handler)
 
   emitWidget = (filePath) ->
     id = widgetId filePath
