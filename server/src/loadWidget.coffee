@@ -1,30 +1,8 @@
 fs = require 'fs'
-coffee = require 'coffee-script'
-stylus = require('stylus')
-nib = require('nib')
 toSource = require('tosource')
+
+parseWidget = require './parseWidget'
 validateWidget = require './validateWidget'
-
-parseStyle = (id, style) ->
-  return "" unless style
-  scopedStyle = "##{id}\n  " + style.replace(/\n/g, "\n  ")
-  stylus(scopedStyle)
-    .import('nib')
-    .use(nib())
-    .render()
-
-parseWidget = (id, filePath, body) ->
-  if filePath.match /\.coffee$/
-    body = coffee.eval body
-  else
-    body = eval '({' + body + '})'
-
-  unless body.css?
-    body.css = parseStyle(id, body.style || '')
-    delete body.style
-
-  body.id = id
-  body
 
 prettyPrintError = (filePath, error) ->
   return 'file not found' if error.code == 'ENOENT'

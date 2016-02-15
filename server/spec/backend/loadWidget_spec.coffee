@@ -4,7 +4,7 @@ path = require('path')
 loadWidget = require '../../src/loadWidget.coffee'
 testDir = path.resolve(__dirname, path.join('..', 'test_widgets'))
 
-test 'parsing coffeescript widgets', (t) ->
+test 'loading coffeescript widgets', (t) ->
   widgetPath = path.join(testDir, 'widget-1.coffee')
 
   loadWidget 'widget-id', widgetPath, (widget) ->
@@ -22,7 +22,7 @@ test 'parsing coffeescript widgets', (t) ->
     t.ok(validBody, 'it includes a serialized js object of the widget content')
     t.end()
 
-test 'parsing javascript widgets', (t) ->
+test 'loading javascript widgets', (t) ->
   widgetPath = path.join(testDir, 'widget-2.js')
 
   loadWidget 'other-widget-id', widgetPath, (widget) ->
@@ -39,7 +39,7 @@ test 'parsing javascript widgets', (t) ->
     t.ok(validBody, 'it includes a serialized js object of the widget content')
     t.end()
 
-test 'parsing wiggets with syntax errors', (t) ->
+test 'loading wiggets with syntax errors', (t) ->
   widgetPath = path.join(testDir, 'broken-widget.coffee')
 
   loadWidget 'other-widget-id', widgetPath, (widget) ->
@@ -56,7 +56,7 @@ test 'parsing wiggets with syntax errors', (t) ->
 
     t.end()
 
-test 'parsing an invalid widget', (t) ->
+test 'loading an invalid widget', (t) ->
   widgetPath = path.join(testDir, 'invalid-widget.coffee')
 
   loadWidget 'other-widget-id', widgetPath, (widget) ->
