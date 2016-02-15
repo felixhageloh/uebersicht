@@ -4,29 +4,32 @@ httpGet = require '../helpers/httpGet'
 httpPost = require '../helpers/httpPost'
 
 Server = require '../../src/app.coffee'
-server = Server(3030, '../spec/test_widgets', '.')
+server = Server(3030, '../spec/test_widgets', '../spec/test_files')
 host = 'localhost:3030'
 
 WebSocket = require 'ws'
 ws = new WebSocket("ws://#{host}")
 
 test 'dispatching events', (t) ->
+  t.plan(1)
   messages = {}
-  numMessages = 0
-
-  onMessagesReceived = ->
-    t.equal(
-      messages['WIDGET_ADDED'].length, 5,
-      'it should dispatch 5 WIDGET_ADDED events'
-    )
-    t.end()
-
-  ws.on 'message', (data) ->
+  onMessage = (data) ->
     data = JSON.parse(data)
     messages[data.type] ||= []
     messages[data.type].push data.payload
-    numMessages++
-    onMessagesReceived() if numMessages == 5
+    isDone = (
+      messages['WIDGET_ADDED']?.length == 5 and
+      messages['WIDGET_SETTINGS_CHANGED']?.length == 5
+    )
+
+    if isDone
+      ws.removeListener 'message', onMessage
+      t.ok(
+        true,
+        'it dispatches 5 WIDGET_ADDED and 5 WIDGET_SETTINGS_CHANGED events'
+      )
+
+  ws.on 'message', onMessage
 
 test 'serving the client', (t) ->
   t.plan 4
@@ -92,7 +95,7 @@ test 'starting on the specified port', (t) ->
   t.plan(1)
   server.close()
 
-  server = Server(3031, '../spec/test_widgets', '.')
+  server = Server(3031, '../spec/test_widgets', '../spec/test_files')
   httpGet "http://localhost:3031/", (res) ->
     server.close()
     t.equal(res.statusCode, 200, 'app should respond on port 3031')

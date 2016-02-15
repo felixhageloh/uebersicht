@@ -1,4 +1,5 @@
 redux = require 'redux'
+window.$ = require 'jquery'
 
 reducer = require './src/reducer'
 listenToRemote = require './src/listen'
@@ -32,7 +33,6 @@ init = ->
     render(store.getState(), screenId, contentEl)
 
     store.subscribe ->
-      console.log 'huh'
       render(store.getState(), screenId, contentEl)
 
     listenToRemote (action) ->

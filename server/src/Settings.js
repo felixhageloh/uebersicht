@@ -7,12 +7,10 @@ module.exports = function Settings(settingsDirPath) {
   const api = {};
   let settings;
 
-  const settingsFile = path.resolve(
-    __dirname,
-    path.join(settingsDirPath, 'WidgetSettings.json')
-  );
+  const fullSettingsDirPath = path.resolve(__dirname, settingsDirPath);
+  const settingsFile = path.join(fullSettingsDirPath, 'WidgetSettings.json');
 
-  initSettingsFile(settingsDirPath);
+  initSettingsFile(fullSettingsDirPath);
 
   function initSettingsFile(dirPath) {
     if (!fs.existsSync(dirPath)) {
@@ -21,10 +19,12 @@ module.exports = function Settings(settingsDirPath) {
   }
 
   api.load = function load() {
-    settings = fs.existsSync(settingsFile)
-      ? require(settingsFile)
-      : {};
-    return settings;
+    let persistedSettings = {};
+    try {
+      persistedSettings = require(settingsFile);
+    } catch (e) { /* do nothing */ }
+
+    return persistedSettings;
   };
 
   api.persist = function persist(newSettings) {

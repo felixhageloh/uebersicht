@@ -7,9 +7,11 @@ const handlers = {
     const newWidgets = Object.assign({}, state.widgets, {
       [widget.id]: widget,
     });
-    const newSettings = state.settings[widget.id]
+
+    const settings = state.settings || {};
+    const newSettings = settings[widget.id]
       ? state.settings
-      : Object.assign({}, state.settings, { [widget.id]: {} });
+      : Object.assign({}, settings, { [widget.id]: {} });
 
     return Object.assign({},
       state,

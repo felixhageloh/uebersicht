@@ -1,8 +1,10 @@
+$ = require('jquery');
+
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
 module.exports = (implementation) ->
   api = {}
-  publicApi = {}
+  internalApi = {}
 
   el = null
   contentEl = null
@@ -19,7 +21,7 @@ module.exports = (implementation) ->
 
   init = ->
     implementation[k] ||= v for k, v of defaults
-    implementation[k] ||= v for k, v of publicApi
+    implementation[k] ||= v for k, v of internalApi
 
     api
 
@@ -37,7 +39,7 @@ module.exports = (implementation) ->
   api.destroy = ->
     stop()
     return unless el?
-    el.parentNode.removeChild(el)
+    el.parentNode?.removeChild(el)
     el = null
     contentEl = null
 
@@ -47,21 +49,21 @@ module.exports = (implementation) ->
     !!el
 
   # starts the widget refresh cycle
-  publicApi.start = start = ->
+  internalApi.start = start = ->
     return if started
     started = true
     clearTimeout timer if timer?
     refresh()
 
   # stops the widget refresh cycle
-  publicApi.stop = stop = ->
+  internalApi.stop = stop = ->
     return unless started
     started  = false
     rendered = false
     clearTimeout timer if timer?
 
   # run widget command and redraw the widget
-  publicApi.refresh = refresh = ->
+  internalApi.refresh = refresh = ->
     return redraw() unless implementation.command?
 
     request = run implementation.command, (err, output) ->
@@ -73,7 +75,7 @@ module.exports = (implementation) ->
       timer = setTimeout refresh, implementation.refreshFrequency
 
   # runs command in the shell and calls callback with the result (err, stdout)
-  publicApi.run = run = (command, callback) ->
+  internalApi.run = run = (command, callback) ->
     $.ajax(
       url: "/run/"
       method: 'POST'
