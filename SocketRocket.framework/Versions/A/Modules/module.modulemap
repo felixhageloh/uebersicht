@@ -1,0 +1,6 @@
+framework module SocketRocket {
+  umbrella header "SocketRocket.h"
+
+  export *
+  module * { export * }
+}
