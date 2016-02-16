@@ -33,6 +33,6 @@
 	<key>NSSupportsAppNap</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>http://tracesof.net/uebersicht/updates.xml.rss</string>
+	<string>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</string>
 </dict>
 </plist>
