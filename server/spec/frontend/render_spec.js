@@ -49,29 +49,67 @@ test('destroying removed widgets', (t) => {
   t.end();
 });
 
-test('rendering widgets that are assigned to a screen', (t) => {
-  state.widgets.fred = buildWidget('fred');
-  state.settings.fred = { screenId: '567' };
+
+test('rendering widgets that are visible on all screens', (t) => {
+  state.settings.baz = {
+    showOnAllScreens: true,
+  };
 
   render(state, '123', domEl);
-  t.ok(
-    !!domEl.querySelector('#fred'),
-    'it renders widgets assigned to another screen when the screen is unavailable'
+  t.equal(domEl.childNodes.length, 2, 'it renders them');
+
+  render(state, '678', domEl);
+  t.equal(domEl.childNodes.length, 2, 'it renders them on any screen');
+
+  t.end();
+});
+
+
+test('rendering widgets that are pinned to the main screen', (t) => {
+  state.settings.baz = {
+    showOnAllScreens: false,
+    showOnMainScreen: true,
+  };
+
+  render(state, '123', domEl);
+  t.equal(
+    domEl.childNodes.length, 2,
+    'it renders them if current screen is main'
   );
 
-  state.settings.fred = { screenId: '567', pinned: true };
+  render(state, '156', domEl);
+  t.equal(
+    domEl.childNodes.length, 1,
+    'it does not render them if current screen is mot main'
+  );
+  t.end();
+});
+
+test('rendering widgets that are pinned to selected screens', (t) => {
+  state.settings.baz = {
+    showOnAllScreens: false,
+    showOnMainScreen: false,
+    showOnSelectedScreens: true,
+  };
+
   render(state, '123', domEl);
-  t.ok(
-    !domEl.querySelector('#fred'),
-    'it does not render widgets pinned to another screen'
+  t.equal(
+    domEl.childNodes.length, 1,
+    'it does not render them if no screen is selected'
   );
 
-  state.settings.fred = { screenId: '567' };
-  state.screens = ['123', '567'];
+  state.settings.baz.screens = ['567'];
   render(state, '123', domEl);
-  t.ok(
-    !domEl.querySelector('#fred'),
-    'it does not render widgets whos assigned screen is available'
+  t.equal(
+    domEl.childNodes.length, 1,
+    'it does not render them if current screen is not in selected screens'
+  );
+
+  state.settings.baz.screens = ['567', '123'];
+  render(state, '123', domEl);
+  t.equal(
+    domEl.childNodes.length, 2,
+    'it renders them if current screen is in selected screens'
   );
 
   t.end();

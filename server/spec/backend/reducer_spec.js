@@ -21,7 +21,12 @@ test('WIDGET_ADDED', (t) => {
   );
 
   t.looseEqual(
-    newState.settings.foo, {},
+    newState.settings.foo, {
+      showOnAllScreens: true,
+      showOnMainScreen: false,
+      showOnSelectedScreens: false,
+      screens: [],
+    },
     'it initializes settings for a widget'
   );
 

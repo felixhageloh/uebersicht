@@ -2,6 +2,7 @@
 
 const defaultSettings = {
   showOnAllScreens: true,
+  showOnMainScreen: false,
   showOnSelectedScreens: false,
   screens: [],
 };
