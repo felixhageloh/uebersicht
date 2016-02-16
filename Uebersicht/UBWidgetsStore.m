@@ -9,12 +9,14 @@
 #import "UBWidgetsStore.h"
 #import "UBListener.h"
 
+
 @implementation UBWidgetsStore {
     UBListener* listener;
     NSMutableDictionary* widgets;
     NSMutableDictionary* settings;
     NSArray* sortedWidgets;
     void (^changeHandler)(NSDictionary*);
+    NSDictionary* defaultSettings;
 }
 
 - (id)init
@@ -27,14 +29,21 @@
         settings = [[NSMutableDictionary alloc] init];
         listener = [[UBListener alloc] init];
         
+        defaultSettings = @{
+            @"showOnAllScreens": @YES,
+            @"showOnSelectedScreens": @NO,
+            @"screens": @[]
+        };
+        
         [listener on:@"WIDGET_ADDED" do:^(NSDictionary* data) {
             [self addWidget:data];
             [self notifyChange];
         }];
         
         [listener on:@"WIDGET_SETTINGS_CHANGED" do:^(NSDictionary* details) {
-            NSMutableDictionary* sett = [self getOrAddSettings:details[@"id"]];
-            [sett addEntriesFromDictionary:details[@"settings"]];
+            settings[details[@"id"]] = [[NSMutableDictionary alloc]
+                initWithDictionary:details[@"settings"]
+            ];
             [self notifyChange];
         }];
         
@@ -45,21 +54,40 @@
             }
         }];
         
-        [listener on:@"WIDGET_WAS_PINNED" do:^(NSString* widgetId) {
-            NSMutableDictionary* sett = [self getOrAddSettings:widgetId];
-            [sett setObject:@YES forKey:@"pinned"];
+        [listener on:@"WIDGET_SET_TO_SELECTED_SCREENS" do:^(NSString* widgetId) {
+            [self updateSettings:widgetId withPatch:@{
+                @"showOnAllScreens": @NO,
+                @"showOnSelectedScreens": @YES,
+                @"showOnMainScreen": @NO
+            }];
             [self notifyChange];
         }];
         
-        [listener on:@"WIDGET_WAS_UNPINNED" do:^(NSString* widgetId) {
-            NSMutableDictionary* sett = [self getOrAddSettings:widgetId];
-            [sett setObject:@NO forKey:@"pinned"];
+        [listener on:@"WIDGET_SET_TO_ALL_SCREENS" do:^(NSString* widgetId) {
+            [self updateSettings:widgetId withPatch:@{
+                @"showOnAllScreens": @YES,
+                @"showOnSelectedScreens": @NO,
+                @"showOnMainScreen": @NO
+            }];
             [self notifyChange];
         }];
         
-        [listener on:@"WIDGET_DID_CHANGE_SCREEN" do:^(NSDictionary* data) {
-            NSMutableDictionary* sett = [self getOrAddSettings:data[@"id"]];
-            sett[@"screenId"] = data[@"screenId"];
+        [listener on:@"WIDGET_SET_TO_MAIN_SCREEN" do:^(NSString* widgetId) {
+            [self updateSettings:widgetId withPatch:@{
+                @"showOnAllScreens": @NO,
+                @"showOnSelectedScreens": @NO,
+                @"showOnMainScreen": @YES
+            }];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"SCREEN_SELECTED_FOR_WIDGET" do:^(NSDictionary* data) {
+            [self selectScreen:data[@"screenId"] forWidget:data[@"id"]];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"SCREEN_DESELECTED_FOR_WIDGET" do:^(NSDictionary* data) {
+            [self deselectScreen:data[@"screenId"] forWidget:data[@"id"]];
             [self notifyChange];
         }];
         
@@ -111,7 +139,7 @@
 
 - (NSDictionary*)addWidget:(NSDictionary*)widget
 {
-    BOOL alreadyExists = !!widgets[@"id"];
+    BOOL alreadyExists = !!widgets[widget[@"id"]];
     widgets[widget[@"id"]] = widget;
     if (!alreadyExists) {
         sortedWidgets = [widgets.allKeys
@@ -119,16 +147,24 @@
         ];
     }
     
+    if (!settings[widget[@"id"]]) {
+        settings[widget[@"id"]] = [[NSMutableDictionary alloc]
+            initWithDictionary:defaultSettings
+        ];
+    }
+    
     return widget;
 }
 
-- (NSMutableDictionary*)getOrAddSettings:(NSString*)widgetId
+- (void)updateSettings:(NSString*)widgetId withPatch:(NSDictionary*)patch
 {
     if (!settings[widgetId]) {
-        settings[widgetId] = [[NSMutableDictionary alloc] init];
+        settings[widgetId] = [[NSMutableDictionary alloc]
+            initWithDictionary:defaultSettings
+        ];
     }
     
-    return settings[widgetId];
+    [settings[widgetId] addEntriesFromDictionary:patch];
 }
 
 - (void)removeWidget:(NSString*)widgetId
@@ -137,6 +173,29 @@
     
     sortedWidgets = [widgets.allKeys
         sortedArrayUsingSelector:@selector(compare:)
+    ];
+}
+
+- (void)selectScreen:(NSNumber*)screenId forWidget:(NSString*)widgetId
+{
+    NSArray* screens = settings[widgetId][@"screens"];
+    
+    if (![screens containsObject:screenId]) {
+        settings[widgetId][@"screens"] = [screens arrayByAddingObject:screenId];
+    }
+}
+
+- (void)deselectScreen:(NSNumber*)screenId forWidget:(NSString*)widgetId
+{
+    NSArray* screens = settings[widgetId][@"screens"];
+    NSPredicate *withoutScreen = [NSPredicate
+        predicateWithBlock: ^BOOL(id s, NSDictionary * _) {
+            return s != screenId;
+        }
+    ];
+    
+    settings[widgetId][@"screens"] = [screens
+        filteredArrayUsingPredicate: withoutScreen
     ];
 }
 

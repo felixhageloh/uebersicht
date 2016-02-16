@@ -1,5 +1,11 @@
 'use strict';
 
+const defaultSettings = {
+  showOnAllScreens: true,
+  showOnSelectedScreens: false,
+  screens: [],
+};
+
 const handlers = {
 
   WIDGET_ADDED: (state, action) => {
@@ -11,7 +17,7 @@ const handlers = {
     const settings = state.settings || {};
     const newSettings = settings[widget.id]
       ? state.settings
-      : Object.assign({}, settings, { [widget.id]: {} });
+      : Object.assign({}, settings, { [widget.id]: defaultSettings });
 
     return Object.assign({},
       state,
@@ -41,17 +47,50 @@ const handlers = {
     return Object.assign({}, state, { settings: newSettings });
   },
 
-  WIDGET_WAS_PINNED: (state, action) => {
-    return updateSettings(state, action.payload, 'pinned', true);
+  WIDGET_SET_TO_ALL_SCREENS: (state, action) => {
+    return updateSettings(state, action.payload, {
+      showOnAllScreens: true,
+      showOnSelectedScreens: false,
+      showOnMainScreen: false,
+    });
   },
 
-  WIDGET_WAS_UNPINNED: (state, action) => {
-    return updateSettings(state, action.payload, 'pinned', false);
+  WIDGET_SET_TO_SELECTED_SCREENS: (state, action) => {
+    return updateSettings(state, action.payload, {
+      showOnSelectedScreens: true,
+      showOnAllScreens: false,
+      showOnMainScreen: false,
+    });
   },
 
-  WIDGET_DID_CHANGE_SCREEN: (state, action) => {
-    const details = action.payload;
-    return updateSettings(state, details.id, 'screenId', details.screenId);
+  WIDGET_SET_TO_MAIN_SCREEN: (state, action) => {
+    return updateSettings(state, action.payload, {
+      showOnSelectedScreens: false,
+      showOnAllScreens: false,
+      showOnMainScreen: true,
+    });
+  },
+
+  SCREEN_SELECTED_FOR_WIDGET: (state, action) => {
+    const settings = state.settings[action.payload.id];
+    const newScreens = (settings.screens || []).slice();
+
+    if (newScreens.indexOf(action.payload.screenId) === -1) {
+      newScreens.push(action.payload.screenId);
+    }
+
+    return updateSettings(state, action.payload.id, {
+      screens: newScreens,
+    });
+  },
+
+  SCREEN_DESELECTED_FOR_WIDGET: (state, action) => {
+    const newScreens = (state.settings[action.payload.id].screens || [])
+      .filter((s) => s !== action.payload.screenId);
+
+    return updateSettings(state, action.payload.id, {
+      screens: newScreens,
+    });
   },
 
   SCREENS_DID_CHANGE: (state, action) => {
@@ -61,13 +100,12 @@ const handlers = {
   },
 };
 
-function updateSettings(state, widgetId, key, value) {
-  if (state.settings[widgetId][key] === value) {
-    return state;
-  }
-
-  const newSettings = Object.assign({}, state.settings);
-  newSettings[widgetId][key] = value;
+function updateSettings(state, widgetId, patch) {
+  const widgetSettings = state.settings[widgetId];
+  const newSettings = Object.assign({},
+    state.settings,
+    { [widgetId]: Object.assign({}, widgetSettings, patch) }
+  );
 
   return Object.assign({}, state, { settings: newSettings });
 }

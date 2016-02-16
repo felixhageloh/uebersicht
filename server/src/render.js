@@ -6,26 +6,15 @@ function isVisibleOnScreen(widgetId, screenId, state) {
   var settings = state.settings[widgetId] || {};
   var isVisible = false;
 
-  if (settings.screenId === screenId) {
+  if (settings.showOnAllScreens) {
     isVisible = true;
-  } else {
-    isVisible =
-      !settings.screenId &&
-        isMainScreen(screenId, state.screens) ||
-      settings.screenId &&
-        !settings.pinned &&
-        screenIsUnavailable(settings.screenId, state.screens);
+  } else if (settings.showOnMainScreen) {
+    isVisible = state.screens.indexOf(screenId) === 0;
+  } else if (settings.showOnSelectedScreens) {
+    isVisible = (settings.screens || []).indexOf(screenId) !== -1;
   }
 
   return isVisible;
-}
-
-function isMainScreen(screenId, screens) {
-  return screenId === screens[0];
-}
-
-function screenIsUnavailable(screenId, screens) {
-  return screens.indexOf(screenId) === -1;
 }
 
 function renderWidget(widget, domEl) {

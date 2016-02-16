@@ -101,13 +101,23 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     
     
     NSMenu* widgetMenu = [[NSMenu alloc] init];
-    [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:0];
-    [self addPinnedToggleToMenu:widgetMenu forWidget:widgetId];
-    [self
-        addScreens: [screensController screens]
-        toWidgetMenu: widgetMenu
-        forWidget: widgetId
-    ];
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    if ([settings[@"showOnSelectedScreens"] boolValue]) {
+        [self
+            addScreens: [screensController screens]
+            toWidgetMenu: widgetMenu
+            forWidget: widgetId
+         ];
+        [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:0];
+        [self addMainScreenOptionToMenu:widgetMenu forWidget:widgetId];
+        [self addAllScreensOptionToMenu:widgetMenu forWidget:widgetId];
+    } else if ([settings[@"showOnMainScreen"] boolValue]) {
+        [self addSelectedScreensOptionToMenu:widgetMenu forWidget:widgetId];
+        [self addAllScreensOptionToMenu:widgetMenu forWidget:widgetId];
+    } else {
+        [self addSelectedScreensOptionToMenu:widgetMenu forWidget:widgetId];
+        [self addMainScreenOptionToMenu:widgetMenu forWidget:widgetId];
+    }
     
     [self addEditMenuItemToMenu:widgetMenu forWidget:widgetId];
     [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:1];
@@ -131,17 +141,47 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 
 }
 
-
-- (void)addPinnedToggleToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
+- (void)addMainScreenOptionToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
 {
     NSMenuItem* pin = [[NSMenuItem alloc]
-        initWithTitle: @"Hide when screen is unavailable"
-        action: @selector(togglePinned:)
+        initWithTitle: @"Show only on current main display"
+        action: @selector(showOnMainScreen:)
         keyEquivalent: @""
     ];
+    NSDictionary* settings = [widgets getSettings:widgetId];
     [pin setTarget:self];
     [pin setRepresentedObject:widgetId];
-    [pin setState:[[widgets getSettings:widgetId][@"pinned"] boolValue]];
+    [pin setState:[settings[@"showOnMainScreeen"] boolValue]];
+    [menu insertItem:pin atIndex:0];
+}
+
+
+- (void)addAllScreensOptionToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
+{
+    NSMenuItem* pin = [[NSMenuItem alloc]
+        initWithTitle: @"Show on all screens"
+        action: @selector(showOnAllScreens:)
+        keyEquivalent: @""
+    ];
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    [pin setTarget:self];
+    [pin setRepresentedObject:widgetId];
+    [pin setState:[settings[@"showOnAllScreens"] boolValue]];
+    [menu insertItem:pin atIndex:0];
+}
+
+- (void)addSelectedScreensOptionToMenu:(NSMenu*)menu
+                             forWidget:(NSString*)widgetId
+{
+    NSMenuItem* pin = [[NSMenuItem alloc]
+        initWithTitle: @"Show only on selected screens"
+        action: @selector(showOnSelectedScreens:)
+        keyEquivalent: @""
+    ];
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    [pin setTarget:self];
+    [pin setRepresentedObject:widgetId];
+    [pin setState:[settings[@"showOnSelectedScreens"] boolValue]];
     [menu insertItem:pin atIndex:0];
 }
 
@@ -157,7 +197,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSString *title;
     NSMenuItem *newItem;
     NSString *name;
-    NSNumber* widgetScreenId = [widgets getSettings:widgetId][@"screenId"];
+    NSArray* widgetScreens = [widgets getSettings:widgetId][@"screens"];
     
     newItem = [NSMenuItem separatorItem];
     [menu insertItem:newItem atIndex:0];
@@ -168,7 +208,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         title = [NSString stringWithFormat:@"Show on %@", name];
         newItem = [[NSMenuItem alloc]
             initWithTitle: title
-            action: @selector(screenWasSelected:)
+            action: @selector(toggleScreen:)
             keyEquivalent: @""
         ];
         
@@ -180,8 +220,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
             }
         ];
         
-        if (widgetScreenId &&
-            [screenId isEqualToNumber:widgetScreenId]) {
+        if ([widgetScreens containsObject:screenId]) {
             [newItem setState:YES];
         }
         [menu insertItem:newItem atIndex:i];
@@ -191,12 +230,19 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 
 - (BOOL)isWidgetVisible:(NSString*)widgetId
 {
-    NSDictionary* widget = [widgets getSettings:widgetId];
-    BOOL screenUnavailable = !screensController.screens[widget[@"screenId"]];
-    return (
-        !widget[@"screenId"] ||
-        (widget[@"screenId"] && !([widget[@"pinned"] boolValue] && screenUnavailable))
-    );
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    BOOL isVisible = NO;
+    
+    if ([settings[@"showOnAllScreens"] boolValue]) {
+        isVisible = YES;
+    } else if ([settings[@"showOnMainScreen"] boolValue]) {
+        isVisible = YES;
+    } else if ([settings[@"showOnSelectedScreens"] boolValue]) {
+        NSArray* screens = settings[@"screens"];
+        isVisible = screens != nil && [screens count] > 0;
+     }
+    
+    return isVisible;
 }
 
 
@@ -206,25 +252,52 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 }
 
 
-- (void)togglePinned:(id)sender
+- (void)showOnAllScreens:(id)sender
 {
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
-    BOOL isPinned = ![[widgets getSettings:widgetId][@"pinned"] boolValue];
     
     [dispatcher
-        dispatch: isPinned ? @"WIDGET_WAS_PINNED" : @"WIDGET_WAS_UNPINNED"
+        dispatch: @"WIDGET_SET_TO_ALL_SCREENS"
         withPayload: widgetId
     ];
 }
 
-- (void)screenWasSelected:(id)sender
+- (void)showOnSelectedScreens:(id)sender
+{
+    NSString* widgetId = [(NSMenuItem*)sender representedObject];
+    
+    [dispatcher
+        dispatch: @"WIDGET_SET_TO_SELECTED_SCREENS"
+        withPayload: widgetId
+    ];
+}
+
+- (void)showOnMainScreen:(id)sender
+{
+    NSString* widgetId = [(NSMenuItem*)sender representedObject];
+    
+    [dispatcher
+        dispatch: @"WIDGET_SET_TO_MAIN_SCREEN"
+        withPayload: widgetId
+    ];
+}
+
+- (void)toggleScreen:(id)sender
 {
     NSMenuItem* menuItem = (NSMenuItem*)sender;
     NSDictionary* data = [menuItem representedObject];
     NSNumber* screenId = data[@"screenId"];
+    NSDictionary* widgetSettings = [widgets getSettings:data[@"widgetId"]];
+    NSString* message;
+    
+    if ([(NSArray*)widgetSettings[@"screens"] containsObject:screenId]) {
+        message = @"SCREEN_DESELECTED_FOR_WIDGET";
+    } else {
+        message = @"SCREEN_SELECTED_FOR_WIDGET";
+    }
 
     [dispatcher
-        dispatch: @"WIDGET_DID_CHANGE_SCREEN"
+        dispatch: message
         withPayload: @{
             @"id": data[@"widgetId"],
             @"screenId": screenId
