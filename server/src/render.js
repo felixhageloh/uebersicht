@@ -12,7 +12,8 @@ function isVisibleOnScreen(widgetId, screenId, state) {
     isVisible =
       !settings.screenId &&
         isMainScreen(screenId, state.screens) ||
-      !settings.pinned &&
+      settings.screenId &&
+        !settings.pinned &&
         screenIsUnavailable(settings.screenId, state.screens);
   }
 

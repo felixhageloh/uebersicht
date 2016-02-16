@@ -194,8 +194,8 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSDictionary* widget = [widgets getSettings:widgetId];
     BOOL screenUnavailable = !screensController.screens[widget[@"screenId"]];
     return (
-        ![widget[@"hidden"] boolValue] &&
-        !([widget[@"pinned"] boolValue] && screenUnavailable)
+        !widget[@"screenId"] ||
+        (widget[@"screenId"] && !([widget[@"pinned"] boolValue] && screenUnavailable))
     );
 }
 
