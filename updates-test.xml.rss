@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>Übersicht App Changelog</title>
+      <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates-test.xml.rss</link>
+      <description>Most recent changes with links to updates.</description>
+      <language>en</language>
+        <item>
+            <title>Version 0.7.25</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.25.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Tue, Feb 16 2016 17:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.25.app.zip"
+                       sparkle:version="25"
+                       sparkle:shortVersionString="0.7.25"
+                       length="10600"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.7.24</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.24.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Thu, Feb 04 2016 20:40:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.24.app.zip"
+                       sparkle:version="24"
+                       sparkle:shortVersionString="0.7.24"
+                       length="10592"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.7.23</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.23.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Thu, Jan 14 2016 10:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.23.app.zip"
+                       sparkle:version="23"
+                       sparkle:shortVersionString="0.7.23"
+                       length="10600"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.7</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sun, Nov 29 2015 14:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.app.zip"
+                       sparkle:version="22"
+                       sparkle:shortVersionString="0.7"
+                       length="10400"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.6.20</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.6.20.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Mon, Nov 16 2015 20:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.20.app.zip"
+                       sparkle:version="20"
+                       sparkle:shortVersionString="0.6.20"
+                       length="10384"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.6.19</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.6.19.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sat, Nov 14 2015 16:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.19.app.zip"
+                       sparkle:version="19"
+                       sparkle:shortVersionString="0.6.19"
+                       length="10384"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.6</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.6.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Fri, Nov 13 2015 20:46:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.app.zip"
+                       sparkle:version="18"
+                       sparkle:shortVersionString="0.6"
+                       length="10392"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.5</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.5.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sun, Mar 01 2015 12:58:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.5.app.zip"
+                       sparkle:version="17"
+                       sparkle:shortVersionString="0.5"
+                       length="10400"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.4.15</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.4.15.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sun, Jan 04 2015 14:30:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.4.15.app.zip"
+                       sparkle:version="15"
+                       sparkle:shortVersionString="0.4"
+                       length="10392"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.4</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.4.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Mon, Dec 29 2014 09:20:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.4.app.zip"
+                       sparkle:version="14"
+                       sparkle:shortVersionString="0.4"
+                       length="10392"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.3.13</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.13.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sun, Oct 26 2014 13:35:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.13.app.zip"
+                       sparkle:version="13"
+                       sparkle:shortVersionString="0.3.13"
+                       length="10352"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.3.12</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.12.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sun, Oct 12 2014 12:35:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.12.app.zip"
+                       sparkle:version="12"
+                       sparkle:shortVersionString="0.3.12"
+                       length="9752"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.3.11</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.11.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Sat, Oct 4 2014 11:02:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.11.app.zip"
+                       sparkle:version="11"
+                       sparkle:shortVersionString="0.3.11"
+                       length="9912"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.3</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Tue, Sep 9 2014 09:08:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.app.zip"
+                       sparkle:version="10"
+                       sparkle:shortVersionString="0.3"
+                       length="9896"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.2.7</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.2.7.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Wed, Aug 20 2014 19:15:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.2.7.app.zip"
+                       sparkle:version="7"
+                       sparkle:shortVersionString="0.2"
+                       length="9888"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.2</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.2.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Thu, Jul 22 2014 11:15:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.2.app.zip"
+                       sparkle:version="6"
+                       sparkle:shortVersionString="0.2"
+                       length="9696"
+                       type="application/octet-stream" />
+        </item>
+        <item>
+            <title>Version 0.1</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.1.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Tue, Apr 22 2014 9:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.1.app.zip"
+                       sparkle:version="5"
+                       sparkle:shortVersionString="0.1"
+                       length="9792"
+                       type="application/octet-stream" />
+        </item>
+
+        <item>
+            <title>Version 0.1</title>
+            <sparkle:releaseNotesLink>
+              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.1.html
+            </sparkle:releaseNotesLink>
+            <pubDate>Mon, Apr 14 2014 19:48:44 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.1.app.zip"
+                       sparkle:version="0.1"
+                       length="15656"
+                       type="application/octet-stream" />
+        </item>
+   </channel>
+</rss>
