@@ -7,9 +7,11 @@
       <language>en</language>
         <item>
             <title>Version 0.7.25</title>
-            <sparkle:releaseNotesLink>
-              https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.25.html
-            </sparkle:releaseNotesLink>
+            <description>
+              ## What's New
+
+              - Fixed a vulnerability in the updater by delivering all updates over https.
+            </<description>>
             <pubDate>Tue, Feb 16 2016 17:00:00 +0200</pubDate>
             <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.25.app.zip"
                        sparkle:version="25"
