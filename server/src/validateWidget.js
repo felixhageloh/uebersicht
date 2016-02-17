@@ -1,7 +1,7 @@
 'use strict';
 
 function validateHasCommand(impl, issues, message) {
-  if (!impl.command && impl.refreshFrequency !== false) {
+  if (typeof impl.command !== 'string' && impl.refreshFrequency !== false) {
     issues.push(message);
   }
 }
