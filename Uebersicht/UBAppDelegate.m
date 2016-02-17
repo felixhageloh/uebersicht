@@ -94,6 +94,12 @@ int const PORT = 41416;
     [widgetsStore onChange: ^(NSDictionary* widgets) {
         [widgetsController render];
     }];
+    
+    // make sure notifcations always show
+    NSUserNotificationCenter* unc = [NSUserNotificationCenter
+        defaultUserNotificationCenter
+    ];
+    unc.delegate = self;
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -319,6 +325,12 @@ int const PORT = 41416;
     
     [NSApp activateIgnoringOtherApps:YES];
     [inspector show:self];
+}
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
+     shouldPresentNotification:(NSUserNotification *)notification
+{
+    return YES;
 }
 
 

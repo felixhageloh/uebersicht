@@ -12,7 +12,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface UBAppDelegate : NSObject <NSApplicationDelegate>
+@interface UBAppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
 
 @property (weak) IBOutlet NSMenu *statusBarMenu;
 

@@ -313,7 +313,15 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
     NSString* filePath = [widgets get:widgetId][@"filePath"];
     
-    [[NSWorkspace sharedWorkspace] openFile:filePath];
+    if (![[NSWorkspace sharedWorkspace] openFile:filePath]) {
+        NSString* message = @"Please configure an app to edit .%@ files";
+        [self
+            notifyUser: [NSString
+                stringWithFormat: message, [filePath pathExtension]
+            ]
+            withTitle: @"No Editor Configured."
+        ];
+    }
 }
 
 - (void)notifyUser:(NSString*)message withTitle:(NSString*)title
