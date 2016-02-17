@@ -53,6 +53,7 @@ const handlers = {
       showOnAllScreens: true,
       showOnSelectedScreens: false,
       showOnMainScreen: false,
+      screens: [],
     });
   },
 
@@ -69,6 +70,7 @@ const handlers = {
       showOnSelectedScreens: false,
       showOnAllScreens: false,
       showOnMainScreen: true,
+      screens: [],
     });
   },
 

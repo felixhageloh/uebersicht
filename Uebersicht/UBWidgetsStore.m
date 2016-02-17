@@ -58,7 +58,7 @@
             [self updateSettings:widgetId withPatch:@{
                 @"showOnAllScreens": @NO,
                 @"showOnSelectedScreens": @YES,
-                @"showOnMainScreen": @NO
+                @"showOnMainScreen": @NO,
             }];
             [self notifyChange];
         }];
@@ -67,7 +67,8 @@
             [self updateSettings:widgetId withPatch:@{
                 @"showOnAllScreens": @YES,
                 @"showOnSelectedScreens": @NO,
-                @"showOnMainScreen": @NO
+                @"showOnMainScreen": @NO,
+                @"screens": @[]
             }];
             [self notifyChange];
         }];
@@ -76,7 +77,8 @@
             [self updateSettings:widgetId withPatch:@{
                 @"showOnAllScreens": @NO,
                 @"showOnSelectedScreens": @NO,
-                @"showOnMainScreen": @YES
+                @"showOnMainScreen": @YES,
+                @"screens": @[]
             }];
             [self notifyChange];
         }];
