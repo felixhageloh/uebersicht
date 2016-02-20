@@ -100,6 +100,21 @@ int const PORT = 41416;
         defaultUserNotificationCenter
     ];
     unc.delegate = self;
+    
+
+    [[[NSWorkspace sharedWorkspace] notificationCenter]
+        addObserver: self
+        selector: @selector(wakeFromSleep:)
+        name: NSWorkspaceDidWakeNotification
+        object: nil
+    ];
+    
+    [[[NSWorkspace sharedWorkspace] notificationCenter]
+        addObserver: self
+        selector: @selector(workspaceChanged:)
+        name: NSWorkspaceActiveSpaceDidChangeNotification
+        object: nil
+    ];
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -154,8 +169,11 @@ int const PORT = 41416;
 
     [task setStandardOutput:[NSPipe pipe]];
     [task.standardOutput fileHandleForReading].readabilityHandler = ^(NSFileHandle *handle) {
-        NSData *output   = [handle availableData];
-        NSString *outStr = [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
+        NSData *output = [handle availableData];
+        NSString *outStr = [[NSString alloc]
+            initWithData:output
+            encoding:NSUTF8StringEncoding
+        ];
         
         NSLog(@"%@", outStr);
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -333,5 +351,18 @@ int const PORT = 41416;
     return YES;
 }
 
+- (void)wakeFromSleep:(NSNotification *)notification
+{
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] reload];
+    }
+}
+
+- (void)workspaceChanged:(NSNotification *)notification
+{
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] workspaceChanged];
+    }
+}
 
 @end

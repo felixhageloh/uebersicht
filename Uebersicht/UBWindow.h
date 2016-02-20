@@ -22,5 +22,6 @@
 - (void)sendToDesktop;
 - (void)comeToFront;
 - (BOOL)isInFront;
+- (void)workspaceChanged;
 
 @end

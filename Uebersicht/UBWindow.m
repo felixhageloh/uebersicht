@@ -15,11 +15,9 @@
 
 #import "UBWindow.h"
 #import "UBLocation.h"
-#import "UBWallperServer.h"
 
 @implementation UBWindow {
     NSURL *widgetsUrl;
-    UBWallperServer* wallpaperServer;
     BOOL webviewLoaded;
     WebView* webView;
 }
@@ -46,16 +44,8 @@
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
         
-        
         webView = [self buildWebView];
-        
         [self setContentView:webView];
-        [[[NSWorkspace sharedWorkspace] notificationCenter]
-            addObserver: self
-            selector: @selector(wakeFromSleep:)
-            name: NSWorkspaceDidWakeNotification
-            object: nil
-        ];
     }
 
     return self;
@@ -85,13 +75,6 @@
 
 - (void)loadUrl:(NSURL*)url
 {
-    if (!wallpaperServer) {
-        wallpaperServer = [[UBWallperServer alloc] initWithWindow:self];
-        [wallpaperServer onWallpaperChange:^{
-            [self notifyWebviewOfWallaperChange];
-        }];
-    }
-
     widgetsUrl = url;
     webviewLoaded = NO;
     [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL: url]];
@@ -100,12 +83,6 @@
 - (void)reload
 {
     webviewLoaded = NO;
-    [webView reloadFromOrigin:self];
-}
-
-
-- (void)wakeFromSleep:(NSNotification *)notification
-{
     [webView reloadFromOrigin:self];
 }
 
@@ -153,7 +130,7 @@
         
         [[webView windowScriptObject] setValue:self forKey:@"os"];
         [[webView windowScriptObject] setValue:location forKey:@"geolocation"];
-        [self notifyWebviewOfWallaperChange];
+        [self workspaceChanged];
     }
 }
 
@@ -163,20 +140,27 @@
     [self handleWebviewLoadError:error];
 }
 
-- (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error
-       forFrame:(WebFrame *)frame {
+- (void)webView:(WebView *)sender
+    didFailProvisionalLoadWithError:(NSError *)error
+    forFrame:(WebFrame *)frame
+{
     [self handleWebviewLoadError:error];
 }
 
 
-- (void)webView:(WebView *)theWebView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
-                                                           request:(NSURLRequest *)request
-                                                             frame:(WebFrame *)frame
-                                                   decisionListener:(id<WebPolicyDecisionListener>)listener
+- (void)webView:(WebView *)theWebView
+    decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+    request:(NSURLRequest *)request
+    frame:(WebFrame *)frame
+    decisionListener:(id<WebPolicyDecisionListener>)listener
 {
+    int actionType = [actionInformation[WebActionNavigationTypeKey]
+        unsignedIntValue
+    ];
+    
     if (frame != theWebView.mainFrame) {
         [listener use];
-    } else if ([actionInformation[WebActionNavigationTypeKey] unsignedIntValue] == WebNavigationTypeLinkClicked) {
+    } else if (actionType == WebNavigationTypeLinkClicked) {
         [[NSWorkspace sharedWorkspace] openURL:request.URL];
         [listener ignore];
     } else if ([request.URL isEqualTo: widgetsUrl]) {
@@ -191,10 +175,17 @@
 {
     NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
     if ([url isEqualTo: widgetsUrl]) {
-        NSLog(@"%@ failed to load: %@ Reloading...", url, error.localizedDescription);
+        NSLog(
+            @"%@ failed to load: %@ Reloading...",
+            url,
+            error.localizedDescription
+        );
 
-        [self performSelector:@selector(loadUrl:) withObject:widgetsUrl
-                   afterDelay:5.0];
+        [self
+            performSelector: @selector(loadUrl:)
+            withObject: widgetsUrl
+            afterDelay: 5.0
+        ];
     }
 }
 
@@ -203,24 +194,16 @@
 #pragma mark WebscriptObject
 #
 
-- (void)notifyWebviewOfWallaperChange
+- (void)workspaceChanged
 {
     [[webView windowScriptObject]
-        evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"];
-}
-
-- (NSString*)wallpaperUrl
-{
-    return wallpaperServer.url;
+        evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"
+    ];
 }
 
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
 {
-    if (aSelector == @selector(wallpaperUrl)) {
-        return NO;
-    }
-
     return YES;
 }
 
@@ -228,9 +211,9 @@
 #pragma mark flags
 #
 
-- (BOOL)canBecomeKeyWindow      { return [self isInFront]; }
-- (BOOL)canBecomeMainWindow     { return [self isInFront]; }
-- (BOOL)acceptsFirstResponder   { return [self isInFront]; }
+- (BOOL)canBecomeKeyWindow { return [self isInFront]; }
+- (BOOL)canBecomeMainWindow { return [self isInFront]; }
+- (BOOL)acceptsFirstResponder { return [self isInFront]; }
 - (BOOL)acceptsMouseMovedEvents { return [self isInFront]; }
 
 @end
