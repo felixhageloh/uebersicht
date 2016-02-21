@@ -58,6 +58,7 @@ int const PORT = 41416;
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
             [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
             [self renderOnScreens:[screensController screens]];
+
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
             if (portOffset >= 20) {
@@ -245,20 +246,21 @@ int const PORT = 41416;
         if (![windows objectForKey:screenId]) {
             window = [[UBWindow alloc] init];
             [windows setObject:window forKey:screenId];
+            
+            [window loadUrl:[
+                [self serverUrl:@"http"]
+                    URLByAppendingPathComponent:[NSString
+                        stringWithFormat:@"%@",
+                        screenId
+                    ]
+                ]
+            ];
         } else {
             window = windows[screenId];
         }
         
         [window setFrame:[screensController screenRect:screenId] display:YES];
         [window makeKeyAndOrderFront:self];
-        [window loadUrl:[
-            [self serverUrl:@"http"]
-                URLByAppendingPathComponent:[NSString
-                    stringWithFormat:@"%@",
-                    screenId
-                ]
-            ]
-        ];
         
         [obsoleteScreens removeObject:screenId];
     }
