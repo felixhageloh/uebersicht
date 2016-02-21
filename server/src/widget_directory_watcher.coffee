@@ -8,10 +8,14 @@ loadWidget = require './loadWidget.coffee'
 module.exports = (directoryPath) ->
   api = {}
   widgetPaths = {}
-  watcher = fsevents directoryPath
+  watcher = null
   eventEmitter = new EventEmitter()
 
   init = ->
+    if !fs.existsSync(directoryPath)
+      throw new Error "could not find widget dir at #{directoryPath}"
+
+    watcher = fsevents directoryPath
     watcher.on 'change', (filePath, info) ->
       switch info.event
         when 'modified', 'moved-in', 'created'
