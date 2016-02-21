@@ -19,13 +19,15 @@ render: (output) -> """
   <p>
     Thanks for trying out Übersicht!
     This is an example widget to get you started.
-    You can download new widgets from:
-
-    <strong>http://tracesof.net/uebersicht-widgets/</strong>
-
+  </p>
+  <p>
     To view this example widget, choose <em>'Open Widgets Folder'</em>
     from the status bar menu. Use it to create your own widget,
     or simply delete it.
+  </p>
+  <p>
+    To download other widgets, choose <em>'Visist Widgets Gallery'</em>
+    from the status bar menu.
   </p>
 """
 
@@ -34,6 +36,7 @@ render: (output) -> """
 style: """
   background: rgba(#fff, 0.95) url('übersicht-logo.png') no-repeat 50% 20px
   background-size: 176px 84px
+  -webkit-backdrop-filter: blur(20px)
   border-radius: 1px
   border: 2px solid #fff
   box-sizing: border-box
@@ -52,16 +55,6 @@ style: """
     font-size: 20px
     font-weight: 300
     margin: 16px 0 8px
-
-  strong
-    background: #ad7a7c
-    color: #fff
-    display: block
-    font-size: 16px
-    font-style: italic
-    font-weight: 200
-    margin: 12px -20px
-    padding: 8px 20px
 
   em
     font-weight: 400
