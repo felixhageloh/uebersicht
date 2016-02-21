@@ -213,7 +213,7 @@
 - (void)setDefaultInteractionShortcutKey
 {
     
-    NSData* encodedKey = [NSKeyedArchiver archivedDataWithRootObject:@"cmd"];
+    NSData* encodedKey = [NSKeyedArchiver archivedDataWithRootObject:@"none"];
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:encodedKey
                                                             forKey:@"interactionShortcut"];
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
