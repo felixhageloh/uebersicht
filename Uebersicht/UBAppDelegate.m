@@ -55,9 +55,11 @@ int const PORT = 41416;
     keepServerAlive = YES;
     
     [self startServer: ^(NSString* output) {
+        // note that these might be called several times
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
             [widgetsStore reset];
             [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
+            // this will trigger a render
             [screensController screensChanged:self];
 
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
