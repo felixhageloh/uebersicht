@@ -43,6 +43,7 @@
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
+        [self setReleasedWhenClosed:NO];
         
         webView = [self buildWebView];
         [self setContentView:webView];
@@ -71,6 +72,10 @@
 {
     [view setFrameLoadDelegate:nil];
     [view setPolicyDelegate:nil];
+    [[view windowScriptObject] removeWebScriptKey:@"os"];
+    [[view windowScriptObject] removeWebScriptKey:@"geolocation"];
+    [view stopLoading:self];
+    [view removeFromSuperview];
 }
 
 - (void)loadUrl:(NSURL*)url
