@@ -20,7 +20,7 @@
 - (void)setUp
 {
     [super setUp];
-    deletgate = [[NSApplication sharedApplication] delegate];
+    deletgate = (UBAppDelegate*)[[NSApplication sharedApplication] delegate];
 }
 
 - (void)tearDown
