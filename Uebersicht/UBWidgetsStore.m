@@ -106,6 +106,12 @@
     changeHandler = aChangeHandler;
 }
 
+- (void)reset
+{
+    widgets = [[NSMutableDictionary alloc] init];
+    settings = [[NSMutableDictionary alloc] init];
+}
+
 - (NSDictionary*)get:(NSString*)widgetId
 {
     NSMutableDictionary* widget;

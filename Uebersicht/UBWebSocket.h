@@ -13,6 +13,7 @@
 
 + (id)sharedSocket;
 - (void)open:(NSURL*)aUrl;
+- (void)close;
 - (void)send:(id)message;
 - (void)listen:(void (^)(id))listener;
 

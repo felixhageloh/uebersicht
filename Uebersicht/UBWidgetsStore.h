@@ -11,6 +11,7 @@
 @interface UBWidgetsStore : NSObject
 
 - (void)onChange:(void (^)(NSDictionary*))aChangeHandler;
+- (void)reset;
 - (NSDictionary*)get:(NSString*)widgetId;
 - (NSDictionary*)getSettings:(NSString*)widgetId;
 - (NSArray*)sortedWidgets;

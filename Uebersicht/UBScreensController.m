@@ -26,7 +26,6 @@ int const MAX_DISPLAYS = 42;
         screens = [[NSMutableDictionary alloc] initWithCapacity:MAX_DISPLAYS];
         listener = target;
         dispatcher = [[UBDispatcher alloc] init];
-        [self updateScreens];
         
         [[NSNotificationCenter defaultCenter]
             addObserver: self

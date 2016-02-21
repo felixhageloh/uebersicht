@@ -56,8 +56,9 @@ int const PORT = 41416;
     
     [self startServer: ^(NSString* output) {
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
+            [widgetsStore reset];
             [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
-            [self renderOnScreens:[screensController screens]];
+            [screensController screensChanged:self];
 
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
@@ -294,6 +295,13 @@ int const PORT = 41416;
 
 - (void)widgetDirDidChange
 {
+    for (NSNumber* screenId in screensController.screens) {
+        [windows[screenId] close];
+        [windows removeAllObjects];
+    }
+    
+    [[UBWebSocket sharedSocket] close];
+    
     if (widgetServer){
         // server will restart by itself
         [widgetServer terminate];

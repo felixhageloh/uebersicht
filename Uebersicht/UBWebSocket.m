@@ -36,7 +36,7 @@
 
 - (void)send:(id)message
 {
-    if (ws.readyState == SR_OPEN) {
+    if (ws && ws.readyState == SR_OPEN) {
         [ws send:message];
     } else {
         [queuedMessages addObject: message];
@@ -50,6 +50,10 @@
 
 - (void)open:(NSURL*)aUrl
 {
+    if (ws) {
+        return;
+    }
+    
     url = aUrl;
     ws = [[SRWebSocket alloc]
         initWithURLRequest:[NSURLRequest requestWithURL:url]
@@ -58,8 +62,19 @@
     [ws open];
 }
 
+- (void)close
+{
+    if (ws) {
+        ws.delegate = nil;
+        [ws close];
+        ws = nil;
+        url = nil;
+    }
+}
+
 - (void)reopen
 {
+    [self close];
     if (url) {
         [self open:url];
     }
