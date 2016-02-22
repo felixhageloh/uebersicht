@@ -23,5 +23,6 @@
 - (void)comeToFront;
 - (BOOL)isInFront;
 - (void)workspaceChanged;
+- (void)wallpaperChanged;
 
 @end

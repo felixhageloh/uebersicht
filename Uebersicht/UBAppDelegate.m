@@ -119,6 +119,8 @@ int const PORT = 41416;
         name: NSWorkspaceActiveSpaceDidChangeNotification
         object: nil
     ];
+    
+    [self listenToWallpaperChanges];
 }
 
 - (void)startServer:(void (^)(NSString*))callback
@@ -374,6 +376,78 @@ int const PORT = 41416;
 {
     for (NSNumber* screenId in windows) {
         [windows[screenId] workspaceChanged];
+    }
+}
+
+- (void)wallpaperChanged:(NSNotification *)notification
+{
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] wallpaperChanged];
+    }
+}
+
+- (void)listenToWallpaperChanges
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(
+        NSLibraryDirectory,
+        NSUserDomainMask,
+        YES
+    );
+    
+    CFStringRef path = (__bridge CFStringRef)[paths[0]
+        stringByAppendingPathComponent:@"/Application Support/Dock/"
+    ];
+    
+    FSEventStreamContext context = {
+        0,
+        (__bridge void *)(self), NULL, NULL, NULL
+    };
+    FSEventStreamRef stream;
+    
+    stream = FSEventStreamCreate(
+        NULL,
+        &wallpaperSettingsChanged,
+        &context,
+        CFArrayCreate(NULL, (const void **)&path, 1, NULL),
+        kFSEventStreamEventIdSinceNow,
+        0,
+        kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes
+    );
+    
+    FSEventStreamScheduleWithRunLoop(
+        stream,
+        CFRunLoopGetCurrent(),
+        kCFRunLoopDefaultMode
+    );
+    FSEventStreamStart(stream);
+
+}
+
+void wallpaperSettingsChanged(
+    ConstFSEventStreamRef streamRef,
+    void *this,
+    size_t numEvents,
+    void *eventPaths,
+    const FSEventStreamEventFlags eventFlags[],
+    const FSEventStreamEventId eventIds[]
+)
+{
+    CFStringRef path;
+    CFArrayRef  paths = eventPaths;
+
+    //printf("Callback called\n");
+    for (int i=0; i < numEvents; i++) {
+        path = CFArrayGetValueAtIndex(paths, i);
+        if (CFStringFindWithOptions(path, CFSTR("desktoppicture.db"),
+                                    CFRangeMake(0,CFStringGetLength(path)),
+                                    kCFCompareCaseInsensitive,
+                                    NULL) == true) {
+            [(__bridge UBAppDelegate*)this
+                performSelector:@selector(wallpaperChanged:)
+                withObject:nil
+                afterDelay:0.5
+            ];
+        }
     }
 }
 

@@ -98,6 +98,27 @@
     [super close];
 }
 
+- (void) forceRedraw
+{
+    [[webView windowScriptObject]
+        evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"
+    ];
+}
+
+#
+#pragma mark signals/events
+#
+
+- (void)workspaceChanged
+{
+    [self forceRedraw];
+}
+
+- (void)wallpaperChanged
+{
+    [self forceRedraw];
+}
+
 #
 #pragma mark window control
 #
@@ -198,13 +219,6 @@
 #
 #pragma mark WebscriptObject
 #
-
-- (void)workspaceChanged
-{
-    [[webView windowScriptObject]
-        evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"
-    ];
-}
 
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
