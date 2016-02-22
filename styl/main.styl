@@ -1,21 +1,15 @@
-@import 'nib'
-@import 'lightbox.css'
-@import 'highlight.css'
-
-global-reset()
-
-
 html, body
   background: #fff
   color: #152033
   font-family: Ubuntu, Helvetica Neue, Arial, Sans
   font-style: normal
   font-weight: 300
-  line-height: 1.4
+  line-height: 1.5
 
-header, section
-  width: 500px
+header, section, #disqus_thread
+  width: 532px
   margin: 0 auto
+  padding: 24px 16px 32px 16px
 
 a, a:link, a:visited
   color: #86585a
@@ -26,43 +20,63 @@ a, a:link, a:visited
     color: #852a2f
     text-decoration: underline
 
+p
+  margin: 0.25em 0
 
 header
   display: block
-  image: "images/logo.png" 200px 96px
+  background: url('images/logo@2x.png')  center 30px no-repeat
+  background-size:  200px 96px
   background-repeat: no-repeat
-  background-position: center 30px
 
   h2
-    padding-top: 160px
+    padding-top: 132px
+    font-size: 18px
     font-style: italic
     text-align: center
+    margin-bottom: 24px
+    font-weight: inherit
 
-main
-  section
-    margin-top: 24px
+  #preview
+    width: 564px
+    margin: 32px -16px 24px -16px
     display: block
 
-  h1
+main
+  background: #f9f9f9
+  border-top: 1px solid #e0e0e0
+
+  section
+    display: block
+    border-bottom: 1px solid #e0e0e0
     border-top: 1px solid #e0e0e0
+    margin-top: -1px
+
+  h1
     font-weight: 300
-    font-size: 24px
-    padding: 24px 0 8px
+    font-size: 28px
+    margin: 0 0 12px 0
     //text-align: center
     font-style: italic
 
   pre
     margin: 20px 0
-    font-family: Ubuntu Mono, Menlo, Currier New, Mono
     border: 1px solid #e0e0e0
+
+    code
+      line-height: 1.3
+      font-family: Ubuntu Mono, Menlo, Currier New, Mono
+      font-size: inherit
 
   ul
     padding: 4px 0 8px 0
+    margin: 0
 
   li
     margin: 8px 0
     border-left: 8px solid #ddd
     padding-left: 8px
+    list-style: none
 
 .download
   text-align: center
@@ -70,26 +84,35 @@ main
 
   a, a:link, a:visited
     font-size: 16px
-    font-weight: 300
+    font-weight: 400
     padding: 10px 20px
     display: inline-block
-    background-color: #ac7a7b
-    color: #fff
+    border: 1px solid #152033
+    background-color: transparent
     border-radius: 2px
     margin-right: 10px
+    color: #152033;
 
     span
       font-size: 10px
 
     &:hover
-      background-color: #810034
+      background-color: #152033
       text-decoration: none
+      color: #fff
 
   a.app
-    background-color: #c29785
+    color: #fff
+    border: 1px solid #86585a
+    background-color: #86585a
 
     &:hover
-      background-color: #bc6444
+      border: 1px solid #814d51
+      background-color: #814d51
+
+    &:active
+      border: 1px solid #5f3a3c
+      background-color: #5f3a3c
 
 .screenshots
   width: 90%
@@ -116,7 +139,7 @@ main
   .badges
     text-align: center
     font-size: 0
-    margin: 32px 0
+    margin: 42px 0
 
     a, a:link, a:visited
       display: inline-block
@@ -127,6 +150,10 @@ main
       word-spacing: normal
       min-width: 30%
       text-align: left
+      opacity: 0.6
+
+      &:hover
+        opacity: 1
 
       h2
         font-size: 14px
@@ -138,8 +165,7 @@ main
     margin-left: 64px
 
     span
-      color: #292f33
-      font-family: Gotham, Helvetica Neue, Helvetica, Arial, sans-serif
+      color: #152033
     img
       height: 18px
       width: 22px
@@ -147,31 +173,23 @@ main
 
   .github
     span
-      color: #333
-      font-family: Helvetica, Arial, freesans, clean, sans-serif
+      color: #152033
     img
       height: 24px
       width: 24px
       vertical-align: bottom
 
-
-
-#disqus_thread
-  width: 500px
-  margin: 4px auto
-  padding-top: 32px
-  border-top: 1px solid #e0e0e0
-
-
-@media only screen and (max-width: 500px)
+@media only screen and (max-width: 532px)
   body, html
     width: 100%
 
   header, section, #disqus_thread
     width: 100%
-    padding-left: 16px
-    padding-right: 16px
     box-sizing: border-box
+
+  header #preview
+    width: 100%
+    margin: 32px auto 24px auto
 
   .download a
     margin: 10px 0 0 0
