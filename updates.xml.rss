@@ -6,6 +6,23 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 0.8</title>
+            <description><![CDATA[
+              <h3>What's new</h3>
+              <ul>
+                <li>Added support for multiple screens!</li>
+                <li>Added option to open widgets in a text editor from the status bar menu.</li>
+                <li>Deprecated makeBgSlice in favor of CSS -webkit-backdrop-filter</li>
+              </ul>
+            ]]></description>
+            <pubDate>Mon, Feb 22 2016 18:15:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.30.app.zip"
+                       sparkle:version="30"
+                       sparkle:shortVersionString="0.8.30"
+                       length="31416"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.7.25</title>
             <description><![CDATA[
               <h3>What's new</h3>
