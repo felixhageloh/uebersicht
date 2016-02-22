@@ -5,6 +5,8 @@ html, body
   font-style: normal
   font-weight: 300
   line-height: 1.5
+  padding: 0
+  margin: 0
 
 header, section, #disqus_thread
   width: 532px
@@ -39,6 +41,7 @@ header
 
   #preview
     width: 564px
+    height: 331px
     margin: 32px -16px 24px -16px
     display: block
 
@@ -189,12 +192,20 @@ main
 
   header #preview
     width: 100%
-    margin: 32px auto 24px auto
+    height: auto
+    margin: 32px 0 24px 0
+    box-sizing: border-box
 
-  .download a
-    margin: 10px 0 0 0
+  .download
     width: 100%
     box-sizing: border-box
+    padding: 0 8px
+
+    a
+      margin: 8px 0 24px 0
+      width: 100%
+      box-sizing: border-box
+      line-height: 1.5em
 
   .more-info .badges
     whitespace: nowrap
