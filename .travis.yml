@@ -1,4 +1,12 @@
 language: node_js
+
+os:
+  - osx
+
 node_js:
-  - "5.1"
-script: cd server && npm install && npm test
+  - 5.1
+
+script:
+  - cd server
+  - npm install
+  - npm test
