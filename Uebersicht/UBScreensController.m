@@ -57,9 +57,6 @@ int const MAX_DISPLAYS = 42;
     NSMutableArray *ids = [[NSMutableArray alloc] initWithCapacity:numDisplays];
     
     for(int i = 0; i < numDisplays; i++) {
-        if (CGDisplayIsInMirrorSet(displays[i]))
-            continue;
-        
         name = [self screenNameForDisplay:displays[i]];
         if (!name)
             name = [NSString stringWithFormat:@"Display %i", i];
