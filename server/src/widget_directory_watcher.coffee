@@ -12,20 +12,18 @@ module.exports = (directoryPath) ->
   eventEmitter = new EventEmitter()
 
   init = ->
+    # follow symlink if widgetDirectory is one
+    if fs.lstatSync(directoryPath).isSymbolicLink()
+      directoryPath = fs.readlinkSync(directoryPath)
+
     if !fs.existsSync(directoryPath)
       throw new Error "could not find widget dir at #{directoryPath}"
 
     watcher = fsevents directoryPath
     watcher.on 'change', (filePath, info) ->
-
       # fsevents returns decomposed Unicode and fs returns precomposed Unicode
       # so normalize() is used to convert "U\xCC\x88" to "\xC3\x9C"
       filePath = filePath.normalize()
-
-      # checks if widget directory is a symbolic link and ensures the correct path
-      if fs.lstatSync(directoryPath).isSymbolicLink()
-        symbolicLinkPath = fs.readlinkSync(directoryPath)
-        filePath = directoryPath + filePath.slice(symbolicLinkPath.length)
 
       switch info.event
         when 'modified', 'moved-in', 'created'
