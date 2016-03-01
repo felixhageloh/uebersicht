@@ -16,15 +16,13 @@ module.exports = (directoryPath) ->
     if fs.lstatSync(directoryPath).isSymbolicLink()
       directoryPath = fs.readlinkSync(directoryPath)
 
+    directoryPath = directoryPath.normalize()
+
     if !fs.existsSync(directoryPath)
       throw new Error "could not find widget dir at #{directoryPath}"
 
     watcher = fsevents directoryPath
     watcher.on 'change', (filePath, info) ->
-      # fsevents returns decomposed Unicode and fs returns precomposed Unicode
-      # so normalize() is used to convert "U\xCC\x88" to "\xC3\x9C"
-      filePath = filePath.normalize()
-
       switch info.event
         when 'modified', 'moved-in', 'created'
           findWidgets filePath, info.type, (widgetPath) ->
@@ -62,7 +60,7 @@ module.exports = (directoryPath) ->
   # looking path it finds.
   findWidgets = (path, type, onFound) ->
     if type == 'file'
-      onFound path if isWidgetPath(path)
+      onFound path.normalize() if isWidgetPath(path)
     else
       fs.readdir path, (err, subPaths) ->
         return console.log err if err
@@ -71,6 +69,7 @@ module.exports = (directoryPath) ->
           getPathType fullPath, (p, t) -> findWidgets(p, t, onFound)
 
   findRemovedWidgets = (filePath, onFound) ->
+    filePath = filePath.normalize()
     for widgetPath in Object.keys(widgetPaths)
       onFound(widgetPath) if widgetPath.indexOf(filePath) == 0
 
