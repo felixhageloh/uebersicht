@@ -1,15 +1,15 @@
-'use strict';
+// can't use strict here, because widgets will get evaled as strict as well
 
-const coffee = require('coffee-script');
-const stylus = require('stylus');
-const nib = require('nib');
-const ms = require('ms');
+var coffee = require('coffee-script');
+var stylus = require('stylus');
+var nib = require('nib');
+var ms = require('ms');
 
 function parseStyle(id, style) {
-  let css = '';
+  var css = '';
 
   if (style) {
-    const scopedStyle = '#' + id + '\n  ' + style.replace(/\n/g, '\n  ');
+    var scopedStyle = '#' + id + '\n  ' + style.replace(/\n/g, '\n  ');
     css = stylus(scopedStyle)
       .import('nib')
       .use(nib())
@@ -20,7 +20,7 @@ function parseStyle(id, style) {
 }
 
 module.exports = function parseWidget(id, filePath, body) {
-  let parsed;
+  var parsed;
 
   if (filePath.match(/\.coffee$/)) {
     parsed = coffee.eval(body);
