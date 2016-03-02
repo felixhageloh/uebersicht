@@ -6,6 +6,24 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 0.8.35</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Widgets show again when screens are mirrored.</li>
+                <li>Fixed issue were widgets could appear duplicated.</li>
+                <li>window.jQuery is available again (was acidentally removed).</li>
+                <li>Tightened sercurity by only listen to requests from your local machine.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Wen, Mar 02 2016 09:05:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.35.app.zip"
+                       sparkle:version="35"
+                       sparkle:shortVersionString="0.8.35"
+                       length="31416"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.8</title>
             <description><![CDATA[
               <h3>What's new</h3>
