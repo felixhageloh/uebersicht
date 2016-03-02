@@ -185,7 +185,7 @@ Git might not like the umlaut (ü) in some of the path names and will constantly
 
     git config core.precomposeunicode false
 
-However, the common advice is to set this to `true`. It might depend on the OS and git version which one to use.s
+However, the common advice is to set this to `true`. It might depend on the OS and git version which one to use.
 
 ### building
 
