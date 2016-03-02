@@ -60,7 +60,7 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
     .use(connect.static(path.resolve(__dirname, './public')))
     .use(connect.static(widgetPath))
     .use(serveClient)
-    .listen port, ->
+    .listen port, '127.0.0.1', ->
       messageBus = MessageBus(server: server)
       sharedSocket.open("ws://127.0.0.1:#{port}")
       callback?()
