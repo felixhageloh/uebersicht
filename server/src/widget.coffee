@@ -1,4 +1,5 @@
-$ = require('jquery');
+$ = require('jquery')
+window.jQuery = $
 
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
