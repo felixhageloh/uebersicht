@@ -21,7 +21,7 @@ module.exports = (implementation) ->
     afterRender: ->
 
   init = ->
-    implementation[k] ||= v for k, v of defaults
+    implementation[k] ?= v for k, v of defaults
     implementation[k] ||= v for k, v of internalApi
 
     api

@@ -193,9 +193,9 @@ test('rendering when refreshFrequency is false', (t) => {
   var instance = Widget(widget);
   var domEl = instance.render();
   t.ok(numRenders === 1, 'it does an initial render');
-  clock.tick(100);
-  clock.tick(100);
-  t.ok(numRenders === 1, "it does't render after that");
+  clock.tick(1000);
+  clock.tick(1000);
+  t.equal(numRenders, 1, "it does't render after that");
 
   clock.restore();
   instance.destroy();
@@ -276,8 +276,6 @@ test('update', (t) => {
 
   var server = makeFakeServer();
   server.respondToRun('stuff');
-  server.autoRespond = true;
-  server.respondImmediately = true;
 
   var instance = Widget(widget);
   var domEl = instance.render();
@@ -292,6 +290,8 @@ test('update', (t) => {
     server.restore();
     t.end();
   };
+
+  server.respond();
 });
 
 test('error handling', (t) => {
