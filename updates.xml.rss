@@ -6,6 +6,21 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 0.8.36</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>refreshFrequency: false works again.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Thur, Mar 03 2016 09:10:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.36.app.zip"
+                       sparkle:version="36"
+                       sparkle:shortVersionString="0.8.36"
+                       length="31416"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.8.35</title>
             <description><![CDATA[
               <h3>What's New</h3>
