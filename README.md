@@ -213,17 +213,7 @@ Click on `Uebersicht` in the project navigator and then select the menu `Editor 
 
 You can then attempt to build, you may then be presented with code sign issues, click `Fix Issue` to continue.
 
-Now you need to actually remove some code signing, open the following file in a text editor:
-
-`Uebersicht.xcodeproj/project.pbxproj`
-
-Look for roughly line 434, you should see 'Developer ID Application: Felix Hageloh', you'll want to replace:
-
-`      shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\..."`
-
-with:
-
-`      shellScript = ""`
+Now you need to remove the code signing shell script, select the `Übersicht` target and under `Build Phases` remove the code in the `Code Sign Frameworks` section.
 
 You should now be able to build successfully.
 
