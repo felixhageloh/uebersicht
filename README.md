@@ -175,7 +175,7 @@ then run
     npm install -g coffee-script
     npm install -g grunt-cli
 
-finally, inside the project dir run
+finally, inside the `server` dir run
 
     npm install
 
@@ -203,6 +203,22 @@ Then point your browser to `localhost:<port>`. While developing you can use
     grunt
 
 to continuously watch, compile and run specs.
+
+# Building in Xcode
+
+The first time opening the project in Xcode you might see this message when trying to build: "The run destination My Mac is not valid for Running the scheme 'Übersicht'."
+
+Click on `Uebersicht` in the project navigator and then select the menu `Editor > Validate Settings...` and click `Perform Changes`.
+
+You can then attempt to build, you may then be presented with code sign issues, click `Fix Issue` to continue.
+
+Now you need to remove the code signing shell script, select the `Übersicht` target and under `Build Phases` remove the code in the `Code Sign Frameworks` section.
+
+You should now be able to build successfully.
+
+There is one last step on the Node.js side to complete. For the sake of brevity, this link will solve your problem:
+
+http://stackoverflow.com/questions/31254725/transport-security-has-blocked-a-cleartext-http
 
 # Legal
 
