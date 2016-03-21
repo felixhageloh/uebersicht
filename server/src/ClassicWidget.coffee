@@ -1,6 +1,12 @@
 $ = require('jquery')
 window.jQuery = $
 
+defaults =
+  id: 'widget'
+  refreshFrequency: 1000
+  render: (output) -> output
+  afterRender: ->
+
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
 module.exports = (implementation) ->
@@ -13,12 +19,6 @@ module.exports = (implementation) ->
   started = false
   rendered = false
   mounted = false
-
-  defaults =
-    id: 'widget'
-    refreshFrequency: 1000
-    render: (output) -> output
-    afterRender: ->
 
   init = ->
     implementation[k] ?= v for k, v of defaults

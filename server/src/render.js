@@ -1,5 +1,6 @@
 // needs to run in the client, so no ES6 here.
-var Widget = require('./widget.coffee');
+var ClassicWidget = require('./ClassicWidget.coffee');
+var VirtualDomWidget = require('./VirtualDomWidget');
 var rendered = {};
 
 function isVisibleOnScreen(widgetId, screenId, state) {
@@ -26,7 +27,12 @@ function renderWidget(widget, domEl) {
     prevRendered.instance.destroy();
   }
 
-  var instance = Widget(eval(widget.body));
+  var instance;
+  if (/\.jsx$/.test(widget.filePath)) {
+    instance = VirtualDomWidget(widget.body);
+  } else {
+    instance = ClassicWidget(eval(widget.body));
+  }
   domEl.appendChild(instance.render());
   rendered[widget.id] = {
     instance: instance,

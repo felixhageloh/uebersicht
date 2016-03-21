@@ -1,6 +1,6 @@
 var test = require('tape');
 var sinon = require('sinon');
-var Widget = require('../../src/widget.coffee');
+var Widget = require('../../src/Widget.js');
 
 function makeFakeServer() {
   var server = sinon.fakeServer.create();

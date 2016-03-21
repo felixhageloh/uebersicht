@@ -1,8 +1,5 @@
 fs = require 'fs'
-toSource = require('tosource')
-
-parseWidget = require './parseWidget'
-validateWidget = require './validateWidget'
+transform = require './transformWidget'
 
 prettyPrintError = (filePath, error) ->
   return 'file not found' if error.code == 'ENOENT'
@@ -23,7 +20,7 @@ module.exports = loadWidget = (id, filePath, callback) ->
     filePath: filePath
 
   respond = (widgetBody) ->
-    result.body = '(' + toSource(widgetBody) + ')'
+    result.body = widgetBody
     callback(result)
 
   respondWithError = (error) ->
@@ -33,12 +30,6 @@ module.exports = loadWidget = (id, filePath, callback) ->
   fs.readFile filePath, encoding: 'utf8', (err, data) ->
     return respondWithError(err) if err
     try
-      body = parseWidget(id, filePath, data)
+      respond(transform(id, filePath, data))
     catch err
-      return respondWithError(err)
-
-    issues = validateWidget(body)
-    if (issues and issues.length > 0)
-      respondWithError(id + ': ' + issues.join(', '))
-    else
-      respond(body)
+      respondWithError(err)

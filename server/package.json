@@ -16,7 +16,6 @@
   "license": "GPL v3 <http://www.gnu.org/licenses/>",
   "private": true,
   "devDependencies": {
-    "babel-preset-es2015": "^6.3.13",
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
     "coffeeify": "^1.0.0",
@@ -27,6 +26,9 @@
     "uglify-js": "^2.6.1"
   },
   "dependencies": {
+    "babel": "^6.5.2",
+    "babel-plugin-transform-react-jsx": "^6.6.5",
+    "babel-preset-es2015": "^6.6.0",
     "coffee-script": "~1.7.1",
     "connect": "~2.9.0",
     "fsevents": "^1.0.6",
@@ -34,7 +36,10 @@
     "minimist": "0.0.8",
     "ms": "^0.7.1",
     "nib": "~1.0.2",
+    "raf": "^3.2.0",
     "redux": "^3.3.1",
+    "snabbdom": "^0.4.2",
+    "snabbdom-jsx": "^0.3.0",
     "stylus": "~0.42.2",
     "tosource": "~0.1.1",
     "ws": "^1.0.0"

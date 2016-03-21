@@ -92,6 +92,6 @@ module.exports = (directoryPath) ->
       .replace(/\s/g, '_')
 
   isWidgetPath = (filePath) ->
-    /\.coffee$|\.js$/.test filePath
+    /\.coffee$|\.js$|\.jsx$/.test filePath
 
   init()
