@@ -1,4 +1,3 @@
-// needs to run in the client, so no ES6 here.
 var ClassicWidget = require('./ClassicWidget.coffee');
 var VirtualDomWidget = require('./VirtualDomWidget');
 var rendered = {};
@@ -33,7 +32,7 @@ function renderWidget(widget, domEl) {
   } else {
     instance = ClassicWidget(eval(widget.body));
   }
-  domEl.appendChild(instance.render());
+  domEl.appendChild(instance.create());
   rendered[widget.id] = {
     instance: instance,
     widget: widget,

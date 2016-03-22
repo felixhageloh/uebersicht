@@ -1,6 +1,6 @@
 var raf = require('raf');
 
-module.exports = function main(initialState, render, patch, target) {
+module.exports = function RenderLoop(initialState, render, patch, target) {
   var currentState = null;
   var oldNode = target;
   var redrawScheduled = false;

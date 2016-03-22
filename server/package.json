@@ -41,6 +41,7 @@
     "snabbdom": "^0.4.2",
     "snabbdom-jsx": "^0.3.0",
     "stylus": "~0.42.2",
+    "superagent": "^1.8.1",
     "tosource": "~0.1.1",
     "ws": "^1.0.0"
   }

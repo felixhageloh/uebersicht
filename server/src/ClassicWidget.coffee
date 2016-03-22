@@ -1,6 +1,9 @@
 $ = require('jquery')
 window.jQuery = $
 
+CommandLoop = require('./CommandLoop')
+runCommand = require('./runCommand')
+
 defaults =
   id: 'widget'
   refreshFrequency: 1000
@@ -27,14 +30,20 @@ module.exports = (implementation) ->
     api
 
   # renders and returns the widget's dom element
-  api.render = ->
+  api.create = ->
     el = document.createElement 'div'
     contentEl = document.createElement 'div'
     contentEl.id = implementation.id
     contentEl.className = 'widget'
     el.innerHTML = "<style>#{implementation.css}</style>\n"
     el.appendChild(contentEl)
-    start()
+
+    commandLoop = CommandLoop(
+      implementation.command,
+      implementation.refreshFrequency
+    ).map (err, output) ->
+      redraw(err, output)
+
     el
 
   api.destroy = ->
@@ -51,42 +60,20 @@ module.exports = (implementation) ->
 
   # starts the widget refresh cycle
   internalApi.start = start = ->
-    return if started
-    started = true
-    clearTimeout timer if timer?
-    refresh()
+    commandLoop.start()
 
   # stops the widget refresh cycle
   internalApi.stop = stop = ->
-    return unless started
-    started  = false
-    rendered = false
-    clearTimeout timer if timer?
+    commandLoop.stop()
 
   # run widget command and redraw the widget
   internalApi.refresh = refresh = ->
     return redraw() unless implementation.command?
-
-    clearTimeout timer if timer?
-
-    request = run implementation.command, (err, output) ->
-      redraw err, output if started
-
-    request.always ->
-      return unless started
-      return if implementation.refreshFrequency == false
-      timer = setTimeout refresh, implementation.refreshFrequency
+    commandLoop.forceTick()
 
   # runs command in the shell and calls callback with the result (err, stdout)
   internalApi.run = run = (command, callback) ->
-    $.ajax(
-      url: "/run/"
-      method: 'POST'
-      data: command
-      timeout: implementation.refreshFrequency
-      error: (xhr) -> callback(xhr.responseText || 'error running command')
-      success: (output) -> callback(null, output)
-    )
+    runCommand(command, callback)
 
   redraw = (error, output) ->
     if error
@@ -98,7 +85,7 @@ module.exports = (implementation) ->
       renderOutput output
     catch e
       contentEl.innerHTML = e.message
-      console.error errorToString(e)
+      throw e
 
   renderOutput = (output) ->
     if implementation.update? and rendered
