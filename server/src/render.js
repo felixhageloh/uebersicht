@@ -1,5 +1,4 @@
-var ClassicWidget = require('./ClassicWidget.coffee');
-var VirtualDomWidget = require('./VirtualDomWidget');
+var Widget = require('./Widget');
 var rendered = {};
 
 function isVisibleOnScreen(widgetId, screenId, state) {
@@ -26,12 +25,7 @@ function renderWidget(widget, domEl) {
     prevRendered.instance.destroy();
   }
 
-  var instance;
-  if (/\.jsx$/.test(widget.filePath)) {
-    instance = VirtualDomWidget(widget.body);
-  } else {
-    instance = ClassicWidget(eval(widget.body));
-  }
+  var instance = Widget(widget);
   domEl.appendChild(instance.create());
   rendered[widget.id] = {
     instance: instance,

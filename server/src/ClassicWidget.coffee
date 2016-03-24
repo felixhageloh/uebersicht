@@ -12,7 +12,7 @@ defaults =
 
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
-module.exports = (implementation) ->
+module.exports = (implementationString) ->
   api = {}
   internalApi = {}
 
@@ -22,8 +22,10 @@ module.exports = (implementation) ->
   started = false
   rendered = false
   mounted = false
+  implementation = {}
 
   init = ->
+    implementation = eval(implementationString)
     implementation[k] ?= v for k, v of defaults
     implementation[k] ||= v for k, v of internalApi
 
