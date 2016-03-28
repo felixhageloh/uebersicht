@@ -20,19 +20,21 @@ const defaults = {
 
 module.exports = function VirtualDomWidget(implementationString) {
   const api = {};
-  const implementation = {};
+  let implementation;
   let contentEl;
   let commandLoop;
   let renderLoop;
 
-  function init() {
-    (new Function('exports', 'html', implementationString))(
+  function init(source) {
+    implementation = {};
+    (new Function('exports', 'html', source))(
       implementation,
       html
     );
 
     for (var k in defaults) {
-      if (implementation[k] === undefined || implementation[k] === null) {
+      if (implementation[k] === undefined ||
+          implementation[k] === null) {
         implementation[k] = defaults[k];
       }
     }
@@ -40,23 +42,32 @@ module.exports = function VirtualDomWidget(implementationString) {
     return api;
   }
 
-  api.create = function render() {
+  function start() {
+    commandLoop = CommandLoop(
+      implementation.command,
+      implementation.refreshFrequency
+    ).map((err, output) => {
+      renderLoop.update({ error: err, output: output });
+    });
+  }
+
+  function render(state) {
+    return implementation.render(state);
+  }
+
+  api.create = function create() {
     contentEl = document.createElement('div');
     contentEl.id = implementation.id;
     contentEl.className = 'widget';
 
     renderLoop = RenderLoop(
       { output: '', error: null },
-      implementation.render.bind(implementation),
+      render,
       patch,
       contentEl
     );
 
-    commandLoop = CommandLoop(
-      implementation.command,
-      implementation.refreshFrequency
-    ).map((err, output) => renderLoop.update({ error: err, output: output }));
-
+    start();
     return contentEl;
   };
 
@@ -65,8 +76,15 @@ module.exports = function VirtualDomWidget(implementationString) {
     if (contentEl && contentEl.parentNode) {
       contentEl.parentNode.removeChild(contentEl);
     }
+    renderLoop = null;
     contentEl = null;
   };
 
-  return init();
+  api.update = function update(newImplementationString) {
+    commandLoop.stop();
+    init(newImplementationString);
+    start();
+  };
+
+  return init(implementationString);
 };

@@ -22,10 +22,11 @@ module.exports = (implementationString) ->
   started = false
   rendered = false
   mounted = false
+  commandLoop = null
   implementation = {}
 
-  init = ->
-    implementation = eval(implementationString)
+  init = (source) ->
+    implementation = eval(source)
     implementation[k] ?= v for k, v of defaults
     implementation[k] ||= v for k, v of internalApi
 
@@ -54,6 +55,13 @@ module.exports = (implementationString) ->
     el.parentNode?.removeChild(el)
     el = null
     contentEl = null
+    rendered = false
+
+  api.update = (implementationString) ->
+    parentEl = el.parentNode
+    api.destroy()
+    init(implementationString)
+    parentEl.appendChild(api.create())
 
   api.domEl = -> el
 
@@ -111,4 +119,4 @@ module.exports = (implementationString) ->
     str += "\n  in #{err.stack.split('\n')[0]}()" if err.stack
     str
 
-  init()
+  init(implementationString)

@@ -22,15 +22,15 @@ function renderWidget(widget, domEl) {
   if (prevRendered && prevRendered.widget === widget) {
     return;
   } else if (prevRendered) {
-    prevRendered.instance.destroy();
+    prevRendered.instance.update(widget.body);
+  } else {
+    var instance = Widget(widget);
+    domEl.appendChild(instance.create());
+    rendered[widget.id] = {
+      instance: instance,
+      widget: widget,
+    };
   }
-
-  var instance = Widget(widget);
-  domEl.appendChild(instance.create());
-  rendered[widget.id] = {
-    instance: instance,
-    widget: widget,
-  };
 }
 
 function destroyWidget(id) {
