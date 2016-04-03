@@ -12,7 +12,7 @@ defaults =
 
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
-module.exports = (implementationString) ->
+module.exports = (widgetObject) ->
   api = {}
   internalApi = {}
 
@@ -25,8 +25,8 @@ module.exports = (implementationString) ->
   commandLoop = null
   implementation = {}
 
-  init = (source) ->
-    implementation = eval(source)
+  init = (newImplementation) ->
+    implementation = newImplementation
     implementation[k] ?= v for k, v of defaults
     implementation[k] ||= v for k, v of internalApi
 
@@ -57,10 +57,10 @@ module.exports = (implementationString) ->
     contentEl = null
     rendered = false
 
-  api.update = (implementationString) ->
+  api.update = (newImplementation) ->
     parentEl = el.parentNode
     api.destroy()
-    init(implementationString)
+    init(newImplementation)
     parentEl.appendChild(api.create())
 
   api.domEl = -> el
@@ -119,4 +119,4 @@ module.exports = (implementationString) ->
     str += "\n  in #{err.stack.split('\n')[0]}()" if err.stack
     str
 
-  init(implementationString)
+  init(widgetObject)

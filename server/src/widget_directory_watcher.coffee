@@ -77,7 +77,6 @@ module.exports = (directoryPath) ->
   # callback gets called with (path, type) where path is the path passed in,
   # for convenience
   getPathType = (path, callback) ->
-    #console.log path
     fs.stat path, (err, stat) ->
       return console.log err if err
       type = if stat.isDirectory() then 'directory' else 'file'
@@ -92,6 +91,8 @@ module.exports = (directoryPath) ->
       .replace(/\s/g, '_')
 
   isWidgetPath = (filePath) ->
-    /\.coffee$|\.js$|\.jsx$/.test filePath
+    filePath.indexOf('/node_modules/') == -1 and
+    filePath.indexOf('/src/') == -1 and
+    /\.coffee$|\.js$|\.jsx$/.test(filePath)
 
   init()

@@ -1,13 +1,21 @@
 var ClassicWidget = require('./ClassicWidget.coffee');
 var VirtualDomWidget = require('./VirtualDomWidget');
+const html = require('snabbdom-jsx').html;
 
 module.exports = function Widget(widget) {
-  var instance;
+  var api;
+  var implementation = eval(widget.body)(widget.id);
+
   if (/\.jsx$/.test(widget.filePath)) {
-    instance = VirtualDomWidget(widget.body);
+    api = VirtualDomWidget(implementation);
   } else {
-    instance = ClassicWidget(widget.body);
+    api = ClassicWidget(implementation);
   }
 
-  return instance;
+  var updateSub = api.update;
+  api.update = function update(newSource) {
+    updateSub(eval(newSource)(widget.id));
+  };
+
+  return api;
 };

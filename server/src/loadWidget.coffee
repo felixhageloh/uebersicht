@@ -19,7 +19,8 @@ module.exports = loadWidget = (id, filePath, callback) ->
     id: id
     filePath: filePath
 
-  respond = (widgetBody) ->
+  respond = (error, widgetBody) ->
+    return respondWithError(error) if error
     result.body = widgetBody
     callback(result)
 
@@ -27,9 +28,5 @@ module.exports = loadWidget = (id, filePath, callback) ->
     result.error = prettyPrintError(filePath, error)
     callback(result)
 
-  fs.readFile filePath, encoding: 'utf8', (err, data) ->
-    return respondWithError(err) if err
-    try
-      respond(transform(id, filePath, data))
-    catch err
-      respondWithError(err)
+  transform(id, filePath, respond)
+

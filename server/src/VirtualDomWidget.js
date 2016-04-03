@@ -1,7 +1,6 @@
 const RenderLoop = require('./RenderLoop');
 const CommandLoop = require('./CommandLoop');
 const snabbdom = require('snabbdom');
-const html = require('snabbdom-jsx').html;
 
 const patch = snabbdom.init([
   require('snabbdom/modules/class'),
@@ -18,20 +17,15 @@ const defaults = {
   },
 };
 
-module.exports = function VirtualDomWidget(implementationString) {
+module.exports = function VirtualDomWidget(widgetObject) {
   const api = {};
   let implementation;
   let contentEl;
   let commandLoop;
   let renderLoop;
 
-  function init(source) {
-    implementation = {};
-    (new Function('exports', 'html', source))(
-      implementation,
-      html
-    );
-
+  function init(newImplementation) {
+    implementation = newImplementation;
     for (var k in defaults) {
       if (implementation[k] === undefined ||
           implementation[k] === null) {
@@ -80,11 +74,11 @@ module.exports = function VirtualDomWidget(implementationString) {
     contentEl = null;
   };
 
-  api.update = function update(newImplementationString) {
+  api.update = function update(newImplementation) {
     commandLoop.stop();
-    init(newImplementationString);
+    init(newImplementation);
     start();
   };
 
-  return init(implementationString);
+  return init(widgetObject);
 };

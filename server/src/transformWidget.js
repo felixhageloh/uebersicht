@@ -1,69 +1,47 @@
-// can't use strict here, because widgets will get evaled as strict as well
+'use strict';
 
-var coffee = require('coffee-script');
-var babel = require('babel-core');
-var stylus = require('stylus');
-var nib = require('nib');
-var ms = require('ms');
-var jsxTransform = require('babel-plugin-transform-react-jsx');
-var es2015 = require('babel-preset-es2015');
-var toSource = require('toSource');
+const browserify = require('browserify');
+const widgetify = require('./widgetify');
+const coffeeify = require('coffeeify');
+const babelify = require('babelify');
+const jsxTransform = require('babel-plugin-transform-react-jsx');
+const es2015 = require('babel-preset-es2015');
+const through = require('through2');
 
-function parseStyle(id, style) {
-  var css = '';
+function wrapJSWidget() {
+  let src = '';
 
-  if (style) {
-    var scopedStyle = '#' + id + '\n  ' + style.replace(/\n/g, '\n  ');
-    css = stylus(scopedStyle)
-      .import('nib')
-      .use(nib())
-      .render();
+  function write(buf, enc, next) { src += buf; next(); }
+  function end(next) {
+    const tree = modifyAST(esprima.parse(data), widgetId);
+    this.push('{' + src + '}');
+    next();
   }
 
-  return css;
+  return through(write, end);
 }
 
-function transformJSWidget(id, body) {
-  var parsed = eval('({' + body + '})');
-
-  if (!parsed.css) {
-    parsed.css = parseStyle(id, parsed.style || '');
-    delete parsed.style;
-  }
-
-  parsed.id = id;
-  return '(' + toSource(parsed) + ')';
-}
-
-function transformCoffeeWidget(id, body) {
-  var parsed = coffee.eval(body);
-
-  if (!parsed.css) {
-    parsed.css = parseStyle(id, parsed.style || '');
-    delete parsed.style;
-  }
-
-  parsed.id = id;
-  return '(' + toSource(parsed) + ')';
-}
-
-function transformJSXWidget(id, body) {
-  return babel.transform(body, {
-    presets: [es2015],
-    plugins: [[jsxTransform, { pragma: 'html' }]],
-  }).code;
-}
-
-module.exports = function transformWidget(id, filePath, body) {
-  var transformed;
+module.exports = function transformWidget(id, filePath, callback) {
+  const widget = browserify(filePath, { detectGlobals: false })
+    .require(filePath, { expose: id });
 
   if (filePath.match(/\.coffee$/)) {
-    transformed = transformCoffeeWidget(id, body);
+    widget.transform(coffeeify, {
+      bare: true,
+      header: false,
+    });
   } else if (filePath.match(/\.jsx$/)) {
-    transformed = transformJSXWidget(id, body);
+    widget.transform(babelify, {
+      presets: [es2015],
+      plugins: [[jsxTransform, { pragma: 'html' }]],
+    });
   } else {
-    transformed = transformJSWidget(id, body);
+    widget.transform(wrapJSWidget);
   }
 
-  return transformed;
+  widget
+    .transform(widgetify, { id: id })
+    .bundle((err, parsed) => {
+      callback(err, parsed ? parsed.toString() : undefined);
+    });
 };
