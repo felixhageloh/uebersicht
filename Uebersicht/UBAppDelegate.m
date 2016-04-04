@@ -334,7 +334,8 @@ int const PORT = 41416;
 - (IBAction)refreshWidgets:(id)sender
 {
     for (NSNumber* screenId in windows) {
-        [windows[screenId] reload];
+        UBWindow* window = windows[screenId];
+        [window reload];
     }
 }
 
@@ -368,7 +369,8 @@ int const PORT = 41416;
 - (void)wakeFromSleep:(NSNotification *)notification
 {
     for (NSNumber* screenId in windows) {
-        [windows[screenId] reload];
+        UBWindow* window = windows[screenId];
+        [window reload];
     }
 }
 
