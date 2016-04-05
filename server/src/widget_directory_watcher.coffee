@@ -3,8 +3,6 @@ fs = require 'fs'
 fsevents = require('fsevents')
 EventEmitter = require('events');
 
-loadWidget = require './loadWidget.coffee'
-
 module.exports = (directoryPath) ->
   api = {}
   widgetPaths = {}
@@ -12,12 +10,6 @@ module.exports = (directoryPath) ->
   eventEmitter = new EventEmitter()
 
   init = ->
-    # follow symlink if widgetDirectory is one
-    if fs.lstatSync(directoryPath).isSymbolicLink()
-      directoryPath = fs.readlinkSync(directoryPath)
-
-    directoryPath = directoryPath.normalize()
-
     if !fs.existsSync(directoryPath)
       throw new Error "could not find widget dir at #{directoryPath}"
 
@@ -25,20 +17,20 @@ module.exports = (directoryPath) ->
     watcher.on 'change', (filePath, info) ->
       switch info.event
         when 'modified', 'moved-in', 'created'
-          findWidgets filePath, info.type, (widgetPath) ->
-            widgetPaths[widgetPath] = true
-            emitWidget(widgetPath)
+          findWidgets filePath, info.type, (filePath) ->
+            widgetPaths[filePath] = true
+            eventEmitter.emit('widgetFileAdded', filePath)
         when 'moved-out', 'deleted'
-          findRemovedWidgets filePath, (widgetPath) ->
-            eventEmitter.emit('widgetRemoved', widgetId(widgetPath))
-            delete widgetPaths[widgetPath]
+          findRemovedWidgets filePath, (filePath) ->
+            delete widgetPaths[filePath]
+            eventEmitter.emit('widgetFileRemoved', widgetId(filePath))
 
     watcher.start()
     console.log 'watching', directoryPath
 
-    findWidgets directoryPath, 'directory', (widgetPath) ->
-      widgetPaths[widgetPath] = true
-      emitWidget(widgetPath)
+    findWidgets directoryPath, 'directory', (filePath) ->
+      widgetPaths[filePath] = true
+      eventEmitter.emit('widgetFileAdded', filePath)
 
     api
 
@@ -51,10 +43,6 @@ module.exports = (directoryPath) ->
 
   api.off = (type, handler) ->
     eventEmitter.removeListener(type, handler)
-
-  emitWidget = (filePath) ->
-    id = widgetId filePath
-    loadWidget id, filePath, (widget) -> eventEmitter.emit('widget', widget)
 
   # recursively walks the directory tree and calls onFound for every widgety
   # looking path it finds.
@@ -81,14 +69,6 @@ module.exports = (directoryPath) ->
       return console.log err if err
       type = if stat.isDirectory() then 'directory' else 'file'
       callback path, type
-
-  widgetId = (filePath) ->
-    fileParts = filePath.replace(directoryPath, '').split(/\/+/)
-    fileParts = (part for part in fileParts when part)
-
-    fileParts.join('-')
-      .replace(/\./g, '-')
-      .replace(/\s/g, '_')
 
   isWidgetPath = (filePath) ->
     filePath.indexOf('/node_modules/') == -1 and

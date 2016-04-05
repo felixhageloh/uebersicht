@@ -46,6 +46,7 @@
     "superagent": "^1.8.1",
     "through2": "^2.0.1",
     "tosource": "~0.1.1",
+    "watchify": "^3.7.0",
     "ws": "^1.0.0"
   }
 }

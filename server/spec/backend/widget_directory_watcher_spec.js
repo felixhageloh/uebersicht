@@ -15,20 +15,20 @@ test.onFinish(() => {
   execSync('rm -rf ' + testDirPath);
 });
 
-test('loading widgets that are already present in the widget dir', (t) => {
+test('files that are already present in the widget dir', (t) => {
   t.timeoutAfter(300);
   var fixturePath = path.resolve(__dirname, '../test_widgets');
   var watcher = WidgetDirWatcher(fixturePath);
   var expectedWidgets = [
-    'widget-1-coffee',
-    'widget-2-js',
-    'some-dir-widget-index-1-coffee',
-    'broken-widget-coffee',
-    'invalid-widget-coffee',
+    path.join(fixturePath, 'widget-1.coffee'),
+    path.join(fixturePath, 'widget-2.js'),
+    path.join(fixturePath, 'some-dir.widget', 'index-1.coffee'),
+    path.join(fixturePath, 'broken-widget.coffee'),
+    path.join(fixturePath, 'invalid-widget.coffee'),
   ];
 
-  watcher.on('widget', (widget) => {
-    var idx = expectedWidgets.indexOf(widget.id);
+  watcher.on('widgetFileAdded', (filePath) => {
+    var idx = expectedWidgets.indexOf(filePath);
     if (idx > -1) {
       expectedWidgets.splice(idx, 1);
     }
@@ -43,30 +43,30 @@ test('loading widgets that are already present in the widget dir', (t) => {
 
 test('detecting changes', (t) => {
   var newWidgetPath = path.join(testDirPath, 'new-widget.coffee');
-  var watcher =  WidgetDirWatcher(testDirPath);
+  var watcher = WidgetDirWatcher(testDirPath);
 
   t.test('adding files', (tt) => {
-    var listener = (widget) => {
-      if (widget.id === 'new-widget-coffee') {
-        tt.pass('it emits an event for new widgets');
-        watcher.off('widget', listener);
+    var listener = (filePath) => {
+      if (filePath === newWidgetPath) {
+        tt.pass('it emits an event for new files');
+        watcher.off('widgetFileAdded', listener);
         tt.end();
       }
     };
-    watcher.on('widget', listener);
+    watcher.on('widgetFileAdded', listener);
     fs.writeFile(newWidgetPath, "command: ''");
   });
 
   t.test('removing files', (tt) => {
-    var listener = (id) => {
-      if (id === 'new-widget-coffee') {
-        watcher.off('widgetRemoved', listener);
+    var listener = (filePath) => {
+      if (filePath === newWidgetPath) {
+        watcher.off('widgetFileRemoved', listener);
         tt.pass('it emits a widgetRemoved event when a widget file is removed');
         tt.end();
       }
     };
 
-    watcher.on('widgetRemoved', listener);
+    watcher.on('widgetFileRemoved', listener);
     fs.unlink(newWidgetPath);
   });
 

@@ -29,17 +29,36 @@ function addId(widgetObjectExp, widetId) {
   widgetObjectExp.properties.push(idProperty);
 }
 
-function parseStyle(styleProp, widetId) {
-  const isStringLiteral = styleProp.value.type === 'Literal' &&
-    typeof styleProp.value.value === 'string';
+function flattenStyle(styleProp, tree) {
+  const preface = {
+    type: 'Program',
+    body: tree.body.slice(0, -1),
+  };
 
-  if (!isStringLiteral) {
+  preface.body.push({
+    type: 'ExpressionStatement',
+    expression: styleProp.value,
+  });
+
+  return eval(escodegen.generate(preface));
+}
+
+function parseStyle(styleProp, widetId, tree) {
+  let styleString;
+
+  if (styleProp.value.type === 'Literal') {
+    styleString = styleProp.value.value;
+  } else {
+    styleString = flattenStyle(styleProp, tree);
+  }
+
+  if (typeof styleString !== 'string') {
     return;
   }
 
   const scopedStyle = '#' + widetId
     + '\n  '
-    + styleProp.value.value.replace(/\n/g, '\n  ');
+    + styleString.replace(/\n/g, '\n  ');
 
   const css = stylus(scopedStyle)
     .import('nib')
@@ -47,6 +66,7 @@ function parseStyle(styleProp, widetId) {
     .render();
 
   styleProp.key.name = 'css';
+  styleProp.value.type = 'Literal';
   styleProp.value.value = css;
 }
 
@@ -56,9 +76,9 @@ function parseRefreshFrequency(prop) {
   }
 }
 
-function parseWidgetProperty(prop, widgetId) {
+function parseWidgetProperty(prop, widgetId, tree) {
   switch (prop.key.name) {
-    case 'style': parseStyle(prop, widgetId); break;
+    case 'style': parseStyle(prop, widgetId, tree); break;
     case 'refreshFrequency': parseRefreshFrequency(prop); break;
   }
 }
@@ -68,7 +88,7 @@ function modifyAST(tree, widgetId) {
 
   if (widgetObjectExp) {
     widgetObjectExp.properties.map(function(prop) {
-      parseWidgetProperty(prop, widgetId);
+      parseWidgetProperty(prop, widgetId, tree);
     });
     addId(widgetObjectExp, widgetId);
     addExports(tree.body[tree.body.length - 1]);

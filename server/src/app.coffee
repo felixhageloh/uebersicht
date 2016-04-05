@@ -5,6 +5,7 @@ redux = require 'redux'
 
 MessageBus = require('./MessageBus')
 WidgetDirWatcher = require('./widget_directory_watcher.coffee')
+WidgetBundler = require('./WidgetBundler.js')
 Settings = require('./Settings')
 StateServer = require('./StateServer')
 CommandServer = require('./command_server.coffee')
@@ -29,14 +30,26 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
 
   # watch widget dir and dispatch correct actions
   widgetPath = path.resolve(__dirname, widgetPath)
-  dirWatcher = WidgetDirWatcher widgetPath
+  # follow symlink if widgetDirectory is one
+  if fs.lstatSync(widgetPath).isSymbolicLink()
+    widgetPath = fs.readlinkSync(widgetPath)
+  widgetPath = widgetPath.normalize()
 
-  dirWatcher.on 'widget', (widget) ->
+  bundler = WidgetBundler(widgetPath)
+  dirWatcher = WidgetDirWatcher(widgetPath)
+
+  dirWatcher.on 'widgetFileAdded', (filePath) ->
+    bundler.addBundle(filePath)
+
+  dirWatcher.on 'widgetFileRemoved', (filePath) ->
+    bundler.removeBundle(filePath)
+
+  bundler.on 'widget', (widget) ->
     action = actions.addWidget(widget)
     store.dispatch(action)
     dispatchToRemote(action)
 
-  dirWatcher.on 'widgetRemoved', (id) ->
+  bundler.on 'widgetRemoved', (id) ->
     action = actions.removeWidget(id)
     store.dispatch(action)
     dispatchToRemote(action)

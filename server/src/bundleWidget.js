@@ -1,6 +1,7 @@
 'use strict';
 
 const browserify = require('browserify');
+const watchify = require('watchify');
 const widgetify = require('./widgetify');
 const coffeeify = require('coffeeify');
 const babelify = require('babelify');
@@ -21,27 +22,36 @@ function wrapJSWidget() {
   return through(write, end);
 }
 
-module.exports = function transformWidget(id, filePath, callback) {
-  const widget = browserify(filePath, { detectGlobals: false })
-    .require(filePath, { expose: id });
+module.exports = function bundleWidget(id, filePath, callback) {
+  const bundle = browserify(filePath, {
+    detectGlobals: false,
+    cache: {},
+    packageCache: {},
+  });
+
+
+  bundle.plugin(watchify, {poll: true});
+  bundle.require(filePath, { expose: id });
 
   if (filePath.match(/\.coffee$/)) {
-    widget.transform(coffeeify, {
+    bundle.transform(coffeeify, {
       bare: true,
       header: false,
     });
   } else if (filePath.match(/\.jsx$/)) {
-    widget.transform(babelify, {
+    bundle.transform(babelify, {
       presets: [es2015],
       plugins: [[jsxTransform, { pragma: 'html' }]],
     });
   } else {
-    widget.transform(wrapJSWidget);
+    bundle.transform(wrapJSWidget);
   }
 
-  widget
-    .transform(widgetify, { id: id })
-    .bundle((err, parsed) => {
-      callback(err, parsed ? parsed.toString() : undefined);
-    });
+  bundle.transform(widgetify, { id: id });
+
+  return {
+    id: id,
+    filePath: filePath,
+    bundle: bundle,
+  };
 };
