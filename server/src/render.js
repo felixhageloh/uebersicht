@@ -43,16 +43,19 @@ module.exports = function render(state, screen, domEl) {
 
   for (var id in state.widgets) {
     var widget = state.widgets[id];
+    if (!isVisibleOnScreen(id, screen, state)) {
+      continue;
+    }
 
-    if (!widget.error && isVisibleOnScreen(id, screen, state)) {
-      renderWidget(widget, domEl);
-
-      var idx = remaining.indexOf(widget.id);
-      if (idx > -1) {
-        remaining.splice(idx, 1);
-      }
-    } else if (widget.error) {
+    if (widget.error) {
       console.error(widget.error);
+    } else {
+      renderWidget(widget, domEl);
+    }
+
+    var idx = remaining.indexOf(widget.id);
+    if (idx > -1) {
+      remaining.splice(idx, 1);
     }
   }
 
