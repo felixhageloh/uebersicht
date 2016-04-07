@@ -15,12 +15,16 @@ const defaults = {
   render: function render(props) {
     return html('div', null, props.output);
   },
+  outputToProps: function outputToProps(err, output) {
+    return { error: err, output: output };
+  },
+  initialProps: { output: '', error: null },
 };
 
 module.exports = function VirtualDomWidget(widgetObject) {
   const api = {};
   let implementation;
-  let contentEl;
+  let wrapperEl;
   let commandLoop;
   let renderLoop;
 
@@ -41,7 +45,9 @@ module.exports = function VirtualDomWidget(widgetObject) {
       implementation.command,
       implementation.refreshFrequency
     ).map((err, output) => {
-      renderLoop.update({ error: err, output: output });
+      renderLoop.update(
+        implementation.outputToProps(err, output, renderLoop.state)
+      );
     });
   }
 
@@ -50,33 +56,37 @@ module.exports = function VirtualDomWidget(widgetObject) {
   }
 
   api.create = function create() {
-    contentEl = document.createElement('div');
-    contentEl.id = implementation.id;
-    contentEl.className = 'widget';
+    const contentEl = document.createElement('div');
+    wrapperEl = document.createElement('div');
+    wrapperEl.id = implementation.id;
+    wrapperEl.className = 'widget';
+    wrapperEl.appendChild(contentEl);
+    document.body.appendChild(wrapperEl);
 
     renderLoop = RenderLoop(
-      { output: '', error: null },
+      implementation.initialProps,
       render,
       patch,
       contentEl
     );
 
     start();
-    return contentEl;
+    return wrapperEl;
   };
 
   api.destroy = function destroy() {
     commandLoop.stop();
-    if (contentEl && contentEl.parentNode) {
-      contentEl.parentNode.removeChild(contentEl);
+    if (wrapperEl && wrapperEl.parentNode) {
+      wrapperEl.parentNode.removeChild(wrapperEl);
     }
     renderLoop = null;
-    contentEl = null;
+    wrapperEl = null;
   };
 
   api.update = function update(newImplementation) {
     commandLoop.stop();
     init(newImplementation);
+    renderLoop.update(renderLoop.state); // force redraw
     start();
   };
 

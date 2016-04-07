@@ -5,6 +5,7 @@ const html = require('snabbdom-jsx').html;
 module.exports = function Widget(widget) {
   var api;
   var implementation = eval(widget.body)(widget.id);
+  implementation.id = widget.id;
 
   if (/\.jsx$/.test(widget.filePath)) {
     api = VirtualDomWidget(implementation);
