@@ -112,12 +112,20 @@ function getWidgetObjectExpression(tree) {
 
 module.exports = function(file, options) {
   const widgetId = options.id;
-  let data = '';
+  let src = '';
 
-  function write(buf, enc, next) { data += buf; next(); }
+  function write(buf, enc, next) { src += buf; next(); }
   function end(next) {
-    const tree = modifyAST(esprima.parse(data), widgetId);
-    this.push(escodegen.generate(tree));
+    let tree;
+    try {
+      tree = esprima.parse(src);
+    } catch (e) {
+      this.emit('error', e);
+    }
+
+    if (tree) {
+      this.push(escodegen.generate(modifyAST(tree, widgetId)));
+    }
     next();
   }
 
