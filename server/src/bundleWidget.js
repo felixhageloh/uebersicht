@@ -1,3 +1,4 @@
+
 'use strict';
 
 const browserify = require('browserify');
@@ -10,12 +11,16 @@ const es2015 = require('babel-preset-es2015');
 const through = require('through2');
 
 function wrapJSWidget() {
-  let src = '';
-
-  function write(buf, enc, next) { src += buf; next(); }
+  let start = true;
+  function write(chunk, enc, next) {
+    if (start) {
+      this.push('({');
+      start = false;
+    }
+    next(null, chunk);
+  }
   function end(next) {
-    const tree = modifyAST(esprima.parse(data), widgetId);
-    this.push('{' + src + '}');
+    this.push('})');
     next();
   }
 
