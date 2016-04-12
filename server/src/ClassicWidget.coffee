@@ -25,8 +25,10 @@ module.exports = (widgetObject) ->
   commandLoop = null
   implementation = {}
 
-  init = (newImplementation) ->
-    implementation = newImplementation
+  init = (widget) ->
+    implementation = eval(widget.body)(widget.id);
+    implementation.id == widget.id
+
     implementation[k] ?= v for k, v of defaults
     implementation[k] ||= v for k, v of internalApi
 

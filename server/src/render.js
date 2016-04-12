@@ -22,7 +22,7 @@ function renderWidget(widget, domEl) {
   if (prevRendered && prevRendered.widget === widget) {
     return;
   } else if (prevRendered) {
-    prevRendered.instance.update(widget.body);
+    prevRendered.instance.update(widget);
   } else {
     var instance = Widget(widget);
     domEl.appendChild(instance.create());
