@@ -16,8 +16,12 @@ const defaults = {
   render: function render(props) {
     return html('div', null, props.output);
   },
-  outputToProps: function outputToProps(err, output) {
-    return { error: err, output: output };
+  updateProps: function updateProps(props, action) {
+    if (action.type === 'UB/COMMAND_RAN') {
+      return { error: action.error, output: action.output };
+    } else {
+      return props;
+    }
   },
   initialProps: { output: '', error: null },
 };
@@ -48,15 +52,19 @@ module.exports = function VirtualDomWidget(widgetObject) {
       implementation.command,
       implementation.refreshFrequency
     ).map((err, output) => {
-      renderLoop.update(
-        implementation.outputToProps(err, output, renderLoop.state)
-      );
+      dispatch({ type: 'UB/COMMAND_RAN', error: err, output: output });
     });
+  }
+
+  function dispatch(action) {
+    renderLoop.update(
+      implementation.updateProps(renderLoop.state, action)
+    );
   }
 
   function render(state) {
     try {
-      return implementation.render(state);
+      return implementation.render(state, dispatch);
     } catch (e) {
       console.error(e);
       return html('div', {}, e.message);

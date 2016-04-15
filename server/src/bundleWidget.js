@@ -7,6 +7,7 @@ const widgetify = require('./widgetify');
 const coffeeify = require('coffeeify');
 const babelify = require('babelify');
 const jsxTransform = require('babel-plugin-transform-react-jsx');
+const restSpreadTransform = require('babel-plugin-transform-object-rest-spread')
 const es2015 = require('babel-preset-es2015');
 const through = require('through2');
 
@@ -46,7 +47,7 @@ module.exports = function bundleWidget(id, filePath, callback) {
   } else if (filePath.match(/\.jsx$/)) {
     bundle.transform(babelify, {
       presets: [es2015],
-      plugins: [[jsxTransform, { pragma: 'html' }]],
+      plugins: [restSpreadTransform, [jsxTransform, { pragma: 'html' }]],
     });
   } else {
     bundle.transform(wrapJSWidget);
