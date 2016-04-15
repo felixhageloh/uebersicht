@@ -1,4 +1,4 @@
-const runCommand = require('./runCommand');
+const runShellCommand = require('./runShellCommand');
 
 function scheduleTick(tick, refreshFrequency) {
   if (refreshFrequency !== false) {
@@ -11,20 +11,24 @@ module.exports = function CommandLoop(command, refreshFrequency) {
   const callbacks = [];
   let started = false;
   let timer;
+  let runCommand;
+
+  if (typeof command === 'function') {
+    runCommand = command;
+  } else {
+    runCommand = (callback) => {
+      runShellCommand(command, callback).timeout(refreshFrequency);
+    };
+  }
 
   function loop() {
-    if (!command) {
-      return;
-    }
-
     clearTimeout(timer);
-    runCommand(command, (error, output) => {
+    runCommand((error, output) => {
       if (started) {
         callbacks.forEach(c => c(error, output));
         timer = scheduleTick(loop, refreshFrequency);
       }
-    })
-    .timeout(refreshFrequency);
+    });
   }
 
   api.start = function start() {
@@ -49,7 +53,7 @@ module.exports = function CommandLoop(command, refreshFrequency) {
   };
 
   api.forceTick = function tick() {
-    runCommand(command, (error, output) => {
+    runCommand((error, output) => {
       callbacks.forEach(c => c(error, output));
     });
     return api;

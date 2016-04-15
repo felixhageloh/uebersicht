@@ -2,7 +2,7 @@ $ = require('jquery')
 window.jQuery = $
 
 CommandLoop = require('./CommandLoop')
-runCommand = require('./runCommand')
+runShellCommand = require('./runShellCommand')
 
 defaults =
   id: 'widget'
@@ -85,7 +85,7 @@ module.exports = (widgetObject) ->
 
   # runs command in the shell and calls callback with the result (err, stdout)
   internalApi.run = run = (command, callback) ->
-    runCommand(command, callback)
+    runShellCommand(command, callback)
 
   redraw = (error, output) ->
     if error

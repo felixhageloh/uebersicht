@@ -1,6 +1,6 @@
 const post = require('superagent').post;
 
-module.exports = function runCommand(command, callback) {
+module.exports = function runShellCommand(command, callback) {
   return post('/run/')
     .send(command)
     .end((err, res) => {
