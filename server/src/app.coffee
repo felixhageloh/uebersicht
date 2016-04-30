@@ -79,10 +79,12 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
       callback?()
 
   # api
-  close: ->
+  close: (cb) ->
     dirWatcher.close()
+    bundler.close()
     server.close()
-    messageBus.close()
+    sharedSocket.close()
+    messageBus.close(cb)
 
   on: (ev, handler) ->
     server.on(ev, handler)

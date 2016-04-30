@@ -6,7 +6,6 @@ var sharedSocket = require('../../src/SharedSocket');
 var listen = require('../../src/listen');
 
 test('listen', (t) => {
-  t.plan(1);
   sharedSocket.open('ws://localhost:8889');
 
   listen((message) => {
@@ -15,7 +14,7 @@ test('listen', (t) => {
       { type: 'YASS', payload: 'yay' },
       'it calls listeners with deserialized messages'
     );
-    server.close();
+    server.close(() => t.end());
   });
 
   server.on('connection', (ws) => {

@@ -15,6 +15,12 @@ ws = new WebSocket("ws://#{host}")
 if fs.existsSync('../spec/test_files/WidgetSettings.json')
   fs.unlinkSync('../spec/test_files/WidgetSettings.json')
 
+
+test 'starting on the specified port', (t) ->
+  t.plan(1)
+  httpGet "http://localhost:3030/", (res) ->
+    t.equal(res.statusCode, 200, 'app should respond on port 3030')
+
 test 'dispatching events', (t) ->
   t.plan(1)
   t.timeoutAfter(1000)
@@ -91,11 +97,7 @@ test 'serving static files in the widget dir', (t) ->
   httpGet "http://#{host}/test.jpg", (res) ->
     t.ok(res.statusCode == 200, 'it serves a static image')
 
-test 'starting on the specified port', (t) ->
-  t.plan(1)
-  server.close()
-
-  server = Server(3031, '../spec/test_widgets', '../spec/test_files')
-  httpGet "http://localhost:3031/", (res) ->
-    server.close()
-    t.equal(res.statusCode, 200, 'app should respond on port 3031')
+test 'closing', (t) ->
+  server.close ->
+    t.pass 'it closes'
+    t.end()

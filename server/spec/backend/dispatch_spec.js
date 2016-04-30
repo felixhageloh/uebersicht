@@ -20,8 +20,7 @@ test('queuing up messages', (t) => {
 
       if (expectedMessages.length === 0) {
         t.pass('it queues up messages and sends them once the socket opens');
-        t.end();
-        server.close();
+        server.close(() => t.end());
       }
     });
   });

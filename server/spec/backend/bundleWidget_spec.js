@@ -22,6 +22,7 @@ test('bundling coffeescript widgets', (t) => {
       src.indexOf('command') > -1,
       'the source code looks ok'
     );
+    widget.bundle.close();
   });
 });
 
@@ -43,6 +44,7 @@ test('bundling javascript widgets', (t) => {
       src.indexOf('command') > -1,
       'the source code looks ok'
     );
+    widget.bundle.close();
   });
 });
 
@@ -65,6 +67,7 @@ test('bundling widgets with syntax errors', (t) => {
       'unexpected indentation while parsing file: ' + widgetPath,
       'the error message is correct'
     );
+    widget.bundle.close();
   });
 });
 

@@ -67,7 +67,8 @@ test('forwarding stderr', (t) => {
   });
 });
 
-test('it closes', (t) => {
+test('closing', (t) => {
   app.close();
+  t.pass('it closes');
   t.end();
 });

@@ -9,8 +9,7 @@ test('subscribing listeners', (t) => {
   sharedSocket.onMessage((message) => {
     t.equal(message, 'yay');
     sharedSocket.close();
-    server.close();
-    t.end();
+    server.close(() =>  t.end());
   });
 
   sharedSocket.open(url);
