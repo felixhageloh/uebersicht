@@ -28,7 +28,7 @@ function wrapJSWidget() {
   return through(write, end);
 }
 
-module.exports = function bundleWidget(id, filePath, callback) {
+module.exports = function bundleWidget(id, filePath) {
   const bundle = browserify(filePath, {
     detectGlobals: false,
     cache: {},
