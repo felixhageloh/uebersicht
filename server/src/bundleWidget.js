@@ -2,12 +2,12 @@
 'use strict';
 
 const browserify = require('browserify');
-const watchify = require('watchify');
+const watchify = require('./watchify');
 const widgetify = require('./widgetify');
 const coffeeify = require('coffeeify');
 const babelify = require('babelify');
 const jsxTransform = require('babel-plugin-transform-react-jsx');
-const restSpreadTransform = require('babel-plugin-transform-object-rest-spread')
+const restSpreadTransform = require('babel-plugin-transform-object-rest-spread');
 const es2015 = require('babel-preset-es2015');
 const through = require('through2');
 
@@ -36,7 +36,7 @@ module.exports = function bundleWidget(id, filePath) {
   });
 
 
-  bundle.plugin(watchify, {poll: true});
+  bundle.plugin(watchify);
   bundle.require(filePath, { expose: id });
 
   if (filePath.match(/\.coffee$/)) {

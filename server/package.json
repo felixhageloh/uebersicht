@@ -5,7 +5,7 @@
   "main": "server.coffee",
   "scripts": {
     "test": "npm run-script test-local && npm run-script test-browser",
-    "test-local": "tape -r coffee-script/register spec/backend/**/* | tap-spec",
+    "test-local": "rm -rf spec/tmp && tape -r coffee-script/register spec/backend/**/* | tap-spec",
     "test-browser": "browserify -t coffeeify -t [babelify --presets es2015] spec/frontend/*.* | tape-run | tap-spec",
     "start": "coffee server.coffee",
     "release": "npm run-script build-client && npm run-script build-server",
@@ -47,7 +47,6 @@
     "superagent": "^1.8.1",
     "through2": "^2.0.1",
     "tosource": "~0.1.1",
-    "watchify": "^3.7.0",
     "ws": "^1.0.0"
   }
 }
