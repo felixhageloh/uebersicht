@@ -23,7 +23,7 @@ module.exports = (directoryPath) ->
         when 'moved-out', 'deleted'
           findRemovedWidgets filePath, (filePath) ->
             delete widgetPaths[filePath]
-            eventEmitter.emit('widgetFileRemoved', widgetId(filePath))
+            eventEmitter.emit('widgetFileRemoved', filePath)
 
     watcher.start()
     console.log 'watching', directoryPath
