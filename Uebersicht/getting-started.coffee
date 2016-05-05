@@ -26,7 +26,7 @@ render: (output) -> """
     or simply delete it.
   </p>
   <p>
-    To download other widgets, choose <em>'Visist Widgets Gallery'</em>
+    To download other widgets, choose <em>'Visit Widgets Gallery'</em>
     from the status bar menu.
   </p>
 """
