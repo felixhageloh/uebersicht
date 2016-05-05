@@ -1,66 +1,69 @@
 'use strict';
 
 const bundleWidget = require('./bundleWidget');
-const EventEmitter = require('events');
+const fs = require('fs');
 
-module.exports = function WidgetBundler(directoryPath) {
+module.exports = function WidgetBundler() {
   const api = {};
-  const widgets = {};
-  const eventEmitter = new EventEmitter();
+  const bundles = {};
 
-  api.on = function on(type, handler) {
-    eventEmitter.on(type, handler);
-  };
-
-  api.off = function off(type, handler) {
-    eventEmitter.removeListener(type, handler);
-  };
-
-  api.addBundle = function addBundle(filePath) {
-    if (!widgets[filePath]) {
-      const id = widgetId(filePath);
-      const widget =  bundleWidget(id, filePath);
-      widgets[filePath] = widget;
-      widget.bundle.on('update', emitWidget(widget));
-      emitWidget(widget)();
+  api.push = function push(action, callback) {
+    if (action && action.type) {
+      action.type === 'added'
+        ? addWidget(action.id, action.filePath, callback)
+        : removeWidget(action.id, action.filePath, callback)
+        ;
     }
   };
 
-  api.removeBundle = function removeBundle(filePath) {
-    if (widgets[filePath]) {
-      widgets[filePath].close();
-      eventEmitter.emit('widgetRemoved', widgetId(filePath));
+  api.close = function close() {
+    for (var id in bundles) {
+      bundles[id].close();
+      delete bundles[id];
     }
   };
 
-  function emitWidget(widget) {
-    return function() {
-      const result = {
-        id: widget.id,
-        filePath: widget.filePath,
-      };
-
-      widget.bundle.bundle((err, srcBuffer) => {
-        if (err) {
-          result.error = prettyPrintError(widget.filePath, err);
-        } else {
-          result.body = srcBuffer.toString();
-        }
-
-        eventEmitter.emit('widget', result);
+  function addWidget(id, filePath, emit) {
+    if (!bundles[id]) {
+      bundles[id] = WidgetBundle(id, filePath, (widget) => {
+        emit({type: 'added', widget: widget});
       });
-    };
+    }
   }
 
-  function widgetId(filePath) {
-    const fileParts = filePath
-      .replace(directoryPath, '')
-      .split(/\/+/)
-      .filter((part) => !!part);
+  function removeWidget(id, filePath, emit) {
+    if (bundles[id]) {
+      bundles[id].close();
+      delete bundles[id];
+      emit({type: 'removed', id: id});
+    }
+  }
 
-    return fileParts.join('-')
-      .replace(/\./g, '-')
-      .replace(/\s/g, '_');
+  function WidgetBundle(id, filePath, callback) {
+    const bundle = bundleWidget(id, filePath);
+    const buildWidget = () => {
+      const widget = {
+        id: id,
+        filePath: filePath,
+      };
+
+      fs.access(filePath, fs.R_OK, (couldNotRead) => {
+        if (couldNotRead) return;
+        bundle.bundle((err, srcBuffer) => {
+          if (err) {
+            widget.error = prettyPrintError(filePath, err);
+          } else {
+            widget.body = srcBuffer.toString();
+          }
+
+          callback(widget);
+        });
+      });
+    };
+
+    bundle.on('update', buildWidget);
+    buildWidget();
+    return bundle;
   }
 
   function prettyPrintError(filePath, error) {

@@ -4,7 +4,7 @@ fs = require 'fs'
 redux = require 'redux'
 
 MessageBus = require('./MessageBus')
-WidgetDirWatcher = require('./widget_directory_watcher.coffee')
+watchDir = require('./directory_watcher.coffee')
 WidgetBundler = require('./WidgetBundler.js')
 Settings = require('./Settings')
 StateServer = require('./StateServer')
@@ -13,6 +13,7 @@ serveClient = require('./serveClient')
 sharedSocket = require('./SharedSocket')
 actions = require('./actions')
 reducer = require('./reducer')
+resolveWidget = require('./resolveWidget')
 
 dispatchToRemote = require('./dispatch')
 listenToRemote = require('./listen')
@@ -36,23 +37,15 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
   widgetPath = widgetPath.normalize()
 
   bundler = WidgetBundler(widgetPath)
-  dirWatcher = WidgetDirWatcher(widgetPath)
-
-  dirWatcher.on 'widgetFileAdded', (filePath) ->
-    bundler.addBundle(filePath)
-
-  dirWatcher.on 'widgetFileRemoved', (filePath) ->
-    bundler.removeBundle(filePath)
-
-  bundler.on 'widget', (widget) ->
-    action = actions.addWidget(widget)
-    store.dispatch(action)
-    dispatchToRemote(action)
-
-  bundler.on 'widgetRemoved', (id) ->
-    action = actions.removeWidget(id)
-    store.dispatch(action)
-    dispatchToRemote(action)
+  # TODO: use a stream/generator/promise pattern instead of nested callbacks
+  dirWatcher = watchDir(widgetPath, (fileEvent) ->
+    bundler.push(resolveWidget(fileEvent), (widgetEvent) ->
+      action = actions.get(widgetEvent)
+      if (action)
+        store.dispatch(action)
+        dispatchToRemote(action)
+    )
+  )
 
   # load and replay settings
   settings = Settings(settingsPath)
@@ -80,7 +73,7 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
 
   # api
   close: (cb) ->
-    dirWatcher.close()
+    dirWatcher.stop()
     bundler.close()
     server.close()
     sharedSocket.close()

@@ -54,10 +54,5 @@ module.exports = function bundleWidget(id, filePath) {
   }
 
   bundle.transform(widgetify, { id: id });
-
-  return {
-    id: id,
-    filePath: filePath,
-    bundle: bundle,
-  };
+  return bundle;
 };

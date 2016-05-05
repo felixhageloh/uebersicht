@@ -3,11 +3,12 @@ var path = require('path');
 var fs = require('fs');
 var execSync = require('child_process').execSync;
 
-var WidgetDirWatcher = require('../../src/widget_directory_watcher.coffee');
+var DirWatcher = require('../../src/directory_watcher.coffee');
 var fixturePath = path.resolve(__dirname, '../test_widgets');
 var newWidgetPath = path.join(fixturePath, 'new-widget.coffee');
 
 var watcher;
+var callback;
 
 test('files that are already present in the widget dir', (t) => {
   t.timeoutAfter(300);
@@ -19,49 +20,48 @@ test('files that are already present in the widget dir', (t) => {
     path.join(fixturePath, 'invalid-widget.coffee'),
   ];
 
-  var listener = (filePath) => {
-    var idx = expectedWidgets.indexOf(filePath);
+  callback = (event) => {
+    if (event.type !== 'added') {
+      return;
+    }
+    var idx = expectedWidgets.indexOf(event.filePath);
     if (idx > -1) {
       expectedWidgets.splice(idx, 1);
     }
 
     if (expectedWidgets.length === 0) {
+      callback = () => {};
       t.pass('it emits an event for all widgets already in the folder');
-      watcher.off('widgetFileAdded', listener);
       t.end();
     }
   };
 
-  watcher = WidgetDirWatcher(fixturePath);
-  watcher.on('widgetFileAdded', listener);
+  watcher = DirWatcher(fixturePath, (event) => callback(event) );
 });
 
 test('adding files', (t) => {
   t.timeoutAfter(300);
-  var listener = (filePath) => {
-    if (filePath === newWidgetPath) {
+  callback = (event) => {
+    if (event.type === 'added' && event.filePath === newWidgetPath) {
+      callback = () => {};
       t.pass('it emits an event for new files');
-      watcher.off('widgetFileAdded', listener);
       t.end();
     }
   };
-  watcher.on('widgetFileAdded', listener);
   fs.writeFile(newWidgetPath, "command: ''");
 });
 
 test('removing files', (t) => {
   t.timeoutAfter(300);
-  var listener = (filePath) => {
-    if (filePath === newWidgetPath) {
-      watcher.off('widgetFileRemoved', listener);
+  callback = (event) => {
+    if (event.type === 'removed' && event.filePath === newWidgetPath) {
+      callback = () => {};
       t.pass(
         'it emits a widgetFileRemoved event when a widget file is removed'
       );
       t.end();
     }
   };
-
-  watcher.on('widgetFileRemoved', listener);
   fs.unlink(newWidgetPath);
 });
 
@@ -78,25 +78,25 @@ test('adding folders', (t) => {
     "command: 'yay'"
   );
 
-  listener = (filePath) => {
-    if (filePath === path.join(fixturePath, 'another', 'widget.js')) {
-      watcher.off('widgetFileAdded', listener);
+  var expectedPath = path.join(fixturePath, 'another', 'widget.js');
+  callback = (event) => {
+    if (event.type === 'added' && event.filePath === expectedPath) {
+      callback = () => {};
       t.pass(
         'it emits an event when a subfolder containing a widget is added'
       );
       t.end();
     }
   };
-
-  watcher.on('widgetFileAdded', listener);
   fs.rename(aWidgetFolder, path.join(fixturePath, 'another'));
 });
 
 test('removing folders', (t) => {
   t.timeoutAfter(300);
-  listener = (filePath) => {
-    if (filePath === path.join(fixturePath, 'another', 'widget.js')) {
-      watcher.off('widgetFileRemoved', listener);
+  var expectedPath = path.join(fixturePath, 'another', 'widget.js');
+  callback = (event) => {
+    if (event.type === 'removed' && event.filePath === expectedPath) {
+      callback = () => {};
       t.pass(
         'it emits a widgetFileRemoved event when a subfolder containing a ' +
         'widget is removed'
@@ -105,15 +105,14 @@ test('removing folders', (t) => {
     }
   };
 
-  watcher.on('widgetFileRemoved', listener);
   var newPath = path.resolve(__dirname, '../tmp3');
   fs.renameSync(path.join(fixturePath, 'another'), newPath);
   execSync('rm -rf ' + newPath);
 });
 
-test('closing', (t) => {
-  watcher.close();
-  t.pass('it closes');
+test('stopping', (t) => {
+  watcher.stop();
+  t.pass('it can be stopped');
   t.end();
 });
 
