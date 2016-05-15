@@ -12,7 +12,7 @@ defaults =
 
 # This is a wrapper (something like a base class), around the
 # specific implementation of a widget.
-module.exports = (widgetObject) ->
+module.exports = ClassicWidget = (widgetObject) ->
   api = {}
   internalApi = {}
 
