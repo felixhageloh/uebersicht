@@ -11,10 +11,11 @@ function watchify (b, opts) {
     if (!opts) opts = {};
     var cache = b._options.cache;
     var pkgcache = b._options.packageCache;
-    var delay = typeof opts.delay === 'number' ? opts.delay : 100;
+    var delay = typeof opts.delay === 'number' ? opts.delay : 0;
     var changingDeps = {};
     var pending = false;
     var updating = false;
+    var mtimes = {};
 
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
@@ -118,6 +119,13 @@ function watchify (b, opts) {
     }
 
     function invalidate (id) {
+        var mtime = fs.statSync(id).mtime.getTime();
+        if ((mtimes[id] || 0) >= mtime) {
+            return;
+        }
+
+        mtimes[id] = mtime;
+
         if (cache) delete cache[id];
         if (pkgcache) delete pkgcache[id];
         changingDeps[id] = true;
