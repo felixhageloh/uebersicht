@@ -106,7 +106,7 @@ module.exports = ClassicWidget = (widgetObject) ->
       renderOutput output
     catch e
       contentEl.innerHTML = e.message
-      throw e
+      #throw e
 
   renderOutput = (output) ->
     if implementation.update? and rendered

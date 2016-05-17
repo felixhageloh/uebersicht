@@ -7,7 +7,9 @@ document.body.appendChild(domEl); // needed to use selectors
 function buildWidget(id) {
   return {
     id: id,
-    body: '(' + JSON.stringify({ id: id, refreshFrequency: false }) + ')',
+    body: '(function require() { return ' +
+      JSON.stringify({ id: id, refreshFrequency: false }) +
+    '})',
   };
 }
 

@@ -1,5 +1,6 @@
 var test = require('tape');
 var sinon = require('sinon');
+var tosource = require('tosource');
 var Widget = require('../../src/Widget.js');
 
 function makeFakeServer() {
@@ -15,9 +16,15 @@ function makeFakeServer() {
   return server;
 }
 
+function buildWidget(impl) {
+  return Widget({
+    body: '(function require() { return ' + tosource(impl) + '})',
+  });
+}
+
 test('widget creation', (t) => {
-  var widget = Widget({ command: '', id: 'foo', css: 'background: red' });
-  var el = widget.render();
+  var widget = buildWidget({ command: '', id: 'foo', css: 'background: red' });
+  var el = widget.create();
 
   t.ok(
     el && el.tagName === 'DIV',
@@ -41,51 +48,50 @@ test('widget creation', (t) => {
 });
 
 test('defaults', (t) => {
-  var widget = { command: '', id: 'foo', css: '' };
-  Widget(widget);
+  var implementation = buildWidget({ command: '', id: 'foo', css: '' })
+    .implementation();
 
   t.equal(
-    widget.refreshFrequency, 1000,
+    implementation.refreshFrequency, 1000,
     'it sets the refresh frequency to 1s'
   );
 
   t.equal(
-    typeof widget.render, 'function',
+    typeof implementation.render, 'function',
     'it provides a default render function'
   );
 
   t.ok(
-    widget.render('stuff') === 'stuff',
+    implementation.render('stuff') === 'stuff',
     'the default render method returns what is passed to it'
   );
 
   t.equal(
-    typeof widget.afterRender, 'function',
+    typeof implementation.afterRender, 'function',
     'it provides a default afterRender function'
   );
 
-  widget = {
+  implementation = buildWidget({
     id: 'foo',
     command: '',
     css: '',
     refreshFrequency: 42,
     render: () => 'render!',
     afterRender: () => 'afterRender!',
-  };
-  Widget(widget);
+  }).implementation();
 
   t.equal(
-    widget.refreshFrequency, 42,
+    implementation.refreshFrequency, 42,
     "it doesn't override the refreshFrequency"
   );
 
   t.equal(
-    widget.render(), 'render!',
+    implementation.render(), 'render!',
     "it doesn't override the render method"
   );
 
   t.equal(
-    widget.afterRender(), 'afterRender!',
+    implementation.afterRender(), 'afterRender!',
     "it doesn't override the afterRender method"
   );
 
@@ -93,20 +99,18 @@ test('defaults', (t) => {
 });
 
 test('internal api', (t) => {
-  var widget = { command: '', id: 'foo', css: '' };
-  Widget(widget);
+  var api = buildWidget({ command: '', id: 'foo', css: '' })
+    .internalApi();
 
-  t.equal(typeof widget.start, 'function', 'it has a start method');
-  t.equal(typeof widget.stop, 'function', 'it has a stop method');
-  t.equal(typeof widget.refresh, 'function', 'it has a refresh method');
-  t.equal(typeof widget.run, 'function', 'it has a run method');
+  t.equal(typeof api.start, 'function', 'it has a start method');
+  t.equal(typeof api.stop, 'function', 'it has a stop method');
+  t.equal(typeof api.refresh, 'function', 'it has a refresh method');
+  t.equal(typeof api.run, 'function', 'it has a run method');
   t.end();
 });
 
 test('running commands', (t) => {
-  var widget = { id: 'foo', command: '', css: ''};
-  Widget(widget);
-
+  var widget = buildWidget({ id: 'foo', command: '', css: ''}).internalApi();
   var server = makeFakeServer();
   server.respondToRun('some output');
 
@@ -126,47 +130,61 @@ test('running commands', (t) => {
 });
 
 test('standard rendering', (t) => {
-  var numRenders = 0;
-  var widget = {
+  var clock = sinon.useFakeTimers();
+  var instance = buildWidget({
     id: 'foo',
     command: '',
     refreshFrequency: 100,
+    numRenders: 0,
     render(out) {
-      numRenders++;
-      return 'rendered: ' + out;
+      this.numRenders++;
+      return `rendered ${this.numRenders} ${out}`;
     },
-  };
+  });
 
   var server = makeFakeServer();
-  var clock = sinon.useFakeTimers();
-
   server.respondToRun('Hello World!');
   server.autoRespond = true;
   server.respondImmediately = true;
 
-  var instance = Widget(widget);
-  var domEl = instance.render();
-
-  t.ok(numRenders === 1, 'it does an initial render');
+  var domEl = instance.create();
+  var contentEl = domEl.querySelector('.widget');
   t.equal(
-    domEl.querySelector('.widget').textContent, 'rendered: Hello World!',
-    'it renders correctly'
+    contentEl.textContent, 'rendered 1 Hello World!',
+    'it does an initial render'
   );
 
   clock.tick(100);
-  t.ok(numRenders === 2, 'it renders after the first tick');
-  clock.tick(100);
-  t.ok(numRenders === 3, 'it renders after the second tick');
+  t.equal(
+    contentEl.textContent, 'rendered 2 Hello World!',
+    'it renders after the first tick'
+  );
 
-  widget.stop();
   clock.tick(100);
-  clock.tick(100);
-  t.ok(numRenders === 3, 'it pauses when stopped');
+  t.equal(
+    contentEl.textContent, 'rendered 3 Hello World!',
+    'it renders after the second tick'
+  );
 
-  widget.start();
-  t.ok(numRenders === 4, 'it resumes when started');
+  var internalApi = instance.internalApi();
+  internalApi.stop();
   clock.tick(100);
-  t.ok(numRenders === 5, 'it continues rendering');
+  clock.tick(100);
+  t.equal(
+    contentEl.textContent, 'rendered 3 Hello World!',
+    'it pauses when stopped'
+  );
+
+  internalApi.start();
+  t.equal(
+    contentEl.textContent, 'rendered 4 Hello World!',
+    'it resumes when started'
+  );
+
+  t.equal(
+    contentEl.textContent, 'rendered 4 Hello World!',
+    'it continues rendering'
+  );
 
   instance.destroy();
   server.restore();
@@ -175,27 +193,35 @@ test('standard rendering', (t) => {
 });
 
 test('rendering when refreshFrequency is false', (t) => {
-  var numRenders = 0;
-  var widget = {
+  var clock = sinon.useFakeTimers();
+  var instance = buildWidget({
     id: 'foo',
-    command: 'yay',
     refreshFrequency: false,
-    render() { numRenders++; },
-  };
+    numRenders: 0,
+    render(out) {
+      this.numRenders++;
+      return `rendered ${this.numRenders} times`;
+    },
+  });
 
   var server = makeFakeServer();
-  var clock = sinon.useFakeTimers();
-
-  server.respondToRun('Hello World!');
+  server.respondToRun('');
   server.autoRespond = true;
   server.respondImmediately = true;
 
-  var instance = Widget(widget);
-  var domEl = instance.render();
-  t.ok(numRenders === 1, 'it does an initial render');
+  var domEl = instance.create();
+  var contentEl = domEl.querySelector('.widget');
+  t.equal(
+    contentEl.textContent, 'rendered 1 times',
+    'it does an initial render'
+  );
+
   clock.tick(1000);
   clock.tick(1000);
-  t.equal(numRenders, 1, "it does't render after that");
+  t.equal(
+    contentEl.textContent, 'rendered 1 times',
+    'it does\'t render after that'
+  );
 
   clock.restore();
   instance.destroy();
@@ -204,20 +230,20 @@ test('rendering when refreshFrequency is false', (t) => {
 });
 
 test('refreshing manually', (t) => {
-  var widget = {
+  var instance = buildWidget({
     id: 'bar',
     refreshFrequency: false,
     command: 'refresh me',
     css: '',
-  };
-  var instance = Widget(widget);
-  var domEl = instance.render();
+  });
+  var domEl = instance.create();
   var server = makeFakeServer();
+  var internalApi = instance.internalApi();
 
   server.respondToRun('some output');
-  widget.start();
+  internalApi.start();
 
-  widget.refresh();
+  internalApi.refresh();
   t.equal(server.requests[0].requestBody, 'refresh me');
 
   server.respond();
@@ -232,110 +258,103 @@ test('refreshing manually', (t) => {
 });
 
 test('afterRender hook', (t) => {
-  var widget = {
-    id: 'fred',
-    command: '',
-    refreshFrequency: 100,
-  };
-
   var server = makeFakeServer();
   var clock = sinon.useFakeTimers();
+
   server.respondToRun('Hello World!');
   server.autoRespond = true;
 
-  var instance = Widget(widget);
-  var domEl = instance.render();
-  var numCalls = 0;
+  var instance = buildWidget({
+    id: 'fred',
+    command: '',
+    refreshFrequency: 100,
+    numCalls: 0,
+    afterRender(el) {
+      this.numCalls++;
+      el.innerHTML = `called ${this.numCalls} times`;
+    },
+  });
 
-  widget.afterRender = (el) => {
-    numCalls++;
-    if (numCalls === 3) {
-      t.pass('it calls it after every render');
-
-      t.ok(
-        el === domEl.querySelector('.widget'),
-        'it calls it with the widget content dom element'
-      );
-
-      instance.destroy();
-      server.restore();
-      clock.restore();
-      t.end();
-    }
-  };
-
+  var domEl = instance.create();
   clock.tick(300);
+  t.equal(
+    domEl.querySelector('.widget').textContent, 'called 3 times',
+    'it get\'s called after every render, with the content dom element'
+  );
+
+  instance.destroy();
+  server.restore();
+  clock.restore();
+  t.end();
 });
 
 test('update', (t) => {
-  var widget = {
+  var instance = buildWidget({
     id: 'fred',
     command: '',
     refreshFrequency: false,
-  };
+    update(output, el) {
+      el.innerHTML = `content: ${el.textContent}, output: ${output}`;
+    },
+  });
 
   var server = makeFakeServer();
   server.respondToRun('stuff');
+  server.autoRespond = true;
+  server.respondImmediately = true;
 
-  var instance = Widget(widget);
-  var domEl = instance.render();
+  var domEl = instance.create();
+  var contentEl = domEl.querySelector('.widget');
+  t.equal(
+    contentEl.textContent, 'content: stuff, output: stuff',
+    'it calls update after rendering, with the output and widget dom el'
+  );
 
-  widget.update = (output, el) => {
-    var contentEl = domEl.querySelector('.widget');
-    t.equal(contentEl.textContent, 'stuff', 'renders first');
-    t.equal(output, 'stuff', 'it calls it with the command output');
-    t.equal(contentEl, el, 'it calls it with the content element');
-
-    instance.destroy();
-    server.restore();
-    t.end();
-  };
-
-  server.respond();
+  instance.destroy();
+  server.restore();
+  t.end();
 });
 
 test('error handling', (t) => {
-  var widget = {
+  var instance = buildWidget({
     id: 'foo',
     refreshFrequency: false,
     render() { throw new Error('something went sorry'); },
-    update() { t.fail('it should not call update when render fails'); },
-  };
-  var instance = Widget(widget);
-  var domEl = instance.render();
+    update() { throw new Error('should not call update when render fails'); },
+  });
 
+  var domEl = instance.create();
   t.equal(
     domEl.querySelector('.widget').textContent, 'something went sorry',
     'it catches and renders errors in render()'
   );
 
   instance.destroy();
-  widget = {
+  instance = buildWidget({
     id: 'foo',
     refreshFrequency: false,
     update() { throw new Error('ohoh'); },
-  };
-  instance = Widget(widget);
-  domEl = instance.render();
+  });
 
+  domEl = instance.create();
   t.equal(
     domEl.querySelector('.widget').textContent, 'ohoh',
     'it catches and renders errors in update()'
   );
 
   instance.destroy();
-  widget = {
+  instance = buildWidget({
     id: 'foo',
     command: 'yay',
     refreshFrequency: 100,
-  };
+  });
 
   var clock = sinon.useFakeTimers();
   var server = sinon.fakeServer.create({ respondImmediately: true });
   server.respondWith('POST', '/run/', [ 500, {}, 'oh noez!']);
+  server.respondImmediately = true;
 
-  instance = Widget(widget);
-  domEl = instance.render();
+  domEl = instance.create();
   server.respond();
 
   t.equal(
