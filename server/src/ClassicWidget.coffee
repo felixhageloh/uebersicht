@@ -46,8 +46,11 @@ module.exports = ClassicWidget = (widgetObject) ->
     commandLoop = CommandLoop(
       implementation.command,
       implementation.refreshFrequency
-    ).map (err, output) ->
-      redraw(err, output)
+    )
+
+    commandLoop
+      .map((err, output) -> redraw(err, output))
+      .start()
 
     el
 

@@ -15,10 +15,12 @@ module.exports = function CommandLoop(command, refreshFrequency) {
 
   if (typeof command === 'function') {
     runCommand = command;
-  } else {
+  } else if (typeof command === 'string') {
     runCommand = (callback) => {
       runShellCommand(command, callback).timeout(refreshFrequency);
     };
+  } else {
+    runCommand = (callback) => callback();
   }
 
   function loop() {
@@ -59,5 +61,5 @@ module.exports = function CommandLoop(command, refreshFrequency) {
     return api;
   };
 
-  return api.start();
+  return api;
 };

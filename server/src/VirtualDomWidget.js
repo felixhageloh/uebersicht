@@ -13,6 +13,7 @@ const patch = snabbdom.init([
 const defaults = {
   id: 'widget',
   refreshFrequency: 1000,
+  init: function init() {},
   render: function render(props) {
     return html('div', null, props.output);
   },
@@ -48,12 +49,18 @@ module.exports = function VirtualDomWidget(widgetObject) {
   }
 
   function start() {
+    implementation.init();
+
     commandLoop = CommandLoop(
       implementation.command,
       implementation.refreshFrequency
-    ).map((err, output) => {
-      dispatch({ type: 'UB/COMMAND_RAN', error: err, output: output });
-    });
+    );
+
+    commandLoop
+      .map((err, output) => {
+        dispatch({ type: 'UB/COMMAND_RAN', error: err, output: output });
+      })
+      .start();
   }
 
   function dispatch(action) {
