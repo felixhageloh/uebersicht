@@ -37,7 +37,7 @@ module.exports = (directoryPath, callback) ->
   unregisterFiles = (path) ->
     path = path.normalize()
     for filePath in Object.keys(foundPaths) when filePath.indexOf(path) == 0
-      callback({type: 'removed', filePath: filePath})
+      callback({type: 'removed', filePath: filePath, rootPath: directoryPath})
 
   # recursively walks the directory tree and calls onFound for every file it
   # finds

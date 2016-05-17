@@ -118,12 +118,25 @@ function watchify (b, opts) {
         fwatcherFiles[file].push(dep);
     }
 
-    function invalidate (id) {
-        var mtime = fs.statSync(id).mtime.getTime();
-        if ((mtimes[id] || 0) >= mtime) {
-            return;
+    function getMTime(filePath) {
+        var mtime;
+
+        try {
+            fs.statSync(filePath).mtime.getTime();
+        } catch (e) {
+            if (e.code === 'ENOENT') {
+                mtime = new Date().getTime();
+            } else {
+                throw(e);
+            }
         }
 
+        return mtime;
+    }
+
+    function invalidate (id) {
+        var mtime = getMTime(id);
+        if ((mtimes[id] || 0) >= mtime) return;
         mtimes[id] = mtime;
 
         if (cache) delete cache[id];

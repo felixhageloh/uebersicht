@@ -45,6 +45,10 @@ test('adding files', (t) => {
     if (event.type === 'added' && event.filePath === newWidgetPath) {
       callback = () => {};
       t.pass('it emits an event for new files');
+      t.equal(
+        event.rootPath, fixturePath,
+        'the event includes the root path'
+      )
       t.end();
     }
   };
@@ -56,8 +60,10 @@ test('removing files', (t) => {
   callback = (event) => {
     if (event.type === 'removed' && event.filePath === newWidgetPath) {
       callback = () => {};
-      t.pass(
-        'it emits a widgetFileRemoved event when a widget file is removed'
+      t.pass('it emits a removed event when a widget file is removed');
+      t.equal(
+        event.rootPath, fixturePath,
+        'the event includes the root path'
       );
       t.end();
     }
@@ -98,7 +104,7 @@ test('removing folders', (t) => {
     if (event.type === 'removed' && event.filePath === expectedPath) {
       callback = () => {};
       t.pass(
-        'it emits a widgetFileRemoved event when a subfolder containing a ' +
+        'it emits a removed event when a subfolder containing a ' +
         'widget is removed'
       );
       t.end();
