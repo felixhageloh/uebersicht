@@ -54,3 +54,30 @@ test('transforming valid widgets', (t) => {
   transform.write(src);
   transform.end();
 });
+
+test('transforming a widget with a syntax error', (t) => {
+  var transform = widgetify('path/', { id: 'foo' });
+  var src = `
+    ({
+      foo: 14,
+      style: 'color: ' + color,
+      refreshFrequency: '2s'
+    })
+  `;
+
+  transform
+    .on('error', (e) => {
+      t.pass('it emits an error');
+      t.ok(
+        e.name === 'ReferenceError' && e.message === 'color is not defined',
+        'the error looks ok'
+      );
+      t.end();
+    })
+    .pipe(grabOutput((transformed) => {
+      t.ok(!transformed, 'and there is no outout');
+    }));
+
+  transform.write(src);
+  transform.end();
+});

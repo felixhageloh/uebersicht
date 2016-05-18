@@ -119,13 +119,13 @@ module.exports = function(file, options) {
     let tree;
     try {
       tree = esprima.parse(src);
+      if (tree) {
+        this.push(escodegen.generate(modifyAST(tree, widgetId)));
+      }
     } catch (e) {
       this.emit('error', e);
     }
 
-    if (tree) {
-      this.push(escodegen.generate(modifyAST(tree, widgetId)));
-    }
     next();
   }
 
