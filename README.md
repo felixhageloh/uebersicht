@@ -7,25 +7,40 @@ For general info check out the [Übersicht website.](http://tracesof.net/uebersi
 
 In essence, widgets are plain JavaScript objects that define a few key properties and methods. They need to be defined in a single file with a `.js` or `.coffee` extension for Übersicht to pick them up. Übersicht will listen to file changes inside your widget directory, so you can edit widgets and see the result live.
 
-They can also be written in [CoffeeScript](http://coffeescript.org) which has a cleaner multi-line string syntax that comes in handy in several places. This documentation will use the CoffeScript syntax, but here is a small example widget [in pure JavaScript](https://gist.github.com/felixhageloh/34645a899a0f22f583bb). As an alternative, you could use CoffeScript's back-tick <tt>`</tt> operator to only write the relevant parts in JavaScript.
+You can also include node modules and split your widget into seperate files using [NodeJS' module syntax](https://www.sitepoint.com/understanding-module-exports-exports-node-js/). Any file that is in a directory called `/node_modules`, `/lib` or '/src' will be treated as a module and will not show up as a seperate widget.
+
+Currently they are best written in [CoffeeScript](http://coffeescript.org). Plain JS widgets work as well, but they currently don't have CommonJS support. _The plan is to have a new widget syntax soon, that will use ES2015 and a virtual DOM. [you can already try it out]()_ This documentation will use the CoffeScript syntax, but here is a small example widget [in pure JavaScript](https://gist.github.com/felixhageloh/34645a899a0f22f583bb). As an alternative, you could use CoffeScript's back-tick <tt>`</tt> operator to only write the relevant parts in JavaScript.
 
 The following properties and methods are currently supported:
 
 
 ### command
 
-A **string** containing the shell command to be executed, for example:
+A **string** containing the shell command to be executed, or
+a **function(callback)** which eventually calls callback with some data.
+For example:
 
 ```coffeescript
 command: "echo Hello World"
 ```
 
-
-Note, that in some cases they need to properly escaped, like:
+Watch out for quotes inside commands. Often they need to properly escaped, like:
 
 ```coffeescript
 command: "ps axo \"rss,pid,ucomm\" | sort -nr | head -n3"
 ```
+
+Example using a command function:
+
+```coffeescript
+command: (callback) ->
+  # example function that fetches data from a server
+  fetchData 'some/url', (error, data) ->
+    callback(error, data)
+```
+
+The first and only argument passed to a command function is a callback, which must be called to continue running the widget. It follows the standard NodeJS [error-first callback pattern](http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/).
+
 
 ### refreshFrequency
 
@@ -172,11 +187,6 @@ Install node and npm using homebrew
 
 then run
 
-    npm install -g coffee-script
-    npm install -g grunt-cli
-
-finally, inside the `server` dir run
-
     npm install
 
 ### git and unicode characters
@@ -189,20 +199,13 @@ However, the common advice is to set this to `true`. It might depend on the OS a
 
 ### building
 
-The code base consists of two parts, a cocoa app and a NodeJS app inside `server/`. To build the node app seperately, use `grunt release`. This happens automatically every time you build using XCode.
+The code base consists of two parts, a cocoa app and a NodeJS app inside `server/`. To build the node app seperately, use `npm run release`. This happens automatically every time you build using XCode.
 
 The node app can be run standalone using
 
 ```coffeescript
 coffee server/server.coffee -d <path/to/widget/dir> -p <port>
 ```
-
-Then point your browser to `localhost:<port>`. While developing you can use
-
-    cd server
-    grunt
-
-to continuously watch, compile and run specs.
 
 # Building in Xcode
 
@@ -224,4 +227,4 @@ http://stackoverflow.com/questions/31254725/transport-security-has-blocked-a-cle
 
 The source for Übersicht is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-© 2014 Felix Hageloh
+© 2016 Felix Hageloh
