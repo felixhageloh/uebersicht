@@ -1,14 +1,12 @@
-'use strict';
-
-const through = require('through2');
-const esprima = require('esprima');
-const escodegen = require('escodegen');
+var through = require('through2');
+var esprima = require('esprima');
+var escodegen = require('escodegen');
 var stylus = require('stylus');
 var nib = require('nib');
 var ms = require('ms');
 
 function addExports(node) {
-  const widgetObjectExp = node.expression;
+  var widgetObjectExp = node.expression;
 
   node.expression = {
     type: 'AssignmentExpression',
@@ -19,7 +17,7 @@ function addExports(node) {
 }
 
 function addId(widgetObjectExp, widetId) {
-  const idProperty = {
+  var idProperty = {
     type: 'Property',
     key: { type: 'Identifier', name: 'id' },
     value: { type: 'Literal', value: widetId },
@@ -30,7 +28,7 @@ function addId(widgetObjectExp, widetId) {
 }
 
 function flattenStyle(styleProp, tree) {
-  const preface = {
+  var preface = {
     type: 'Program',
     body: tree.body.slice(0, -1),
   };
@@ -44,7 +42,7 @@ function flattenStyle(styleProp, tree) {
 }
 
 function parseStyle(styleProp, widetId, tree) {
-  let styleString;
+  var styleString;
 
   if (styleProp.value.type === 'Literal') {
     styleString = styleProp.value.value;
@@ -56,11 +54,11 @@ function parseStyle(styleProp, widetId, tree) {
     return;
   }
 
-  const scopedStyle = '#' + widetId
+  var scopedStyle = '#' + widetId
     + '\n  '
     + styleString.replace(/\n/g, '\n  ');
 
-  const css = stylus(scopedStyle)
+  var css = stylus(scopedStyle)
     .import('nib')
     .use(nib())
     .render();
@@ -84,7 +82,7 @@ function parseWidgetProperty(prop, widgetId, tree) {
 }
 
 function modifyAST(tree, widgetId) {
-  const widgetObjectExp = getWidgetObjectExpression(tree);
+  var widgetObjectExp = getWidgetObjectExpression(tree);
 
   if (widgetObjectExp) {
     widgetObjectExp.properties.map(function(prop) {
@@ -98,10 +96,10 @@ function modifyAST(tree, widgetId) {
 }
 
 function getWidgetObjectExpression(tree) {
-  const lastStatement = tree.body[tree.body.length - 1];
+  var lastStatement = tree.body[tree.body.length - 1];
 
   if (lastStatement && lastStatement.type === 'ExpressionStatement' ) {
-    const widgetObjectExp = lastStatement.expression;
+    var widgetObjectExp = lastStatement.expression;
     if (widgetObjectExp.type === 'ObjectExpression') {
       return widgetObjectExp;
     }
@@ -111,12 +109,12 @@ function getWidgetObjectExpression(tree) {
 }
 
 module.exports = function(file, options) {
-  const widgetId = options.id;
-  let src = '';
+  var widgetId = options.id;
+  var src = '';
 
   function write(buf, enc, next) { src += buf; next(); }
   function end(next) {
-    let tree;
+    var tree;
     try {
       tree = esprima.parse(src);
       if (tree) {
