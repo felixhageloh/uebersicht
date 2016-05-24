@@ -110,6 +110,43 @@ test('internal api', (t) => {
 });
 
 test('running commands', (t) => {
+  var clock = sinon.useFakeTimers();
+  var instance = buildWidget({ id: 'foo', command: 'command', css: ''});
+  var widget = instance.implementation();
+  var server = makeFakeServer();
+
+  server.respondToRun('some output');
+  server.autoRespond = true;
+  server.respondImmediately = true;
+  var requests = server.requests;
+
+  instance.create();
+
+  t.equal(
+    server.requests[0].requestBody, 'command',
+    'it sends the command to the server'
+  );
+
+  clock.tick(1000);
+  t.ok(
+    requests.length === 2 && requests[1].requestBody === 'command',
+    'for every tick'
+  );
+
+  widget.command = 'new command';
+  clock.tick(1000);
+  console.log(requests[2].requestBody);
+  t.equal(
+    requests[2].requestBody === 'new command',
+    'when updating command it sends the new command to the server'
+  );
+
+  t.end();
+  instance.destroy();
+  clock.restore();
+});
+
+test('manually running commands', (t) => {
   var widget = buildWidget({ id: 'foo', command: '', css: ''}).internalApi();
   var server = makeFakeServer();
   server.respondToRun('some output');

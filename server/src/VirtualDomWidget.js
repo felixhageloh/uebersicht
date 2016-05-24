@@ -1,5 +1,6 @@
 const RenderLoop = require('./RenderLoop');
-const CommandLoop = require('./CommandLoop');
+const Timer = require('./Timer');
+const runCommand = require('./runCommand');
 const snabbdom = require('snabbdom');
 const html = require('snabbdom-jsx').html;
 
@@ -50,15 +51,12 @@ module.exports = function VirtualDomWidget(widgetObject) {
 
   function start() {
     implementation.init();
-
-    commandLoop = CommandLoop(
-      implementation.command,
-      implementation.refreshFrequency
-    );
-
-    commandLoop
-      .map((err, output) => {
-        dispatch({ type: 'UB/COMMAND_RAN', error: err, output: output });
+    commandLoop = Timer()
+      .map((done) => {
+        runCommand(implementation, (err, output) => {
+          dispatch({ type: 'UB/COMMAND_RAN', error: err, output: output });
+          done(implementation.refreshFrequency);
+        });
       })
       .start();
   }

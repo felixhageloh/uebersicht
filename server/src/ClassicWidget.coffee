@@ -1,7 +1,8 @@
 $ = require('jquery')
 window.jQuery = $
 
-CommandLoop = require('./CommandLoop')
+Timer = require('./Timer')
+runCommand = require('./runCommand')
 runShellCommand = require('./runShellCommand')
 
 defaults =
@@ -32,6 +33,11 @@ module.exports = ClassicWidget = (widgetObject) ->
     implementation[k] ?= v for k, v of defaults
     implementation[k] ||= v for k, v of internalApi
 
+    commandLoop = Timer().map (done) ->
+      runCommand implementation, (err, output) ->
+        redraw(err, output)
+        done(implementation.refreshFrequency)
+
     api
 
   # renders and returns the widget's dom element
@@ -43,15 +49,7 @@ module.exports = ClassicWidget = (widgetObject) ->
     el.innerHTML = "<style>#{implementation.css}</style>\n"
     el.appendChild(contentEl)
 
-    commandLoop = CommandLoop(
-      implementation.command,
-      implementation.refreshFrequency
-    )
-
-    commandLoop
-      .map((err, output) -> redraw(err, output))
-      .start()
-
+    start()
     el
 
   api.destroy = ->
