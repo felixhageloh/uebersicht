@@ -10,7 +10,7 @@
     "start": "coffee server.coffee",
     "release": "npm run-script build-client && npm run-script build-server",
     "build-client": "browserify -i ws -t coffeeify -t [babelify --presets es2015] -r ./src/runShellCommand.js:run client.coffee | uglifyjs -c --screw-ie8 > release/public/client.js",
-    "build-server": "browserify -t coffeeify --node --detect-globals false --no-bundle-external server.coffee > release/server.js && cd release && npm install --production --no-progress"
+    "build-server": "browserify -t coffeeify --node --detect-globals false --no-bundle-external server.coffee > release/server.js && cd release && npm prune && npm install --production --no-progress"
   },
   "author": "Felix Hageloh",
   "license": "GPL v3 <http://www.gnu.org/licenses/>",
