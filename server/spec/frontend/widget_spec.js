@@ -135,9 +135,8 @@ test('running commands', (t) => {
 
   widget.command = 'new command';
   clock.tick(1000);
-  console.log(requests[2].requestBody);
   t.equal(
-    requests[2].requestBody === 'new command',
+    requests[2].requestBody, 'new command',
     'when updating command it sends the new command to the server'
   );
 
