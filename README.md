@@ -7,9 +7,9 @@ For general info check out the [Übersicht website.](http://tracesof.net/uebersi
 
 In essence, widgets are plain JavaScript objects that define a few key properties and methods. They need to be defined in a single file with a `.js` or `.coffee` extension for Übersicht to pick them up. Übersicht will listen to file changes inside your widget directory, so you can edit widgets and see the result live.
 
-You can also include node modules and split your widget into seperate files using [NodeJS' module syntax](https://www.sitepoint.com/understanding-module-exports-exports-node-js/). Any file that is in a directory called `/node_modules`, `/lib` or '/src' will be treated as a module and will not show up as a seperate widget.
+You can also include node modules and split your widget into separate files using [NodeJS' module syntax](https://www.sitepoint.com/understanding-module-exports-exports-node-js/). Any file that is in a directory called `/node_modules`, `/lib` or '/src' will be treated as a module and will not show up as a separate widget.
 
-Currently they are best written in [CoffeeScript](http://coffeescript.org). Plain JS widgets work as well, but they currently don't have CommonJS support. _The plan is to have a new widget syntax soon, that will use ES2015 and a virtual DOM. [you can already try it out]()_ This documentation will use the CoffeScript syntax, but here is a small example widget [in pure JavaScript](https://gist.github.com/felixhageloh/34645a899a0f22f583bb). As an alternative, you could use CoffeScript's back-tick <tt>`</tt> operator to only write the relevant parts in JavaScript.
+Currently they are best written in [CoffeeScript](http://coffeescript.org). Plain JS widgets work as well, but it currently doesn't have CommonJS support. This documentation will use the CoffeScript syntax, but here is a small example widget [in pure JavaScript](https://gist.github.com/felixhageloh/34645a899a0f22f583bb). As an alternative, you could use CoffeScript's back-tick <tt>`</tt> operator to only write the relevant parts in JavaScript.
 
 The following properties and methods are currently supported:
 
