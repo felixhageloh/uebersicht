@@ -6,6 +6,23 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 0.9</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Module support for CoffeScript widgets, using NodeJS' require().</li>
+                <li>Commands can be functions instead of just strings.</li>
+                <li>Files inside directories called /src /lib or /node_modules are not treated as widgets anymore.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Wed, May 25 2016 09:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.9.39.app.zip"
+                       sparkle:version="39"
+                       sparkle:shortVersionString="0.9.39"
+                       length="43840"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.8.36</title>
             <description><![CDATA[
               <h3>What's New</h3>
