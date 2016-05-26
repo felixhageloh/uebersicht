@@ -6,6 +6,22 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 0.9.40</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Adds workaround for widgets relying on process.argv[0], like the weather widget.</li>
+                <li>Some widgets that rely on @ (this) inside style definitions are still breaking. It used to work in the past, but is actually invalid syntax, so it is hard to support moving forward. However, usually you can just fix the widget by removing the @.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Wed, May 26 2016 02:30:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.9.40.app.zip"
+                       sparkle:version="40"
+                       sparkle:shortVersionString="0.9.40"
+                       length="43840"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.9</title>
             <description><![CDATA[
               <h3>What's New</h3>

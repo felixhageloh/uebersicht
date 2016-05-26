@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Übersicht v0.9.40 Changelog</title>
+</head>
+<body>
+<h1>What's New</h1>
+<ul>
+  <li>Adds workaround for widgets relying on process.argv[0], like the weather widget.</li>
+  <li>Some widgets that rely on @ (this) inside style definitions are still breaking. It used to work in the past, but is actually invalid syntax, so it is hard to support moving forward. However, usually you can just fix the widget by removing the @.</li>
+</ul>
+</body>
+</html>
