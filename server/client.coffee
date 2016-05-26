@@ -26,6 +26,11 @@ init = ->
   window.addEventListener 'contextmenu', (e) ->
     e.preventDefault()
 
+  # hack to make old widgets relying on process.argv[0] work
+  window.process = {
+    argv: ["$(ps -o comm= $PPID | sed -e 's/UM-LM\^H/Ü/')"]
+  }
+
   getState (err, initialState) ->
     bail err, 10000 if err?
 
