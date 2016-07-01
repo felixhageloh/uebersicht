@@ -12,11 +12,16 @@ screenId = null
 
 init = ->
   sharedSocket.open("ws://#{window.location.host}")
-
   screenId = Number(window.location.pathname.replace(/\//g, ''))
-  window.uebersicht = require './src/os_bridge.coffee'
   contentEl = document.getElementById('__uebersicht')
   contentEl.innerHTML = ''
+
+  # legacy
+  window.uebersicht =
+    makeBgSlice: (canvas) ->
+      console.warn 'makeBgSlice has been deprecated. Please use CSS \
+        backdrop-filter instead: \
+        https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter'
 
   window.addEventListener 'onwallpaperchange', ->
     # force a redraw of backdrop filters

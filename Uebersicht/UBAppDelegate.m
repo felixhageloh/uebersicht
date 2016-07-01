@@ -14,7 +14,6 @@
 #import "UBWindow.h"
 #import "UBPreferencesController.m"
 #import "UBScreensController.h"
-#import "WebInspector.h"
 #import "UBKeyHandler.h"
 #import "UBWidgetsController.h"
 #import "UBWidgetsStore.h"
@@ -342,22 +341,22 @@ int const PORT = 41416;
 - (IBAction)showDebugConsole:(id)sender
 {
 
-    NSNumber* currentScreen = [[NSScreen mainScreen]
-        deviceDescription
-    ][@"NSScreenNumber"];
-    
-    NSWindow* window = windows[currentScreen];
-    WebInspector *inspector= [WebInspector.alloc
-        initWithWebView: window.contentView
-    ];
-
-    [[NSUserDefaults standardUserDefaults]
-        setBool: NO
-        forKey: @"WebKit Web Inspector Setting - inspectorStartsAttached"
-    ];
-    
-    [NSApp activateIgnoringOtherApps:YES];
-    [inspector show:self];
+//    NSNumber* currentScreen = [[NSScreen mainScreen]
+//        deviceDescription
+//    ][@"NSScreenNumber"];
+//    
+//    NSWindow* window = windows[currentScreen];
+//    WebInspector *inspector= [WebInspector.alloc
+//        initWithWebView: window.contentView
+//    ];
+//
+//    [[NSUserDefaults standardUserDefaults]
+//        setBool: NO
+//        forKey: @"WebKit Web Inspector Setting - inspectorStartsAttached"
+//    ];
+//    
+//    [NSApp activateIgnoringOtherApps:YES];
+//    [inspector show:self];
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center

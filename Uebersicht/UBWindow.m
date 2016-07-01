@@ -14,12 +14,12 @@
 //
 
 #import "UBWindow.h"
-#import "UBLocation.h"
+@import WebKit;
 
 @implementation UBWindow {
     NSURL *widgetsUrl;
     BOOL webviewLoaded;
-    WebView* webView;
+    WKWebView* webView;
 }
 
 - (id)init
@@ -36,9 +36,11 @@
         [self setBackgroundColor:[NSColor clearColor]];
         [self setOpaque:NO];
         [self sendToDesktop];
-        [self setCollectionBehavior:(NSWindowCollectionBehaviorTransient |
-                                     NSWindowCollectionBehaviorCanJoinAllSpaces |
-                                     NSWindowCollectionBehaviorIgnoresCycle)];
+        [self setCollectionBehavior:(
+            NSWindowCollectionBehaviorTransient |
+            NSWindowCollectionBehaviorCanJoinAllSpaces |
+            NSWindowCollectionBehaviorIgnoresCycle
+        )];
 
         [self setRestorable:NO];
         [self disableSnapshotRestoration];
@@ -53,27 +55,29 @@
 }
 
 
-- (WebView*)buildWebView
+- (WKWebView*)buildWebView
 {
-    WebView* view = [[WebView alloc]
+    WKWebView* view = [[WKWebView alloc]
         initWithFrame: [self frame]
-        frameName: nil
-        groupName: nil
+        configuration: [[WKWebViewConfiguration alloc] init]
     ];
-    [view setDrawsBackground:NO];
-    [view setMaintainsBackForwardList:NO];
-    [view setFrameLoadDelegate:self];
-    [view setPolicyDelegate:self];
+    
+    [view setValue:@YES forKey:@"drawsTransparentBackground"];
+    [view.configuration.preferences
+        setValue: @YES
+        forKey: @"developerExtrasEnabled"
+    ];
+    view.navigationDelegate = (id<WKNavigationDelegate>)self;
+//    [view setMaintainsBackForwardList:NO];
     
     return view;
 }
 
-- (void)teardownWebview:(WebView*)view
+- (void)teardownWebview:(WKWebView*)view
 {
-    [view setFrameLoadDelegate:nil];
-    [view setPolicyDelegate:nil];
-    [[view windowScriptObject] removeWebScriptKey:@"os"];
-    [[view windowScriptObject] removeWebScriptKey:@"geolocation"];
+//    [view setFrameLoadDelegate:nil];
+//    [[view windowScriptObject] removeWebScriptKey:@"geolocation"];
+    view.navigationDelegate = nil;
     [view stopLoading:self];
     [view removeFromSuperview];
 }
@@ -82,7 +86,7 @@
 {
     widgetsUrl = url;
     webviewLoaded = NO;
-    [[webView mainFrame] loadRequest:[NSURLRequest requestWithURL: url]];
+    [webView loadRequest:[NSURLRequest requestWithURL: url]];
 }
 
 - (void)reload
@@ -100,8 +104,9 @@
 
 - (void) forceRedraw
 {
-    [[webView windowScriptObject]
-        evaluateWebScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"
+    [webView
+        evaluateJavaScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"
+        completionHandler: nil
     ];
 }
 
@@ -147,84 +152,58 @@
 #pragma mark WebView delegates
 #
 
-- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender didFinishNavigation:(WKNavigation*)navigation
 {
-    if (frame == webView.mainFrame) {
-        NSLog(@"loaded %@", webView.mainFrameURL);
-        JSContextRef jsContext = [frame globalContext];
-        UBLocation* location   = [[UBLocation alloc] initWithContext:jsContext];
-        
-        [[webView windowScriptObject] setValue:self forKey:@"os"];
-        [[webView windowScriptObject] setValue:location forKey:@"geolocation"];
-        [self workspaceChanged];
-    }
+    NSLog(@"loaded %@", webView.URL);
+//    JSContextRef jsContext = [frame globalContext];
+//    UBLocation* location   = [[UBLocation alloc] initWithContext:jsContext];
+//
+//    [[webView windowScriptObject] setValue:location forKey:@"geolocation"];
+    [self workspaceChanged];
 }
 
-- (void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error
-       forFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender
+    didFailNavigation:(WKNavigation*)nav
+    withError:(NSError *)error
 {
     [self handleWebviewLoadError:error];
 }
 
 - (void)webView:(WebView *)sender
-    didFailProvisionalLoadWithError:(NSError *)error
-    forFrame:(WebFrame *)frame
+    didFailProvisionalNavigation:(WKNavigation *)nav
+    withError:(NSError *)error
 {
     [self handleWebviewLoadError:error];
 }
 
 
-- (void)webView:(WebView *)theWebView
-    decidePolicyForNavigationAction:(NSDictionary *)actionInformation
-    request:(NSURLRequest *)request
-    frame:(WebFrame *)frame
-    decisionListener:(id<WebPolicyDecisionListener>)listener
+- (void)webView: (WebView *)theWebView
+    decidePolicyForNavigationAction: (WKNavigationAction*)action
+    decisionHandler: (void (^)(WKNavigationActionPolicy))handler
 {
-    int actionType = [actionInformation[WebActionNavigationTypeKey]
-        unsignedIntValue
-    ];
-    
-    if (frame != theWebView.mainFrame) {
-        [listener use];
-    } else if (actionType == WebNavigationTypeLinkClicked) {
-        [[NSWorkspace sharedWorkspace] openURL:request.URL];
-        [listener ignore];
-    } else if ([request.URL isEqualTo: widgetsUrl]) {
-        [listener use];
+    if (!action.sourceFrame.mainFrame) {
+        handler(WKNavigationActionPolicyAllow);
+    } else if (action.navigationType == WKNavigationTypeLinkActivated) {
+        [[NSWorkspace sharedWorkspace] openURL:action.request.URL];
+        handler(WKNavigationActionPolicyCancel);
+    } else if ([action.request.URL isEqualTo: widgetsUrl]) {
+        handler(WKNavigationActionPolicyAllow);
     } else {
-        [listener ignore];
+        handler(WKNavigationActionPolicyCancel);
     }
 
 }
 
 - (void)handleWebviewLoadError:(NSError *)error
 {
-    NSURL* url = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
-    if ([url isEqualTo: widgetsUrl]) {
-        NSLog(
-            @"%@ failed to load: %@ Reloading...",
-            url,
-            error.localizedDescription
-        );
-
-        [self
-            performSelector: @selector(loadUrl:)
-            withObject: widgetsUrl
-            afterDelay: 5.0
-        ];
-    }
+    NSLog(@"Error loading webview: %@", error);
+    [self
+        performSelector: @selector(loadUrl:)
+        withObject: widgetsUrl
+        afterDelay: 5.0
+    ];
 }
 
-
-#
-#pragma mark WebscriptObject
-#
-
-
-+ (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
-{
-    return YES;
-}
 
 #
 #pragma mark flags

@@ -11,8 +11,6 @@
 //  details.
 
 #import <Cocoa/Cocoa.h>
-#import <WebKit/WebKit.h>
-#import <JavaScriptCore/JavaScriptCore.h>
 
 @interface UBWindow : NSWindow
 

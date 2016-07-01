@@ -124,7 +124,6 @@
 		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsStore.h; sourceTree = "<group>"; };
 		DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsStore.m; sourceTree = "<group>"; };
-		DCE2453D18ED864800C9FAE3 /* WebInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebInspector.h; sourceTree = "<group>"; };
 		DCE7E3BF1A376AD400A12516 /* UBLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBLocation.h; sourceTree = "<group>"; };
 		DCE7E3C01A376AD400A12516 /* UBLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBLocation.m; sourceTree = "<group>"; };
 		DCECA1C51893F23200C0CA32 /* localnode */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = localnode; path = server/release/localnode; sourceTree = "<group>"; };
@@ -209,7 +208,6 @@
 				DC43AD9417EC2D9500241CC2 /* MainMenu.xib */,
 				DC43AD9117EC2D9500241CC2 /* UBAppDelegate.h */,
 				DC43AD9217EC2D9500241CC2 /* UBAppDelegate.m */,
-				DCE2453D18ED864800C9FAE3 /* WebInspector.h */,
 				DC43ADB317EC31EB00241CC2 /* UBWindow.h */,
 				DC43ADB417EC31EB00241CC2 /* UBWindow.m */,
 				DC4913941BEF9A75003E76EF /* UBScreensController.h */,
@@ -594,10 +592,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -617,10 +616,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
