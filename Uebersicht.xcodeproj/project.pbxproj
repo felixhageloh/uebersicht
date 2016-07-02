@@ -76,6 +76,10 @@
 		DC314A1E1C0EE024000A56D2 /* UBWidgetsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsController.h; sourceTree = "<group>"; };
 		DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsController.m; sourceTree = "<group>"; };
 		DC3A31671C64A0A100722112 /* SocketRocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SocketRocket.framework; sourceTree = "<group>"; };
+		DC404DE81D26B92000305CE2 /* WKInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKInspector.h; sourceTree = "<group>"; };
+		DC404DE91D26B9E000305CE2 /* WKBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKBase.h; sourceTree = "<group>"; };
+		DC404DED1D26BB6500305CE2 /* WKPage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKPage.h; sourceTree = "<group>"; };
+		DC404DEE1D26C1D000305CE2 /* WKView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKView.h; sourceTree = "<group>"; };
 		DC43AD7C17EC2D9500241CC2 /* Übersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Übersicht.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		DC43AD8217EC2D9500241CC2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -157,6 +161,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DC404DEB1D26BAA400305CE2 /* WKHeaders */ = {
+			isa = PBXGroup;
+			children = (
+				DC404DE81D26B92000305CE2 /* WKInspector.h */,
+				DC404DE91D26B9E000305CE2 /* WKBase.h */,
+				DC404DED1D26BB6500305CE2 /* WKPage.h */,
+				DC404DEE1D26C1D000305CE2 /* WKView.h */,
+			);
+			name = WKHeaders;
+			sourceTree = "<group>";
+		};
 		DC43AD7317EC2D9500241CC2 = {
 			isa = PBXGroup;
 			children = (
@@ -229,6 +244,7 @@
 				DC9F7CE21C439CE50014E25B /* UBDispatcher.m */,
 				DCAC78CB1C551D130051E78B /* UBListener.h */,
 				DCAC78CC1C551D130051E78B /* UBListener.m */,
+				DC404DEB1D26BAA400305CE2 /* WKHeaders */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,
 			);

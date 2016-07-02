@@ -18,6 +18,10 @@
 #import "UBWidgetsController.h"
 #import "UBWidgetsStore.h"
 #import "UBWebSocket.h"
+#import "WKInspector.h"
+#import "WKView.h"
+#import "WKPage.h"
+@import WebKit;
 
 int const PORT = 41416;
 
@@ -43,7 +47,7 @@ int const PORT = 41416;
     preferences = [[UBPreferencesController alloc]
         initWithWindowNibName:@"UBPreferencesController"
     ];
-    
+
     // NSTask doesn't terminate when xcode stop is pressed. Other ways of
     // spawning the server, like system() or popen() have the same problem.
     // So, hit em with a hammer :(
@@ -69,13 +73,6 @@ int const PORT = 41416;
             }
         }
     }];
-    
-    // enable the web inspector
-    [[NSUserDefaults standardUserDefaults]
-        setBool: YES
-        forKey: @"WebKitDeveloperExtras"
-    ];
-    [[NSUserDefaults standardUserDefaults] synchronize];
     
     // listen for keyboard events
     keyHandler = [[UBKeyHandler alloc]
@@ -340,23 +337,30 @@ int const PORT = 41416;
 
 - (IBAction)showDebugConsole:(id)sender
 {
+    NSNumber* currentScreen = [[NSScreen mainScreen]
+        deviceDescription
+    ][@"NSScreenNumber"];
+    
+    NSWindow* window = windows[currentScreen];
+    if ([window.contentView.subviews[0] isKindOfClass:[WKView class]]) {
+        WKView* webview = window.contentView.subviews[0];
+        
+        WKInspectorRef inspector = WKPageGetInspector(webview.pageRef);
 
-//    NSNumber* currentScreen = [[NSScreen mainScreen]
-//        deviceDescription
-//    ][@"NSScreenNumber"];
-//    
-//    NSWindow* window = windows[currentScreen];
-//    WebInspector *inspector= [WebInspector.alloc
-//        initWithWebView: window.contentView
-//    ];
-//
-//    [[NSUserDefaults standardUserDefaults]
-//        setBool: NO
-//        forKey: @"WebKit Web Inspector Setting - inspectorStartsAttached"
-//    ];
-//    
-//    [NSApp activateIgnoringOtherApps:YES];
-//    [inspector show:self];
+        [NSApp activateIgnoringOtherApps:YES];
+        
+        WKInspectorShowConsole(inspector);
+        [self
+            performSelector: @selector(detachInspector:)
+            withObject: (__bridge id)(inspector)
+            afterDelay: 0
+        ];
+    }
+}
+
+- (void)detachInspector:(WKInspectorRef)inspector
+{
+     WKInspectorDetach(inspector);
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
