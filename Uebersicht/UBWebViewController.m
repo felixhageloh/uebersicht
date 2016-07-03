@@ -82,17 +82,13 @@
 
 - (void)forceRedraw:(WKWebView*)webView
 {
-    [webView
-        evaluateJavaScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"
-        completionHandler: nil
-    ];
+    [view setNeedsDisplay:YES];
 }
 
 - (void)webView:(WKWebView *)webView
     didFinishNavigation:(WKNavigation*)navigation
 {
     NSLog(@"loaded %@", webView.URL);
-    [self forceRedraw: webView];
 }
 
 - (void)webView:(WKWebView *)sender

@@ -440,7 +440,6 @@ void wallpaperSettingsChanged(
     CFStringRef path;
     CFArrayRef  paths = eventPaths;
 
-    //printf("Callback called\n");
     for (int i=0; i < numEvents; i++) {
         path = CFArrayGetValueAtIndex(paths, i);
         if (CFStringFindWithOptions(path, CFSTR("desktoppicture.db"),

@@ -23,11 +23,6 @@ init = ->
         backdrop-filter instead: \
         https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter'
 
-  window.addEventListener 'onwallpaperchange', ->
-    # force a redraw of backdrop filters
-    contentEl.style.transform = 'translateZ(1px)'
-    requestAnimationFrame -> contentEl.style.transform = ''
-
   window.addEventListener 'contextmenu', (e) ->
     e.preventDefault()
 
