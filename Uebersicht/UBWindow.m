@@ -14,12 +14,10 @@
 //
 
 #import "UBWindow.h"
-@import WebKit;
+#import "UBWebViewController.h"
 
 @implementation UBWindow {
-    NSURL *widgetsUrl;
-    BOOL webviewLoaded;
-    WKWebView* webView;
+    UBWebViewController* webViewController;
 }
 
 - (id)init
@@ -47,68 +45,35 @@
         [self setDisplaysWhenScreenProfileChanges:YES];
         [self setReleasedWhenClosed:NO];
         
-        webView = [self buildWebView];
-        [self setContentView:webView];
+        webViewController = [[UBWebViewController alloc]
+            initWithFrame: [self frame]
+        ];
+        [self setContentView:webViewController.view];
     }
 
     return self;
 }
 
 
-- (WKWebView*)buildWebView
-{
-    WKWebView* view = [[WKWebView alloc]
-        initWithFrame: [self frame]
-        configuration: [[WKWebViewConfiguration alloc] init]
-    ];
-    
-    [view setValue:@YES forKey:@"drawsTransparentBackground"];
-    [view.configuration.preferences
-        setValue: @YES
-        forKey: @"developerExtrasEnabled"
-    ];
-    view.navigationDelegate = (id<WKNavigationDelegate>)self;
-//    [view setMaintainsBackForwardList:NO];
-    
-    return view;
-}
-
-- (void)teardownWebview:(WKWebView*)view
-{
-//    [view setFrameLoadDelegate:nil];
-//    [[view windowScriptObject] removeWebScriptKey:@"geolocation"];
-    view.navigationDelegate = nil;
-    [view stopLoading:self];
-    [view removeFromSuperview];
-}
 
 - (void)loadUrl:(NSURL*)url
 {
-    widgetsUrl = url;
-    webviewLoaded = NO;
-    [webView loadRequest:[NSURLRequest requestWithURL: url]];
+    [webViewController load:url];
 }
 
 - (void)reload
 {
-    webviewLoaded = NO;
-    [webView reloadFromOrigin:self];
+    [webViewController reload];
 }
 
 
 - (void)close
 {
-    [self teardownWebview:webView];
+    [webViewController destroy];
     [super close];
 }
 
-- (void) forceRedraw
-{
-    [webView
-        evaluateJavaScript:@"window.dispatchEvent(new Event('onwallpaperchange'))"
-        completionHandler: nil
-    ];
-}
+
 
 #
 #pragma mark signals/events
@@ -116,12 +81,12 @@
 
 - (void)workspaceChanged
 {
-    [self forceRedraw];
+    [webViewController redraw];
 }
 
 - (void)wallpaperChanged
 {
-    [self forceRedraw];
+    [webViewController redraw];
 }
 
 #
@@ -146,62 +111,6 @@
 - (BOOL)isInFront
 {
     return self.level == kCGNormalWindowLevel-1;
-}
-
-#
-#pragma mark WebView delegates
-#
-
-- (void)webView:(WebView *)sender didFinishNavigation:(WKNavigation*)navigation
-{
-    NSLog(@"loaded %@", webView.URL);
-//    JSContextRef jsContext = [frame globalContext];
-//    UBLocation* location   = [[UBLocation alloc] initWithContext:jsContext];
-//
-//    [[webView windowScriptObject] setValue:location forKey:@"geolocation"];
-    [self workspaceChanged];
-}
-
-- (void)webView:(WebView *)sender
-    didFailNavigation:(WKNavigation*)nav
-    withError:(NSError *)error
-{
-    [self handleWebviewLoadError:error];
-}
-
-- (void)webView:(WebView *)sender
-    didFailProvisionalNavigation:(WKNavigation *)nav
-    withError:(NSError *)error
-{
-    [self handleWebviewLoadError:error];
-}
-
-
-- (void)webView: (WebView *)theWebView
-    decidePolicyForNavigationAction: (WKNavigationAction*)action
-    decisionHandler: (void (^)(WKNavigationActionPolicy))handler
-{
-    if (!action.sourceFrame.mainFrame) {
-        handler(WKNavigationActionPolicyAllow);
-    } else if (action.navigationType == WKNavigationTypeLinkActivated) {
-        [[NSWorkspace sharedWorkspace] openURL:action.request.URL];
-        handler(WKNavigationActionPolicyCancel);
-    } else if ([action.request.URL isEqualTo: widgetsUrl]) {
-        handler(WKNavigationActionPolicyAllow);
-    } else {
-        handler(WKNavigationActionPolicyCancel);
-    }
-
-}
-
-- (void)handleWebviewLoadError:(NSError *)error
-{
-    NSLog(@"Error loading webview: %@", error);
-    [self
-        performSelector: @selector(loadUrl:)
-        withObject: widgetsUrl
-        afterDelay: 5.0
-    ];
 }
 
 

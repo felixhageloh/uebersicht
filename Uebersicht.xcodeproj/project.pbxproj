@@ -10,6 +10,7 @@
 		DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */; };
 		DC3A31681C64A0A100722112 /* SocketRocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; };
 		DC3A31691C64A0D500722112 /* SocketRocket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DC404DF31D2844E100305CE2 /* UBWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC404DF21D2844E100305CE2 /* UBWebViewController.m */; };
 		DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
 		DC43AD8A17EC2D9500241CC2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC43AD8817EC2D9500241CC2 /* InfoPlist.strings */; };
 		DC43AD8C17EC2D9500241CC2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43AD8B17EC2D9500241CC2 /* main.m */; };
@@ -80,6 +81,8 @@
 		DC404DE91D26B9E000305CE2 /* WKBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKBase.h; sourceTree = "<group>"; };
 		DC404DED1D26BB6500305CE2 /* WKPage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKPage.h; sourceTree = "<group>"; };
 		DC404DEE1D26C1D000305CE2 /* WKView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKView.h; sourceTree = "<group>"; };
+		DC404DF11D2844E100305CE2 /* UBWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWebViewController.h; sourceTree = "<group>"; };
+		DC404DF21D2844E100305CE2 /* UBWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWebViewController.m; sourceTree = "<group>"; };
 		DC43AD7C17EC2D9500241CC2 /* Übersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Übersicht.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		DC43AD8217EC2D9500241CC2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -225,6 +228,8 @@
 				DC43AD9217EC2D9500241CC2 /* UBAppDelegate.m */,
 				DC43ADB317EC31EB00241CC2 /* UBWindow.h */,
 				DC43ADB417EC31EB00241CC2 /* UBWindow.m */,
+				DC404DF11D2844E100305CE2 /* UBWebViewController.h */,
+				DC404DF21D2844E100305CE2 /* UBWebViewController.m */,
 				DC4913941BEF9A75003E76EF /* UBScreensController.h */,
 				DC4913951BEF9A75003E76EF /* UBScreensController.m */,
 				DC57ED2A18DB4EC900A24FDD /* UBPreferencesController.h */,
@@ -463,6 +468,7 @@
 				DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */,
 				DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
+				DC404DF31D2844E100305CE2 /* UBWebViewController.m in Sources */,
 				DCAC78CD1C551D130051E78B /* UBListener.m in Sources */,
 				DC43AD9317EC2D9500241CC2 /* UBAppDelegate.m in Sources */,
 				DC443E321C0305E500AA31C7 /* UBKeyHandler.m in Sources */,
