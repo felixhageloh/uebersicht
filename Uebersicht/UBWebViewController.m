@@ -51,7 +51,7 @@
 {
     WKWebView* webView = [[WKWebView alloc]
         initWithFrame: frame
-        configuration: [[WKWebViewConfiguration alloc] init]
+        configuration: [self sharedConfig]
     ];
     
     [webView setValue:@YES forKey:@"drawsTransparentBackground"];
@@ -69,6 +69,15 @@
     webView.navigationDelegate = nil;
     [webView stopLoading:self];
     [webView removeFromSuperview];
+}
+
+- (WKWebViewConfiguration*)sharedConfig {
+    static WKWebViewConfiguration *sharedConfig = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedConfig =  [[WKWebViewConfiguration alloc] init];
+    });
+    return sharedConfig;
 }
 
 - (void)forceRedraw:(WKWebView*)webView
