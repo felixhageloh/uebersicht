@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC314A1F1C0EE024000A56D2 /* UBWidgetsController.m */; };
 		DC3A31681C64A0A100722112 /* SocketRocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; };
-		DC3A31691C64A0D500722112 /* SocketRocket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DC3A31691C64A0D500722112 /* SocketRocket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC3A31671C64A0A100722112 /* SocketRocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DC404DF31D2844E100305CE2 /* UBWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC404DF21D2844E100305CE2 /* UBWebViewController.m */; };
 		DC404DF51D294B3100305CE2 /* geolocation.js in Resources */ = {isa = PBXBuildFile; fileRef = DC404DF41D294B3100305CE2 /* geolocation.js */; };
 		DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
@@ -30,7 +30,7 @@
 		DC4F43F4189E90DD00937925 /* status-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4F43F2189E90DD00937925 /* status-icon@2x.png */; };
 		DC4FC28118EAB1CA00B7FD79 /* übersicht-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = DC4FC28018EAB1CA00B7FD79 /* übersicht-logo.png */; };
 		DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */; };
-		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
+		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
 		DC9296A71C5017CF006E4267 /* widget-status-visible.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A51C5017CF006E4267 /* widget-status-visible.png */; };
 		DC9296A81C5017CF006E4267 /* widget-status-visible@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */; };
@@ -354,7 +354,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = UB;
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = tracesOf;
 				TargetAttributes = {
 					DC43AD7B17EC2D9500241CC2 = {
@@ -452,7 +452,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Felix Hageloh\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/SocketRocket.framework/Versions/A\"";
+			shellScript = "#LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\n#IDENTITY=\"Developer ID Application: Felix Hageloh\"\n#codesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"\n#codesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/SocketRocket.framework/Versions/A\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -548,6 +548,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -563,9 +564,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.9;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -596,8 +597,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				SDKROOT = macosx10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -618,6 +619,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CODE_SIGN_FLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
 				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
@@ -642,6 +644,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CODE_SIGN_FLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
 				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
@@ -665,6 +668,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "UebersichtTests/UebersichtTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = test.uebersicht;
 				PRODUCT_NAME = UebersichtTests;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
 				WRAPPER_EXTENSION = xctest;
@@ -683,6 +687,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "UebersichtTests/UebersichtTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = test.uebersicht;
 				PRODUCT_NAME = UebersichtTests;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Übersicht.app/Contents/MacOS/Übersicht";
 				WRAPPER_EXTENSION = xctest;
