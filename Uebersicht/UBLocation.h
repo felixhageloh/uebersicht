@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <WebKit/WebKit.h>
-#import <CoreLocation/CoreLocation.h>
-#import <JavaScriptCore/JavaScriptCore.h>
 
-@interface UBLocation : NSObject<CLLocationManagerDelegate>
+@import WebKit;
+@import CoreLocation;
 
-- (id) initWithContext:(JSContextRef)context;
-- (void)getCurrentPosition:(WebScriptObject *)callback;
+@interface UBLocation : NSObject<CLLocationManagerDelegate, WKScriptMessageHandler>
+
+//- (id) initWithContext:(JSContextRef)context;
+//- (void)getCurrentPosition:(WebScriptObject *)callback;
 @end

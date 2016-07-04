@@ -7,6 +7,7 @@
 //
 
 #import "UBWebViewController.h"
+#import "UBLocation.h"
 
 @implementation UBWebViewController {
     NSURL* url;
@@ -75,9 +76,43 @@
     static WKWebViewConfiguration *sharedConfig = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedConfig =  [[WKWebViewConfiguration alloc] init];
+        sharedConfig = [self buildConfig];
     });
     return sharedConfig;
+}
+
+- (WKWebViewConfiguration*)buildConfig
+{
+    NSString* geolocationScript = [NSString
+        stringWithContentsOfURL: [[NSBundle mainBundle]
+            URLForResource: @"geolocation"
+            withExtension: @"js"
+        ]
+        encoding: NSUTF8StringEncoding
+        error: nil
+    ];
+    
+    WKUserContentController* ucController = [
+        [WKUserContentController alloc] init
+    ];
+    
+    UBLocation* locationHandler = [[UBLocation alloc] init];
+    
+    [ucController addUserScript:[[WKUserScript alloc]
+        initWithSource: geolocationScript
+        injectionTime: WKUserScriptInjectionTimeAtDocumentStart
+        forMainFrameOnly: YES
+    ]];
+    
+    [ucController
+        addScriptMessageHandler: locationHandler
+        name: @"geolocation"
+    ];
+    
+    WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
+    config.userContentController = ucController;
+    
+    return config;
 }
 
 - (void)forceRedraw:(WKWebView*)webView
