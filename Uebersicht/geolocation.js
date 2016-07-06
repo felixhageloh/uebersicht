@@ -62,4 +62,6 @@ window.__UBCallbacks__ = (function () {
             callbackId: callbackId
         });
      }
+ 
+     window.geolocation = geolocation;
 }());
