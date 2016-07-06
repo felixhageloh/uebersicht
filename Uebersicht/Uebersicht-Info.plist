@@ -31,8 +31,6 @@
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2014 Felix Hageloh. Released under the GNU General Public License v3.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>PLz can I haz location.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
