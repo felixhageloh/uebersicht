@@ -83,6 +83,16 @@
 
 - (WKWebViewConfiguration*)buildConfig
 {
+    WKUserContentController* ucController = [
+        [WKUserContentController alloc] init
+    ];
+    
+    // geolocation
+    [ucController
+        addScriptMessageHandler: [[UBLocation alloc] init]
+        name: @"geolocation"
+    ];
+    
     NSString* geolocationScript = [NSString
         stringWithContentsOfURL: [[NSBundle mainBundle]
             URLForResource: @"geolocation"
@@ -91,23 +101,22 @@
         encoding: NSUTF8StringEncoding
         error: nil
     ];
-    
-    WKUserContentController* ucController = [
-        [WKUserContentController alloc] init
-    ];
-    
-    UBLocation* locationHandler = [[UBLocation alloc] init];
-    
     [ucController addUserScript:[[WKUserScript alloc]
         initWithSource: geolocationScript
         injectionTime: WKUserScriptInjectionTimeAtDocumentStart
         forMainFrameOnly: YES
     ]];
     
-    [ucController
-        addScriptMessageHandler: locationHandler
-        name: @"geolocation"
+    // hack to make old widgets relying on process.argv[0] work
+    NSString* processArgvHack = [NSString
+        stringWithFormat:@"process = {argv: ['%@'.replace(/ /g, '\\\\ ')]}",
+        [[NSBundle mainBundle] pathForResource:@"localnode" ofType:nil]
     ];
+    [ucController addUserScript:[[WKUserScript alloc]
+        initWithSource: processArgvHack
+        injectionTime: WKUserScriptInjectionTimeAtDocumentStart
+        forMainFrameOnly: YES
+    ]];
     
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.userContentController = ucController;
