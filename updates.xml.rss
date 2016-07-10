@@ -6,6 +6,23 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 1.0.42</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Upgraded to WKWebView which should bring performance and stability improvements.</li>
+                <li>Fixed localstorage. It now persists when the app is restarted.</li>
+                <li>OS X 10.10 or later is required for this version.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Sun, Jul 10 2016 20:45:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.42.app.zip"
+                       sparkle:version="42"
+                       sparkle:shortVersionString="1.0.42"
+                       length="43856"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.9.40</title>
             <description><![CDATA[
               <h3>What's New</h3>
