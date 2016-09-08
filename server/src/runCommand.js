@@ -6,7 +6,7 @@ module.exports = function runCommand(widget, callback) {
   const {command, refreshFrequency} = widget;
 
   if (typeof command === 'function') {
-    command(callback);
+    command.apply(widget, [callback]);
   } else if (typeof command === 'string') {
     runShellCommand(command, callback).timeout(refreshFrequency);
   } else {
