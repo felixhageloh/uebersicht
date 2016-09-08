@@ -21,6 +21,7 @@
 #import "WKInspector.h"
 #import "WKView.h"
 #import "WKPage.h"
+#import "WKWebViewInternal.h"
 @import WebKit;
 
 int const PORT = 41416;
@@ -341,11 +342,22 @@ int const PORT = 41416;
         deviceDescription
     ][@"NSScreenNumber"];
     
+    
     NSWindow* window = windows[currentScreen];
+    WKPageRef page = NULL;
+    SEL pageForTesting = @selector(_pageForTesting);
+    
     if ([window.contentView.subviews[0] isKindOfClass:[WKView class]]) {
         WKView* webview = window.contentView.subviews[0];
-        
-        WKInspectorRef inspector = WKPageGetInspector(webview.pageRef);
+        page = webview.pageRef;
+    } else if ([window.contentView respondsToSelector:pageForTesting]) {
+        page = (__bridge WKPageRef)([window.contentView
+            performSelector:pageForTesting
+        ]);
+    }
+    
+    if (page) {
+        WKInspectorRef inspector = WKPageGetInspector(page);
 
         [NSApp activateIgnoringOtherApps:YES];
         

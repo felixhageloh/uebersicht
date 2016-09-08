@@ -132,6 +132,7 @@
 		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsStore.h; sourceTree = "<group>"; };
 		DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsStore.m; sourceTree = "<group>"; };
+		DCD6280E1D8187EC00358595 /* WKWebViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKWebViewInternal.h; sourceTree = "<group>"; };
 		DCE7E3BF1A376AD400A12516 /* UBLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBLocation.h; sourceTree = "<group>"; };
 		DCE7E3C01A376AD400A12516 /* UBLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBLocation.m; sourceTree = "<group>"; };
 		DCECA1C51893F23200C0CA32 /* localnode */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = localnode; path = server/release/localnode; sourceTree = "<group>"; };
@@ -167,6 +168,7 @@
 		DC404DEB1D26BAA400305CE2 /* WKHeaders */ = {
 			isa = PBXGroup;
 			children = (
+				DCD6280E1D8187EC00358595 /* WKWebViewInternal.h */,
 				DC404DE81D26B92000305CE2 /* WKInspector.h */,
 				DC404DE91D26B9E000305CE2 /* WKBase.h */,
 				DC404DED1D26BB6500305CE2 /* WKPage.h */,

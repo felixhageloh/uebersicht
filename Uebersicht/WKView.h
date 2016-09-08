@@ -9,8 +9,6 @@
 
 #import "WKBase.h"
 
-typedef const struct OpaqueWKPage* WKPageRef;
-
 @interface WKView : NSView {}
 @property (readonly) WKPageRef pageRef;
 @end
