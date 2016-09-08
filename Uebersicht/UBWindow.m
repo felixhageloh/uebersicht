@@ -105,7 +105,7 @@
 
 - (void)sendToDesktop
 {
-    [self setLevel:kCGDesktopWindowLevel];
+    [self setLevel:kCGDesktopWindowLevel-1];
 }
 
 - (void)comeToFront
