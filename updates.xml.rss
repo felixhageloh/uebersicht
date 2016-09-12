@@ -6,6 +6,23 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 1.0.43</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Compatability with macOS Sierra.</li>
+                <li>Internal widget API is usable from withing a command function.</li>
+                <li>Fixed clashes with other apps, such as Path Finder Desktop.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Mon, Sep 12 2016 9:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.43.app.zip"
+                       sparkle:version="43"
+                       sparkle:shortVersionString="1.0.43"
+                       length="43856"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 1.0.42</title>
             <description><![CDATA[
               <h3>What's New</h3>
