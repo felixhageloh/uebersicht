@@ -6,6 +6,22 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 1.0.44</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Fixes issues with Übersicht not showing in some cases.</li>
+                <li>The fix for avoiding clashes with apps such as Path Finder Desktop is now available as an option called Compatibilty Mode. It has the drawback that Übersicht won't show in some cases, such as restarting the Dock or adding a new space.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Mon, Sep 23 2016 9:20:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.44.app.zip"
+                       sparkle:version="44"
+                       sparkle:shortVersionString="1.0.44"
+                       length="43848"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 1.0.43</title>
             <description><![CDATA[
               <h3>What's New</h3>
