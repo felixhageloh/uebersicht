@@ -17,6 +17,7 @@
 @property (weak) IBOutlet NSMenu *statusBarMenu;
 
 - (void)widgetDirDidChange;
+- (void)compatibilityModeDidChange;
 - (void)screensChanged:(NSDictionary*)screens;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)openWidgetDir:(id)sender;

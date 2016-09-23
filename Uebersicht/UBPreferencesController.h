@@ -18,6 +18,7 @@
 @property (weak) IBOutlet NSPopUpButton *filePicker;
 @property (weak) IBOutlet NSMatrix *interactionShortcutRadio;
 @property BOOL startAtLogin;
+@property BOOL compatibilityMode;
 @property NSURL* widgetDir;
 
 - (IBAction)showFilePicker:(id)sender;

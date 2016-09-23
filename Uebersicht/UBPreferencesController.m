@@ -233,6 +233,19 @@
 }
 
 
+- (BOOL)compatibilityMode
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [[defaults valueForKey:@"compatibilityMode"] boolValue];
+}
+
+- (void)setCompatibilityMode:(BOOL)enabled
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:@(enabled) forKey:@"compatibilityMode"];
+    [(UBAppDelegate *)[NSApp delegate] compatibilityModeDidChange];
+}
+
 #
 #pragma mark Startup
 #

@@ -105,7 +105,12 @@
 
 - (void)sendToDesktop
 {
-    [self setLevel:kCGDesktopWindowLevel-1];
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    if ([[defaults valueForKey:@"compatibilityMode"] boolValue]) {
+        [self setLevel:kCGDesktopWindowLevel - 1];
+    } else {
+        [self setLevel:kCGDesktopWindowLevel];
+    }
 }
 
 - (void)comeToFront

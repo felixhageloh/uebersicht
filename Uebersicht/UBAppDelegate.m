@@ -309,6 +309,13 @@ int const PORT = 41416;
     }
 }
 
+- (void)compatibilityModeDidChange
+{
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] sendToDesktop];
+    }
+}
+
 - (IBAction)showPreferences:(id)sender
 {
     [preferences showWindow:nil];
