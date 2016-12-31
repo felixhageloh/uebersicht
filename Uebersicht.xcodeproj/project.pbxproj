@@ -117,6 +117,7 @@
 		DC57ED2B18DB4EC900A24FDD /* UBPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBPreferencesController.m; sourceTree = "<group>"; };
 		DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UBPreferencesController.xib; sourceTree = "<group>"; };
 		DC5D25BB18FC46E0000078C4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		DC84AF8F1E17B912008BF454 /* UBScreenChangeListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBScreenChangeListener.h; sourceTree = "<group>"; };
 		DC9296A51C5017CF006E4267 /* widget-status-visible.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible.png"; sourceTree = "<group>"; };
 		DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible@2x.png"; sourceTree = "<group>"; };
 		DC9296A91C501D34006E4267 /* widget-status-hidden.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-hidden.png"; sourceTree = "<group>"; };
@@ -251,6 +252,7 @@
 				DC9F7CE21C439CE50014E25B /* UBDispatcher.m */,
 				DCAC78CB1C551D130051E78B /* UBListener.h */,
 				DCAC78CC1C551D130051E78B /* UBListener.m */,
+				DC84AF8F1E17B912008BF454 /* UBScreenChangeListener.h */,
 				DC404DEB1D26BAA400305CE2 /* WKHeaders */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,

@@ -8,6 +8,7 @@
 
 #import "UBScreensController.h"
 #import "UBDispatcher.h"
+#import "UBScreenChangeListener.h"
 
 int const MAX_DISPLAYS = 42;
 
@@ -19,7 +20,7 @@ int const MAX_DISPLAYS = 42;
 @synthesize screens;
 @synthesize sortedScreens;
 
-- (id)initWithChangeListener:(id)target;
+- (id)initWithChangeListener:(id<UBScreenChangeListener>)target;
 {
     self = [super init];
     if (self) {
@@ -29,7 +30,7 @@ int const MAX_DISPLAYS = 42;
         
         [[NSNotificationCenter defaultCenter]
             addObserver: self
-            selector: @selector(screensChanged:)
+            selector: @selector(syncScreens:)
             name: NSApplicationDidChangeScreenParametersNotification
             object: nil
         ];
@@ -46,12 +47,23 @@ int const MAX_DISPLAYS = 42;
         initWithCapacity:MAX_DISPLAYS
     ];
     
-    
-    
     CGDirectDisplayID displays[MAX_DISPLAYS];
     uint32_t numDisplays;
     
-    CGGetActiveDisplayList(MAX_DISPLAYS, displays, &numDisplays);
+    CGError error = CGGetActiveDisplayList(
+        MAX_DISPLAYS,
+        displays,
+        &numDisplays
+    );
+    
+    if (error || numDisplays == 0) {
+        [self
+            performSelector: @selector(updateScreens)
+            withObject: nil
+            afterDelay: 1
+        ];
+        return;
+    }
     
     [screens removeAllObjects];
     NSMutableArray *ids = [[NSMutableArray alloc] initWithCapacity:numDisplays];
@@ -84,7 +96,7 @@ int const MAX_DISPLAYS = 42;
     ];
 }
 
-- (void)screensChanged:(id)sender
+- (void)syncScreens:(id)sender
 {
     [self updateScreens];
     [listener screensChanged:screens];

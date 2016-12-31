@@ -37,12 +37,14 @@ int const PORT = 41416;
     UBWidgetsStore* widgetsStore;
     UBWidgetsController* widgetsController;
     NSMutableDictionary* windows;
+    BOOL needsRefresh;
 }
 
 @synthesize statusBarMenu;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    needsRefresh = YES;
     windows = [[NSMutableDictionary alloc] initWithCapacity:42];
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     preferences = [[UBPreferencesController alloc]
@@ -64,7 +66,7 @@ int const PORT = 41416;
             [widgetsStore reset];
             [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
             // this will trigger a render
-            [screensController screensChanged:self];
+            [screensController syncScreens:self];
 
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             portOffset++;
@@ -259,6 +261,9 @@ int const PORT = 41416;
             ];
         } else {
             window = windows[screenId];
+            if (needsRefresh) {
+                [window reload];
+            }
         }
         
         [window setFrame:[screensController screenRect:screenId] display:YES];
@@ -272,6 +277,7 @@ int const PORT = 41416;
         [windows removeObjectForKey:screenId];
     }
     
+    needsRefresh = NO;
     NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 
@@ -337,10 +343,8 @@ int const PORT = 41416;
 
 - (IBAction)refreshWidgets:(id)sender
 {
-    for (NSNumber* screenId in windows) {
-        UBWindow* window = windows[screenId];
-        [window reload];
-    }
+    needsRefresh = YES;
+    [screensController syncScreens:self];
 }
 
 - (IBAction)showDebugConsole:(id)sender
@@ -390,7 +394,7 @@ int const PORT = 41416;
 
 - (void)wakeFromSleep:(NSNotification *)notification
 {
-    for (NSNumber* screenId in windows) {
+     for (NSNumber* screenId in windows) {
         UBWindow* window = windows[screenId];
         [window reload];
     }

@@ -11,8 +11,9 @@
 //  details.
 
 #import <Cocoa/Cocoa.h>
+#import "UBScreenChangeListener.h"
 
-@interface UBAppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
+@interface UBAppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, UBScreenChangeListener>
 
 @property (weak) IBOutlet NSMenu *statusBarMenu;
 
