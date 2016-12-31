@@ -32,6 +32,7 @@
         defaultSettings = @{
             @"showOnAllScreens": @YES,
             @"showOnSelectedScreens": @NO,
+            @"hidden": @NO,
             @"screens": @[]
         };
         
@@ -59,6 +60,7 @@
                 @"showOnAllScreens": @NO,
                 @"showOnSelectedScreens": @YES,
                 @"showOnMainScreen": @NO,
+                @"hidden": @NO,
             }];
             [self notifyChange];
         }];
@@ -68,7 +70,8 @@
                 @"showOnAllScreens": @YES,
                 @"showOnSelectedScreens": @NO,
                 @"showOnMainScreen": @NO,
-                @"screens": @[]
+                @"hidden": @NO,
+                @"screens": @[],
             }];
             [self notifyChange];
         }];
@@ -78,7 +81,22 @@
                 @"showOnAllScreens": @NO,
                 @"showOnSelectedScreens": @NO,
                 @"showOnMainScreen": @YES,
-                @"screens": @[]
+                @"hidden": @NO,
+                @"screens": @[],
+            }];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"WIDGET_SET_TO_HIDE" do:^(NSString* widgetId) {
+            [self updateSettings:widgetId withPatch:@{
+                @"hidden": @YES,
+            }];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"WIDGET_SET_TO_SHOW" do:^(NSString* widgetId) {
+            [self updateSettings:widgetId withPatch:@{
+                @"hidden": @NO,
             }];
             [self notifyChange];
         }];

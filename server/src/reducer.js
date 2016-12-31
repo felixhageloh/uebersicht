@@ -4,6 +4,7 @@ const defaultSettings = {
   showOnAllScreens: true,
   showOnMainScreen: false,
   showOnSelectedScreens: false,
+  hidden: false,
   screens: [],
 };
 
@@ -53,6 +54,7 @@ const handlers = {
       showOnAllScreens: true,
       showOnSelectedScreens: false,
       showOnMainScreen: false,
+      hidden: false,
       screens: [],
     });
   },
@@ -62,6 +64,7 @@ const handlers = {
       showOnSelectedScreens: true,
       showOnAllScreens: false,
       showOnMainScreen: false,
+      hidden: false,
     });
   },
 
@@ -70,7 +73,20 @@ const handlers = {
       showOnSelectedScreens: false,
       showOnAllScreens: false,
       showOnMainScreen: true,
+      hidden: false,
       screens: [],
+    });
+  },
+
+  WIDGET_SET_TO_HIDE: (state, action) => {
+    return updateSettings(state, action.payload, {
+      hidden: true,
+    });
+  },
+
+  WIDGET_SET_TO_SHOW: (state, action) => {
+    return updateSettings(state, action.payload, {
+      hidden: false,
     });
   },
 

@@ -101,6 +101,9 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     
     
     NSMenu* widgetMenu = [[NSMenu alloc] init];
+    [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:0];
+    [self addHideOptionToMenu:widgetMenu forWidget:widgetId];
+    
     [self
         addScreens: [screensController screens]
         toWidgetMenu: widgetMenu
@@ -161,6 +164,21 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     [item setTarget:self];
     [item setRepresentedObject:widgetId];
     [item setState:[settings[@"showOnAllScreens"] boolValue]];
+    [menu insertItem:item atIndex:0];
+}
+
+- (void)addHideOptionToMenu:(NSMenu*)menu forWidget:(NSString*)widgetId
+{
+    NSMenuItem* item = [[NSMenuItem alloc]
+        initWithTitle: @"Hide widget"
+        action: @selector(toggleHidden:)
+        keyEquivalent: @""
+    ];
+    
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    [item setTarget:self];
+    [item setRepresentedObject:widgetId];
+    [item setState:[settings[@"hidden"] boolValue]];
     [menu insertItem:item atIndex:0];
 }
 
@@ -278,6 +296,26 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         dispatch: @"WIDGET_SET_TO_MAIN_SCREEN"
         withPayload: widgetId
     ];
+}
+
+- (void)toggleHidden:(id)sender
+{
+    NSString* widgetId = [(NSMenuItem*)sender representedObject];
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    
+    if ([settings[@"hidden"] boolValue]) {
+        [dispatcher
+            dispatch: @"WIDGET_SET_TO_SHOW"
+            withPayload: widgetId
+        ];
+    
+    } else {
+        [dispatcher
+            dispatch: @"WIDGET_SET_TO_HIDE"
+            withPayload: widgetId
+        ];
+    }
+
 }
 
 - (void)toggleScreen:(id)sender

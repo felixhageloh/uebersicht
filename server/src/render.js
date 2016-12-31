@@ -5,7 +5,10 @@ function isVisibleOnScreen(widgetId, screenId, state) {
   var settings = state.settings[widgetId] || {};
   var isVisible = false;
 
-  if (settings.showOnAllScreens || settings.showOnAllScreens === undefined) {
+  if (settings.hidden) {
+    isVisible = false;
+  } else if (settings.showOnAllScreens ||
+             settings.showOnAllScreens === undefined) {
     isVisible = true;
   } else if (settings.showOnMainScreen) {
     isVisible = state.screens.indexOf(screenId) === 0;
