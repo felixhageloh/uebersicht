@@ -10,7 +10,7 @@
 #import "UBWidgetsStore.h"
 #import "UBScreensController.h"
 #import "UBDispatcher.h"
-
+#import "UBWidgetForScripting.h"
 
 @implementation UBWidgetsController {
     UBWidgetsStore* widgets;
@@ -364,6 +364,19 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     [[NSUserNotificationCenter defaultUserNotificationCenter]
         deliverNotification:notification
     ];
+}
+
+- (NSArray*)widgetsForScripting
+{
+    NSMutableArray* allWidgets = [NSMutableArray array];
+    for ( NSString* widgetId in [widgets sortedWidgets]) {
+        [allWidgets addObject: [[UBWidgetForScripting alloc]
+                initWithId: widgetId
+                andSettings: [widgets getSettings:widgetId]
+            ]
+        ];
+    }
+    return allWidgets;
 }
 
 

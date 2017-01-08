@@ -16,6 +16,7 @@
 @interface UBAppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, UBScreenChangeListener>
 
 @property (weak) IBOutlet NSMenu *statusBarMenu;
+@property (readonly) NSArray* widgets;
 
 - (void)widgetDirDidChange;
 - (void)compatibilityModeDidChange;

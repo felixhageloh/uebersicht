@@ -22,6 +22,7 @@
 #import "WKView.h"
 #import "WKPage.h"
 #import "WKWebViewInternal.h"
+
 @import WebKit;
 
 int const PORT = 41416;
@@ -363,7 +364,7 @@ int const PORT = 41416;
         page = webview.pageRef;
     } else if ([window.contentView respondsToSelector:pageForTesting]) {
         page = (__bridge WKPageRef)([window.contentView
-            performSelector:pageForTesting
+            performSelector: pageForTesting
         ]);
     }
     
@@ -476,6 +477,20 @@ void wallpaperSettingsChanged(
             ];
         }
     }
+}
+
+#
+# pragma mark script support
+#
+
+- (NSArray*)getWidgets
+{
+   return [widgetsController widgetsForScripting];
+}
+
+- (BOOL)application:(NSApplication *)sender delegateHandlesKey:(NSString *)key
+{
+    return [key isEqualToString:@"widgets"];
 }
 
 @end

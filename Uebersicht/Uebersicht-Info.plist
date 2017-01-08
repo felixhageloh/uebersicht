@@ -29,6 +29,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSAppleScriptEnabled</key>
+	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2014 Felix Hageloh. Released under the GNU General Public License v3.</string>
 	<key>NSMainNibFile</key>
@@ -37,6 +39,8 @@
 	<string>NSApplication</string>
 	<key>NSSupportsAppNap</key>
 	<true/>
+	<key>OSAScriptingDefinition</key>
+	<string>Uebersicht.sdef</string>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</string>
 </dict>

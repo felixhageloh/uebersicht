@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+
+<dictionary title="Übersicht">
+    <suite name="Übersicht Suite" code="uebt" description="Übersicht Scripts">
+        <command name="refresh" code="wigetrfs" description="Refresh all widgets.">
+            <cocoa class="UBRefreshCommand"/>
+        </command>
+        <class name="application" code="capp" description="An application's top level scripting object.">
+            <cocoa class="NSApplication"/>
+            <element type="widget" description="A list of all widgets." access="r">
+                <cocoa key="widgets"/>
+            </element>
+            <property name="name" code="pnam" description="The name of the application." type="text" access="r"/>
+            <property name="version" code="vers" description="The version of the application." type="text" access="r"/>
+        </class>
+        <class name="widget" code="Wdgt" description="A Widget." plural="widgets">
+            <cocoa class="UBWidgetForScripting"/>
+            <property name="id" code="ID  " description="The widget's unique ID." type="text"  access="r">
+                <cocoa key="id"/>
+            </property>
+            <property name="hidden" code="wghd" description="Is this widget is hidden?" type="boolean"  access="rw">
+                <cocoa key="hidden"/>
+            </property>
+            <property name="showOnMainScreen" code="wgms" description="Is this widget visible on the main screen only?" type="boolean" access="rw">
+                <cocoa key="showOnMainScreen"/>
+            </property>
+            <property name="showOnAllScreens" code="wgas" description="Is this widget visible on all screens?" type="boolean" access="rw">
+                <cocoa key="showOnAllScreens"/>
+            </property>
+        </class>
+    </suite>
+    <suite name="Standard Suite" code="ustd" description="Common classes and commands for all applications.">
+        <command name="quit" code="aevtquit" description="Quit the application.">
+          <cocoa class="NSQuitCommand"/>
+        </command>
+    </suite>
+</dictionary>

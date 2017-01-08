@@ -32,6 +32,9 @@
 		DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */; };
 		DC5D25BF18FC4838000078C4 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		DC5D25C018FC4988000078C4 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC5D25BB18FC46E0000078C4 /* Sparkle.framework */; };
+		DC62CC731E1C0F73004F85B8 /* Uebersicht.sdef in Resources */ = {isa = PBXBuildFile; fileRef = DC74D0741E1A6FC300893D53 /* Uebersicht.sdef */; };
+		DC66522D1E212735003267AF /* UBWidgetForScripting.m in Sources */ = {isa = PBXBuildFile; fileRef = DC66522C1E212735003267AF /* UBWidgetForScripting.m */; };
+		DC74D0781E1A71E500893D53 /* UBRefreshCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = DC74D0771E1A71E500893D53 /* UBRefreshCommand.m */; };
 		DC9296A71C5017CF006E4267 /* widget-status-visible.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A51C5017CF006E4267 /* widget-status-visible.png */; };
 		DC9296A81C5017CF006E4267 /* widget-status-visible@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */; };
 		DC9296AB1C501D34006E4267 /* widget-status-hidden.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A91C501D34006E4267 /* widget-status-hidden.png */; };
@@ -62,7 +65,7 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		DC5D25BE18FC4823000078C4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
@@ -117,6 +120,11 @@
 		DC57ED2B18DB4EC900A24FDD /* UBPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBPreferencesController.m; sourceTree = "<group>"; };
 		DC57ED2C18DB4EC900A24FDD /* UBPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UBPreferencesController.xib; sourceTree = "<group>"; };
 		DC5D25BB18FC46E0000078C4 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		DC66522B1E212735003267AF /* UBWidgetForScripting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetForScripting.h; sourceTree = "<group>"; };
+		DC66522C1E212735003267AF /* UBWidgetForScripting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetForScripting.m; sourceTree = "<group>"; };
+		DC74D0741E1A6FC300893D53 /* Uebersicht.sdef */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Uebersicht.sdef; sourceTree = "<group>"; };
+		DC74D0761E1A71E500893D53 /* UBRefreshCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBRefreshCommand.h; sourceTree = "<group>"; };
+		DC74D0771E1A71E500893D53 /* UBRefreshCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBRefreshCommand.m; sourceTree = "<group>"; };
 		DC84AF8F1E17B912008BF454 /* UBScreenChangeListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBScreenChangeListener.h; sourceTree = "<group>"; };
 		DC9296A51C5017CF006E4267 /* widget-status-visible.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible.png"; sourceTree = "<group>"; };
 		DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible@2x.png"; sourceTree = "<group>"; };
@@ -253,6 +261,7 @@
 				DCAC78CB1C551D130051E78B /* UBListener.h */,
 				DCAC78CC1C551D130051E78B /* UBListener.m */,
 				DC84AF8F1E17B912008BF454 /* UBScreenChangeListener.h */,
+				DC74D0751E1A717800893D53 /* Script Support */,
 				DC404DEB1D26BAA400305CE2 /* WKHeaders */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,
@@ -297,6 +306,18 @@
 				DC43ADA617EC2D9500241CC2 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		DC74D0751E1A717800893D53 /* Script Support */ = {
+			isa = PBXGroup;
+			children = (
+				DC66522B1E212735003267AF /* UBWidgetForScripting.h */,
+				DC66522C1E212735003267AF /* UBWidgetForScripting.m */,
+				DC74D0761E1A71E500893D53 /* UBRefreshCommand.h */,
+				DC74D0771E1A71E500893D53 /* UBRefreshCommand.m */,
+				DC74D0741E1A6FC300893D53 /* Uebersicht.sdef */,
+			);
+			name = "Script Support";
 			sourceTree = "<group>";
 		};
 		DCECA1C21893F1C300C0CA32 /* server */ = {
@@ -363,6 +384,7 @@
 				TargetAttributes = {
 					DC43AD7B17EC2D9500241CC2 = {
 						DevelopmentTeam = S3P44NRLCW;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -398,6 +420,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC62CC731E1C0F73004F85B8 /* Uebersicht.sdef in Resources */,
 				DCECA1CF1894008800C0CA32 /* MainMenu.xib in Resources */,
 				DC43AD8A17EC2D9500241CC2 /* InfoPlist.strings in Resources */,
 				DC9296AC1C501D34006E4267 /* widget-status-hidden@2x.png in Resources */,
@@ -474,7 +497,9 @@
 				DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */,
 				DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
+				DC74D0781E1A71E500893D53 /* UBRefreshCommand.m in Sources */,
 				DC404DF31D2844E100305CE2 /* UBWebViewController.m in Sources */,
+				DC66522D1E212735003267AF /* UBWidgetForScripting.m in Sources */,
 				DCAC78CD1C551D130051E78B /* UBListener.m in Sources */,
 				DC43AD9317EC2D9500241CC2 /* UBAppDelegate.m in Sources */,
 				DC443E321C0305E500AA31C7 /* UBKeyHandler.m in Sources */,
@@ -619,6 +644,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = S3P44NRLCW;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -644,6 +670,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = S3P44NRLCW;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",

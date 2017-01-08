@@ -16,4 +16,6 @@
            widgets:(UBWidgetsStore*)theWidgets
            screens:(UBScreensController*)screens;
 - (void)render;
+- (NSArray*)widgetsForScripting;
+
 @end
