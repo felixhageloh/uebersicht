@@ -241,8 +241,9 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 {
     NSDictionary* settings = [widgets getSettings:widgetId];
     BOOL isVisible = NO;
-    
-    if ([settings[@"showOnAllScreens"] boolValue]) {
+    if ([settings[@"hidden"] boolValue]) {
+        isVisible = NO;
+    } else if ([settings[@"showOnAllScreens"] boolValue]) {
         isVisible = YES;
     } else if ([settings[@"showOnMainScreen"] boolValue]) {
         isVisible = YES;
@@ -302,20 +303,12 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 {
     NSString* widgetId = [(NSMenuItem*)sender representedObject];
     NSDictionary* settings = [widgets getSettings:widgetId];
+    BOOL isHidden = [settings[@"hidden"] boolValue];
     
-    if ([settings[@"hidden"] boolValue]) {
-        [dispatcher
-            dispatch: @"WIDGET_SET_TO_SHOW"
-            withPayload: widgetId
-        ];
-    
-    } else {
-        [dispatcher
-            dispatch: @"WIDGET_SET_TO_HIDE"
-            withPayload: widgetId
-        ];
-    }
-
+    [dispatcher
+        dispatch: isHidden ? @"WIDGET_SET_TO_SHOW" : @"WIDGET_SET_TO_HIDE"
+        withPayload: widgetId
+    ];
 }
 
 - (void)toggleScreen:(id)sender
