@@ -6,6 +6,23 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 1.1.45</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Fixes issues with Übersicht not showing when computer wakes from sleep.</li>
+                <li>There is a new 'hide' option for widgets.</li>
+                <li>Adds scripting support.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Sun, Jan 15 2017 15:10:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.1.45.app.zip"
+                       sparkle:version="45"
+                       sparkle:shortVersionString="1.1.45"
+                       length="43856"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 1.0.44</title>
             <description><![CDATA[
               <h3>What's New</h3>
