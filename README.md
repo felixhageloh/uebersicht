@@ -190,7 +190,7 @@ lists all widgets
 
 hides the widget with ID "top-cpu-coffee"
 
-## Typing the umlaut 'Ü'
+### Typing the umlaut 'Ü'
 
 Unfortunately OS X seems to use a different UTF-8 code point for the Ü in its file system than you get by typing it normally (or by copy pasting it from here). There are three ways you can get the correct character:
 
