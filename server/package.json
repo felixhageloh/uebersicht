@@ -32,6 +32,7 @@
     "browserify": "^13.0.0",
     "coffeeify": "^2.0.1",
     "connect": "~2.9.0",
+    "cors-anywhere": "^0.4.0",
     "escodegen": "^1.8.0",
     "esprima": "^2.7.2",
     "fsevents": "^1.0.6",
