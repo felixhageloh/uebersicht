@@ -21,6 +21,7 @@
                        sparkle:shortVersionString="1.1.45"
                        length="43856"
                        type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
         </item>
         <item>
             <title>Version 1.0.44</title>
@@ -37,6 +38,7 @@
                        sparkle:shortVersionString="1.0.44"
                        length="43848"
                        type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
         </item>
         <item>
             <title>Version 1.0.43</title>
@@ -54,6 +56,7 @@
                        sparkle:shortVersionString="1.0.43"
                        length="43856"
                        type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
         </item>
         <item>
             <title>Version 1.0.42</title>
@@ -71,6 +74,7 @@
                        sparkle:shortVersionString="1.0.42"
                        length="43856"
                        type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
         </item>
         <item>
             <title>Version 0.9.40</title>
