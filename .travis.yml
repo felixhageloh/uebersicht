@@ -1,0 +1,15 @@
+os: osx
+language: objective-c
+osx_image: xcode8.3
+node_js: 5.1.1
+
+before_install:
+  - cd server
+
+install:
+  - npm install
+
+script:
+  - npm run build-server
+  - npm run build-client
+  - npm run test-local
