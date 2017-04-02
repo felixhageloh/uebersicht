@@ -25,6 +25,7 @@ test('WIDGET_ADDED', (t) => {
       showOnAllScreens: true,
       showOnMainScreen: false,
       showOnSelectedScreens: false,
+      hidden: false,
       screens: [],
     },
     'it initializes settings for a widget'
