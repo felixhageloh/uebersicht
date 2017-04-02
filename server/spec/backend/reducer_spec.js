@@ -46,6 +46,19 @@ test('WIDGET_ADDED', (t) => {
   t.end();
 });
 
+test('WIDGET_REMOVED', (t) => {
+  var action = { type: 'WIDGET_REMOVED', payload: 'foo' };
+  var state = { widgets: {} };
+  var newState = reduce(state, action);
+  t.equal(state, newState, 'it ignores non existing widgets');
+
+  newState = reduce({
+    widgets: { foo: {}, bar: {}},
+  }, action);
+  t.looseEqual(newState.widgets, {bar: {}}, 'it removes existing widgets');
+  t.end();
+});
+
 
 test('WIDGET_SETTINGS_CHANGED', (t) => {
   var action = {
@@ -67,5 +80,36 @@ test('WIDGET_SETTINGS_CHANGED', (t) => {
     'it merges with existing settings'
   );
 
+  t.end();
+});
+
+test('WIDGET_SET_TO_HIDE / SHOW', (t) => {
+  var action = { type: 'WIDGET_SET_TO_HIDE', payload: 'bar' };
+  var state = {
+    settings: {
+      foo: { hidden: false, some: 'other', stuff: 1 },
+      bar: { hidden: false, many: 'other', things: 42 },
+    },
+  };
+  var newState = reduce(state, action);
+  t.looseEqual(
+    state.settings,
+    {
+      foo: { hidden: false, some: 'other', stuff: 1 },
+      bar: { hidden: false, many: 'other', things: 42 },
+    },
+    'it hides widgets'
+  );
+
+  action = { type: 'WIDGET_SET_TO_SHOW', payload: 'bar' };
+  newState = reduce(newState, action);
+  t.looseEqual(
+    state.settings,
+    {
+      foo: { hidden: false, some: 'other', stuff: 1 },
+      bar: { hidden: false, many: 'other', things: 42 },
+    },
+    'it shows widgets'
+  );
   t.end();
 });
