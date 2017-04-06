@@ -7,6 +7,7 @@
     "test": "npm run-script test-local && npm run-script test-browser",
     "test-local": "tape -r coffee-script/register spec/backend/**/* | tap-spec",
     "test-browser": "browserify -t coffeeify -t [babelify --presets es2015] spec/frontend/*.*  | tape-run | tap-spec",
+    "test-browser-phantom": "browserify -t coffeeify -t [babelify --presets es2015] spec/frontend/*.*  | tape-run --browser phantom | tap-spec",
     "start": "coffee server.coffee",
     "release": "npm run-script build-client && npm run-script build-server",
     "build-client": "browserify -i ws -t coffeeify -t [babelify --presets es2015] -r ./src/runShellCommand.js:run client.coffee | uglifyjs -c --screw-ie8 > release/public/client.js",
