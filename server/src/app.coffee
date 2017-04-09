@@ -1,4 +1,5 @@
 connect = require 'connect'
+serveStatic = require 'serve-static'
 path = require 'path'
 fs = require 'fs'
 redux = require 'redux'
@@ -63,8 +64,8 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
   server = connect()
     .use(CommandServer(widgetPath))
     .use(StateServer(store))
-    .use(connect.static(path.resolve(__dirname, './public')))
-    .use(connect.static(widgetPath))
+    .use(serveStatic(path.resolve(__dirname, './public')))
+    .use(serveStatic(widgetPath))
     .use(serveClient)
     .listen port, '127.0.0.1', ->
       messageBus = MessageBus(server: server)
