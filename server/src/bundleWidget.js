@@ -1,4 +1,3 @@
-
 'use strict';
 
 const browserify = require('browserify');
