@@ -16,10 +16,13 @@ window.onload = ->
     bail err, 10000 if err?
     store = redux.createStore(reducer, initialState)
     store.subscribe ->
-      render(store.getState(), screenId, contentEl)
+      render(store.getState(), screenId, contentEl, store.dispatch)
     listenToRemote (action) ->
-      store.dispatch(action)
-    render(initialState, screenId, contentEl)
+      if action.type == 'WIDGET_WANTS_REFRESH'
+        render.rendered[action.payload]?.instance?.forceRefresh()
+      else
+        store.dispatch(action)
+    render(initialState, screenId, contentEl, store.dispatch)
 
 # legacy
 window.uebersicht =

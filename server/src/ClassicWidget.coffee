@@ -77,6 +77,9 @@ module.exports = ClassicWidget = (widgetObject) ->
   api.implementation = ->
     implementation
 
+  api.forceRefresh = ->
+    internalApi.refresh()
+
   # starts the widget refresh cycle
   internalApi.start = start = ->
     commandLoop.start()

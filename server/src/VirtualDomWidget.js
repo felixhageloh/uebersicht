@@ -111,5 +111,9 @@ module.exports = function VirtualDomWidget(widgetObject) {
     start();
   };
 
+  api.forceRefresh = function forceRefresh() {
+    commandLoop.forceTick();
+  };
+
   return init(widgetObject);
 };

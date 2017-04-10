@@ -5,6 +5,7 @@
     <suite name="Übersicht Suite" code="uebt" description="Übersicht Scripts">
         <command name="refresh" code="wigetrfs" description="Refresh all widgets.">
             <cocoa class="UBRefreshCommand"/>
+            <direct-parameter description="A widget." type="widget"/>
         </command>
         <class name="application" code="capp" description="An application's top level scripting object.">
             <cocoa class="NSApplication"/>
@@ -28,6 +29,9 @@
             <property name="showOnAllScreens" code="wgas" description="Is this widget visible on all screens?" type="boolean" access="rw">
                 <cocoa key="showOnAllScreens"/>
             </property>
+            <responds-to name="refresh">
+                <cocoa method="refresh:"/>
+            </responds-to>
         </class>
     </suite>
     <suite name="Standard Suite" code="ustd" description="Common classes and commands for all applications.">

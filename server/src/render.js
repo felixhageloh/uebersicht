@@ -41,22 +41,20 @@ function destroyWidget(id) {
   delete rendered[id];
 }
 
-module.exports = function render(state, screen, domEl) {
-  var remaining = Object.keys(rendered);
+function render(state, screen, domEl, dispatch) {
+  const remaining = Object.keys(rendered);
 
   for (var id in state.widgets) {
-    var widget = state.widgets[id];
+    const widget = state.widgets[id];
     if (!isVisibleOnScreen(id, screen, state)) {
       continue;
     }
-
     if (widget.error) {
       console.error(widget.error);
     } else {
-      renderWidget(widget, domEl);
+      renderWidget(widget, domEl, dispatch);
     }
-
-    var idx = remaining.indexOf(widget.id);
+    const idx = remaining.indexOf(widget.id);
     if (idx > -1) {
       remaining.splice(idx, 1);
     }
@@ -65,4 +63,7 @@ module.exports = function render(state, screen, domEl) {
   remaining.forEach(function(obsolete) {
     destroyWidget(obsolete);
   });
-};
+}
+
+render.rendered = rendered;
+module.exports = render;

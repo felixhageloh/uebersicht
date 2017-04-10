@@ -79,4 +79,12 @@ static UBDispatcher* dispatcher;
     ];
 }
 
+- (void)refresh:(NSScriptCommand*)command
+{
+    [dispatcher
+        dispatch: @"WIDGET_WANTS_REFRESH"
+        withPayload: _id
+    ];
+}
+
 @end

@@ -16,4 +16,5 @@
 @property (nonatomic) BOOL showOnMainScreen;
 
 -(id)initWithId:(NSString*)widgetId andSettings:(NSDictionary*)settings;
+-(void)refresh:(NSScriptCommand*)command;
 @end
