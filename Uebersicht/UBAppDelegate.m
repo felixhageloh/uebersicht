@@ -493,4 +493,9 @@ void wallpaperSettingsChanged(
     return [key isEqualToString:@"widgets"];
 }
 
+- (void)reloadWidget:(NSString*)widgetId
+{
+    [widgetsController reloadWidget:widgetId];
+}
+
 @end

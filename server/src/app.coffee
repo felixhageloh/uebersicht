@@ -82,3 +82,4 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
 
   on: (ev, handler) ->
     server.on(ev, handler)
+

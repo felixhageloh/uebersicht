@@ -25,5 +25,6 @@
 - (IBAction)openWidgetDir:(id)sender;
 - (IBAction)showDebugConsole:(id)sender;
 - (IBAction)refreshWidgets:(id)sender;
+- (void)reloadWidget:(NSString*)widgetId;
 
 @end

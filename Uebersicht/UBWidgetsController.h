@@ -17,5 +17,6 @@
            screens:(UBScreensController*)screens;
 - (void)render;
 - (NSArray*)widgetsForScripting;
+- (void)reloadWidget:(NSString*)widgetId;
 
 @end

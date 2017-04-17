@@ -10,4 +10,9 @@
 
 @implementation UBReloadCommand
 
+-(id)performDefaultImplementation
+{
+    return nil;
+}
+
 @end

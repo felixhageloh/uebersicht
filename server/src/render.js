@@ -26,6 +26,7 @@ function renderWidget(widget, domEl) {
     return;
   } else if (prevRendered) {
     prevRendered.instance.update(widget);
+    prevRendered.widget = widget;
   } else {
     var instance = Widget(widget);
     domEl.appendChild(instance.create());

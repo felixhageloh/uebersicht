@@ -355,6 +355,19 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     }
 }
 
+- (void)reloadWidget:(NSString*)widgetId
+{
+    NSString* filePath = [widgets get:widgetId][@"filePath"];
+    NSDictionary* attributes  = [NSDictionary
+        dictionaryWithObjectsAndKeys: [NSDate date], NSFileModificationDate, nil
+    ];
+    [NSFileManager.defaultManager
+        setAttributes: attributes
+        ofItemAtPath:filePath
+        error: NULL
+    ];
+}
+
 - (void)notifyUser:(NSString*)message withTitle:(NSString*)title
 {
     NSUserNotification *notification = [[NSUserNotification alloc] init];

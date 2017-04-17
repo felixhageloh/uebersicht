@@ -17,4 +17,5 @@
 
 -(id)initWithId:(NSString*)widgetId andSettings:(NSDictionary*)settings;
 -(void)refresh:(NSScriptCommand*)command;
+-(void)reload:(NSScriptCommand*)command;
 @end

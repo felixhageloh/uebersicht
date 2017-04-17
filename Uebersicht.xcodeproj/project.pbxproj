@@ -50,6 +50,7 @@
 		DCECA1CA1893F4EF00C0CA32 /* public in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C91893F4EF00C0CA32 /* public */; };
 		DCECA1CE1893FE5500C0CA32 /* node_modules in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1CD1893FE5500C0CA32 /* node_modules */; };
 		DCECA1CF1894008800C0CA32 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC43AD9417EC2D9500241CC2 /* MainMenu.xib */; };
+		DCF9D9011E9D512600D27988 /* UBReloadCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = DCF9D9001E9D512600D27988 /* UBReloadCommand.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,6 +149,8 @@
 		DCECA1C61893F23200C0CA32 /* server.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = server.js; path = server/release/server.js; sourceTree = "<group>"; };
 		DCECA1C91893F4EF00C0CA32 /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; name = public; path = server/release/public; sourceTree = "<group>"; };
 		DCECA1CD1893FE5500C0CA32 /* node_modules */ = {isa = PBXFileReference; lastKnownFileType = folder; name = node_modules; path = server/release/node_modules; sourceTree = "<group>"; };
+		DCF9D8FF1E9D512600D27988 /* UBReloadCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBReloadCommand.h; sourceTree = "<group>"; };
+		DCF9D9001E9D512600D27988 /* UBReloadCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBReloadCommand.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -315,6 +318,8 @@
 				DC66522C1E212735003267AF /* UBWidgetForScripting.m */,
 				DC74D0761E1A71E500893D53 /* UBRefreshCommand.h */,
 				DC74D0771E1A71E500893D53 /* UBRefreshCommand.m */,
+				DCF9D8FF1E9D512600D27988 /* UBReloadCommand.h */,
+				DCF9D9001E9D512600D27988 /* UBReloadCommand.m */,
 				DC74D0741E1A6FC300893D53 /* Uebersicht.sdef */,
 			);
 			name = "Script Support";
@@ -492,6 +497,7 @@
 				DC9F7CE31C439CE50014E25B /* UBDispatcher.m in Sources */,
 				DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */,
 				DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */,
+				DCF9D9011E9D512600D27988 /* UBReloadCommand.m in Sources */,
 				DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */,
 				DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */,
 				DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */,

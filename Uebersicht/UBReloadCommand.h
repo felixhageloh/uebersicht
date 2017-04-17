@@ -8,6 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface UBReloadCommand : NSObject
+@interface UBReloadCommand : NSScriptCommand
 
 @end

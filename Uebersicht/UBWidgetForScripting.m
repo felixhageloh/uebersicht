@@ -8,6 +8,7 @@
 
 #import "UBWidgetForScripting.h"
 #import "UBDispatcher.h"
+#import "UBAppDelegate.h"
 
 static UBDispatcher* dispatcher;
 
@@ -85,6 +86,11 @@ static UBDispatcher* dispatcher;
         dispatch: @"WIDGET_WANTS_REFRESH"
         withPayload: _id
     ];
+}
+
+- (void)reload:(NSScriptCommand*)command
+{
+    [(UBAppDelegate*)NSApp.delegate reloadWidget: _id];
 }
 
 @end

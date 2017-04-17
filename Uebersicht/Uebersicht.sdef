@@ -7,6 +7,10 @@
             <cocoa class="UBRefreshCommand"/>
             <direct-parameter description="A widget." type="widget"/>
         </command>
+        <command name="reload" code="wigetrld" description="Reload a widget.">
+            <cocoa class="UBReloadCommand"/>
+            <direct-parameter description="A widget." type="widget"/>
+        </command>
         <class name="application" code="capp" description="An application's top level scripting object.">
             <cocoa class="NSApplication"/>
             <element type="widget" description="A list of all widgets." access="r">
@@ -31,6 +35,9 @@
             </property>
             <responds-to name="refresh">
                 <cocoa method="refresh:"/>
+            </responds-to>
+            <responds-to name="reload">
+                <cocoa method="reload:"/>
             </responds-to>
         </class>
     </suite>
