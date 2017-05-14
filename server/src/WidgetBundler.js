@@ -56,6 +56,7 @@ module.exports = function WidgetBundler() {
             widget.body = srcBuffer.toString();
           }
 
+          widget.mtime = fs.statSync(filePath).mtime;
           callback(widget);
         });
       });

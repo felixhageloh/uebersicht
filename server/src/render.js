@@ -22,7 +22,7 @@ function isVisibleOnScreen(widgetId, screenId, state) {
 function renderWidget(widget, domEl) {
   var prevRendered = rendered[widget.id];
 
-  if (prevRendered && prevRendered.widget === widget) {
+  if (prevRendered && prevRendered.widget.mtime === widget.mtime) {
     return;
   } else if (prevRendered) {
     prevRendered.instance.update(widget);

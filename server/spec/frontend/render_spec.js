@@ -10,6 +10,7 @@ function buildWidget(id) {
     body: '(function require() { return ' +
       JSON.stringify({ id: id, refreshFrequency: false }) +
     '})',
+    mtime: new Date(),
   };
 }
 
@@ -129,7 +130,7 @@ test('performance when re-rendering', (t) => {
 
   prevNode = domEl.querySelector('#foo');
 
-  // new object ref
+  // new mtime
   state.widgets.foo = buildWidget('foo');
   render(state, '123', domEl);
   newNode = domEl.querySelector('#foo');
