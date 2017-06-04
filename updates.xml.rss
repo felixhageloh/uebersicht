@@ -10,6 +10,24 @@
             <description><![CDATA[
               <h3>What's New</h3>
               <ul>
+                <li>Adds a proxy server for making direct Ajax requests.</li>
+                <li>Scripting support: individual widgets can be refreshed and reloaded now.</li>
+                <li>Widget commands now respect your bash env.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Sun, Jun 04 2017 13:40:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.46.app.zip"
+                       sparkle:version="46"
+                       sparkle:shortVersionString="1.2.46"
+                       length="58872"
+                       type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+        </item>
+        <item>
+            <title>Version 1.1.45</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
                 <li>Fixes issues with Übersicht not showing when computer wakes from sleep.</li>
                 <li>There is a new 'hide' option for widgets.</li>
                 <li>Adds scripting support.</li>
