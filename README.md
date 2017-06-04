@@ -174,6 +174,17 @@ A global object called `uebersicht` exists which exposes extra functionality tha
 
 Has been deprecated as of version 0.8 in favor of -webkit-backdrop-filter. It should be available on all systems that have Safari 9+ installed. https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
 
+## Built In Proxy Server
+
+If you like you make Ajax requests to an external site without using a command, you can make use of the built in proxy server. It is running on `http://127.0.0.1:41417` and can be used as follows:
+
+    command: (callback) ->
+      proxy = "http://127.0.0.1:41417/"
+      server = "http://example.com:8080"
+      path = "/getsomejson"
+      $.get proxy + server + path, (json) ->
+        callback null, json
+
 ## Scripting Support
 
 Übersicht has AppleScript support since version 1.1.45. To get detailed information on what you can script, open the Script Editor and add Übersicht to the Library (use Window -> Library to show). Here are a few examples of what you can do with AppleScript:
@@ -182,9 +193,13 @@ Has been deprecated as of version 0.8 in favor of -webkit-backdrop-filter. It sh
 
 refreshes all widgets.
 
+    tell application "Übersicht" to refresh widget id "my-widget"
+
+refreshes widget with id "my-widget".
+
     tell application "Übersicht" to every widget
 
-lists all widgets
+lists all widgets.
 
     tell application "Übersicht" to set hidden of widget id "top-cpu-coffee" to false
 
