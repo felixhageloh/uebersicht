@@ -6,7 +6,7 @@ module.exports = (workingDir) ->
   # the Connect middleware
   (req, res, next) ->
     return next() unless req.method == 'POST' and req.url == '/run/'
-    shell = spawn 'bash', ['-l'], cwd: workingDir
+    shell = spawn 'bash', [], cwd: workingDir
 
     command = ''
     req.on 'data', (chunk) -> command += chunk
