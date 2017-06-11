@@ -5,10 +5,10 @@ const snabbdom = require('snabbdom');
 const html = require('snabbdom-jsx').html;
 
 const patch = snabbdom.init([
-  require('snabbdom/modules/class'),
-  require('snabbdom/modules/props'),
-  require('snabbdom/modules/style'),
-  require('snabbdom/modules/eventlisteners'),
+  require('snabbdom/modules/class').default,
+  require('snabbdom/modules/props').default,
+  require('snabbdom/modules/style').default,
+  require('snabbdom/modules/eventlisteners').default,
 ]);
 
 const defaults = {
