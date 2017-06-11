@@ -19,7 +19,9 @@ resolveWidget = require('./resolveWidget')
 dispatchToRemote = require('./dispatch')
 listenToRemote = require('./listen')
 
-module.exports = (port, widgetPath, settingsPath, callback) ->
+module.exports = (port, widgetPath, settingsPath, options, callback) ->
+  options ||= {}
+
   # global store for app state
   store = redux.createStore(
     reducer,
@@ -62,7 +64,7 @@ module.exports = (port, widgetPath, settingsPath, callback) ->
   # set up the server
   messageBus = null
   server = connect()
-    .use(CommandServer(widgetPath))
+    .use(CommandServer(widgetPath, options.loginShell))
     .use(StateServer(store))
     .use(serveStatic(path.resolve(__dirname, './public')))
     .use(serveStatic(widgetPath))

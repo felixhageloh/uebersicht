@@ -20,6 +20,7 @@
 @property BOOL startAtLogin;
 @property BOOL compatibilityMode;
 @property NSURL* widgetDir;
+@property BOOL loginShell;
 
 - (IBAction)showFilePicker:(id)sender;
 - (IBAction)shortcutKeyChanged:(id)sender;

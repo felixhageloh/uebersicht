@@ -26,5 +26,6 @@
 - (IBAction)showDebugConsole:(id)sender;
 - (IBAction)refreshWidgets:(id)sender;
 - (void)reloadWidget:(NSString*)widgetId;
+- (void)loginShellDidChange;
 
 @end

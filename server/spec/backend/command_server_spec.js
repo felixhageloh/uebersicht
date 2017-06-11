@@ -7,7 +7,7 @@ var httpPost = require('../helpers/httpPost');
 var commandServer = require('../../src/command_server.coffee');
 
 var workingDir = path.resolve(__dirname, path.join('..', 'test_widgets'));
-var app = connect()
+var server = connect()
   .use(commandServer(workingDir))
   .listen(8887);
 
@@ -45,6 +45,13 @@ test('running commands', (t) => {
   });
 });
 
+test('shell type', (t) => {
+  httpPost(url, 'echo $(shopt | grep login_shell)', (res, body) => {
+    t.equal(body, 'login_shell off\n', 'it is not a login shell');
+    t.end();
+  });
+});
+
 test('running broken commands', (t) => {
   t.plan(2);
 
@@ -68,7 +75,19 @@ test('forwarding stderr', (t) => {
 });
 
 test('closing', (t) => {
-  app.close();
+  server.close();
   t.pass('it closes');
   t.end();
+});
+
+test('using a login shell', (t) => {
+  server = connect()
+    .use(commandServer(workingDir, true))
+    .listen(8887);
+
+  httpPost(url, 'echo $(shopt | grep login_shell)', (res, body) => {
+    t.equal(body, 'login_shell on\n', 'it indeed runs in a login shell');
+    server.close();
+    t.end();
+  });
 });

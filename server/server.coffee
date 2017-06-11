@@ -10,8 +10,10 @@ try
   widgetPath = args.d ? args.dir  ? './widgets'
   port = args.p ? args.port ? 41416
   settingsPath = args.s ? args.settings ? './settings'
+  options =
+    loginShell: args['login-shell']
 
-  server = UebersichtServer(Number(port), widgetPath, settingsPath, ->
+  server = UebersichtServer(Number(port), widgetPath, settingsPath, options, ->
     console.log 'server started on port', port
   )
   server.on 'close', handleError

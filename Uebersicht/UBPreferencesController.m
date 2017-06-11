@@ -233,6 +233,30 @@
 }
 
 
+#
+#pragma mark Login Shell
+#
+
+
+- (BOOL)loginShell
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:@"loginShell"];
+}
+
+- (void)setLoginShell:(BOOL)enabled
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:enabled forKey:@"loginShell"];
+    [(UBAppDelegate *)[NSApp delegate] loginShellDidChange];
+}
+
+
+#
+#pragma mark Compatability Mode
+#
+
+
 - (BOOL)compatibilityMode
 {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];

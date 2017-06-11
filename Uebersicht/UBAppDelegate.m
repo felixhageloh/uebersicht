@@ -129,7 +129,11 @@ int const PORT = 41416;
 
     void (^keepAlive)(NSTask*) = ^(NSTask* theTask) {
         if (keepServerAlive) {
-            [self performSelector:@selector(startServer:) withObject:callback afterDelay:5.0];
+            [self
+                performSelector: @selector(startServer:)
+                withObject: callback
+                afterDelay: 1.0
+            ];
         }
     };
 
@@ -170,6 +174,9 @@ int const PORT = 41416;
     NSBundle* bundle     = [NSBundle mainBundle];
     NSString* nodePath   = [bundle pathForResource:@"localnode" ofType:nil];
     NSString* serverPath = [bundle pathForResource:@"server" ofType:@"js"];
+    BOOL loginShell = [[NSUserDefaults standardUserDefaults]
+        boolForKey:@"loginShell"
+    ];
 
     NSTask *task = [[NSTask alloc] init];
 
@@ -199,8 +206,8 @@ int const PORT = 41416;
         serverPath,
         @"-d", widgetPath,
         @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset],
-        @"-s", [[self getPreferencesDir] path]
-        
+        @"-s", [[self getPreferencesDir] path],
+        loginShell ? @"--login-shell" : @""
     ]];
     
     [task launch];
@@ -230,6 +237,7 @@ int const PORT = 41416;
         ]
     ];
 }
+
 
 #
 #pragma mark Screen Handling
@@ -282,6 +290,21 @@ int const PORT = 41416;
     NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 
+
+- (void)restartServer
+{
+    for (NSNumber* screenId in screensController.screens) {
+        [windows[screenId] close];
+        [windows removeAllObjects];
+    }
+    [[UBWebSocket sharedSocket] close];
+    if (widgetServer){
+        // server will restart by itself
+        [widgetServer terminate];
+    }
+}
+
+
 #
 # pragma mark received actions
 #
@@ -303,17 +326,7 @@ int const PORT = 41416;
 
 - (void)widgetDirDidChange
 {
-    for (NSNumber* screenId in screensController.screens) {
-        [windows[screenId] close];
-        [windows removeAllObjects];
-    }
-    
-    [[UBWebSocket sharedSocket] close];
-    
-    if (widgetServer){
-        // server will restart by itself
-        [widgetServer terminate];
-    }
+    [self restartServer];
 }
 
 - (void)compatibilityModeDidChange
@@ -321,6 +334,11 @@ int const PORT = 41416;
     for (NSNumber* screenId in windows) {
         [windows[screenId] sendToDesktop];
     }
+}
+
+- (void)loginShellDidChange
+{
+    [self restartServer];
 }
 
 - (IBAction)showPreferences:(id)sender

@@ -1,12 +1,12 @@
 # middleware to serve the results of shell commands
 # Listens to POST /run/
 {spawn} = require('child_process')
-module.exports = (workingDir) ->
-
+module.exports = (workingDir, useLoginShell) ->
+  args = if useLoginShell then ['-l'] else []
   # the Connect middleware
   (req, res, next) ->
     return next() unless req.method == 'POST' and req.url == '/run/'
-    shell = spawn 'bash', [], cwd: workingDir
+    shell = spawn 'bash', args, cwd: workingDir
 
     command = ''
     req.on 'data', (chunk) -> command += chunk
