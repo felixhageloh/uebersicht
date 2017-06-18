@@ -17,5 +17,9 @@ module.exports = function MessageBus(options) {
     ws.on('message', broadcast);
   });
 
+  wss.on('error', function handleError(err) {
+    console.error(err);
+  });
+
   return wss;
 };

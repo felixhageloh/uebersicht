@@ -69,10 +69,14 @@ module.exports = (port, widgetPath, settingsPath, options, callback) ->
     .use(serveStatic(path.resolve(__dirname, './public')))
     .use(serveStatic(widgetPath))
     .use(serveClient)
-    .listen port, '127.0.0.1', ->
-      messageBus = MessageBus(server: server)
-      sharedSocket.open("ws://127.0.0.1:#{port}")
-      callback?()
+    .listen port, '127.0.0.1', (err) ->
+      try
+        return server.emit('error', err) if err
+        messageBus = MessageBus(server: server)
+        sharedSocket.open("ws://127.0.0.1:#{port}")
+        callback?()
+      catch e
+        server.emit('error', e)
 
   # api
   close: (cb) ->

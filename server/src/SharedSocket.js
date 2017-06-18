@@ -23,6 +23,10 @@ function handleMessage(data) {
   messageListeners.forEach((f) => f(data));
 }
 
+function handleError(err) {
+  console.error(err);
+}
+
 exports.open = function open(url) {
   ws = new WebSocket(url);
 
@@ -30,10 +34,12 @@ exports.open = function open(url) {
     ws.on('open', handleWSOpen);
     ws.on('close', handleWSCosed);
     ws.on('message', handleMessage);
+    ws.on('error', handleError);
   } else {
     ws.onopen = handleWSOpen;
     ws.onclose = handleWSCosed;
     ws.onmessage = (e) => handleMessage(e.data);
+    ws.onerror = handleError;
   }
 };
 
