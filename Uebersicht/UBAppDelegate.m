@@ -59,24 +59,7 @@ int const PORT = 41416;
     
     // start server and load webview
     portOffset = 0;
-    keepServerAlive = YES;
-    
-    [self startServer: ^(NSString* output) {
-        // note that these might be called several times
-        if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [widgetsStore reset];
-            [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
-            // this will trigger a render
-            [screensController syncScreens:self];
-
-        } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
-            portOffset++;
-            if (portOffset >= 20) {
-                keepServerAlive = NO;
-                NSLog(@"couldn't find an open port. Giving up...");
-            }
-        }
-    }];
+    [self startUp];
     
     // listen for keyboard events
     keyHandler = [[UBKeyHandler alloc]
@@ -120,26 +103,80 @@ int const PORT = 41416;
         object: nil
     ];
     
+    [[[NSWorkspace sharedWorkspace] notificationCenter]
+        addObserver: self
+        selector: @selector(loginSessionBecameActive:)
+        name: NSWorkspaceSessionDidBecomeActiveNotification
+        object: nil
+    ];
+ 
+    [[[NSWorkspace sharedWorkspace] notificationCenter]
+        addObserver: self
+        selector: @selector(loginSessionResigned:)
+        name: NSWorkspaceSessionDidResignActiveNotification
+        object: nil
+    ];
+    
     [self listenToWallpaperChanges];
 }
 
-- (void)startServer:(void (^)(NSString*))callback
+- (void)startUp
 {
-    NSLog(@"starting server task");
 
-    void (^keepAlive)(NSTask*) = ^(NSTask* theTask) {
+    NSLog(@"starting server task");
+    
+    void (^handleData)(NSString*) = ^(NSString* output) {
+        // note that these might be called several times
+        if ([output rangeOfString:@"server started"].location != NSNotFound) {
+            [widgetsStore reset];
+            [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
+            // this will trigger a render
+            [screensController syncScreens:self];
+
+        } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
+            portOffset++;
+        }
+    };
+
+    void (^handleExit)(NSTask*) = ^(NSTask* theTask) {
+        [self shutdown];
+        if (portOffset >= 20) {
+            keepServerAlive = NO;
+            NSLog(@"couldn't find an open port. Giving up...");
+        }
         if (keepServerAlive) {
             [self
-                performSelector: @selector(startServer:)
-                withObject: callback
+                performSelector: @selector(startUp)
+                withObject: nil
                 afterDelay: 1.0
             ];
         }
     };
+    
+    keepServerAlive = YES;
+    widgetServer = [self
+        launchWidgetServer: [preferences.widgetDir path]
+        onData: handleData
+        onExit: handleExit
+    ];
+}
 
-    widgetServer = [self launchWidgetServer:[preferences.widgetDir path]
-                                     onData:callback
-                                     onExit:keepAlive];
+- (void)shutdown:(Boolean)keepAlive
+{
+    keepServerAlive = keepAlive;
+    for (NSNumber* screenId in screensController.screens) {
+        [windows[screenId] close];
+        [windows removeAllObjects];
+    }
+    [[UBWebSocket sharedSocket] close];
+    if (widgetServer){
+        [widgetServer terminate];
+    }
+}
+
+- (void)shutdown
+{
+    [self shutdown:false];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
@@ -291,18 +328,7 @@ int const PORT = 41416;
 }
 
 
-- (void)restartServer
-{
-    for (NSNumber* screenId in screensController.screens) {
-        [windows[screenId] close];
-        [windows removeAllObjects];
-    }
-    [[UBWebSocket sharedSocket] close];
-    if (widgetServer){
-        // server will restart by itself
-        [widgetServer terminate];
-    }
-}
+
 
 
 #
@@ -326,7 +352,7 @@ int const PORT = 41416;
 
 - (void)widgetDirDidChange
 {
-    [self restartServer];
+    [self shutdown:true];
 }
 
 - (void)compatibilityModeDidChange
@@ -338,7 +364,7 @@ int const PORT = 41416;
 
 - (void)loginShellDidChange
 {
-    [self restartServer];
+    [self shutdown:true];
 }
 
 - (IBAction)showPreferences:(id)sender
@@ -432,6 +458,17 @@ int const PORT = 41416;
         [windows[screenId] wallpaperChanged];
     }
 }
+
+- (void)loginSessionBecameActive:(NSNotification *)notification
+{
+    [self startUp];
+}
+
+- (void)loginSessionResigned:(NSNotification *)notification
+{
+    [self shutdown];
+}
+
 
 - (void)listenToWallpaperChanges
 {
