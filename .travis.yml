@@ -3,10 +3,10 @@ language: objective-c
 osx_image: xcode8.3
 node_js: 6.10.2
 
-before_install:
-  - cd server
-  - gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-  - rvm get stable --auto-dotfiles
+# before_install:
+#   - cd server
+#   - gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+#   - rvm get stable --auto-dotfiles
 
 install:
   - npm install
