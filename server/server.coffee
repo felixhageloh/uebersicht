@@ -21,7 +21,7 @@ try
   server.on 'error', handleError
 
   cors_host = '127.0.0.1' # bind to loopback only
-  cors_port = 41417 # maybe use: port + 1
+  cors_port = port + 1
   cors_proxy.createServer(
     originWhitelist: ['http://127.0.0.1:' + port]
     requireHeader: ['origin']
