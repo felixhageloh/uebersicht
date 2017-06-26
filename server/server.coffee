@@ -3,7 +3,7 @@ UebersichtServer = require './src/app.coffee'
 cors_proxy = require 'cors-anywhere'
 
 handleError = (err) ->
-  console.log err
+  console.log(err.message || err)
   throw err
 
 try
