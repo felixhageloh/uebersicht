@@ -81,16 +81,7 @@
 
 - (void)workspaceChanged
 {
-    [webViewController
-        performSelector: @selector(redraw)
-        withObject: nil
-        afterDelay: 0.016
-    ];
-    [webViewController
-        performSelector: @selector(redraw)
-        withObject: nil
-        afterDelay: 0.032
-    ];
+    [webViewController redraw];
 }
 
 - (void)wallpaperChanged

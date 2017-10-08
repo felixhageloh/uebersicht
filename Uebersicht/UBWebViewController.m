@@ -54,7 +54,6 @@
         initWithFrame: frame
         configuration: [self sharedConfig]
     ];
-    
     [webView setValue:@YES forKey:@"drawsTransparentBackground"];
     [webView.configuration.preferences
         setValue: @YES
@@ -126,7 +125,14 @@
 
 - (void)forceRedraw:(WKWebView*)webView
 {
-    [view setNeedsDisplay:YES];
+    [webView
+         evaluateJavaScript:
+             @"document.documentElement.style.transform = 'scale(1)';\
+               requestAnimationFrame(function() {\
+                 document.documentElement.style.transform = '';\
+               });"
+         completionHandler:NULL
+     ];
 }
 
 - (void)webView:(WKWebView *)webView
