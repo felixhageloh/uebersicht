@@ -6,6 +6,23 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 1.2.51</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Fixes issues when switching users.</li>
+                <li>Improves compatability with macOS High Sierra.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Sun, Oct 08 2017 10:10:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.51.app.zip"
+                       sparkle:version="51"
+                       sparkle:shortVersionString="1.2.51"
+                       length="59840"
+                       type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+        </item>
+        <item>
             <title>Version 1.2.48</title>
             <description><![CDATA[
               <h3>What's New</h3>
