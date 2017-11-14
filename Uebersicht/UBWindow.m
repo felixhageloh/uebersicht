@@ -66,13 +66,12 @@
     [webViewController reload];
 }
 
-
-- (void)close
-{
-    [webViewController destroy];
-    [super close];
-}
-
+// TODO: check if we can do at least some cleanups in webViewController#destroy
+//- (void)close
+//{
+//    [webViewController destroy];
+//    [super close];
+//}
 
 
 #
