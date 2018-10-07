@@ -158,7 +158,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" id="7Za-aa-BIO">
                             <font key="font" metaFont="smallSystem"/>
-                            <string key="title">Loading Bash env will perserve your config, like locale and PATH settings. However, if not set up correctly, it can cause widgets to not function.</string>
+                            <string key="title">Loading Bash env will preserve your config, like locale and PATH settings. However, if not set up correctly, it can cause widgets to not function.</string>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
