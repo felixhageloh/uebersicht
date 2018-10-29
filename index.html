@@ -31,10 +31,9 @@
   <meta property="og:description" content="Übersicht- Keep an eye on what is happening on your machine and in the World." />
   <meta property="og:site_name" content="Übersicht" />
 
-  <!--   <link rel="stylesheet" type="text/css" href="main.css"> -->
-  <style type="text/css">html,body{background:#fff;color:#152033;font-family:Ubuntu,Helvetica Neue,Arial,Sans;font-style:normal;font-weight:300;line-height:1.5;padding:0;margin:0}header,section,#disqus_thread{width:532px;margin:0 auto;padding:24px 16px 32px 16px}a,a:link,a:visited{color:#86585a;text-decoration:none;font-weight:500;}a:hover,a:link:hover,a:visited:hover{color:#852a2f;text-decoration:underline}p{margin:.25em 0}header{display:block;background:url("images/logo@2x.png") center 30px no-repeat;background-size:200px 96px;background-repeat:no-repeat;}header h2{padding-top:132px;font-size:18px;font-style:italic;text-align:center;margin-bottom:24px;font-weight:inherit}header #preview{width:564px;height:331px;margin:32px -16px 24px -16px;display:block}main{background:#f9f9f9;border-top:1px solid #e0e0e0;}main section{display:block;border-bottom:1px solid #e0e0e0;border-top:1px solid #e0e0e0;margin-top:-1px}main h1{font-weight:300;font-size:28px;margin:0 0 12px 0;font-style:italic}main pre{margin:20px 0;border:1px solid #e0e0e0;}main pre code{line-height:1.3;font-family:Ubuntu Mono,Menlo,Currier New,Mono;font-size:inherit}main ul{padding:4px 0 8px 0;margin:0}main li{margin:8px 0;border-left:8px solid #ddd;padding-left:8px;list-style:none}.download{text-align:center;font-size:0;}.download a,.download a:link,.download a:visited{font-size:16px;font-weight:400;padding:10px 20px;display:inline-block;border:1px solid #152033;background-color:transparent;border-radius:2px;margin-right:10px;color:#152033;}.download a span,.download a:link span,.download a:visited span{font-size:10px}.download a:hover,.download a:link:hover,.download a:visited:hover{background-color:#152033;text-decoration:none;color:#fff}.download a.app{color:#fff;border:1px solid #86585a;background-color:#86585a;}.download a.app:hover{border:1px solid #814d51;background-color:#814d51}.download a.app:active{border:1px solid #5f3a3c;background-color:#5f3a3c}.screenshots{width:90%;margin:16px auto 0;font-size:0;whitespace:nowrap;padding:0;}.screenshots li{width:25%;box-sizing:border-box;border:10px solid #fff;display:inline-block;margin:0;}.screenshots li img{width:100%}.more-info h1{border-color:transparent;padding-top:8px}.more-info .badges{text-align:center;font-size:0;margin:42px 0;}.more-info .badges a,.more-info .badges a:link,.more-info .badges a:visited{display:inline-block;font-size:24px;line-height:1;text-decoration:none;font-weight:500;word-spacing:normal;min-width:30%;text-align:left;opacity:.6;}.more-info .badges a:hover,.more-info .badges a:link:hover,.more-info .badges a:visited:hover{opacity:1}.more-info .badges a h2,.more-info .badges a:link h2,.more-info .badges a:visited h2{font-size:14px;font-weight:200;color:#666;margin-bottom:4px}.more-info .twitter{margin-left:64px;}.more-info .twitter span{color:#152033}.more-info .twitter img{height:18px;width:22px;vertical-align:baseline}.more-info .github span{color:#152033}.more-info .github img{height:24px;width:24px;vertical-align:bottom}@media only screen and (max-width:532px){body,html{width:100%}header,section,#disqus_thread{width:100%;box-sizing:border-box}header #preview{width:100%;height:auto;margin:32px 0 24px 0;box-sizing:border-box}.download{width:100%;box-sizing:border-box;padding:0 8px;}.download a{margin:8px 0 24px 0;width:100%;box-sizing:border-box;line-height:1.5em}.more-info .badges{whitespace:nowrap;}.more-info .badges a,.more-info .badges a:link,.more-info .badges a:visited{min-width:auto}.more-info .badges .twitter{margin-left:32px}}</style>
+  <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="stylesheet" type="text/css" href="fresco.css">
-  <link rel="stylesheet" type="text/css" href="highlight.css">
+  <link rel="stylesheet" type="text/css" href="prism.css">
 </head>
 <body>
   <header>
@@ -45,7 +44,7 @@
     <img id='preview' src="images/Screen.jpg"></img>
 
     <nav class="download">
-      <a href="http://tracesof.net/uebersicht/releases/Uebersicht-1.2.53.app.zip"
+      <a href="http://tracesof.net/uebersicht/releases/Uebersicht-1.3.55.app.zip"
          title="Dowload App for Mac OS X 10.10+"
          class="app">Download <span>(OS X 10.10+)</span></a>
 
@@ -95,20 +94,21 @@
 
     <section class='developers'>
       <h1>Rolling your own</h1>
-      <p>Widgets are written in CoffeeScript or plain JavaScript. A minimal widget, written in CoffeeScript looks like this:</p>
+      <p>Widgets are written in JavaScript + React's JSX. A minimal widget looks like this:</p>
 
-<pre><code>  command: "echo Hello World!"
+<pre><code class="language-jsx">  export const command = "echo Hello World!"
 
-  refreshFrequency: 5000 # ms
+  export const refreshFrequency = 5000 // ms
 
-  render: (output) ->
-    "&lt;h1&gt;#{output}&lt;/h1&gt;"
+  export const render ({ output }) => (
+    &lt;h1&gt;{output}&lt;/h1&gt;
+  )
 
-  style: """
+  export const className = `
     left: 20px
     top: 20px
     color: #fff
-  """
+  `
 </code></pre>
     </section>
 
@@ -156,14 +156,12 @@
     $('a.app').on('click', function () {
       ga('send', 'event', 'download', 'app');
     })
-
-    hljs.initHighlightingOnLoad();
   };
 
   setTimeout(function () {
     var styleTag
       , styles = [
-      "http://fonts.googleapis.com/css?family=Ubuntu:300,300italic",
+      "http://fonts.googleapis.com/css?family=Ubuntu:300,700i",
       "http://fonts.googleapis.com/css?family=Ubuntu+Mono"
     ];
 
