@@ -50,9 +50,7 @@ function render(state, screen, domEl, dispatch) {
     if (!isVisibleOnScreen(id, screen, state)) {
       continue;
     }
-    if (widget.error) {
-      console.error(widget.error);
-    } else {
+    if (widget.error || widget.implementation) {
       renderWidget(widget, domEl, dispatch);
     }
     const idx = remaining.indexOf(widget.id);

@@ -27,6 +27,23 @@ const handlers = {
     );
   },
 
+  WIDGET_LOADED: (state, action) => {
+    if (!state.widgets[action.id]) {
+      return state;
+    }
+    const widget = Object.assign(
+      {},
+      state.widgets[action.id],
+      {implementation: action.payload}
+    );
+    const newWidgets = Object.assign(
+      {},
+      state.widgets,
+      {[widget.id]: widget}
+    );
+    return Object.assign({}, state, {widgets: newWidgets});
+  },
+
   WIDGET_REMOVED: (state, action) => {
     const id = action.payload;
 
@@ -131,13 +148,11 @@ function updateSettings(state, widgetId, patch) {
 
 module.exports = function reduce(state, action) {
   let newState;
-
   const handler = handlers[action.type];
   if (handler) {
     newState = handler(state, action);
   } else {
     newState = state;
   }
-
   return newState;
 };

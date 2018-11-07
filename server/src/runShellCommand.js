@@ -1,13 +1,18 @@
 const post = require('superagent').post;
 
+function wrapError(err, res) {
+  return err
+    ? new Error((res || {}).text || 'error running command')
+    : null
+    ;
+}
+
 module.exports = function runShellCommand(command, callback) {
-  return post('/run/')
-    .send(command)
-    .end((err, res) => {
-      if (callback) {
-        const error = err ? res.text || 'error running command' : null;
-        const output = res.text;
-        callback(error, output);
-      }
-    });
+  const request = post('/run/').send(command);
+  return callback
+    ? request.end((err, res) => callback(wrapError(err, res), (res || {}).text))
+    : request
+      .catch(err => { throw wrapError(err, err.response); })
+      .then(res => res.text)
+    ;
 };

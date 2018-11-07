@@ -9,31 +9,32 @@ module.exports = (workingDir, useLoginShell) ->
     shell = spawn 'bash', args, cwd: workingDir
 
     command = ''
-    req.on 'data', (chunk) -> command += chunk
+    req.on 'data', (chunk) ->  shell.stdin.write chunk
+
     req.on 'end', ->
-      setStatus = (status) ->
+      setStatusOnce = (status) ->
         res.writeHead status
-        setStatus = ->
+        setStatusOnce = ->
 
       shell.stderr.on 'data', (d) ->
-        setStatus 500
+        setStatusOnce 500
         res.write d
 
       shell.stdout.on 'data', (d) ->
-        setStatus 200
+        setStatusOnce 200
         res.write d
 
       shell.on 'error', (err) ->
-        setStatus 500
+        setStatusOnce 500
         res.write err.message
 
       shell.on 'close', ->
-        setStatus 200
+        setStatusOnce 200
         res.end()
 
-      shell.stdin.write command ? ''
       shell.stdin.write '\n'
       shell.stdin.end()
+
 
 
 

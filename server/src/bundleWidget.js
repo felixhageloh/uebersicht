@@ -7,8 +7,9 @@ const coffeeify = require('coffeeify');
 const babelify = require('babelify');
 const jsxTransform = require('babel-plugin-transform-react-jsx');
 const restSpreadTransform = require('babel-plugin-transform-object-rest-spread');
-const es2015 = require('babel-preset-es2015');
+const envPreset = require('babel-preset-env');
 const through = require('through2');
+const emotionPlugin = require('babel-plugin-emotion');
 
 function wrapJSWidget() {
   let start = true;
@@ -28,31 +29,35 @@ function wrapJSWidget() {
 }
 
 module.exports = function bundleWidget(id, filePath) {
+  const isJsxWidget = filePath.match(/\.jsx$/);
   const bundle = browserify(filePath, {
     detectGlobals: false,
     cache: {},
     packageCache: {},
+    debug: isJsxWidget,
   });
-
 
   bundle.plugin(watchify);
   bundle.require(filePath, { expose: id });
-  bundle.external('run');
+  bundle.external('uebersicht');
 
   if (filePath.match(/\.coffee$/)) {
     bundle.transform(coffeeify, {
       bare: true,
       header: false,
     });
-  } else if (filePath.match(/\.jsx$/)) {
+    bundle.transform(widgetify, { id: id });
+  } else if (isJsxWidget) {
     bundle.transform(babelify, {
-      presets: [es2015],
-      plugins: [restSpreadTransform, [jsxTransform, { pragma: 'html' }]],
+      presets: [envPreset],
+      plugins: [
+        restSpreadTransform,
+        [jsxTransform, { pragma: 'html' }],
+      ],
     });
   } else {
     bundle.transform(wrapJSWidget);
+    bundle.transform(widgetify, { id: id });
   }
-
-  bundle.transform(widgetify, { id: id });
   return bundle;
 };

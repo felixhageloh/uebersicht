@@ -1,6 +1,7 @@
 parseArgs = require 'minimist'
 UebersichtServer = require './src/app.coffee'
 cors_proxy = require 'cors-anywhere'
+path = require 'path'
 
 handleError = (err) ->
   console.log(err.message || err)
@@ -8,14 +9,20 @@ handleError = (err) ->
 
 try
   args = parseArgs process.argv.slice(2)
-  widgetPath = args.d ? args.dir  ? './widgets'
+  widgetPath = path.resolve(__dirname, args.d ? args.dir  ? './widgets')
   port = args.p ? args.port ? 41416
-  settingsPath = args.s ? args.settings ? './settings'
+  settingsPath = path.resolve(__dirname, args.s ? args.settings ? './settings')
+  publicPath = path.resolve(__dirname, './public')
   options =
     loginShell: args['login-shell']
 
-  server = UebersichtServer(Number(port), widgetPath, settingsPath, options, ->
-    console.log 'server started on port', port
+  server = UebersichtServer(
+    Number(port),
+    widgetPath,
+    settingsPath,
+    publicPath,
+    options,
+    -> console.log 'server started on port', port
   )
   server.on 'close', handleError
   server.on 'error', handleError

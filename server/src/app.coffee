@@ -10,6 +10,7 @@ WidgetBundler = require('./WidgetBundler.js')
 Settings = require('./Settings')
 StateServer = require('./StateServer')
 CommandServer = require('./command_server.coffee')
+serveWidgets = require('./serveWidgets')
 serveClient = require('./serveClient')
 sharedSocket = require('./SharedSocket')
 actions = require('./actions')
@@ -19,7 +20,7 @@ resolveWidget = require('./resolveWidget')
 dispatchToRemote = require('./dispatch')
 listenToRemote = require('./listen')
 
-module.exports = (port, widgetPath, settingsPath, options, callback) ->
+module.exports = (port, widgetPath, settingsPath, publicPath, options, callback) ->
   options ||= {}
 
   # global store for app state
@@ -32,8 +33,6 @@ module.exports = (port, widgetPath, settingsPath, options, callback) ->
   listenToRemote (action) ->
     store.dispatch(action)
 
-  # watch widget dir and dispatch correct actions
-  widgetPath = path.resolve(__dirname, widgetPath)
   # follow symlink if widgetDirectory is one
   if fs.lstatSync(widgetPath).isSymbolicLink()
     widgetPath = fs.readlinkSync(widgetPath)
@@ -66,9 +65,10 @@ module.exports = (port, widgetPath, settingsPath, options, callback) ->
   server = connect()
     .use(CommandServer(widgetPath, options.loginShell))
     .use(StateServer(store))
-    .use(serveStatic(path.resolve(__dirname, './public')))
+    .use(serveWidgets(bundler, widgetPath))
+    .use(serveStatic(publicPath))
     .use(serveStatic(widgetPath))
-    .use(serveClient)
+    .use(serveClient(publicPath))
     .listen port, '127.0.0.1', (err) ->
       try
         return server.emit('error', err) if err

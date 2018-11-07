@@ -163,12 +163,12 @@
         completionHandler:^(NSArray *placemarks, NSError *error) {
             if (error) return;
             CLPlacemark *placemark = ((CLPlacemark*)placemarks[0]);
-            currentPosition = [self toJSString:location placeMark:placemark];
+            self->currentPosition = [self toJSString:location placeMark:placemark];
             
-            for (id callbackId in waitingForReponse) {
+            for (id callbackId in self->waitingForReponse) {
                 [self
-                    respondToMessage: waitingForReponse[callbackId]
-                    withArguments: currentPosition
+                 respondToMessage: self->waitingForReponse[callbackId]
+                 withArguments: self->currentPosition
                 ];
             }
         }

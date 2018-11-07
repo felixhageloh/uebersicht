@@ -1,14 +1,12 @@
 var raf = require('raf');
 
-module.exports = function RenderLoop(initialState, render, patch, target) {
+module.exports = function RenderLoop(initialState, render) {
   var currentState = null;
-  var oldNode = target;
   var redrawScheduled = false;
   var inRenderingTransaction = false;
 
   var loop = {
     state: initialState,
-    target: target,
     update: update,
   };
 
@@ -34,10 +32,12 @@ module.exports = function RenderLoop(initialState, render, patch, target) {
     }
 
     inRenderingTransaction = true;
-    var newNode = render(currentState);
+    try {
+      render(currentState);
+    } catch (err) {
+      console.error(err);
+    }
     inRenderingTransaction = false;
-
-    oldNode = patch(oldNode, newNode);
     currentState = null;
   }
 

@@ -339,22 +339,21 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DC43AD7B17EC2D9500241CC2 /* Übersicht */ = {
+		DC43AD7B17EC2D9500241CC2 /* Uebersicht */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Übersicht" */;
+			buildConfigurationList = DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Uebersicht" */;
 			buildPhases = (
 				DC06A1C01985092700789130 /* Compile JS */,
 				DC43AD7817EC2D9500241CC2 /* Sources */,
 				DC43AD7917EC2D9500241CC2 /* Frameworks */,
 				DC43AD7A17EC2D9500241CC2 /* Resources */,
 				DC5D25BE18FC4823000078C4 /* CopyFiles */,
-				DC5E277C197034FF00CBDA8B /* Code Sign Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "Übersicht";
+			name = Uebersicht;
 			productName = "Übersicht";
 			productReference = DC43AD7C17EC2D9500241CC2 /* Übersicht.app */;
 			productType = "com.apple.product-type.application";
@@ -384,7 +383,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = UB;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = tracesOf;
 				TargetAttributes = {
 					DC43AD7B17EC2D9500241CC2 = {
@@ -414,7 +413,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DC43AD7B17EC2D9500241CC2 /* Übersicht */,
+				DC43AD7B17EC2D9500241CC2 /* Uebersicht */,
 				DC43AD9C17EC2D9500241CC2 /* UebersichtTests */,
 			);
 		};
@@ -470,22 +469,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=$PATH:/usr/local/bin\ncd server && npm run-script release";
-		};
-		DC5E277C197034FF00CBDA8B /* Code Sign Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Code Sign Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\n#IDENTITY=\"Developer ID Application: Felix Hageloh\"\n#codesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"\n#codesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/SocketRocket.framework/Versions/A\"";
-			showEnvVarsInLog = 0;
+			shellScript = "export PATH=$PATH:/usr/local/bin\ncd server && npm run-script release\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -525,7 +509,7 @@
 /* Begin PBXTargetDependency section */
 		DC43ADA217EC2D9500241CC2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DC43AD7B17EC2D9500241CC2 /* Übersicht */;
+			target = DC43AD7B17EC2D9500241CC2 /* Uebersicht */;
 			targetProxy = DC43ADA117EC2D9500241CC2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -578,12 +562,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -628,12 +614,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -765,7 +753,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Übersicht" */ = {
+		DC43ADAD17EC2D9500241CC2 /* Build configuration list for PBXNativeTarget "Uebersicht" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DC43ADAE17EC2D9500241CC2 /* Debug */,

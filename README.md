@@ -5,157 +5,309 @@ For general info check out the [Übersicht website.](http://tracesof.net/uebersi
 
 ## Writing Widgets
 
-In essence, widgets are plain JavaScript objects that define a few key properties and methods. They need to be defined in a single file with a `.js` or `.coffee` extension for Übersicht to pick them up. Übersicht will listen to file changes inside your widget directory, so you can edit widgets and see the result live.
+In essence, widgets are JavaScript modules that expose a few key properties and methods. They need to be defined in a single file with a `.jsx` extension for Übersicht to pick them up. Previously, widgets could be written in CoffeeScript and are still supported. Check [the old documentation](ClassicWidgets.md) for details. Übersicht will listen to file changes inside your widget directory, so you can edit widgets and see the result live.
 
-You can also include node modules and split your widget into separate files using [NodeJS' module syntax](https://www.sitepoint.com/understanding-module-exports-exports-node-js/). Any file that is in a directory called `/node_modules`, `/lib` or `/src` will be treated as a module and will not show up as a separate widget.
+Widget rendering is done using (React)[https://reactjs.org] and it's (JSX)[https://reactjs.org/docs/introducing-jsx.html] syntax. Simple widget state is managed for you by Übersicht, but for more advanced widgets you can manage state using a Redux-like pattern. You `dispatch` events, which get processed by a single `updateState` function which returns the new state, which is passed to the render function of your widget.
 
-Currently they are best written in [CoffeeScript](http://coffeescript.org). Plain JS widgets work as well, but it currently doesn't have CommonJS support. This documentation will use the CoffeScript syntax, but here is a small example widget [in pure JavaScript](https://gist.github.com/felixhageloh/34645a899a0f22f583bb). As an alternative, you could use CoffeScript's back-tick <tt>`</tt> operator to only write the relevant parts in JavaScript.
+You can also include node modules and split your widget into separate files using [ESM syntax](http://2ality.com/2014/09/es6-modules-final.html). Any file that is in a directory called `/node_modules`, `/lib` or `/src` will be treated as a module and will not show up as a separate widget.
 
-The following properties and methods are currently supported:
-
+The following properties and methods are supported:
 
 ### command
 
-A **string** containing the shell command to be executed, or
-a **function(callback)** which eventually calls callback with some data.
+A **string** containing the shell command to be executed, or<br>
+a **function(dispatch : function)** which eventually dispatches an event,
+or **undefined** meaning that no command will be executed for this widget.
+
 For example:
 
-```coffeescript
-command: "echo Hello World"
+```jsx
+export const command "echo Hello World";
 ```
 
 Watch out for quotes inside commands. Often they need to properly escaped, like:
 
-```coffeescript
-command: "ps axo \"rss,pid,ucomm\" | sort -nr | head -n3"
+```jsx
+export const command = "ps axo \"rss,pid,ucomm\" | sort -nr | head -n3";
 ```
 
 Example using a command function:
 
-```coffeescript
-command: (callback) ->
-  # example function that fetches data from a server
-  fetchData 'some/url', (error, data) ->
-    callback(error, data)
+```jsx
+export const command = (dispatch) =>
+  fetch('some/url.json)')
+    .then((response) => {
+      dispatch({ type: 'FETCH_SUCCEDED', data: response.json() });
+    })
+    .catch((error) => {
+      dispatch({ type: 'FETCH_FAILED', error: error });
+    });
 ```
 
-The first and only argument passed to a command function is a callback, which must be called to continue running the widget. It follows the standard NodeJS [error-first callback pattern](http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/).
+The first and only argument passed to a command function is a `dispatch` function, which you can use to dispatch plain JasvaScript objects, called events, to be picked up by your `updateState` function.
 
 
 ### refreshFrequency
 
-An **integer** specifying how often the above command is executed. It defines the delay in milliseconds between consecutive commands executions. Example:
+An **number** specifying how often the above command is executed.
+
+It defines the delay in milliseconds between consecutive commands executions. Example:
 
 ```coffeescript
-refreshFrequency: 10000
-```
-
-You can also specify `refreshFrequency` as a string, like '2 days', '1d', '10h', '2.5 hrs', '2h', '1m', or '5s'.
-
-```coffeescript
-refreshFrequency: '10s'  # equates to 10000
+export default const refreshFrequency = 1000; // widget will run command once a second
 ```
 
 The default is 1000 (1s). If set to `false` the widget won't refresh automatically.
 
-### style
+### className
 
-A **string** defining the css style of this widget, which is also used to control the position. In order to allow for easy scoping of CSS rules, styles are written using the [Stylus](http://learnboost.github.io/stylus/) preprocessor. Example:
+An **object** or **string** defining the CSS rules to applied to the root of your widget.
 
-```coffeescript
-style: """
-  top:  0
-  left: 0
-  color: #fff
+It is most commonly used control the position of your widget. It is converted to a CSS class name using the [Emotion CSS-in-JS library](https://emotion.sh/docs/css). Read more about [styling your widgets here](#styling-widgets).
 
-  .some-class
-    box-shadow: 0 0 2px rgba(#000, 0.1)
-"""
+```jsx
+export const className = {
+  top: 0,
+  left: 0,
+  color: '#fff'
+}
 ```
 
-For convenience, the [nib library](https://tj.github.io/nib/) for Stylus is included, so mixins for CSS3 are available.
+or
+
+```jsx
+export const className = `
+  top: 0;
+  left: 0;
+  color: #fff;
+`
+```
 
 Note that widgets are positioned absolute in relation to the screen (minus the menu bar), so a widget with `top: 0` and `left: 0` will be positioned in the top left corner of the screen, just below the menu bar.
 
+### render : props
 
-### render : output
+A **function(props : object)** to render your widget.
 
-A **function** returning a HTML string to render this widget. It gets the output of `command` passed in as a string. For example, a widget with:
+If you know [React functional components](https://reactjs.org/docs/components-and-props.html) you know how render works. The `props` passed to this function is whatever state your `updateState` function returns. If you don't provide your own `updateState` function, the default props that are passed are `output` and `error`, containing the output your command produced and any error that might have occurred.
 
-```coffeescript
-command: "echo Hello World!"
-
-render: (output) -> """
-  <h1>#{output}</h1>
-"""
+```jsx
+export const render({output, error}) => {
+  return error ? (
+    <div>Something went wrong: <strong>{String(error)}</strong></div>
+  ) : (
+    <div>
+      <h1>We got some output!</h1>
+      <p>{output}</p>
+    </div>
+  );
+}
 ```
-
-would render as **Hello World!**. Usually, your `output` will be something more complicated, for example a JSON string, so you will have to parse it first.
 
 The default implementation of render just returns `output`.
 
-### afterRender : domEl
+### updateState : event, previousState
 
-A **function** that gets called, as the name suggests, after `render` with a reference to our newly rendered DOM element. It can be used to do one time setups that you wouldn't want to do on every update.
+A **function(event : object, previousState : object)** implementing the state update behavior of this widget.
 
+When provided, this function must return the next state, which will be passed as `props` to your render function. The default function will return `output` and `error` from the event object.
 
-### update : output, domEl
+```jsx
+export const updateState = (event, previousState) => {
+  if (event.error) {
+    return { ...previousState, warning: `We got an error: ${event.error}` };
+  }
+  const [cpuPct, processName] = event.output.split(',');
+  return {
+    cpuPct: parseFloat(cpuPct),
+    processName
+  };
+}
+```
+This will pass a props object containing `cpuPct` and `processName` to the render function. If an error occurred, it will pass the previous state plus a warning message.
 
-A **function** implementing update behavior of this widget. If specified, `render` will be called once when the widget is first initialized. Afterwards, update will be called for every refresh cycle. If no update method is provided, `render` will be called instead.
+If your widget has more complex state logic, for example because it is fetching data from several different sources, it is a good idea to add a `type` property to your events. You can use this type to decide how to update your state. For example:
 
-Since `render` will simply replace the inner HTML of a widget every time, you can use render to do a partial update of your widgets, kick off animations etc. For example, if the output of your command returns a percentage, you could do something like:
-
-```coffeescript
-# we don't care about output here
-render: (_) -> """
-  <div class='bar'></div>
-"""
-
-update: (output, domEl) ->
-  $(domEl).find('.bar').css height: output+'%'
+```jsx
+export const updateState = (event, previousState) => {
+  switch(event.type) {
+    case 'CO2_FETCHED': return updateCo2(event.output, previousState);
+    case 'TEMPERATURE_FETCHED': return updateTemp(event.output, previousState);
+    default: {
+      return previousState;
+    }
+  }
+}
 ```
 
-This will set the height of .bar every time this widget refreshes. As you can see, jQuery is available.
+This example also shows that you can make use of functions to further break down your state update logic.
 
-## Widget Internals
+### initialState
 
-For writing more advanced widgets you might not want to rely on the standard 'run command, then redraw' cycle and instead manage some of the widget internals yourself. There are a few methods you can use from within `render`, `afterRender` and `update`
+An **object** with the initial state of your widget.
 
-### @stop()
+If you provide a custom `updateState` function you might need to define the initial state that gets passed on initial render of the widget. before any command has been run.
 
-Stop the widget from updating if a `refreshFrequency` is set. The widget won't update until `@start` is called.
+```jsx
+export const initialState = { output: 'fetching data...' };
+```
 
-### @start()
+The default initial state is `{ output: '' }`.
 
-Start updating a previously stopped widget again. Does nothing if `refreshFrequency` is set to `false`.
+### init : dispatch
 
-### @refresh()
+A **function(dispatch : function)** that is called the first time your widget loads. Many widgets won't need this, but you can use this function to perform any initial setup for more advanced use cases. For example, instead of relying on periodic shell commands, you might want to open and listen to WebSocket events to update your widget.
 
-Runs the command and redraws the widget as it normally would as part of a refresh cycle. If no command is set, the widget will only redraw.
+```jsx
+export const init = (dispatch) => {
+  const socket = new WebSocket('ws://localhost:8080');
 
-### @run(command, callback)
+  socket.addEventListener('message',  (event) => {
+    disptach({type: 'MESSAGE_RECEIVED', data: event.data});
+  });
+}
+```
 
-Runs a shell command and calls callback with the result. Command is a string containing the shell command, just like the `command` property of a widget. Callback is called with err (if any) and stdout, in standard node fashion.
+## Styling Widgets
+
+Uebersicht comes bundled with [Emotion ](https://emotion.sh) (version 9). It exposes it's `css` and `styled` functions via the `uebersicht` module.
+
+As described above, you can use `className` to style and position the root node of your widget. For further styling you can do something like this:
+
+```jsx
+import { css } from "uebersicht"
+
+const header = css`
+  font-family: Ubuntu;
+  font-size: 20px;
+  text-align: center;
+  color: white;
+`
+
+const boxes = css`
+  display: flex;
+  justify-content: center;
+`
+
+const box = css({
+  height: "40px",
+  width: "40px",
+  "& + &": {
+    marginLeft: "5px"
+  }
+})
+
+export const className = `
+  left: 20px;
+  top: 20px;
+  width: 200px;
+`
+
+export const initialState = { colors: ["DeepPink", "DeepSkyBlue", "Coral"] }
+
+export const render = ({ colors }) => {
+  return (
+    <div>
+      <h1 className={header}>Some colored boxes</h1>
+      <div className={boxes}>
+        {colors.map((color, idx) => (
+          <div className={`${box} ${css({ background: color })}`} key={idx} />
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+Alternatively, you can also make use of Emotion's styles components:
+
+```jsx
+import { styled } from "uebersicht"
+
+const Header = styled("h1")`
+  font-family: Ubuntu;
+  font-size: 20px;
+  text-align: center;
+  color: white;
+`
+
+const Boxes = styled("div")`
+  display: flex;
+  justify-content: center;
+`
+
+const Box = styled("div")(props => ({
+  height: "40px",
+  width: "40px",
+  background: props.color,
+  marginRight: "5px"
+}))
+
+export const className = `
+  left: 20px;
+  top: 20px;
+  width: 200px;
+`
+
+export const initialState = { colors: ["DeepPink", "DeepSkyBlue", "Coral"] }
+
+export const render = ({ colors }) => {
+  return (
+    <div>
+      <Header>Some colored boxes</Header>
+      <Boxes>
+        {colors.map((color, idx) => (
+          <Box color={color} key={idx} />
+        ))}
+      </Boxes>
+    </div>
+  ;
+}
+```
+
+Finally, since you can also install and import any module you like, you can use your favorite styling library instead.
+
+## Running Shell Commands
+
+If need to run extra shell commands without using the [command](#command) property, you can import the `run` function from the `uebersicht` module.
+
+It returns a Promise, which will resolve to the output of the command (stdout) or reject if any error occurred.
+
+```jsx
+import { run } from 'uebersicht'
+
+export const render => (props, dispatch) {
+  <button
+    onClick={() => {
+      run('echo "new output"')
+        .then((output) => dispatch({type: 'OUTPUT_UPDATED', output}))
+    }}
+  >
+    Update
+  </button>
+}
+```
+> Note that in order to receive click events you need to configure an interaction shortcut and give Übersicht accessibility access.
 
 ## Geolocation API
 
-While the WebView used by Übersicht seems to provide the standard HTML5 geolocation API, it is not functional and there seems to be no way to enable it. Übersicht now provides a custom implementation, which tries to follow the standard implementation as closely as possible. However, so far it provides only the basics and might still be somewehat unstable. The api can be found under `window.geolocation` (instead of `window.navigator.geolocation`). And supports the following methods
+While the WebView used by Übersicht seems to provide the standard HTML5 geolocation API, it is not functional and there seems to be no way to enable it. Übersicht now provides a custom implementation, which tries to follow the standard implementation as closely as possible. However, so far it provides only the basics and might still be somewhat unstable. The api can be found under `window.geolocation` (instead of `window.navigator.geolocation`). And supports the following methods
 
-```coffeescript
+```js
 geolocation.getCurrentPosition(callback)
 ```
 
-```coffeescript
+```js
 geolocation.watchPosition(callback)
 ```
 
-```coffeescript
+```js
 geolocation.clearWatch(watchId)
 ```
 
 Check the [documentation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) for details on how to use these methods. The main difference to the standard API is that none of them accept options (the accuracy for position data is always set to the highest) and error reporting has not be implemented yet.
 
-However, in a adition to the standard `Position` object provided by the standard API, Übersicht provides an extra `address` property with the following fields:
+However, in a addition to the standard `Position` object provided by the standard API, Übersicht provides an extra `address` property with the following fields:
 
   - Street
   - City
@@ -164,15 +316,6 @@ However, in a adition to the standard `Position` object provided by the standard
   - State
   - CountryCode
 
-
-## Hosted Functionality
-
-A global object called `uebersicht` exists which exposes extra functionality that is typically not available in a browser. At the moment it is very limited:
-
-
-### uebersicht.makeBgSlice(canvas)
-
-Has been deprecated as of version 0.8 in favor of -webkit-backdrop-filter. It should be available on all systems that have Safari 9+ installed. https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
 
 ## Built In Proxy Server
 
@@ -237,7 +380,7 @@ However, the common advice is to set this to `true`. It might depend on the OS a
 
 ### building
 
-The code base consists of two parts, a cocoa app and a NodeJS app inside `server/`. To build the node app seperately, use `npm run release`. This happens automatically every time you build using XCode.
+The code base consists of two parts, a cocoa app and a NodeJS app inside `server/`. To build the node app separately, use `npm run release`. This happens automatically every time you build using XCode.
 
 The node app can be run standalone using
 
@@ -265,4 +408,4 @@ http://stackoverflow.com/questions/31254725/transport-security-has-blocked-a-cle
 
 The source for Übersicht is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-© 2016 Felix Hageloh
+© 2018 Felix Hageloh
