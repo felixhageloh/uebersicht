@@ -362,15 +362,15 @@ To build Übersicht you will need to have NodeJS and a few dependencies installe
 
 ### setup
 
-Currently, the project supports node 6 (newer versions support is on the way). 
+Currently, the project supports node 8. 
 
 If you already have node, you'll have to
 
    brew unlink node
 
-Now, install node 6 using homebrew
+Now, install node 8 using homebrew
 
-    brew install node@6 && brew link --force node@6
+    brew install node@8 && brew link --force node@6
 
 then run
 
