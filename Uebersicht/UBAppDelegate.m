@@ -57,9 +57,6 @@ int const PORT = 41416;
     // So, hit em with a hammer :(
     system("killall localnode");
     
-    // start server and load webview
-    portOffset = 0;
-    [self startUp];
     
     // listen for keyboard events
     keyHandler = [[UBKeyHandler alloc]
@@ -79,7 +76,7 @@ int const PORT = 41416;
         screens: screensController
     ];
     [widgetsStore onChange: ^(NSDictionary* widgets) {
-        [widgetsController render];
+        [self->widgetsController render];
     }];
     
     // make sure notifcations always show
@@ -117,7 +114,26 @@ int const PORT = 41416;
         object: nil
     ];
     
+    // start server and load webview
+    portOffset = 0;
+    [self startUp];
+    
     [self listenToWallpaperChanges];
+}
+
+- (NSDictionary*)fetchState
+{
+    [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
+    NSURL *urlPath = [[self serverUrl:@"http"] URLByAppendingPathComponent: @"state/"];
+    NSData *jsonData = [NSData dataWithContentsOfURL:urlPath];
+    NSError *error = nil;
+    NSDictionary *dataDictionary = [NSJSONSerialization
+        JSONObjectWithData: jsonData
+        options: NSJSONReadingMutableContainers
+        error: &error
+    ];
+    if (error) NSLog(@"%@", error);
+    return dataDictionary;
 }
 
 - (void)startUp
@@ -128,23 +144,22 @@ int const PORT = 41416;
     void (^handleData)(NSString*) = ^(NSString* output) {
         // note that these might be called several times
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [widgetsStore reset];
-            [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
+            [self->widgetsStore reset: [self fetchState]];
             // this will trigger a render
-            [screensController syncScreens:self];
+            [self->screensController syncScreens:self];
 
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
-            portOffset++;
+            self->portOffset++;
         }
     };
 
     void (^handleExit)(NSTask*) = ^(NSTask* theTask) {
         [self shutdown];
-        if (portOffset >= 20) {
-            keepServerAlive = NO;
+        if (self->portOffset >= 20) {
+            self->keepServerAlive = NO;
             NSLog(@"couldn't find an open port. Giving up...");
         }
-        if (keepServerAlive) {
+        if (self->keepServerAlive) {
             [self
                 performSelector: @selector(startUp)
                 withObject: nil

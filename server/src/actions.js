@@ -1,11 +1,20 @@
 'use strict';
 
 function addWidget(widget) {
+  const {id, filePath, error, mtime} = widget;
   return {
     type: 'WIDGET_ADDED',
-    payload: widget,
+    payload: {id, filePath, error, mtime},
   };
 }
+
+exports.showWidget = function showWidget(id, impl) {
+  return {
+    type: 'WIDGET_LOADED',
+    id: id,
+    payload: impl,
+  };
+};
 
 function removeWidget(id) {
   return {

@@ -23,6 +23,10 @@ module.exports = function WidgetBundler() {
     }
   };
 
+  api.get = function get(id) {
+    return bundles[id].widget.body;
+  };
+
   function addWidget(id, filePath, emit) {
     if (!bundles[id]) {
       bundles[id] = WidgetBundle(id, filePath, (widget) => {
@@ -41,7 +45,7 @@ module.exports = function WidgetBundler() {
 
   function WidgetBundle(id, filePath, callback) {
     const bundle = bundleWidget(id, filePath);
-    const buildWidget = () => {
+    const buildWidget = (paths = []) => {
       const widget = {
         id: id,
         filePath: filePath,
@@ -51,12 +55,13 @@ module.exports = function WidgetBundler() {
         if (couldNotRead) return;
         bundle.bundle((err, srcBuffer) => {
           if (err) {
-            widget.error = prettyPrintError(filePath, err);
+            widget.error = errorJSON(filePath, err);
           } else {
             widget.body = srcBuffer.toString();
           }
 
-          widget.mtime = fs.statSync(filePath).mtime;
+          widget.mtime = fs.statSync(paths[0] || filePath).mtime;
+          bundle.widget = widget;
           callback(widget);
         });
       });
@@ -67,21 +72,34 @@ module.exports = function WidgetBundler() {
     return bundle;
   }
 
-  function prettyPrintError(filePath, error) {
-    if (error.code === 'ENOENT') {
-      return 'file not found';
+  function errorJSON(filePath, error) {
+    if (!error._babel) {
+      return JSON.stringify({
+        line: error.line,
+        column: error.column,
+        path: filePath,
+        lines: error.annotated,
+        message: error.message,
+      });
     }
-    let errStr = error.toString ? error.toString() : String(error.message);
+    return JSON.stringify({
+      line: error.loc.line,
+      column: error.loc.column,
+      lines: parseCodeFrame(error.codeFrame),
+      path: filePath,
+      message: error.message,
+    });
+  }
 
-    // coffeescipt errors will have [stdin] when prettyPrinted (because they are
-    // parsed from stdin). So lets replace that with the real file path
-    if (errStr.indexOf('[stdin]') > -1) {
-      errStr = errStr.replace('[stdin]', filePath);
-    } else {
-      errStr = filePath + ': ' + errStr;
-    }
-
-    return errStr;
+  function parseCodeFrame(codeFrame) {
+    return codeFrame
+      .split('\n')
+      .map(l => {
+        const [num, line] = l.split('|', 2);
+        const lineNum = parseInt(num.replace(/^>/, ''), 10);
+        return isNaN(lineNum) ? undefined : {lineNum: lineNum, line: line};
+      })
+      .filter(i => i);
   }
 
   return api;

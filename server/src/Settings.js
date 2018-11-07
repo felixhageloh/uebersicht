@@ -6,11 +6,9 @@ const fs = require('fs');
 module.exports = function Settings(settingsDirPath) {
   const api = {};
   let settings;
+  const settingsFile = path.join(settingsDirPath, 'WidgetSettings.json');
 
-  const fullSettingsDirPath = path.resolve(__dirname, settingsDirPath);
-  const settingsFile = path.join(fullSettingsDirPath, 'WidgetSettings.json');
-
-  initSettingsFile(fullSettingsDirPath);
+  initSettingsFile(settingsDirPath);
 
   function initSettingsFile(dirPath) {
     if (!fs.existsSync(dirPath)) {

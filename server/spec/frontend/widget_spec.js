@@ -17,9 +17,7 @@ function makeFakeServer() {
 }
 
 function buildWidget(impl) {
-  return Widget({
-    body: '(function require() { return ' + tosource(impl) + '})',
-  });
+  return Widget({implementation: impl});
 }
 
 test('widget creation', (t) => {
@@ -361,7 +359,7 @@ test('error handling', (t) => {
 
   var domEl = instance.create();
   t.equal(
-    domEl.querySelector('.widget').textContent, 'something went sorry',
+    domEl.querySelector('.widget').textContent, 'something went sorry\n',
     'it catches and renders errors in render()'
   );
 
@@ -374,7 +372,7 @@ test('error handling', (t) => {
 
   domEl = instance.create();
   t.equal(
-    domEl.querySelector('.widget').textContent, 'ohoh',
+    domEl.querySelector('.widget').textContent, 'ohoh\n',
     'it catches and renders errors in update()'
   );
 
@@ -394,7 +392,7 @@ test('error handling', (t) => {
   server.respond();
 
   t.equal(
-    domEl.querySelector('.widget').textContent, 'oh noez!',
+    domEl.querySelector('.widget').textContent, 'oh noez!\n',
     'it renders command errors'
   );
 

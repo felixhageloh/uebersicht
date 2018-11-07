@@ -14,11 +14,6 @@ before_install:
 
 install:
   - npm install
-  - brew install phantomjs
 
 script:
-  - npm run build-server
-  - npm run build-client
-
-  - npm run test-local
-  - npm run test-browser-phantom
+  - npm test

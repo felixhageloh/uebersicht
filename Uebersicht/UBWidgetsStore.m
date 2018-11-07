@@ -42,14 +42,14 @@
         }];
         
         [listener on:@"WIDGET_SETTINGS_CHANGED" do:^(NSDictionary* details) {
-            settings[details[@"id"]] = [[NSMutableDictionary alloc]
+            self->settings[details[@"id"]] = [[NSMutableDictionary alloc]
                 initWithDictionary:details[@"settings"]
             ];
             [self notifyChange];
         }];
         
         [listener on:@"WIDGET_REMOVED" do:^(NSString* widgetId) {
-            if (widgets[widgetId]) {
+            if (self->widgets[widgetId]) {
                 [self removeWidget:widgetId];
                 [self notifyChange];
             }
@@ -128,6 +128,12 @@
 {
     widgets = [[NSMutableDictionary alloc] init];
     settings = [[NSMutableDictionary alloc] init];
+}
+
+- (void)reset:(NSDictionary*)state
+{
+    widgets = [(NSDictionary*)state[@"widgets"] mutableCopy];
+    settings = [(NSDictionary*)state[@"settings"] mutableCopy];
 }
 
 - (NSDictionary*)get:(NSString*)widgetId

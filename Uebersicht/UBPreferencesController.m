@@ -98,7 +98,7 @@
             [self setWidgetDir:[openPanel URLs][0]];
         }
         
-        [filePicker selectItemAtIndex:0];
+        [self->filePicker selectItemAtIndex:0];
     }];
 }
 
