@@ -1,4 +1,5 @@
 connect = require 'connect'
+http = require 'http'
 serveStatic = require 'serve-static'
 path = require 'path'
 fs = require 'fs'
@@ -62,21 +63,24 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
 
   # set up the server
   messageBus = null
-  server = connect()
+  middleware = connect()
     .use(CommandServer(widgetPath, options.loginShell))
     .use(StateServer(store))
     .use(serveWidgets(bundler, widgetPath))
     .use(serveStatic(publicPath))
     .use(serveStatic(widgetPath))
     .use(serveClient(publicPath))
-    .listen port, '127.0.0.1', (err) ->
-      try
-        return server.emit('error', err) if err
-        messageBus = MessageBus(server: server)
-        sharedSocket.open("ws://127.0.0.1:#{port}")
-        callback?()
-      catch e
-        server.emit('error', e)
+
+  server = http.createServer(middleware)
+  server.keepAliveTimeout = 30000
+  server.listen port, '127.0.0.1', (err) ->
+    try
+      return server.emit('error', err) if err
+      messageBus = MessageBus(server: server)
+      sharedSocket.open("ws://127.0.0.1:#{port}")
+      callback?()
+    catch e
+      server.emit('error', e)
 
   # api
   close: (cb) ->
