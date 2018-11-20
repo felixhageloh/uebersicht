@@ -8,7 +8,7 @@ html, body
   padding: 0
   margin: 0
 
-header, section, #disqus_thread
+header, section, footer, #disqus_thread
   width: 532px
   margin: 0 auto
   padding: 24px 16px 32px 16px
@@ -46,21 +46,29 @@ header
     margin: 32px -16px 24px -16px
     display: block
 
+h1
+  font-weight: 700
+  font-size: 28px
+  margin: 0 0 12px 0
+  font-style: italic
+
+footer
+  font-size: 12px
+  color #666
+  h1
+    font-size: 14px
+    margin-bottom: 6px
+
 main
   background: #f9f9f9
   border-top: 1px solid #e0e0e0
+  border-bottom: 1px solid #e0e0e0
 
   section
     display: block
     border-bottom: 1px solid #e0e0e0
     border-top: 1px solid #e0e0e0
     margin-top: -1px
-
-  h1
-    font-weight: 700
-    font-size: 28px
-    margin: 0 0 12px 0
-    font-style: italic
 
   pre
     margin: 20px 0
@@ -186,7 +194,7 @@ main
   body, html
     width: 100%
 
-  header, section, #disqus_thread
+  header, section, footer, #disqus_thread
     width: 100%
     box-sizing: border-box
 
