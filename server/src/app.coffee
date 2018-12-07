@@ -66,9 +66,10 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
   # set up the server
   host = "127.0.0.1"
   messageBus = null
+  allowedOrigin = "http://#{host}:#{port}"
   middleware = connect()
     .use(disallowIFraming)
-    .use(ensureSameOrigin("http://#{host}:#{port}"))
+    .use(ensureSameOrigin(allowedOrigin))
     .use(CommandServer(widgetPath, options.loginShell))
     .use(StateServer(store))
     .use(serveWidgets(bundler, widgetPath))
@@ -77,11 +78,15 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
     .use(serveClient(publicPath))
 
   server = http.createServer(middleware)
-  server.keepAliveTimeout = 30000
+  server.keepAliveTimeout = 0
   server.listen port, host, (err) ->
     try
       return server.emit('error', err) if err
-      messageBus = MessageBus(server: server)
+      messageBus = MessageBus(
+        server: server,
+        verifyClient: (info) ->
+          info.origin == allowedOrigin || info.origin == 'Übersicht'
+      )
       sharedSocket.open("ws://#{host}:#{port}")
       callback?()
     catch e
