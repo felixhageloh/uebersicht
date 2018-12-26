@@ -56,7 +56,7 @@ An **number** specifying how often the above command is executed.
 It defines the delay in milliseconds between consecutive commands executions. Example:
 
 ```coffeescript
-export default const refreshFrequency = 1000; // widget will run command once a second
+export const refreshFrequency = 1000; // widget will run command once a second
 ```
 
 The default is 1000 (1s). If set to `false` the widget won't refresh automatically.
@@ -165,7 +165,7 @@ export const init = (dispatch) => {
   const socket = new WebSocket('ws://localhost:8080');
 
   socket.addEventListener('message',  (event) => {
-    disptach({type: 'MESSAGE_RECEIVED', data: event.data});
+    dispatch({type: 'MESSAGE_RECEIVED', data: event.data});
   });
 }
 ```
