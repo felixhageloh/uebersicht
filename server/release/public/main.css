@@ -19,5 +19,5 @@ html {
 
 .widget {
   position: absolute;
-  -webkit-font-smoothing: subpixel-antialiased;
+  -webkit-font-smoothing: antialiased;
 }
