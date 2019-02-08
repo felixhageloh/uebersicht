@@ -78,7 +78,7 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
     .use(serveClient(publicPath))
 
   server = http.createServer(middleware)
-  server.keepAliveTimeout = 0
+  server.keepAliveTimeout = 35000
   server.listen port, host, (err) ->
     try
       return server.emit('error', err) if err
@@ -102,4 +102,3 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
 
   on: (ev, handler) ->
     server.on(ev, handler)
-

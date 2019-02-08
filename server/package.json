@@ -50,7 +50,7 @@
     "serve-static": "^1.13.1",
     "source-map": "^0.7.3",
     "stylus": "~0.54.5",
-    "superagent": "^3.6.3",
+    "superagent": "^3.8.3",
     "through2": "^2.0.3",
     "tmp": "0.0.33",
     "tosource": "~1.0.0",
