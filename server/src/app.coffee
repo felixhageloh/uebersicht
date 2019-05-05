@@ -15,6 +15,7 @@ disallowIFraming = require('./disallowIFraming')
 CommandServer = require('./command_server.coffee')
 serveWidgets = require('./serveWidgets')
 serveClient = require('./serveClient')
+serveCss = require('./serveCss')
 sharedSocket = require('./SharedSocket')
 actions = require('./actions')
 reducer = require('./reducer')
@@ -44,6 +45,9 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
   bundler = WidgetBundler(widgetPath)
   # TODO: use a stream/generator/promise pattern instead of nested callbacks
   dirWatcher = watchDir(widgetPath, (fileEvent) ->
+    if (fileEvent.filePath.replace(fileEvent.rootPath, '') == '/main.css')
+      dispatchToRemote({type: 'MASTER_STYLE_CHANGED'})
+      return
     bundler.push(resolveWidget(fileEvent), (widgetEvent) ->
       action = actions.get(widgetEvent)
       if (action)
@@ -75,6 +79,7 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
     .use(serveWidgets(bundler, widgetPath))
     .use(serveStatic(publicPath))
     .use(serveStatic(widgetPath))
+    .use(serveCss(widgetPath))
     .use(serveClient(publicPath))
 
   server = http.createServer(middleware)

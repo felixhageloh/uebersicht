@@ -6,13 +6,16 @@ listenToRemote = require './src/listen'
 sharedSocket = require './src/SharedSocket'
 render = require './src/render'
 actions = require './src/actions'
+userCssLink = null
 
 
 window.onload = ->
   sharedSocket.open("ws://#{window.location.host}")
   screenId = Number(window.location.pathname.replace(/\//g, ''))
-  contentEl = document.getElementById('__uebersicht')
+  contentEl = document.getElementById('uebersicht')
   contentEl.innerHTML = ''
+  userCssLink = Array.from(document.querySelectorAll('link'))
+    .find((el) => el.href.match('userMain.css'))
 
   getState (err, initialState) ->
     bail err, 10000 if err?
@@ -37,6 +40,8 @@ window.onload = ->
         fetchWidget(action.payload.id)
           .then (widgetImpl) ->
             store.dispatch(actions.showWidget(action.payload.id, widgetImpl))
+      else if action.type == 'MASTER_STYLE_CHANGED'
+        reloadUserCSS()
       else
         store.dispatch(action)
     render(initialState, screenId, contentEl, store.dispatch)
@@ -67,6 +72,10 @@ fetchWidget = (id) -> new Promise (resolve, reject) ->
     document.head.removeChild(scriptTag)
     reject(err)
   document.head.appendChild(scriptTag)
+
+reloadUserCSS = ->
+  href = userCssLink.href.split('?')[0]
+  userCssLink.href = "#{href}?#{new Date().getTime()}"
 
 bail = (err, timeout = 0) ->
   console.log err if err?

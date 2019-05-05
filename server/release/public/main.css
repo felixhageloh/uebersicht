@@ -8,7 +8,7 @@ html {
   overflow: hidden;
 }
 
-#__uebersicht {
+#uebersicht {
   position: absolute;
   height: 100%;
   width: 100%;
@@ -19,5 +19,4 @@ html {
 
 .widget {
   position: absolute;
-  -webkit-font-smoothing: subpixel-antialiased;
 }
