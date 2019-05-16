@@ -418,4 +418,4 @@ http://stackoverflow.com/questions/31254725/transport-security-has-blocked-a-cle
 
 The source for Übersicht is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-© 2018 Felix Hageloh
+© 2019 Felix Hageloh

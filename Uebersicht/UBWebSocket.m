@@ -55,9 +55,9 @@
     }
     
     url = aUrl;
-    ws = [[SRWebSocket alloc]
-        initWithURLRequest:[NSURLRequest requestWithURL:url]
-    ];
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
+    [request setValue:@"Übersicht" forHTTPHeaderField:@"Origin"];
+    ws = [[SRWebSocket alloc] initWithURLRequest: request];
     ws.delegate = self;
     [ws open];
 }

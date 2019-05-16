@@ -12,12 +12,12 @@ const defaults = {
   refreshFrequency: 1000,
   init: function init() {},
   render: function render(props) {
-    return html('div', null, props.error ? String(props.error) : props.output );
+    return html('div', null, props.error ? String(props.error) : props.output);
   },
   updateState: function updateState(event) {
-    return { error: event.error, output: event.output };
+    return {error: event.error, output: event.output};
   },
-  initialState: { output: '' },
+  initialState: {output: ''},
 };
 
 module.exports = function VirtualDomWidget(widgetObject) {
@@ -51,20 +51,22 @@ module.exports = function VirtualDomWidget(widgetObject) {
   function run() {
     implementation.init(dispatch);
     if (!implementation.command) return;
-    commandLoop = Timer().start().map((done) => {
-      execWidgetCommand()
-        .then(commandCompleted)
-        .catch(commandErrored)
-        .then(() => done(implementation.refreshFrequency));
-    });
+    commandLoop = Timer()
+      .start()
+      .map((done) => {
+        execWidgetCommand()
+          .then(commandCompleted)
+          .catch(commandErrored)
+          .then(() => done(implementation.refreshFrequency));
+      });
   }
 
   function commandCompleted(output) {
-    dispatch({ type: 'UB/COMMAND_RAN', output });
+    dispatch({type: 'UB/COMMAND_RAN', output});
   }
 
   function commandErrored(error) {
-    dispatch({ type: 'UB/COMMAND_RAN', error });
+    dispatch({type: 'UB/COMMAND_RAN', error});
   }
 
   const runCommandFunction = (command) => {
@@ -73,16 +75,14 @@ module.exports = function VirtualDomWidget(widgetObject) {
     } catch (err) {
       handleError(err);
     }
-  }
+  };
 
   function execWidgetCommand() {
-    const {command, refreshFrequency} = implementation;
+    const {command} = implementation;
     if (typeof command === 'function')
       return Promise.resolve(runCommandFunction(command));
-    else if (typeof command === 'string')
-      return runShellCommand(command);
-    else
-      return Promise.resolve();
+    else if (typeof command === 'string') return runShellCommand(command);
+    else return Promise.resolve();
   }
 
   function dispatch(event) {
@@ -96,9 +96,8 @@ module.exports = function VirtualDomWidget(widgetObject) {
 
   function fetchErrorDetails(err) {
     return fetch(
-      `/widgets/${widgetObject.id}?line=${err.line}&column=${err.column}`
-      )
-      .then(res => res.json());
+      `/widgets/${widgetObject.id}?line=${err.line}&column=${err.column}`,
+    ).then((res) => res.json());
   }
 
   function render(state) {
@@ -112,7 +111,7 @@ module.exports = function VirtualDomWidget(widgetObject) {
   function handleError(err) {
     currentError = err;
     commandLoop && commandLoop.stop();
-    fetchErrorDetails(err).then(details => {
+    fetchErrorDetails(err).then((details) => {
       if (err !== currentError) return;
       renderErrorDetails(Object.assign({message: err.message}, details));
     });

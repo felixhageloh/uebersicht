@@ -28,7 +28,7 @@ function handleError(err) {
 }
 
 exports.open = function open(url) {
-  ws = new WebSocket(url);
+  ws = new WebSocket(url, ['ws'], {origin: 'Übersicht'});
 
   if (ws.on) {
     ws.on('open', handleWSOpen);
