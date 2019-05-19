@@ -6,6 +6,24 @@
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
         <item>
+            <title>Version 1.4.57</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>New: global CSS. Add a file called main.css to you widgets folder to apply global style and layout.</li>
+                <li>Improved handling of network connection errors.</li>
+                <li>Improved security.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Mon, May 20 2019 08:45:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.57.app.zip"
+                       sparkle:version="57"
+                       sparkle:shortVersionString="1.4.57"
+                       length="51712"
+                       type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+        </item>
+        <item>
             <title>Version 1.3.56</title>
             <description><![CDATA[
               <h3>What's New</h3>
