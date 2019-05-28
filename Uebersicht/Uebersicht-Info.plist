@@ -43,5 +43,21 @@
 	<string>Uebersicht.sdef</string>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>A widget would like to access your Calendar.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>A widget would like to access your Reminders.</string>
+	<key>NSHomeKitUsageDescription</key>
+	<string>A widget would like to make use of HomeKit.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>A widget would like to access your Photo Library.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>A widget would like to access your Media Library.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>A widget would like to access your current locatiuon.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>A widget would like to access Bluetooth.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>A widget would like to control another app.</string>
 </dict>
 </plist>
