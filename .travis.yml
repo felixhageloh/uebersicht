@@ -1,15 +1,15 @@
 os: osx
 language: objective-c
-osx_image: xcode8.3
-node_js: 6.10.2
+
+# Add new versions to test here
+env:
+  - NODE=8
 
 before_install:
-  - |
-    # work-around for issue https://github.com/travis-ci/travis-ci/issues/6307
-    # might not be necessary in the future
-    # https://github.com/commontk/AppLauncher/commit/5fd1ccc32cff5950297ba3de07b81b343cc5f387
-    command curl -sSL https://rvm.io/mpapis.asc | gpg --import -
-    rvm get stable
+  - nvm install $NODE
+  - nvm use $NODE
+  - npm install -g npm
+  - npm config set loglevel warn
   - cd server
 
 install:
