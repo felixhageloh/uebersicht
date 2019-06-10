@@ -19,18 +19,21 @@ test('bundling widgets', (t) => {
     t.equal(typeof event.widget, 'object', 'it emits a widget object');
     t.equal(event.widget.id, 'widget-1', 'the widget object has an id');
     t.equal(
-      event.widget.filePath, action.filePath,
-      'the widget object contains the original file path'
+      event.widget.filePath,
+      action.filePath,
+      'the widget object contains the original file path',
     );
     t.equal(
-      typeof event.widget.body, 'string',
-      'it also contains a string with the widget source code'
+      typeof event.widget.body,
+      'string',
+      'it also contains a string with the widget source code',
     );
 
     const widget = eval(event.widget.body)('widget-1');
     t.equal(
-      widget.command, 'foo',
-      'the source evals to a require function which returns the widget by id'
+      widget.command,
+      'foo',
+      'the source evals to a require function which returns the widget by id',
     );
     callback = () => {};
     t.end();
@@ -43,13 +46,16 @@ test('watching widgets', (t) => {
   callback = (event) => {
     t.equal(event.type, 'added', 'it emits another "added" event');
     t.equal(event.widget.id, 'widget-1', 'for the correct widget');
-    t.equal(
-      typeof event.widget.body, 'string', 'with the widget source code'
-    );
+    t.equal(typeof event.widget.body, 'string', 'with the widget source code');
     t.end();
   };
 
-  fs.utimes(path.join(fixturePath, 'widget-1.coffee'), Date.now(), Date.now());
+  fs.utimes(
+    path.join(fixturePath, 'widget-1.coffee'),
+    Date.now(),
+    Date.now(),
+    () => {},
+  );
 });
 
 test('removing widgets', (t) => {
