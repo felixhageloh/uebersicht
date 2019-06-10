@@ -5,25 +5,35 @@ fsevents = require('fsevents')
 module.exports = (directoryPath, callback) ->
   api = {}
   foundPaths = {}
+  closed = true
+  stopWatching = null;
 
   init = ->
     if !fs.existsSync(directoryPath)
       throw new Error "could not find #{directoryPath}"
 
-    watcher = fsevents directoryPath
-    watcher.on 'change', (filePath, info) ->
+    closed = false
+    stopWatching = fsevents.watch(directoryPath, (filePath, flags, id) ->
+      return if closed
+      info = fsevents.getInfo(filePath, flags, id);
       switch info.event
-        when 'modified', 'moved-in', 'created'
+        when 'modified', 'created'
           findFiles filePath, info.type, registerFile
-        when 'moved-out', 'deleted'
+        when 'deleted'
           unregisterFiles filePath
+        when 'moved'
+          unregisterFiles filePath
+          findFiles filePath, info.type, registerFile
+    )
 
-    watcher.start()
     console.log 'watching', directoryPath
 
     findFiles directoryPath, 'directory', registerFile
+    close
 
-    watcher
+  close = ->
+    closed = true
+    stopWatching?()
 
   registerFile = (filePath) ->
     filePath = filePath.normalize()

@@ -44,7 +44,7 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
 
   bundler = WidgetBundler(widgetPath)
   # TODO: use a stream/generator/promise pattern instead of nested callbacks
-  dirWatcher = watchDir(widgetPath, (fileEvent) ->
+  stopWatchingDir = watchDir(widgetPath, (fileEvent) ->
     if (fileEvent.filePath.replace(fileEvent.rootPath, '') == '/main.css')
       dispatchToRemote({type: 'MASTER_STYLE_CHANGED'})
       return
@@ -99,7 +99,7 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
 
   # api
   close: (cb) ->
-    dirWatcher.stop()
+    stopWatchingDir()
     bundler.close()
     server.close()
     sharedSocket.close()
