@@ -3,7 +3,7 @@ language: objective-c
 
 # Add new versions to test here
 env:
-  - NODE=8
+  - NODE=10
 
 before_install:
   - nvm install $NODE
