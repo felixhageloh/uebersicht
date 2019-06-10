@@ -5,7 +5,24 @@
       <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
-         <item>
+        <item>
+            <title>Version 1.4.58</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>React is exposed via the uebersicht package.</li>
+                <li>IFraming of content served from withing the widget folder is possible again.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Mon, Jun 10 2019 15:55:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.59.app.zip"
+                       sparkle:version="59"
+                       sparkle:shortVersionString="1.4.59"
+                       length="50672"
+                       type="application/octet-stream" />
+          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+        </item>
+        <item>
             <title>Version 1.4.58</title>
             <description><![CDATA[
               <h3>What's New</h3>
