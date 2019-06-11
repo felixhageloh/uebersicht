@@ -1,4 +1,4 @@
-const css = require('react-emotion').css;
+const css = require('emotion').css;
 const RenderLoop = require('./RenderLoop');
 const Timer = require('./Timer');
 const runShellCommand = require('./runShellCommand');

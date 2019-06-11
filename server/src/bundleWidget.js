@@ -1,5 +1,3 @@
-'use strict';
-
 const browserify = require('browserify');
 const watchify = require('./watchify');
 const widgetify = require('./widgetify');
@@ -7,6 +5,7 @@ const coffeeify = require('coffeeify');
 const babelify = require('babelify');
 const jsxTransform = require('@babel/preset-react');
 const restSpreadTransform = require('@babel/plugin-proposal-object-rest-spread');
+const emotion = require('babel-plugin-emotion');
 const envPreset = require('@babel/preset-env');
 const through = require('through2');
 
@@ -52,7 +51,7 @@ module.exports = function bundleWidget(id, filePath) {
         [envPreset, {targets: 'last 4 Safari versions', modules: 'commonjs'}],
         [jsxTransform, {pragma: 'html'}],
       ],
-      plugins: [restSpreadTransform],
+      plugins: [restSpreadTransform, emotion],
     });
   } else {
     bundle.transform(wrapJSWidget);
