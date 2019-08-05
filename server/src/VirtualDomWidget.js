@@ -71,7 +71,7 @@ module.exports = function VirtualDomWidget(widgetObject) {
 
   const runCommandFunction = (command) => {
     try {
-      command.apply(implementation, [dispatch]);
+      return command.apply(implementation, [dispatch]);
     } catch (err) {
       handleError(err);
     }
