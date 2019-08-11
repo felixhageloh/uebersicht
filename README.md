@@ -263,7 +263,7 @@ export const render = ({ colors }) => {
         ))}
       </Boxes>
     </div>
-  ;
+  )
 }
 ```
 
