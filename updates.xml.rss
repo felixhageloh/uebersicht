@@ -5,6 +5,23 @@
       <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
       <description>Most recent changes with links to updates.</description>
       <language>en</language>
+         <item>
+            <title>Version 1.4.60</title>
+            <description><![CDATA[
+              <h3>What's New</h3>
+              <ul>
+                <li>Upgrades and bug fixes.</li>
+                <li>Ships with Node 10.</li>
+              </ul>
+            ]]></description>
+            <pubDate>Tue, Sep 10 2019 9:00:00 +0200</pubDate>
+            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.60.app.zip"
+                       sparkle:version="60"
+                       sparkle:shortVersionString="1.4.60"
+                       length="52856"
+                       type="application/octet-stream" />
+            <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+        </item>
         <item>
             <title>Version 1.4.58</title>
             <description><![CDATA[
