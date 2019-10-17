@@ -9,7 +9,7 @@ In essence, widgets are JavaScript modules that expose a few key properties and 
 
 Widget rendering is done using [React](https://reactjs.org) and it's [JSX](https://reactjs.org/docs/introducing-jsx.html) syntax. Simple widget state is managed for you by Übersicht, but for more advanced widgets you can manage state using a Redux-like pattern. You `dispatch` events, which get processed by a single `updateState` function which returns the new state, which is passed to the render function of your widget.
 
-State is kept when you modify your widget, which allows for live coding. Any changes to the UI of your widget will be immediatly visible.  One drawback (at least with the current implementation) is that if you change the shape of your state you mighy have to 'Refresh all Widgets' from the app menu for your widget to work.
+State is kept when you modify your widget, which allows for live coding. Any changes to the UI of your widget will be immediatly visible.  One drawback (at least with the current implementation) is that if you change the shape of your state you might have to 'Refresh all Widgets' from the app menu for your widget to work.
 
 You can also include node modules and split your widget into separate files using [ESM syntax](http://2ality.com/2014/09/es6-modules-final.html). Any file that is in a directory called `/node_modules`, `/lib` or `/src` will be treated as a module and will not show up as a separate widget.
 
