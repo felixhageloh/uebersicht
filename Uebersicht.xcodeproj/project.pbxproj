@@ -555,7 +555,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "BUILD=\"${BUILT_PRODUCTS_DIR}\"\n\n# By default, use the configured code signing identity for the project/target\nIDENTITY=\"${CODE_SIGN_IDENTITY}\"\nif [ \"$IDENTITY\" == \"\" ]\nthen\n    # If a code signing identity is not specified, use ad hoc signing\n    IDENTITY=\"-\"\nfi\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$FRAMEWORKS_FOLDER_PATH/Sparkle.framework/Versions/A/Resources/AutoUpdate.app\"\ncodesign --entitlements \"$CODE_SIGN_ENTITLEMENTS\" --verbose --force --deep -o runtime --sign  \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/localnode\"\ncodesign --verbose --force --deep -o runtime --sign  \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/node_modules/fsevents/fsevents.node\"\n";
+			shellScript = "BUILD=\"${BUILT_PRODUCTS_DIR}\"\n\n# By default, use the configured code signing identity for the project/target\nIDENTITY=\"${CODE_SIGN_IDENTITY}\"\nif [ \"$IDENTITY\" == \"\" ]\nthen\n    # If a code signing identity is not specified, use ad hoc signing\n    IDENTITY=\"-\"\nfi\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$FRAMEWORKS_FOLDER_PATH/Sparkle.framework/Versions/A/Resources/AutoUpdate.app\"\ncodesign --entitlements \"$CODE_SIGN_ENTITLEMENTS\" --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/localnode\"\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/node_modules/fsevents/fsevents.node\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -739,8 +739,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Uebersicht/Übersicht.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = S3P44NRLCW;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -757,6 +758,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
 				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -768,8 +770,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "Uebersicht/Übersicht.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = S3P44NRLCW;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -786,6 +789,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
 				PRODUCT_NAME = "Übersicht";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
