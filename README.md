@@ -334,21 +334,21 @@ If you like you make Ajax requests to an external site without using a command, 
 
 ## Scripting Support
 
-Übersicht has AppleScript support since version 1.1.45. To get detailed information on what you can script, open the Script Editor and add Übersicht to the Library (use Window -> Library to show). Here are a few examples of what you can do with AppleScript:
+Übersicht has AppleScript support since version 1.1.45. To get detailed information on what you can script, open the Script Editor and add Übersicht to the Library (use Window -> Library to show). Here are a few examples of what you can do with AppleScript. (Note that the examples all use the application id instead of the app name. This is because typing the umlaut Ü can be tricky):
 
-    tell application "Übersicht" to refresh
+    tell application id "tracesOf.Uebersicht" to refresh
 
 refreshes all widgets.
 
-    tell application "Übersicht" to refresh widget id "my-widget"
+    tell application id "tracesOf.Uebersicht" to refresh widget id "my-widget"
 
 refreshes widget with id "my-widget".
 
-    tell application "Übersicht" to every widget
+    tell application id "tracesOf.Uebersicht" to every widget
 
 lists all widgets.
 
-    tell application "Übersicht" to set hidden of widget id "top-cpu-coffee" to false
+    tell application id "tracesOf.Uebersicht" to set hidden of widget id "top-cpu-coffee" to false
 
 hides the widget with ID "top-cpu-coffee"
 
