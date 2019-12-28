@@ -6,22 +6,24 @@
 //  Copyright 2009 Elgato Systems GmbH. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-
+#if __has_feature(modules)
+@import Foundation;
+#else
+#import <Foundation/Foundation.h>
+#endif
+#import "SUExport.h"
 
 /*!
-    @protocol
-    @abstract	Implement this protocol to apply special formatting to the two
-				version numbers.
+    Applies special display formatting to version numbers.
 */
 @protocol SUVersionDisplay
 
 /*!
-    @method     
-    @abstract   An abstract method to format two version strings.
-    @discussion You get both so you can display important distinguishing
-				information, but leave out unnecessary/confusing parts.
+    Formats two version strings.
+
+    Both versions are provided so that important distinguishing information
+    can be displayed while also leaving out unnecessary/confusing parts.
 */
--(void)	formatVersion: (NSString**)inOutVersionA andVersion: (NSString**)inOutVersionB; 
+- (void)formatVersion:(NSString *_Nonnull*_Nonnull)inOutVersionA andVersion:(NSString *_Nonnull*_Nonnull)inOutVersionB;
 
 @end
