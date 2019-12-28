@@ -352,13 +352,6 @@ lists all widgets.
 
 hides the widget with ID "top-cpu-coffee"
 
-### Typing the umlaut 'Ü'
-
-Unfortunately OS X seems to use a different UTF-8 code point for the Ü in its file system than you get by typing it normally (or by copy pasting it from here). There are three ways you can get the correct character:
-
-- use the Script Editor of OS X and add Übersicht to its library. Once you initiate a new script via the Editor it will contain the correct name of the app.
-- while Übersicht is running, list the process using `ps ax | grep sicht` and copy paste the name from there
-- rename the app to whatever you like ('Uebersicht' would be the correct spelling without using the umlaut)
 
 ## Building Übersicht
 
