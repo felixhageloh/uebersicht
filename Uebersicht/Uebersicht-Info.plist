@@ -50,7 +50,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>A widget would like to access your Photo Library.</string>
 	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
+	<string>UBApplication</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>A widget would like to access your Reminders.</string>
 	<key>NSSupportsAppNap</key>

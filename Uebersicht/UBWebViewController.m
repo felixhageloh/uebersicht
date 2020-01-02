@@ -8,6 +8,7 @@
 
 #import "UBWebViewController.h"
 #import "UBLocation.h"
+#import "UBWebView.h"
 
 @implementation UBWebViewController {
     NSURL* url;
@@ -20,6 +21,7 @@
      self = [super init];
     
      if (self) {
+        NSLog(@"yay");
         view = [self buildWebView:frame];
      }
     
@@ -50,7 +52,7 @@
 
 - (WKWebView*)buildWebView:(NSRect)frame
 {
-    WKWebView* webView = [[WKWebView alloc]
+    WKWebView* webView = [[UBWebView alloc]
         initWithFrame: frame
         configuration: [self sharedConfig]
     ];
@@ -116,6 +118,8 @@
         injectionTime: WKUserScriptInjectionTimeAtDocumentStart
         forMainFrameOnly: YES
     ]];
+    
+    [ucController addScriptMessageHandler: self name: @"uebersicht"];
     
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     config.userContentController = ucController;
@@ -183,6 +187,13 @@
     ];
 }
 
-
+- (void)userContentController:(WKUserContentController *)controller
+    didReceiveScriptMessage:(WKScriptMessage *) message
+{
+    if ([message.body isEqual: @"widgetEnter"])
+        [message.webView.window setIgnoresMouseEvents: NO];
+    else if ([message.body isEqual:@"widgetLeave"])
+        [message.webView.window setIgnoresMouseEvents: YES];
+}
 
 @end

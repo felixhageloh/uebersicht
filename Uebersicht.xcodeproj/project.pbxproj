@@ -43,6 +43,8 @@
 		DCAC78CD1C551D130051E78B /* UBListener.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78CC1C551D130051E78B /* UBListener.m */; };
 		DCC701BA23B79D6D00DBC9BC /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC701B823B79CBB00DBC9BC /* Sparkle.framework */; };
 		DCC701BB23B79D7900DBC9BC /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DCC701B823B79CBB00DBC9BC /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DCB95A8D22FAD3F60066A51A /* UBApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = DCB95A8C22FAD3F60066A51A /* UBApplication.m */; };
+		DCBD665922F823AC0043E434 /* UBWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = DCBD665822F823AC0043E434 /* UBWebView.m */; };
 		DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */; };
 		DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E3C01A376AD400A12516 /* UBLocation.m */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
@@ -144,6 +146,10 @@
 		DCAC78CC1C551D130051E78B /* UBListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBListener.m; sourceTree = "<group>"; };
 		DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		DCC701B823B79CBB00DBC9BC /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		DCB95A8B22FAD3F50066A51A /* UBApplication.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBApplication.h; sourceTree = "<group>"; };
+		DCB95A8C22FAD3F60066A51A /* UBApplication.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBApplication.m; sourceTree = "<group>"; };
+		DCBD665722F823AC0043E434 /* UBWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWebView.h; sourceTree = "<group>"; };
+		DCBD665822F823AC0043E434 /* UBWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWebView.m; sourceTree = "<group>"; };
 		DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsStore.h; sourceTree = "<group>"; };
 		DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsStore.m; sourceTree = "<group>"; };
 		DCD6280E1D8187EC00358595 /* WKWebViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKWebViewInternal.h; sourceTree = "<group>"; };
@@ -260,6 +266,8 @@
 				DC43AD9217EC2D9500241CC2 /* UBAppDelegate.m */,
 				DC43ADB317EC31EB00241CC2 /* UBWindow.h */,
 				DC43ADB417EC31EB00241CC2 /* UBWindow.m */,
+				DCBD665722F823AC0043E434 /* UBWebView.h */,
+				DCBD665822F823AC0043E434 /* UBWebView.m */,
 				DC404DF11D2844E100305CE2 /* UBWebViewController.h */,
 				DC404DF21D2844E100305CE2 /* UBWebViewController.m */,
 				DC4913941BEF9A75003E76EF /* UBScreensController.h */,
@@ -286,6 +294,8 @@
 				DC404DEB1D26BAA400305CE2 /* WKHeaders */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,
+				DCB95A8B22FAD3F50066A51A /* UBApplication.h */,
+				DCB95A8C22FAD3F60066A51A /* UBApplication.m */,
 			);
 			path = Uebersicht;
 			sourceTree = "<group>";
@@ -571,9 +581,11 @@
 				DCF9D9011E9D512600D27988 /* UBReloadCommand.m in Sources */,
 				DC314A201C0EE024000A56D2 /* UBWidgetsController.m in Sources */,
 				DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */,
+				DCBD665922F823AC0043E434 /* UBWebView.m in Sources */,
 				DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */,
 				DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
+				DCB95A8D22FAD3F60066A51A /* UBApplication.m in Sources */,
 				DC74D0781E1A71E500893D53 /* UBRefreshCommand.m in Sources */,
 				DC404DF31D2844E100305CE2 /* UBWebViewController.m in Sources */,
 				DC66522D1E212735003267AF /* UBWidgetForScripting.m in Sources */,

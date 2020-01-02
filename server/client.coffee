@@ -7,6 +7,7 @@ sharedSocket = require './src/SharedSocket'
 render = require './src/render'
 actions = require './src/actions'
 userCssLink = null
+detectWidgetHover = require './src/detectWidgetHover'
 
 
 window.onload = ->
@@ -16,6 +17,8 @@ window.onload = ->
   contentEl.innerHTML = ''
   userCssLink = Array.from(document.querySelectorAll('link'))
     .find((el) => el.href.match('userMain.css'))
+
+  detectWidgetHover(contentEl);
 
   getState (err, initialState) ->
     bail err, 10000 if err?

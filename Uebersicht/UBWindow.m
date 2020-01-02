@@ -18,6 +18,7 @@
 
 @implementation UBWindow {
     UBWebViewController* webViewController;
+    NSTrackingArea* trackingArea;
 }
 
 - (id)init
@@ -44,17 +45,48 @@
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
         [self setReleasedWhenClosed:NO];
+        [self setIgnoresMouseEvents:YES];
         
         webViewController = [[UBWebViewController alloc]
             initWithFrame: [self frame]
         ];
         [self setContentView:webViewController.view];
+        [self setupTrackingArea];
     }
 
     return self;
 }
 
 
+
+- (void)setupTrackingArea
+{
+    trackingArea = [[NSTrackingArea alloc]
+        initWithRect: self.contentView.bounds
+        options: NSTrackingMouseMoved
+            | NSTrackingMouseEnteredAndExited
+            | NSTrackingActiveAlways
+        owner: nil
+        userInfo: nil
+    ];
+    [self.contentView addTrackingArea:trackingArea];
+}
+
+- (void)setFrame:(NSRect)newFrame display:(BOOL)doDisplay
+{
+    [super setFrame:newFrame display:doDisplay];
+    [self updateTrackingArea];
+}
+
+- (void)updateTrackingArea
+{
+    if (trackingArea != nil) {
+        [self.contentView removeTrackingArea:trackingArea];
+    }
+    if (self.contentView) {
+        [self setupTrackingArea];
+    }
+}
 
 - (void)loadUrl:(NSURL*)url
 {
@@ -95,12 +127,13 @@
 
 - (void)sendToDesktop
 {
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    if ([[defaults valueForKey:@"compatibilityMode"] boolValue]) {
-        [self setLevel:kCGDesktopWindowLevel - 1];
-    } else {
-        [self setLevel:kCGDesktopWindowLevel];
-    }
+    [self setLevel:kCGNormalWindowLevel-1];
+//    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+//    if ([[defaults valueForKey:@"compatibilityMode"] boolValue]) {
+//        [self setLevel:kCGDesktopWindowLevel - 1];
+//    } else {
+//        [self setLevel:kCGDesktopWindowLevel];
+//    }
 }
 
 - (void)comeToFront
@@ -122,9 +155,10 @@
 #pragma mark flags
 #
 
-- (BOOL)canBecomeKeyWindow { return [self isInFront]; }
-- (BOOL)canBecomeMainWindow { return [self isInFront]; }
+- (BOOL)isKeyWindow { return YES; }
+- (BOOL)canBecomeKeyWindow { return YES; }
+- (BOOL)canBecomeMainWindow { return YES; }
 - (BOOL)acceptsFirstResponder { return [self isInFront]; }
-- (BOOL)acceptsMouseMovedEvents { return [self isInFront]; }
+- (BOOL)acceptsMouseMovedEvents { return YES; }
 
 @end

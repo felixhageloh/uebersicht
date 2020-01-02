@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 @import WebKit;
 
-@interface UBWebViewController : NSObject<WKNavigationDelegate>
+@interface UBWebViewController : NSObject<WKNavigationDelegate, WKScriptMessageHandler>
 
 @property (strong, readonly) NSView* view;
 
@@ -18,5 +18,6 @@
 - (void)reload;
 - (void)redraw;
 - (void)destroy;
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
 
 @end
