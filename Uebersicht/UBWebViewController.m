@@ -21,7 +21,6 @@
      self = [super init];
     
      if (self) {
-        NSLog(@"yay");
         view = [self buildWebView:frame];
      }
     
