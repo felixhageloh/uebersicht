@@ -6,6 +6,7 @@ env:
   - NODE=10
 
 before_install:
+  - unset npm_config_prefix
   - nvm install $NODE
   - nvm use $NODE
   - npm install -g npm
