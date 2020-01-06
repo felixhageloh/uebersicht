@@ -189,10 +189,11 @@
 - (void)userContentController:(WKUserContentController *)controller
     didReceiveScriptMessage:(WKScriptMessage *) message
 {
-    if ([message.body isEqual: @"widgetEnter"])
+    if ([message.body isEqual: @"widgetEnter"]) {
         [message.webView.window setIgnoresMouseEvents: NO];
-    else if ([message.body isEqual:@"widgetLeave"])
+    } else if ([message.body isEqual:@"widgetLeave"]) {
         [message.webView.window setIgnoresMouseEvents: YES];
+    }
 }
 
 @end

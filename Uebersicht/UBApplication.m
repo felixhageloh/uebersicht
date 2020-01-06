@@ -14,7 +14,7 @@
 {
     if (event.type == NSEventTypeMouseEntered) {
         [event.window makeKeyWindow];
-    } 
+    }
     [super sendEvent:event];
 }
 

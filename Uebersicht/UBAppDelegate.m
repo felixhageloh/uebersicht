@@ -14,7 +14,6 @@
 #import "UBWindow.h"
 #import "UBPreferencesController.m"
 #import "UBScreensController.h"
-#import "UBKeyHandler.h"
 #import "UBWidgetsController.h"
 #import "UBWidgetsStore.h"
 #import "UBWebSocket.h"
@@ -34,7 +33,6 @@ int const PORT = 41416;
     UBScreensController* screensController;
     BOOL keepServerAlive;
     int portOffset;
-    UBKeyHandler* keyHandler;
     UBWidgetsStore* widgetsStore;
     UBWidgetsController* widgetsController;
     NSMutableDictionary* windows;
@@ -56,13 +54,6 @@ int const PORT = 41416;
     // spawning the server, like system() or popen() have the same problem.
     // So, hit em with a hammer :(
     system("killall localnode");
-    
-    
-    // listen for keyboard events
-    keyHandler = [[UBKeyHandler alloc]
-        initWithPreferences: preferences
-        listener: self
-    ];
     
     widgetsStore = [[UBWidgetsStore alloc] init];
 
@@ -328,7 +319,8 @@ int const PORT = 41416;
         }
         
         [window setFrame:[screensController screenRect:screenId] display:YES];
-        [window makeKeyAndOrderFront:self];
+        [window setInteractionEnabled: preferences.enableInteraction];
+        [window orderFront:self];
         
         [obsoleteScreens removeObject:screenId];
     }
@@ -342,44 +334,26 @@ int const PORT = 41416;
     NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 
-
-
-
-
 #
 # pragma mark received actions
 #
 
-- (void)modifierKeyReleased
-{
-    for (NSNumber* screenId in windows) {
-        [windows[screenId] sendToDesktop];
-    }
-}
-
-
-- (void)modifierKeyPressed
-{
-   for (NSNumber* screenId in windows) {
-        [windows[screenId] comeToFront];
-    }
-}
 
 - (void)widgetDirDidChange
 {
     [self shutdown:true];
 }
 
-- (void)compatibilityModeDidChange
-{
-    for (NSNumber* screenId in windows) {
-        [windows[screenId] sendToDesktop];
-    }
-}
-
 - (void)loginShellDidChange
 {
     [self shutdown:true];
+}
+
+- (void)interactionDidChange
+{
+    for (NSNumber* screenId in windows) {
+        [windows[screenId] setInteractionEnabled: preferences.enableInteraction];
+    }
 }
 
 - (IBAction)showPreferences:(id)sender

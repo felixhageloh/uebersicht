@@ -14,12 +14,10 @@
 
 @interface UBWindow : NSWindow
 
+@property BOOL interactionEnabled;
 - (id)init;
 - (void)loadUrl:(NSURL*)url;
 - (void)reload;
-- (void)sendToDesktop;
-- (void)comeToFront;
-- (BOOL)isInFront;
 - (void)workspaceChanged;
 - (void)wallpaperChanged;
 

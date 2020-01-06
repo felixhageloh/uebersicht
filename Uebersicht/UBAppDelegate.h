@@ -19,7 +19,7 @@
 @property (readonly) NSArray* widgets;
 
 - (void)widgetDirDidChange;
-- (void)compatibilityModeDidChange;
+- (void)interactionDidChange;
 - (void)screensChanged:(NSDictionary*)screens;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)openWidgetDir:(id)sender;

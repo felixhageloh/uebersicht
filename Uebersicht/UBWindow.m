@@ -19,11 +19,11 @@
 @implementation UBWindow {
     UBWebViewController* webViewController;
     NSTrackingArea* trackingArea;
+    BOOL interactionEnabled;
 }
 
 - (id)init
 {
-
     self = [super
         initWithContentRect: NSMakeRect(0, 0, 0, 0)
         styleMask: NSBorderlessWindowMask
@@ -34,7 +34,6 @@
     if (self) {
         [self setBackgroundColor:[NSColor clearColor]];
         [self setOpaque:NO];
-        [self sendToDesktop];
         [self setCollectionBehavior:(
             NSWindowCollectionBehaviorTransient |
             NSWindowCollectionBehaviorCanJoinAllSpaces |
@@ -51,12 +50,32 @@
             initWithFrame: [self frame]
         ];
         [self setContentView:webViewController.view];
-        [self setupTrackingArea];
     }
 
     return self;
 }
 
+- (void)loadUrl:(NSURL*)url
+{
+    [webViewController load:url];
+}
+
+- (void)reload
+{
+    [webViewController reload];
+}
+
+// TODO: check if we can do at least some cleanups in webViewController#destroy
+//- (void)close
+//{
+//    [webViewController destroy];
+//    [super close];
+//}
+
+
+#
+#pragma mark tracking area
+#
 
 
 - (void)setupTrackingArea
@@ -88,24 +107,6 @@
     }
 }
 
-- (void)loadUrl:(NSURL*)url
-{
-    [webViewController load:url];
-}
-
-- (void)reload
-{
-    [webViewController reload];
-}
-
-// TODO: check if we can do at least some cleanups in webViewController#destroy
-//- (void)close
-//{
-//    [webViewController destroy];
-//    [super close];
-//}
-
-
 #
 #pragma mark signals/events
 #
@@ -121,44 +122,39 @@
 }
 
 #
-#pragma mark window control
+#pragma mark interaction
 #
 
 
-- (void)sendToDesktop
+- (void)setInteractionEnabled:(BOOL)isEnabled
 {
-    [self setLevel:kCGNormalWindowLevel-1];
-//    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-//    if ([[defaults valueForKey:@"compatibilityMode"] boolValue]) {
-//        [self setLevel:kCGDesktopWindowLevel - 1];
-//    } else {
-//        [self setLevel:kCGDesktopWindowLevel];
-//    }
+    if (isEnabled) {
+        [self setLevel:kCGNormalWindowLevel-1];
+        [self updateTrackingArea];
+        interactionEnabled = YES;
+    } else {
+        [self setLevel:kCGDesktopWindowLevel];
+        if (trackingArea != nil) {
+           [self.contentView removeTrackingArea:trackingArea];
+        }
+        [self setIgnoresMouseEvents:YES];
+        interactionEnabled = NO;
+    }
 }
 
-- (void)comeToFront
+- (BOOL)interactionEnabled
 {
-    if (self.isInFront) return;
-
-    [self setLevel:kCGNormalWindowLevel-1];
-    [NSApp activateIgnoringOtherApps:NO];
-    [self makeKeyAndOrderFront:self];
+    return interactionEnabled;
 }
-
-- (BOOL)isInFront
-{
-    return self.level == kCGNormalWindowLevel-1;
-}
-
 
 #
 #pragma mark flags
 #
 
-- (BOOL)isKeyWindow { return YES; }
-- (BOOL)canBecomeKeyWindow { return YES; }
-- (BOOL)canBecomeMainWindow { return YES; }
-- (BOOL)acceptsFirstResponder { return [self isInFront]; }
-- (BOOL)acceptsMouseMovedEvents { return YES; }
+- (BOOL)isKeyWindow { return interactionEnabled; }
+- (BOOL)canBecomeKeyWindow { return interactionEnabled; }
+- (BOOL)canBecomeMainWindow { return interactionEnabled; }
+- (BOOL)acceptsFirstResponder { return interactionEnabled; }
+- (BOOL)acceptsMouseMovedEvents { return interactionEnabled; }
 
 @end

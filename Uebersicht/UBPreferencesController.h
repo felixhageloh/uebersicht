@@ -16,15 +16,12 @@
 
 @property (weak) IBOutlet NSToolbar* toolbar;
 @property (weak) IBOutlet NSPopUpButton *filePicker;
-@property (weak) IBOutlet NSMatrix *interactionShortcutRadio;
 @property BOOL startAtLogin;
 @property BOOL compatibilityMode;
 @property NSURL* widgetDir;
 @property BOOL loginShell;
+@property BOOL enableInteraction;
 
 - (IBAction)showFilePicker:(id)sender;
-- (IBAction)shortcutKeyChanged:(id)sender;
-
-- (CGEventFlags)interactionShortcut;
 
 @end
