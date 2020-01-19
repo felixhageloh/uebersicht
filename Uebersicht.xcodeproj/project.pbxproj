@@ -38,7 +38,7 @@
 		DC9296AB1C501D34006E4267 /* widget-status-hidden.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A91C501D34006E4267 /* widget-status-hidden.png */; };
 		DC9296AC1C501D34006E4267 /* widget-status-hidden@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296AA1C501D34006E4267 /* widget-status-hidden@2x.png */; };
 		DC9F7CE31C439CE50014E25B /* UBDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F7CE21C439CE50014E25B /* UBDispatcher.m */; };
-		DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* getting-started.coffee */; };
+		DCAAAF9618DF0B050097677F /* GettingStarted.jsx in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* GettingStarted.jsx */; };
 		DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78C91C550B810051E78B /* UBWebSocket.m */; };
 		DCAC78CD1C551D130051E78B /* UBListener.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78CC1C551D130051E78B /* UBListener.m */; };
 		DCC701BA23B79D6D00DBC9BC /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC701B823B79CBB00DBC9BC /* Sparkle.framework */; };
@@ -137,7 +137,7 @@
 		DC99A7C418DC41A600E61222 /* Übersicht.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Übersicht.entitlements"; sourceTree = "<group>"; };
 		DC9F7CE11C439CE50014E25B /* UBDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBDispatcher.h; sourceTree = "<group>"; };
 		DC9F7CE21C439CE50014E25B /* UBDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBDispatcher.m; sourceTree = "<group>"; };
-		DCAAAF9518DF0B050097677F /* getting-started.coffee */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "getting-started.coffee"; sourceTree = "<group>"; };
+		DCAAAF9518DF0B050097677F /* GettingStarted.jsx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GettingStarted.jsx; sourceTree = "<group>"; };
 		DCAC78C81C550B810051E78B /* UBWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWebSocket.h; sourceTree = "<group>"; };
 		DCAC78C91C550B810051E78B /* UBWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWebSocket.m; sourceTree = "<group>"; };
 		DCAC78CB1C551D130051E78B /* UBListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBListener.h; sourceTree = "<group>"; };
@@ -298,7 +298,7 @@
 				DC9296A51C5017CF006E4267 /* widget-status-visible.png */,
 				DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */,
 				DC4FC28018EAB1CA00B7FD79 /* übersicht-logo.png */,
-				DCAAAF9518DF0B050097677F /* getting-started.coffee */,
+				DCAAAF9518DF0B050097677F /* GettingStarted.jsx */,
 				DC4F43F1189E90DD00937925 /* status-icon.png */,
 				DC4F43F2189E90DD00937925 /* status-icon@2x.png */,
 				DC43AD8717EC2D9500241CC2 /* Uebersicht-Info.plist */,
@@ -466,7 +466,7 @@
 				DC57ED2E18DB4EC900A24FDD /* UBPreferencesController.xib in Resources */,
 				DCECA1C71893F23200C0CA32 /* localnode in Resources */,
 				DC404DF51D294B3100305CE2 /* geolocation.js in Resources */,
-				DCAAAF9618DF0B050097677F /* getting-started.coffee in Resources */,
+				DCAAAF9618DF0B050097677F /* GettingStarted.jsx in Resources */,
 				DCECA1C81893F23200C0CA32 /* server.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -168,16 +168,16 @@
         return;
     }
     
-    NSURL* gettinStartedWidget = [[NSBundle mainBundle] URLForResource:@"getting-started" withExtension:@"coffee"];
+    NSURL* gettinStartedWidget = [[NSBundle mainBundle] URLForResource:@"GettingStarted" withExtension:@"jsx"];
     
     [fileManager copyItemAtURL:gettinStartedWidget
-                         toURL:[defaultWidgetDir URLByAppendingPathComponent:@"getting-started.coffee"]
+                         toURL:[defaultWidgetDir URLByAppendingPathComponent:@"GettingStarted.jsx"]
                          error:&error];
     
     NSURL* logo = [[NSBundle mainBundle] URLForResource:@"übersicht-logo" withExtension:@"png"];
     
     [fileManager copyItemAtURL:logo
-                         toURL:[defaultWidgetDir URLByAppendingPathComponent:@"übersicht-logo.png"]
+                         toURL:[defaultWidgetDir URLByAppendingPathComponent:@"logo.png"]
                          error:&error];
     
     if (error) {
