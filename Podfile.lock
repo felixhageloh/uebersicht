@@ -1,16 +1,20 @@
 PODS:
   - SocketRocket (0.5.1)
+  - Sparkle (1.23.0)
 
 DEPENDENCIES:
   - SocketRocket
+  - Sparkle
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - SocketRocket
+    - Sparkle
 
 SPEC CHECKSUMS:
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
+  Sparkle: 55b1a87ba69d56913375a281546b7c82dec95bb0
 
-PODFILE CHECKSUM: a3d53a2ed8c7e010b02f141cd5375c3e0aef0ea0
+PODFILE CHECKSUM: f68839bf85fc3a629cc21d58a289a00e2eaaa792
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.7.5

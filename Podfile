@@ -4,6 +4,7 @@ platform :macos, '10.10'
 target 'Uebersicht' do
   # Pods for Uebersicht
   pod 'SocketRocket'
+  pod 'Sparkle'
 
   target 'UebersichtTests' do
     inherit! :search_paths

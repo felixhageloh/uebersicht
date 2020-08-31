@@ -21,7 +21,7 @@
 		DC43AD9F17EC2D9500241CC2 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD9E17EC2D9500241CC2 /* XCTest.framework */; };
 		DC43ADA017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
 		DC43ADA817EC2D9500241CC2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC43ADA617EC2D9500241CC2 /* InfoPlist.strings */; };
-		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
+		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
 		DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADB417EC31EB00241CC2 /* UBWindow.m */; };
 		DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43ADB617EC38D300241CC2 /* WebKit.framework */; };
 		DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4913951BEF9A75003E76EF /* UBScreensController.m */; };
@@ -42,8 +42,6 @@
 		DCAC78CD1C551D130051E78B /* UBListener.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78CC1C551D130051E78B /* UBListener.m */; };
 		DCB95A8D22FAD3F60066A51A /* UBApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = DCB95A8C22FAD3F60066A51A /* UBApplication.m */; };
 		DCBD665922F823AC0043E434 /* UBWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = DCBD665822F823AC0043E434 /* UBWebView.m */; };
-		DCC701BA23B79D6D00DBC9BC /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC701B823B79CBB00DBC9BC /* Sparkle.framework */; };
-		DCC701BB23B79D7900DBC9BC /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DCC701B823B79CBB00DBC9BC /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */; };
 		DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E3C01A376AD400A12516 /* UBLocation.m */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
@@ -63,19 +61,6 @@
 			remoteInfo = "Übersicht";
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		DC5D25BE18FC4823000078C4 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				DCC701BB23B79D7900DBC9BC /* Sparkle.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		16077AE1B133B485D50BF867 /* Pods-UebersichtTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UebersichtTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-UebersichtTests/Pods-UebersichtTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -111,7 +96,7 @@
 		DC43AD9E17EC2D9500241CC2 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		DC43ADA517EC2D9500241CC2 /* UebersichtTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "UebersichtTests-Info.plist"; sourceTree = "<group>"; };
 		DC43ADA717EC2D9500241CC2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
+		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
 		DC43ADB317EC31EB00241CC2 /* UBWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindow.h; sourceTree = "<group>"; };
 		DC43ADB417EC31EB00241CC2 /* UBWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWindow.m; sourceTree = "<group>"; };
 		DC43ADB617EC38D300241CC2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -146,7 +131,6 @@
 		DCB95A8C22FAD3F60066A51A /* UBApplication.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBApplication.m; sourceTree = "<group>"; };
 		DCBD665722F823AC0043E434 /* UBWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWebView.h; sourceTree = "<group>"; };
 		DCBD665822F823AC0043E434 /* UBWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWebView.m; sourceTree = "<group>"; };
-		DCC701B823B79CBB00DBC9BC /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsStore.h; sourceTree = "<group>"; };
 		DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsStore.m; sourceTree = "<group>"; };
 		DCD6280E1D8187EC00358595 /* WKWebViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKWebViewInternal.h; sourceTree = "<group>"; };
@@ -165,7 +149,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DCC701BA23B79D6D00DBC9BC /* Sparkle.framework in Frameworks */,
 				DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */,
 				DC43AD8017EC2D9500241CC2 /* Cocoa.framework in Frameworks */,
 				C19341556FEC4C45CF8E02A2 /* libPods-Uebersicht.a in Frameworks */,
@@ -232,7 +215,6 @@
 		DC43AD7E17EC2D9500241CC2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DCC701B823B79CBB00DBC9BC /* Sparkle.framework */,
 				DCB5D9861948802C000D5C83 /* JavaScriptCore.framework */,
 				DC43ADB617EC38D300241CC2 /* WebKit.framework */,
 				DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */,
@@ -319,7 +301,7 @@
 		DC43ADA317EC2D9500241CC2 /* UebersichtTests */ = {
 			isa = PBXGroup;
 			children = (
-				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
+				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
 				DC43ADA417EC2D9500241CC2 /* Supporting Files */,
 			);
 			path = UebersichtTests;
@@ -371,8 +353,8 @@
 				DC43AD7817EC2D9500241CC2 /* Sources */,
 				DC43AD7917EC2D9500241CC2 /* Frameworks */,
 				DC43AD7A17EC2D9500241CC2 /* Resources */,
-				DC5D25BE18FC4823000078C4 /* CopyFiles */,
 				DC92346F23015178009D9E2F /* Run Script */,
+				408EC9591BE0037CFA86EB7A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -531,6 +513,26 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		408EC9591BE0037CFA86EB7A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Uebersicht/Pods-Uebersicht-frameworks.sh",
+				"${PODS_ROOT}/Sparkle/Sparkle.framework",
+				"${PODS_ROOT}/Sparkle/Sparkle.framework.dSYM",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework",
+				"${DWARF_DSYM_FOLDER_PATH}/Sparkle.framework.dSYM",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Uebersicht/Pods-Uebersicht-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		DC06A1C01985092700789130 /* Compile JS */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -593,7 +595,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */,
+				DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -761,6 +763,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -794,6 +797,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Uebersicht/Uebersicht-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CODE_SIGN_FLAGS = "";
