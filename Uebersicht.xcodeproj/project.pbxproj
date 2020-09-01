@@ -21,7 +21,7 @@
 		DC43AD9F17EC2D9500241CC2 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD9E17EC2D9500241CC2 /* XCTest.framework */; };
 		DC43ADA017EC2D9500241CC2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */; };
 		DC43ADA817EC2D9500241CC2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC43ADA617EC2D9500241CC2 /* InfoPlist.strings */; };
-		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
+		DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */; };
 		DC43ADB517EC35A800241CC2 /* UBWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DC43ADB417EC31EB00241CC2 /* UBWindow.m */; };
 		DC43ADB717EC38D300241CC2 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC43ADB617EC38D300241CC2 /* WebKit.framework */; };
 		DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4913951BEF9A75003E76EF /* UBScreensController.m */; };
@@ -96,7 +96,7 @@
 		DC43AD9E17EC2D9500241CC2 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		DC43ADA517EC2D9500241CC2 /* UebersichtTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "UebersichtTests-Info.plist"; sourceTree = "<group>"; };
 		DC43ADA717EC2D9500241CC2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
+		DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ÜbersichtTests.m"; sourceTree = "<group>"; };
 		DC43ADB317EC31EB00241CC2 /* UBWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindow.h; sourceTree = "<group>"; };
 		DC43ADB417EC31EB00241CC2 /* UBWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWindow.m; sourceTree = "<group>"; };
 		DC43ADB617EC38D300241CC2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -301,7 +301,7 @@
 		DC43ADA317EC2D9500241CC2 /* UebersichtTests */ = {
 			isa = PBXGroup;
 			children = (
-				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
+				DC43ADA917EC2D9500241CC2 /* ÜbersichtTests.m */,
 				DC43ADA417EC2D9500241CC2 /* Supporting Files */,
 			);
 			path = UebersichtTests;
@@ -595,7 +595,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */,
+				DC43ADAA17EC2D9500241CC2 /* ÜbersichtTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -752,7 +752,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 61;
+				CURRENT_PROJECT_VERSION = 62;
 				DEVELOPMENT_TEAM = S3P44NRLCW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -766,6 +766,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MARKETING_VERSION = 1.5;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
 				PRODUCT_NAME = "Übersicht";
@@ -786,7 +787,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 61;
+				CURRENT_PROJECT_VERSION = 62;
 				DEVELOPMENT_TEAM = S3P44NRLCW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -800,6 +801,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MARKETING_VERSION = 1.5;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
 				PRODUCT_NAME = "Übersicht";
