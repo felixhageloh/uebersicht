@@ -17,7 +17,6 @@
 }
 
 @synthesize filePicker;
-@synthesize toolbar;
 
 - (id)initWithWindowNibName:(NSString *)windowNibName
 {
@@ -53,7 +52,6 @@
     [[self.window standardWindowButton:NSWindowMiniaturizeButton] setEnabled:NO];
     [[self.window standardWindowButton:NSWindowZoomButton] setEnabled:NO];
     
-    [toolbar setSelectedItemIdentifier:@"general"];
     [self widgetDirChanged:self.widgetDir];
 }
 

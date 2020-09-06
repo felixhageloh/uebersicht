@@ -14,7 +14,6 @@
 
 @interface UBPreferencesController : NSWindowController
 
-@property (weak) IBOutlet NSToolbar* toolbar;
 @property (weak) IBOutlet NSPopUpButton *filePicker;
 @property BOOL startAtLogin;
 @property BOOL compatibilityMode;
