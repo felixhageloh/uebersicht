@@ -5,16 +5,6 @@
   <meta name="description" content="Übersicht- Keep an eye on what is happening on your machine and in the World." />
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!--[if lt IE 9]>
-    <script>
-      document.createElement('header');
-      document.createElement('nav');
-      document.createElement('section');
-      document.createElement('article');
-      document.createElement('main');
-      document.createElement('footer');
-    </script>
-  <![endif]-->
 
   <!-- twitter -->
   <meta name="twitter:card" content="summary" />
@@ -46,14 +36,30 @@
     <nav class="download">
       <a href="http://tracesof.net/uebersicht/releases/Uebersicht-1.5.62.app.zip"
          title="Dowload App for Mac OS X 10.10+"
-         class="app">Download <span>(OS X 10.10+)</span></a>
+         class="app button">Download <span>(OS X 10.10+)</span></a>
 
       <a href="http://tracesof.net/uebersicht-widgets/"
          target="_blank"
          title="Get Widgets"
-         class="widgets">Get Widgets</a>
-    </nav>
+         class="widgets button">Get Widgets</a>
+      </nav>
+      <a id='sponsor-link' href="#sponsor">
+        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="15px"
+            viewBox="0 0 471.701 471.701" style="enable-background:new 0 0 471.701 471.701;" xml:space="preserve" class='heart'>
+            <g>
+              <path d="M433.601,67.001c-24.7-24.7-57.4-38.2-92.3-38.2s-67.7,13.6-92.4,38.3l-12.9,12.9l-13.1-13.1
+            c-24.7-24.7-57.6-38.4-92.5-38.4c-34.8,0-67.6,13.6-92.2,38.2c-24.7,24.7-38.3,57.5-38.2,92.4c0,34.9,13.7,67.6,38.4,92.3
+            l187.8,187.8c2.6,2.6,6.1,4,9.5,4c3.4,0,6.9-1.3,9.5-3.9l188.2-187.5c24.7-24.7,38.3-57.5,38.3-92.4
+            C471.801,124.501,458.301,91.701,433.601,67.001z M414.401,232.701l-178.7,178l-178.3-178.3c-19.6-19.6-30.4-45.6-30.4-73.3
+            s10.7-53.7,30.3-73.2c19.5-19.5,45.5-30.3,73.1-30.3c27.7,0,53.8,10.8,73.4,30.4l22.6,22.6c5.3,5.3,13.8,5.3,19.1,0l22.4-22.4
+            c19.6-19.6,45.7-30.4,73.3-30.4c27.6,0,53.6,10.8,73.2,30.3c19.6,19.6,30.3,45.6,30.3,73.3
+            C444.801,187.101,434.001,213.101,414.401,232.701z"/>
+          </g>
+        </svg>
+        Support Übersicht
+      </a>
   </header>
+
 
   <main>
     <section class='description'>
@@ -92,6 +98,31 @@
       </ul>
     </section>
 
+    <section id='sponsor'>
+      <H1>Support Übersicht</H1>
+      <p>
+        The app is free to download and open source.
+        However, you can support my ongoing efforts to maintain and improve
+        the app by sponsoring me on GitHub:
+      </p>
+      <p>
+        <iframe
+          src="https://github.com/sponsors/felixhageloh/button"
+          title="Sponsor felixhageloh"
+          height="35" width="116" style="border: 0;"
+        >
+        </iframe>
+      </p>
+      <p>
+        If a sponsorship is not your thing you can also consider making a one-time
+        donation
+      </p>
+      <p>
+        <a id='donate' class='button' href='https://bunq.me/uebersicht'>Buy me a coffee!</a>
+      </p>
+      <em>Thank you!</em>
+    </section>
+
     <section class='developers'>
       <h1>Rolling your own</h1>
       <p>Widgets are written in JavaScript + React's JSX. A minimal widget looks like this:</p>
@@ -112,6 +143,7 @@
 </code></pre>
     </section>
 
+
     <section class='more-info'>
       <h1>What's Next</h1>
 
@@ -126,9 +158,13 @@
           <h2>GitHub</h2>
           <img src="images/GitHub-Mark-48px.png"> <span>uebersicht</span>
         </a>
-        <a class='twitter' href="https://twitter.com/Felx" target="_blank">
+        <a class='twitter' href="https://twitter.com/felx" target="_blank">
           <h2>Twitter</h2>
           <img src="images/twitter.png"> <span>@felx</span>
+        </a>
+        <a class='twitter' href="https://twitter.com/UebersichtApp" target="_blank">
+          <h2>Twitter</h2>
+          <img src="images/twitter.png"> <span>@UebersichtApp</span>
         </a>
       </nav>
     </section>
@@ -144,7 +180,7 @@
       Your use of Übersicht and the widgets provided here is at your sole risk. Übersicht and all widgets are provided on an "as is" basis. Neither the widget author, nor he author of Übersicht can be held responsible for any damages.
     </p>
     <p>
-      © 2018 Felix Hageloh
+      © 2020 Felix Hageloh
     </p>
   </footer>
 </body>
@@ -173,7 +209,7 @@
   setTimeout(function () {
     var styleTag
       , styles = [
-      "https://fonts.googleapis.com/css?family=Ubuntu:300,700i",
+      "https://fonts.googleapis.com/css?family=Ubuntu:300,300i,700i,700",
       "https://fonts.googleapis.com/css?family=Ubuntu+Mono"
     ];
 
