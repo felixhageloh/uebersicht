@@ -35,7 +35,7 @@
         [self setBackgroundColor:[NSColor clearColor]];
         [self setOpaque:NO];
         [self setCollectionBehavior:(
-            NSWindowCollectionBehaviorTransient |
+            NSWindowCollectionBehaviorStationary |
             NSWindowCollectionBehaviorCanJoinAllSpaces |
             NSWindowCollectionBehaviorIgnoresCycle
         )];
