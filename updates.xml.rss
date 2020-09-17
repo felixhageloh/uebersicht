@@ -1,356 +1,445 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
-   <channel>
-      <title>Übersicht App Changelog</title>
-      <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
-      <description>Most recent changes with links to updates.</description>
-      <language>en</language>
-        <item>
-          <title>Version 1.5.62</title>
-          <description><![CDATA[
+<rss
+    version="2.0"
+    xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Übersicht App Changelog</title>
+    <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
+    <description>Most recent changes with links to updates.</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.5.63</title>
+      <description>
+        <![CDATA[
+            <h3>What's New</h3>
+            <ul>
+              <li>Widgets are visible when using 'Show Desktop' again.</li>
+            </ul>
+            <h3>Support Übersicht!</h3>
+            <p> 
+              You can now support Übersicht by becoming a sponsor or by giving a one-time donation! For more information visit
+              <a href="http://tracesof.net/uebersicht/#sponsor">http://tracesof.net/uebersicht/#sponsor</a>
+            </p>
+            <p><em>Thank you!</em></p>
+          ]]>
+      </description>
+      <pubDate>Thu, Sep 17 2020 10:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.5.63.app.zip"
+          sparkle:version="63"
+          sparkle:shortVersionString="1.5.63"
+          length="54648"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.5.62</title>
+      <description>
+        <![CDATA[
             <h3>What's New</h3>
             <ul>
               <li>Finally: Widgets are always clickable 👆!</li>
               <li>Supports the upcoming macOS Big Sur.</li>
             </ul>
-          ]]></description>
-          <pubDate>Thu, Sep 03 2020 17:00:00 +0200</pubDate>
-          <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.5.62.app.zip"
-                      sparkle:version="62"
-                      sparkle:shortVersionString="1.5.62"
-                      length="54648"
-                      type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-          <title>Version 1.4.61</title>
-          <description><![CDATA[
+          ]]>
+      </description>
+      <pubDate>Thu, Sep 03 2020 17:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.5.62.app.zip"
+          sparkle:version="62"
+          sparkle:shortVersionString="1.5.62"
+          length="54648"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.4.61</title>
+      <description>
+        <![CDATA[
             <h3>What's New</h3>
             <ul>
               <li>Fixed permissions for macOS Catalina.</li>
               <li>Upgraded Sparkle.</li>
             </ul>
-          ]]></description>
-          <pubDate>MOn, Jan 06 2020 9:00:00 +0200</pubDate>
-          <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.61.app.zip"
-                      sparkle:version="61"
-                      sparkle:shortVersionString="1.4.61"
-                      length="54256"
-                      type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.4.60</title>
-            <description><![CDATA[
+          ]]>
+      </description>
+      <pubDate>MOn, Jan 06 2020 9:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.61.app.zip"
+          sparkle:version="61"
+          sparkle:shortVersionString="1.4.61"
+          length="54256"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.4.60</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Upgrades and bug fixes.</li>
                 <li>Ships with Node 10.</li>
               </ul>
-            ]]></description>
-            <pubDate>Tue, Sep 10 2019 9:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.60.app.zip"
-                       sparkle:version="60"
-                       sparkle:shortVersionString="1.4.60"
-                       length="52856"
-                       type="application/octet-stream" />
-            <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.4.58</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Tue, Sep 10 2019 9:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.60.app.zip"
+          sparkle:version="60"
+          sparkle:shortVersionString="1.4.60"
+          length="52856"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.4.58</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>React is exposed via the uebersicht package.</li>
                 <li>IFraming of content served from withing the widget folder is possible again.</li>
               </ul>
-            ]]></description>
-            <pubDate>Mon, Jun 10 2019 15:55:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.59.app.zip"
-                       sparkle:version="59"
-                       sparkle:shortVersionString="1.4.59"
-                       length="50672"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.4.58</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Mon, Jun 10 2019 15:55:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.59.app.zip"
+          sparkle:version="59"
+          sparkle:shortVersionString="1.4.59"
+          length="50672"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.4.58</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Allows widgets to ask for permission when accessing resources on Mojave.</li>
               </ul>
-            ]]></description>
-            <pubDate>Thu, May 30 2019 10:40:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.58.app.zip"
-                       sparkle:version="58"
-                       sparkle:shortVersionString="1.4.58"
-                       length="50672"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.4.57</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Thu, May 30 2019 10:40:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.58.app.zip"
+          sparkle:version="58"
+          sparkle:shortVersionString="1.4.58"
+          length="50672"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.4.57</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>New: global CSS. Add a file called main.css to you widgets folder to apply global style and layout.</li>
                 <li>Improved handling of network connection errors.</li>
                 <li>Improved security.</li>
               </ul>
-            ]]></description>
-            <pubDate>Mon, May 20 2019 08:45:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.57.app.zip"
-                       sparkle:version="57"
-                       sparkle:shortVersionString="1.4.57"
-                       length="51712"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.3.56</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Mon, May 20 2019 08:45:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.4.57.app.zip"
+          sparkle:version="57"
+          sparkle:shortVersionString="1.4.57"
+          length="51712"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.3.56</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Fixed an issue where widget commands would often fail with network connection errors.</li>
                 <li>Adds important security fixes.</li>
               </ul>
-            ]]></description>
-            <pubDate>Tue, Nov 20 2018 19:50:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.3.56.app.zip"
-                       sparkle:version="56"
-                       sparkle:shortVersionString="1.3.56"
-                       length="51184"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.3.55</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Tue, Nov 20 2018 19:50:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.3.56.app.zip"
+          sparkle:version="56"
+          sparkle:shortVersionString="1.3.56"
+          length="51184"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.3.55</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                  <li>Widgets are now written in React! Check out the documentation for the new widget syntax. The old widget syntax is still supported, but might be deprecated in the future</li>
   <li>Better error handling with source maps.</li>
               </ul>
-            ]]></description>
-            <pubDate>Tue, Nov 7 2018 14:30:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.3.55.app.zip"
-                       sparkle:version="55"
-                       sparkle:shortVersionString="1.3.55"
-                       length="50976"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.2.53</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Tue, Nov 7 2018 14:30:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.3.55.app.zip"
+          sparkle:version="55"
+          sparkle:shortVersionString="1.3.55"
+          length="50976"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.2.53</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Fixes crash on macOS High Sierra.</li>
                 <li>Fixes multiline string issues for plain js widgets.</li>
               </ul>
-            ]]></description>
-            <pubDate>Tue, Nov 14 2017 11:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.53.app.zip"
-                       sparkle:version="53"
-                       sparkle:shortVersionString="1.2.53"
-                       length="61056"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.2.51</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Tue, Nov 14 2017 11:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.53.app.zip"
+          sparkle:version="53"
+          sparkle:shortVersionString="1.2.53"
+          length="61056"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.2.51</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Fixes issues when switching users.</li>
                 <li>Improves compatability with macOS High Sierra.</li>
               </ul>
-            ]]></description>
-            <pubDate>Sun, Oct 08 2017 10:10:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.51.app.zip"
-                       sparkle:version="51"
-                       sparkle:shortVersionString="1.2.51"
-                       length="59840"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.2.48</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Sun, Oct 08 2017 10:10:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.51.app.zip"
+          sparkle:version="51"
+          sparkle:shortVersionString="1.2.51"
+          length="59840"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.2.48</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Bash env can now be toggled via preferences.</li>
               </ul>
-            ]]></description>
-            <pubDate>Sun, Jun 11 2017 10:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.48.app.zip"
-                       sparkle:version="48"
-                       sparkle:shortVersionString="1.2.48"
-                       length="58872"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-      <title>Übersicht App Changelog</title>
-      <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
-      <description>Most recent changes with links to updates.</description>
-      <language>en</language>
-        <item>
-            <title>Version 1.2.47</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Sun, Jun 11 2017 10:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.48.app.zip"
+          sparkle:version="48"
+          sparkle:shortVersionString="1.2.48"
+          length="58872"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <title>Übersicht App Changelog</title>
+    <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
+    <description>Most recent changes with links to updates.</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.2.47</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Disables bash env for console commands again. It has been causing issues for some people. This feature will probably be released with an option in the future.</li>
               </ul>
-            ]]></description>
-            <pubDate>Sun, Jun 04 2017 22:20:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.47.app.zip"
-                       sparkle:version="47"
-                       sparkle:shortVersionString="1.2.47"
-                       length="58872"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.2.46</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Sun, Jun 04 2017 22:20:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.47.app.zip"
+          sparkle:version="47"
+          sparkle:shortVersionString="1.2.47"
+          length="58872"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.2.46</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Adds a proxy server for making direct Ajax requests.</li>
                 <li>Scripting support: individual widgets can be refreshed and reloaded now.</li>
                 <li>Widget commands now respect your bash env.</li>
               </ul>
-            ]]></description>
-            <pubDate>Sun, Jun 04 2017 13:40:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.46.app.zip"
-                       sparkle:version="46"
-                       sparkle:shortVersionString="1.2.46"
-                       length="58872"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.1.45</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Sun, Jun 04 2017 13:40:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.2.46.app.zip"
+          sparkle:version="46"
+          sparkle:shortVersionString="1.2.46"
+          length="58872"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.1.45</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Fixes issues with Übersicht not showing when computer wakes from sleep.</li>
                 <li>There is a new 'hide' option for widgets.</li>
                 <li>Adds scripting support.</li>
               </ul>
-            ]]></description>
-            <pubDate>Sun, Jan 15 2017 15:10:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.1.45.app.zip"
-                       sparkle:version="45"
-                       sparkle:shortVersionString="1.1.45"
-                       length="43856"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.0.44</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Sun, Jan 15 2017 15:10:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.1.45.app.zip"
+          sparkle:version="45"
+          sparkle:shortVersionString="1.1.45"
+          length="43856"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.0.44</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Fixes issues with Übersicht not showing in some cases.</li>
                 <li>The fix for avoiding clashes with apps such as Path Finder Desktop is now available as an option called Compatibilty Mode. It has the drawback that Übersicht won't show in some cases, such as restarting the Dock or adding a new space.</li>
               </ul>
-            ]]></description>
-            <pubDate>Mon, Sep 23 2016 9:20:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.44.app.zip"
-                       sparkle:version="44"
-                       sparkle:shortVersionString="1.0.44"
-                       length="43848"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.0.43</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Mon, Sep 23 2016 9:20:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.44.app.zip"
+          sparkle:version="44"
+          sparkle:shortVersionString="1.0.44"
+          length="43848"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.0.43</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Compatability with macOS Sierra.</li>
                 <li>Internal widget API is usable from withing a command function.</li>
                 <li>Fixed clashes with other apps, such as Path Finder Desktop.</li>
               </ul>
-            ]]></description>
-            <pubDate>Mon, Sep 12 2016 9:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.43.app.zip"
-                       sparkle:version="43"
-                       sparkle:shortVersionString="1.0.43"
-                       length="43856"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 1.0.42</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Mon, Sep 12 2016 9:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.43.app.zip"
+          sparkle:version="43"
+          sparkle:shortVersionString="1.0.43"
+          length="43856"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 1.0.42</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Upgraded to WKWebView which should bring performance and stability improvements.</li>
                 <li>Fixed localstorage. It now persists when the app is restarted.</li>
                 <li>OS X 10.10 or later is required for this version.</li>
               </ul>
-            ]]></description>
-            <pubDate>Sun, Jul 10 2016 20:45:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.42.app.zip"
-                       sparkle:version="42"
-                       sparkle:shortVersionString="1.0.42"
-                       length="43856"
-                       type="application/octet-stream" />
-          <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-        </item>
-        <item>
-            <title>Version 0.9.40</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Sun, Jul 10 2016 20:45:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.0.42.app.zip"
+          sparkle:version="42"
+          sparkle:shortVersionString="1.0.42"
+          length="43856"
+          type="application/octet-stream" />
+      <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
+    </item>
+    <item>
+      <title>Version 0.9.40</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Adds workaround for widgets relying on process.argv[0], like the weather widget.</li>
                 <li>Some widgets that rely on @ (this) inside style definitions are still breaking. It used to work in the past, but is actually invalid syntax, so it is hard to support moving forward. However, usually you can just fix the widget by removing the @.</li>
               </ul>
-            ]]></description>
-            <pubDate>Wed, May 26 2016 02:30:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.9.40.app.zip"
-                       sparkle:version="40"
-                       sparkle:shortVersionString="0.9.40"
-                       length="43840"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.9</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Wed, May 26 2016 02:30:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.9.40.app.zip"
+          sparkle:version="40"
+          sparkle:shortVersionString="0.9.40"
+          length="43840"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.9</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Module support for CoffeScript widgets, using NodeJS' require().</li>
                 <li>Commands can be functions instead of just strings.</li>
                 <li>Files inside directories called /src /lib or /node_modules are not treated as widgets anymore.</li>
               </ul>
-            ]]></description>
-            <pubDate>Wed, May 25 2016 09:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.9.39.app.zip"
-                       sparkle:version="39"
-                       sparkle:shortVersionString="0.9.39"
-                       length="43840"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.8.36</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Wed, May 25 2016 09:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.9.39.app.zip"
+          sparkle:version="39"
+          sparkle:shortVersionString="0.9.39"
+          length="43840"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.8.36</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>refreshFrequency: false works again.</li>
               </ul>
-            ]]></description>
-            <pubDate>Thur, Mar 03 2016 09:10:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.36.app.zip"
-                       sparkle:version="36"
-                       sparkle:shortVersionString="0.8.36"
-                       length="31416"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.8.35</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Thur, Mar 03 2016 09:10:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.36.app.zip"
+          sparkle:version="36"
+          sparkle:shortVersionString="0.8.36"
+          length="31416"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.8.35</title>
+      <description>
+        <![CDATA[
               <h3>What's New</h3>
               <ul>
                 <li>Widgets show again when screens are mirrored.</li>
@@ -359,249 +448,274 @@
                 <li>Widgets are not parsed in strict mode anymore (accidentally introduced in previous version).</li>
                 <li>Tightened sercurity by only listen to requests from your local machine.</li>
               </ul>
-            ]]></description>
-            <pubDate>Wen, Mar 02 2016 09:05:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.35.app.zip"
-                       sparkle:version="35"
-                       sparkle:shortVersionString="0.8.35"
-                       length="31416"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.8</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Wen, Mar 02 2016 09:05:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.35.app.zip"
+          sparkle:version="35"
+          sparkle:shortVersionString="0.8.35"
+          length="31416"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.8</title>
+      <description>
+        <![CDATA[
               <h3>What's new</h3>
               <ul>
                 <li>Added support for multiple screens!</li>
                 <li>Added option to open widgets in a text editor from the status bar menu.</li>
                 <li>Deprecated makeBgSlice in favor of CSS -webkit-backdrop-filter</li>
               </ul>
-            ]]></description>
-            <pubDate>Mon, Feb 22 2016 18:15:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.30.app.zip"
-                       sparkle:version="30"
-                       sparkle:shortVersionString="0.8.30"
-                       length="31416"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.7.25</title>
-            <description><![CDATA[
+            ]]>
+      </description>
+      <pubDate>Mon, Feb 22 2016 18:15:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.8.30.app.zip"
+          sparkle:version="30"
+          sparkle:shortVersionString="0.8.30"
+          length="31416"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.7.25</title>
+      <description>
+        <![CDATA[
               <h3>What's new</h3>
               <ul>
                 <li>Fixed a vulnerability in the updater by delivering all updates over https.</li>
               </ul>
-            ]]></description>
-            <pubDate>Tue, Feb 16 2016 17:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.25.app.zip"
-                       sparkle:version="25"
-                       sparkle:shortVersionString="0.7.25"
-                       length="10600"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.7.24</title>
-            <sparkle:releaseNotesLink>
+            ]]>
+      </description>
+      <pubDate>Tue, Feb 16 2016 17:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.25.app.zip"
+          sparkle:version="25"
+          sparkle:shortVersionString="0.7.25"
+          length="10600"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.7.24</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.24.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Thu, Feb 04 2016 20:40:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.24.app.zip"
-                       sparkle:version="24"
-                       sparkle:shortVersionString="0.7.24"
-                       length="10592"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.7.23</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Thu, Feb 04 2016 20:40:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.24.app.zip"
+          sparkle:version="24"
+          sparkle:shortVersionString="0.7.24"
+          length="10592"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.7.23</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.23.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Thu, Jan 14 2016 10:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.23.app.zip"
-                       sparkle:version="23"
-                       sparkle:shortVersionString="0.7.23"
-                       length="10600"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.7</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Thu, Jan 14 2016 10:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.23.app.zip"
+          sparkle:version="23"
+          sparkle:shortVersionString="0.7.23"
+          length="10600"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.7</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.7.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Sun, Nov 29 2015 14:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.app.zip"
-                       sparkle:version="22"
-                       sparkle:shortVersionString="0.7"
-                       length="10400"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.6.20</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Sun, Nov 29 2015 14:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.7.app.zip"
+          sparkle:version="22"
+          sparkle:shortVersionString="0.7"
+          length="10400"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.6.20</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.6.20.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Mon, Nov 16 2015 20:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.20.app.zip"
-                       sparkle:version="20"
-                       sparkle:shortVersionString="0.6.20"
-                       length="10384"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.6.19</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Mon, Nov 16 2015 20:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.20.app.zip"
+          sparkle:version="20"
+          sparkle:shortVersionString="0.6.20"
+          length="10384"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.6.19</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.6.19.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Sat, Nov 14 2015 16:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.19.app.zip"
-                       sparkle:version="19"
-                       sparkle:shortVersionString="0.6.19"
-                       length="10384"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.6</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Sat, Nov 14 2015 16:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.19.app.zip"
+          sparkle:version="19"
+          sparkle:shortVersionString="0.6.19"
+          length="10384"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.6</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.6.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Fri, Nov 13 2015 20:46:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.app.zip"
-                       sparkle:version="18"
-                       sparkle:shortVersionString="0.6"
-                       length="10392"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.5</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Fri, Nov 13 2015 20:46:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.6.app.zip"
+          sparkle:version="18"
+          sparkle:shortVersionString="0.6"
+          length="10392"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.5</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.5.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Sun, Mar 01 2015 12:58:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.5.app.zip"
-                       sparkle:version="17"
-                       sparkle:shortVersionString="0.5"
-                       length="10400"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.4.15</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Sun, Mar 01 2015 12:58:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.5.app.zip"
+          sparkle:version="17"
+          sparkle:shortVersionString="0.5"
+          length="10400"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.4.15</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.4.15.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Sun, Jan 04 2015 14:30:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.4.15.app.zip"
-                       sparkle:version="15"
-                       sparkle:shortVersionString="0.4"
-                       length="10392"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.4</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Sun, Jan 04 2015 14:30:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.4.15.app.zip"
+          sparkle:version="15"
+          sparkle:shortVersionString="0.4"
+          length="10392"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.4</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.4.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Mon, Dec 29 2014 09:20:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.4.app.zip"
-                       sparkle:version="14"
-                       sparkle:shortVersionString="0.4"
-                       length="10392"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.3.13</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Mon, Dec 29 2014 09:20:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.4.app.zip"
+          sparkle:version="14"
+          sparkle:shortVersionString="0.4"
+          length="10392"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.3.13</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.13.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Sun, Oct 26 2014 13:35:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.13.app.zip"
-                       sparkle:version="13"
-                       sparkle:shortVersionString="0.3.13"
-                       length="10352"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.3.12</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Sun, Oct 26 2014 13:35:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.13.app.zip"
+          sparkle:version="13"
+          sparkle:shortVersionString="0.3.13"
+          length="10352"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.3.12</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.12.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Sun, Oct 12 2014 12:35:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.12.app.zip"
-                       sparkle:version="12"
-                       sparkle:shortVersionString="0.3.12"
-                       length="9752"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.3.11</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Sun, Oct 12 2014 12:35:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.12.app.zip"
+          sparkle:version="12"
+          sparkle:shortVersionString="0.3.12"
+          length="9752"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.3.11</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.11.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Sat, Oct 4 2014 11:02:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.11.app.zip"
-                       sparkle:version="11"
-                       sparkle:shortVersionString="0.3.11"
-                       length="9912"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.3</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Sat, Oct 4 2014 11:02:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.11.app.zip"
+          sparkle:version="11"
+          sparkle:shortVersionString="0.3.11"
+          length="9912"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.3</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.3.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Tue, Sep 9 2014 09:08:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.app.zip"
-                       sparkle:version="10"
-                       sparkle:shortVersionString="0.3"
-                       length="9896"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.2.7</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Tue, Sep 9 2014 09:08:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.3.app.zip"
+          sparkle:version="10"
+          sparkle:shortVersionString="0.3"
+          length="9896"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.2.7</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.2.7.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Wed, Aug 20 2014 19:15:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.2.7.app.zip"
-                       sparkle:version="7"
-                       sparkle:shortVersionString="0.2"
-                       length="9888"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.2</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Wed, Aug 20 2014 19:15:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.2.7.app.zip"
+          sparkle:version="7"
+          sparkle:shortVersionString="0.2"
+          length="9888"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.2</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.2.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Thu, Jul 22 2014 11:15:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.2.app.zip"
-                       sparkle:version="6"
-                       sparkle:shortVersionString="0.2"
-                       length="9696"
-                       type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 0.1</title>
-            <sparkle:releaseNotesLink>
+</sparkle:releaseNotesLink>
+      <pubDate>Thu, Jul 22 2014 11:15:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.2.app.zip"
+          sparkle:version="6"
+          sparkle:shortVersionString="0.2"
+          length="9696"
+          type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 0.1</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.1.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Tue, Apr 22 2014 9:00:00 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.1.app.zip"
-                       sparkle:version="5"
-                       sparkle:shortVersionString="0.1"
-                       length="9792"
-                       type="application/octet-stream" />
-        </item>
+</sparkle:releaseNotesLink>
+      <pubDate>Tue, Apr 22 2014 9:00:00 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.1.app.zip"
+          sparkle:version="5"
+          sparkle:shortVersionString="0.1"
+          length="9792"
+          type="application/octet-stream" />
+    </item>
 
-        <item>
-            <title>Version 0.1</title>
-            <sparkle:releaseNotesLink>
+    <item>
+      <title>Version 0.1</title>
+      <sparkle:releaseNotesLink>
               https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/0.1.html
-            </sparkle:releaseNotesLink>
-            <pubDate>Mon, Apr 14 2014 19:48:44 +0200</pubDate>
-            <enclosure url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.1.app.zip"
-                       sparkle:version="0.1"
-                       length="15656"
-                       type="application/octet-stream" />
-        </item>
-   </channel>
+</sparkle:releaseNotesLink>
+      <pubDate>Mon, Apr 14 2014 19:48:44 +0200</pubDate>
+      <enclosure
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-0.1.app.zip"
+          sparkle:version="0.1"
+          length="15656"
+          type="application/octet-stream" />
+    </item>
+  </channel>
 </rss>
