@@ -43,6 +43,7 @@
 		DCB95A8D22FAD3F60066A51A /* UBApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = DCB95A8C22FAD3F60066A51A /* UBApplication.m */; };
 		DCBD665922F823AC0043E434 /* UBWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = DCBD665822F823AC0043E434 /* UBWebView.m */; };
 		DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */; };
+		DCCBDB992524638400FFAAE1 /* UBWindowsController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCCBDB982524638400FFAAE1 /* UBWindowsController.m */; };
 		DCE7E3C11A376AD400A12516 /* UBLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E3C01A376AD400A12516 /* UBLocation.m */; };
 		DCECA1C71893F23200C0CA32 /* localnode in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C51893F23200C0CA32 /* localnode */; };
 		DCECA1C81893F23200C0CA32 /* server.js in Resources */ = {isa = PBXBuildFile; fileRef = DCECA1C61893F23200C0CA32 /* server.js */; };
@@ -133,6 +134,8 @@
 		DCBD665822F823AC0043E434 /* UBWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWebView.m; sourceTree = "<group>"; };
 		DCC7B2F41C575BCE00F563C8 /* UBWidgetsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWidgetsStore.h; sourceTree = "<group>"; };
 		DCC7B2F51C575BCE00F563C8 /* UBWidgetsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWidgetsStore.m; sourceTree = "<group>"; };
+		DCCBDB972524638400FFAAE1 /* UBWindowsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UBWindowsController.h; sourceTree = "<group>"; };
+		DCCBDB982524638400FFAAE1 /* UBWindowsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UBWindowsController.m; sourceTree = "<group>"; };
 		DCD6280E1D8187EC00358595 /* WKWebViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKWebViewInternal.h; sourceTree = "<group>"; };
 		DCE7E3BF1A376AD400A12516 /* UBLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBLocation.h; sourceTree = "<group>"; };
 		DCE7E3C01A376AD400A12516 /* UBLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBLocation.m; sourceTree = "<group>"; };
@@ -245,6 +248,8 @@
 				DCB95A8C22FAD3F60066A51A /* UBApplication.m */,
 				DC43AD9117EC2D9500241CC2 /* UBAppDelegate.h */,
 				DC43AD9217EC2D9500241CC2 /* UBAppDelegate.m */,
+				DCCBDB972524638400FFAAE1 /* UBWindowsController.h */,
+				DCCBDB982524638400FFAAE1 /* UBWindowsController.m */,
 				DC43ADB317EC31EB00241CC2 /* UBWindow.h */,
 				DC43ADB417EC31EB00241CC2 /* UBWindow.m */,
 				DCBD665722F823AC0043E434 /* UBWebView.h */,
@@ -580,6 +585,7 @@
 				DC4913961BEF9A75003E76EF /* UBScreensController.m in Sources */,
 				DCBD665922F823AC0043E434 /* UBWebView.m in Sources */,
 				DCC7B2F61C575BCE00F563C8 /* UBWidgetsStore.m in Sources */,
+				DCCBDB992524638400FFAAE1 /* UBWindowsController.m in Sources */,
 				DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */,
 				DC43AD8C17EC2D9500241CC2 /* main.m in Sources */,
 				DCB95A8D22FAD3F60066A51A /* UBApplication.m in Sources */,
