@@ -7,7 +7,7 @@
 //
 
 #import "UBWindowsController.h"
-#import "UBWindow.h"
+#import "UBWindowGroup.h"
 #import "WKInspector.h"
 #import "WKView.h"
 #import "WKPage.h"
@@ -35,21 +35,13 @@
          forceRefresh:(Boolean)forceRefresh
 {
     NSMutableArray* obsoleteScreens = [[windows allKeys] mutableCopy];
-    UBWindow* window;
+    UBWindowGroup* window;
     
     for(NSNumber* screenId in screens) {
         if (![windows objectForKey:screenId]) {
-            window = [[UBWindow alloc] init];
+            window = [[UBWindowGroup alloc] init];
             [windows setObject:window forKey:screenId];
-            
-            [window loadUrl:[
-                baseUrl
-                    URLByAppendingPathComponent:[NSString
-                        stringWithFormat:@"%@",
-                        screenId
-                    ]
-                ]
-            ];
+            [window loadUrl: [self screenUrl:screenId baseUrl:baseUrl]];
         } else {
             window = windows[screenId];
             if (forceRefresh) {
@@ -59,7 +51,6 @@
         
         [window setFrame:[self screenRect:screenId] display:YES];
         [window setInteractionEnabled: interactionEnabled];
-        [window orderFront:self];
         
         [obsoleteScreens removeObject:screenId];
     }
@@ -69,7 +60,6 @@
         [windows removeObjectForKey:screenId];
     }
     
-
     NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 
@@ -97,14 +87,14 @@
 - (void)reloadAll
 {
     for (NSNumber* screenId in windows) {
-        UBWindow* window = windows[screenId];
+        UBWindowGroup* window = windows[screenId];
         [window reload];
     }
 }
 
 - (void)closeAll
 {
-    for (UBWindow* window in [windows allValues]) {
+    for (UBWindowGroup* window in [windows allValues]) {
         [window close];
     }
     [windows removeAllObjects];
@@ -113,7 +103,7 @@
 - (void)showDebugConsoleForScreen:(NSNumber*)screenId
 {
     
-    NSWindow* window = windows[screenId];
+    NSWindow* window = [(UBWindowGroup*)windows[screenId] foreground];
     WKPageRef page = NULL;
     SEL pageForTesting = @selector(_pageForTesting);
     
@@ -157,6 +147,16 @@
     for (NSNumber* screenId in windows) {
         [windows[screenId] wallpaperChanged];
     }
+}
+
+- (NSURL*)screenUrl:(NSNumber*)screenId baseUrl:(NSURL*)baseUrl
+{
+    return [baseUrl
+        URLByAppendingPathComponent:[NSString
+            stringWithFormat:@"%@",
+            screenId
+        ]
+    ];
 }
 
 @end
