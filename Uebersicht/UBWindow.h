@@ -20,5 +20,6 @@
 - (void)reload;
 - (void)workspaceChanged;
 - (void)wallpaperChanged;
+- (void)makeBackgroundWindow;
 
 @end

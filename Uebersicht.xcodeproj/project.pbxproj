@@ -78,7 +78,7 @@
 		DC404DED1D26BB6500305CE2 /* WKPage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKPage.h; sourceTree = "<group>"; };
 		DC404DEE1D26C1D000305CE2 /* WKView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKView.h; sourceTree = "<group>"; };
 		DC404DF11D2844E100305CE2 /* UBWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBWebViewController.h; sourceTree = "<group>"; };
-		DC404DF21D2844E100305CE2 /* UBWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBWebViewController.m; sourceTree = "<group>"; };
+		DC404DF21D2844E100305CE2 /* UBWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = UBWebViewController.m; sourceTree = "<group>"; tabWidth = 4; };
 		DC404DF41D294B3100305CE2 /* geolocation.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = geolocation.js; sourceTree = "<group>"; };
 		DC43AD7C17EC2D9500241CC2 /* Übersicht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Übersicht.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC43AD7F17EC2D9500241CC2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -255,6 +255,8 @@
 				DCCBDB982524638400FFAAE1 /* UBWindowsController.m */,
 				DC43ADB317EC31EB00241CC2 /* UBWindow.h */,
 				DC43ADB417EC31EB00241CC2 /* UBWindow.m */,
+				DCC74B24252AF6DA00C1D1E5 /* UBWindowGroup.h */,
+				DCC74B25252AF6DA00C1D1E5 /* UBWindowGroup.m */,
 				DCBD665722F823AC0043E434 /* UBWebView.h */,
 				DCBD665822F823AC0043E434 /* UBWebView.m */,
 				DC404DF11D2844E100305CE2 /* UBWebViewController.h */,
@@ -281,8 +283,6 @@
 				DC404DEB1D26BAA400305CE2 /* WKHeaders */,
 				DC43AD8617EC2D9500241CC2 /* Supporting Files */,
 				DC43AD9717EC2D9500241CC2 /* Images.xcassets */,
-				DCC74B24252AF6DA00C1D1E5 /* UBWindowGroup.h */,
-				DCC74B25252AF6DA00C1D1E5 /* UBWindowGroup.m */,
 			);
 			path = Uebersicht;
 			sourceTree = "<group>";

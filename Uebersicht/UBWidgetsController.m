@@ -103,6 +103,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSMenu* widgetMenu = [[NSMenu alloc] init];
     [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:0];
     [self addHideOptionToMenu:widgetMenu forWidget:widgetId];
+    [self addBackgroundOptionToMenu:widgetMenu forWidget:widgetId];
     
     [self
         addScreens: [screensController screens]
@@ -188,9 +189,24 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSMenuItem* item = [[NSMenuItem alloc] init];
     NSDictionary* settings = [widgets getSettings:widgetId];
     
-    [item  setTitle:@"Show on selected screens:"];
+    [item setTitle:@"Show on selected screens:"];
     [item setState:[settings[@"showOnSelectedScreens"] boolValue]];
     [item setEnabled:NO];
+    [menu insertItem:item atIndex:0];
+}
+
+- (void)addBackgroundOptionToMenu:(NSMenu*)menu
+                        forWidget:(NSString*)widgetId
+{
+    NSMenuItem* item = [[NSMenuItem alloc]
+        initWithTitle: @"Send to background"
+        action: @selector(toggleBackground:)
+        keyEquivalent: @""
+    ];
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    [item setTarget:self];
+    [item setRepresentedObject:widgetId];
+    [item setState:[settings[@"inBackground"] boolValue]];
     [menu insertItem:item atIndex:0];
 }
 
@@ -307,6 +323,20 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     
     [dispatcher
         dispatch: isHidden ? @"WIDGET_SET_TO_SHOW" : @"WIDGET_SET_TO_HIDE"
+        withPayload: widgetId
+    ];
+}
+
+- (void)toggleBackground:(id)sender
+{
+    NSString* widgetId = [(NSMenuItem*)sender representedObject];
+    NSDictionary* settings = [widgets getSettings:widgetId];
+    BOOL inBackground = [settings[@"inBackground"] boolValue];
+    
+    [dispatcher
+        dispatch: inBackground
+            ? @"WIDGET_SET_TO_FOREGROUND"
+            : @"WIDGET_SET_TO_BACKGROUND"
         withPayload: widgetId
     ];
 }

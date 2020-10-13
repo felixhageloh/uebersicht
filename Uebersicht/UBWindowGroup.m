@@ -18,7 +18,12 @@
 {
     self = [super init];
     if (self) {
+        foreground = [[UBWindow alloc] init];
+        [foreground orderFront:self];
+        [foreground setInteractionEnabled:YES];
+        
         background = [[UBWindow alloc] init];
+        [background makeBackgroundWindow];
         [background orderFront:self];
         [background setInteractionEnabled:NO];
     }
@@ -37,7 +42,7 @@
     [background reload];
 }
 
-- (void)loadUrl:(NSURL *)url
+- (void)loadUrl:(NSURL*)url
 {
     [foreground loadUrl:url];
     [background loadUrl:url];
@@ -51,13 +56,13 @@
 
 - (void)setInteractionEnabled:(BOOL)interactionEnabled
 {
-    if (interactionEnabled) {
+    if (!interactionEnabled) {
+        [foreground close];
+        foreground = nil;
+    } else if (!foreground) {
         foreground = [[UBWindow alloc] init];
         [foreground setInteractionEnabled:YES];
         [foreground orderFront:self];
-    } else {
-        [foreground close];
-        foreground = nil;
     }
 }
 
