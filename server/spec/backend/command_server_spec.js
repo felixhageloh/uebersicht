@@ -7,9 +7,7 @@ var httpPost = require('../helpers/httpPost');
 var commandServer = require('../../src/command_server.coffee');
 
 var workingDir = path.resolve(__dirname, path.join('..', 'test_widgets'));
-var server = connect()
-  .use(commandServer(workingDir))
-  .listen(8887);
+var server = connect().use(commandServer(workingDir)).listen(8887);
 
 var url = 'http://localhost:8887/run/';
 
@@ -40,7 +38,7 @@ test('running commands', (t) => {
     t.equal(
       body,
       workingDir + '\n',
-      'it runs commands in the supplied working dir'
+      'it runs commands in the supplied working dir',
     );
   });
 });
@@ -60,7 +58,7 @@ test('running broken commands', (t) => {
     t.equal(
       body,
       'bash: line 1: fake-command: command not found\n',
-      'it responds with an error message'
+      'it responds with an error message',
     );
   });
 });
@@ -81,12 +79,15 @@ test('closing', (t) => {
 });
 
 test('using a login shell', (t) => {
-  server = connect()
-    .use(commandServer(workingDir, true))
-    .listen(8887);
+  server = connect().use(commandServer(workingDir, true)).listen(8887);
 
   httpPost(url, 'echo $(shopt | grep login_shell)', (res, body) => {
-    t.equal(body, 'login_shell on\n', 'it indeed runs in a login shell');
+    const lines = body.trim().split('\n');
+    t.equal(
+      lines[lines.length - 1],
+      'login_shell on',
+      'it indeed runs in a login shell',
+    );
     server.close();
     t.end();
   });
