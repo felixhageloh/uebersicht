@@ -1,16 +1,11 @@
 os: osx
-language: objective-c
+language: node_js
 
 # Add new versions to test here
-env:
-  - NODE=10
+node_js:
+  - 10
 
 before_install:
-  - unset npm_config_prefix
-  - nvm install $NODE
-  - nvm use $NODE
-  - npm install -g npm
-  - npm config set loglevel warn
   - cd server
 
 install:
