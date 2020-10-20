@@ -128,19 +128,6 @@ int const MAX_DISPLAYS = 42;
     return name;
 }
 
-- (NSRect)screenRect:(NSNumber*)screenId
-{
-    NSRect screenRect = CGDisplayBounds([screenId unsignedIntValue]);
-    CGRect mainScreenRect = CGDisplayBounds(CGMainDisplayID());
-    int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-
-    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height -
-                                mainScreenRect.size.height);
-
-    screenRect.size.height = screenRect.size.height - menuBarHeight;
-    
-    return screenRect;
-}
 
 
 -(NSInteger)indexOfScreenMenuItems:(NSMenu*)menu

@@ -7,8 +7,10 @@ function isVisibleOnScreen(widgetId, screenId, state) {
 
   if (settings.hidden) {
     isVisible = false;
-  } else if (settings.showOnAllScreens ||
-             settings.showOnAllScreens === undefined) {
+  } else if (
+    settings.showOnAllScreens ||
+    settings.showOnAllScreens === undefined
+  ) {
     isVisible = true;
   } else if (settings.showOnMainScreen) {
     isVisible = state.screens.indexOf(screenId) === 0;
@@ -17,6 +19,11 @@ function isVisibleOnScreen(widgetId, screenId, state) {
   }
 
   return isVisible;
+}
+
+function isInBackground(widgetId, state) {
+  const settings = state.settings[widgetId] || {};
+  return settings.inBackground === true;
 }
 
 function renderWidget(widget, domEl) {
@@ -47,21 +54,23 @@ function render(state, screen, domEl, dispatch) {
 
   for (var id in state.widgets) {
     const widget = state.widgets[id];
-    if (!isVisibleOnScreen(id, screen, state)) {
+
+    if (!isVisibleOnScreen(id, screen, state)) continue;
+
+    if (
+      window.isBackground != null &&
+      window.isBackground != isInBackground(id, state)
+    )
       continue;
-    }
-    if (widget.error || widget.implementation) {
+
+    if (widget.error || widget.implementation)
       renderWidget(widget, domEl, dispatch);
-    }
+
     const idx = remaining.indexOf(widget.id);
-    if (idx > -1) {
-      remaining.splice(idx, 1);
-    }
+    if (idx > -1) remaining.splice(idx, 1);
   }
 
-  remaining.forEach(function(obsolete) {
-    destroyWidget(obsolete);
-  });
+  remaining.forEach((obsolete) => destroyWidget(obsolete));
 }
 
 render.rendered = rendered;

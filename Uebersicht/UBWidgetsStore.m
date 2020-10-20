@@ -101,6 +101,20 @@
             [self notifyChange];
         }];
         
+        [listener on:@"WIDGET_SET_TO_BACKGROUND" do:^(NSString* widgetId) {
+            [self updateSettings:widgetId withPatch:@{
+                @"inBackground": @YES,
+            }];
+            [self notifyChange];
+        }];
+        
+        [listener on:@"WIDGET_SET_TO_FOREGROUND" do:^(NSString* widgetId) {
+            [self updateSettings:widgetId withPatch:@{
+                @"inBackground": @NO,
+            }];
+            [self notifyChange];
+        }];
+        
         [listener on:@"SCREEN_SELECTED_FOR_WIDGET" do:^(NSDictionary* data) {
             [self selectScreen:data[@"screenId"] forWidget:data[@"id"]];
             [self notifyChange];

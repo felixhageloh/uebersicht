@@ -19,5 +19,6 @@
 - (void)redraw;
 - (void)destroy;
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
+- (void)makeBackground;
 
 @end

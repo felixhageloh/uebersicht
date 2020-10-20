@@ -9,7 +9,6 @@ const defaultSettings = {
 };
 
 const handlers = {
-
   WIDGET_ADDED: (state, action) => {
     const widget = action.payload;
     const newWidgets = Object.assign({}, state.widgets, {
@@ -19,28 +18,22 @@ const handlers = {
     const settings = state.settings || {};
     const newSettings = settings[widget.id]
       ? state.settings
-      : Object.assign({}, settings, { [widget.id]: defaultSettings });
+      : Object.assign({}, settings, {[widget.id]: defaultSettings});
 
-    return Object.assign({},
-      state,
-      { widgets: newWidgets, settings: newSettings }
-    );
+    return Object.assign({}, state, {
+      widgets: newWidgets,
+      settings: newSettings,
+    });
   },
 
   WIDGET_LOADED: (state, action) => {
     if (!state.widgets[action.id]) {
       return state;
     }
-    const widget = Object.assign(
-      {},
-      state.widgets[action.id],
-      {implementation: action.payload}
-    );
-    const newWidgets = Object.assign(
-      {},
-      state.widgets,
-      {[widget.id]: widget}
-    );
+    const widget = Object.assign({}, state.widgets[action.id], {
+      implementation: action.payload,
+    });
+    const newWidgets = Object.assign({}, state.widgets, {[widget.id]: widget});
     return Object.assign({}, state, {widgets: newWidgets});
   },
 
@@ -54,16 +47,15 @@ const handlers = {
     const newWidgets = Object.assign({}, state.widgets);
     delete newWidgets[id];
 
-    return Object.assign({}, state, { widgets: newWidgets });
+    return Object.assign({}, state, {widgets: newWidgets});
   },
 
   WIDGET_SETTINGS_CHANGED: (state, action) => {
-    const newSettings = Object.assign({},
-      state.settings,
-      { [action.payload.id]: action.payload.settings }
-    );
+    const newSettings = Object.assign({}, state.settings, {
+      [action.payload.id]: action.payload.settings,
+    });
 
-    return Object.assign({}, state, { settings: newSettings });
+    return Object.assign({}, state, {settings: newSettings});
   },
 
   WIDGET_SET_TO_ALL_SCREENS: (state, action) => {
@@ -107,6 +99,18 @@ const handlers = {
     });
   },
 
+  WIDGET_SET_TO_BACKGROUND: (state, action) => {
+    return updateSettings(state, action.payload, {
+      inBackground: true,
+    });
+  },
+
+  WIDGET_SET_TO_FOREGROUND: (state, action) => {
+    return updateSettings(state, action.payload, {
+      inBackground: false,
+    });
+  },
+
   SCREEN_SELECTED_FOR_WIDGET: (state, action) => {
     const settings = state.settings[action.payload.id];
     const newScreens = (settings.screens || []).slice();
@@ -121,8 +125,9 @@ const handlers = {
   },
 
   SCREEN_DESELECTED_FOR_WIDGET: (state, action) => {
-    const newScreens = (state.settings[action.payload.id].screens || [])
-      .filter((s) => s !== action.payload.screenId);
+    const newScreens = (state.settings[action.payload.id].screens || []).filter(
+      (s) => s !== action.payload.screenId,
+    );
 
     return updateSettings(state, action.payload.id, {
       screens: newScreens,
@@ -138,12 +143,11 @@ const handlers = {
 
 function updateSettings(state, widgetId, patch) {
   const widgetSettings = state.settings[widgetId];
-  const newSettings = Object.assign({},
-    state.settings,
-    { [widgetId]: Object.assign({}, widgetSettings, patch) }
-  );
+  const newSettings = Object.assign({}, state.settings, {
+    [widgetId]: Object.assign({}, widgetSettings, patch),
+  });
 
-  return Object.assign({}, state, { settings: newSettings });
+  return Object.assign({}, state, {settings: newSettings});
 }
 
 module.exports = function reduce(state, action) {

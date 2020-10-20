@@ -12,6 +12,7 @@
 
 @implementation UBWebViewController {
     NSURL* url;
+    BOOL isBackground;
 }
 
 @synthesize view;
@@ -22,6 +23,7 @@
     
      if (self) {
         view = [self buildWebView:frame];
+        isBackground = NO;
      }
     
      return self;
@@ -47,6 +49,12 @@
 {
     [self teardownWebview:(WKWebView *)view];
     view = nil;
+}
+
+- (void)makeBackground
+{
+    [self makeBackground:(WKWebView *)view];
+    isBackground = YES;
 }
 
 - (WKWebView*)buildWebView:(NSRect)frame
@@ -138,10 +146,29 @@
      ];
 }
 
+- (void)makeBackground:(WKWebView*)webView
+{
+    [webView
+         evaluateJavaScript: @"window.isBackground = true;"
+         completionHandler:NULL
+     ];
+}
+
 - (void)webView:(WKWebView *)webView
     didFinishNavigation:(WKNavigation*)navigation
 {
-    NSLog(@"loaded %@", webView.URL);
+    NSLog(
+        @"loaded %@ %@",
+        webView.URL,
+        isBackground ? @"background" : @"foreground"
+    );
+
+    [webView
+         evaluateJavaScript: isBackground
+            ? @"window.isBackground = true;"
+            : @"window.isBackground = false;"
+         completionHandler:NULL
+    ];
 }
 
 - (void)webView:(WKWebView *)sender

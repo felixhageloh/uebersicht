@@ -72,6 +72,11 @@
 //    [super close];
 //}
 
+- (void)makeBackgroundWindow
+{
+    [webViewController makeBackground];
+}
+
 
 #
 #pragma mark tracking area

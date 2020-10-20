@@ -17,12 +17,7 @@
 #import "UBWidgetsController.h"
 #import "UBWidgetsStore.h"
 #import "UBWebSocket.h"
-#import "WKInspector.h"
-#import "WKView.h"
-#import "WKPage.h"
-#import "WKWebViewInternal.h"
-
-@import WebKit;
+#import "UBWindowsController.h"
 
 int const PORT = 41416;
 
@@ -31,11 +26,11 @@ int const PORT = 41416;
     NSTask* widgetServer;
     UBPreferencesController* preferences;
     UBScreensController* screensController;
+    UBWindowsController* windowsController;
     BOOL keepServerAlive;
     int portOffset;
     UBWidgetsStore* widgetsStore;
     UBWidgetsController* widgetsController;
-    NSMutableDictionary* windows;
     BOOL needsRefresh;
 }
 
@@ -44,7 +39,6 @@ int const PORT = 41416;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     needsRefresh = YES;
-    windows = [[NSMutableDictionary alloc] initWithCapacity:42];
     statusBarItem = [self addStatusItemToMenu: statusBarMenu];
     preferences = [[UBPreferencesController alloc]
         initWithWindowNibName:@"UBPreferencesController"
@@ -60,6 +54,8 @@ int const PORT = 41416;
     screensController = [[UBScreensController alloc]
         initWithChangeListener:self
     ];
+    
+    windowsController = [[UBWindowsController alloc] init];
     
     widgetsController = [[UBWidgetsController alloc]
         initWithMenu: statusBarMenu
@@ -170,10 +166,7 @@ int const PORT = 41416;
 - (void)shutdown:(Boolean)keepAlive
 {
     keepServerAlive = keepAlive;
-    for (NSNumber* screenId in screensController.screens) {
-        [windows[screenId] close];
-        [windows removeAllObjects];
-    }
+    [windowsController closeAll];
     [[UBWebSocket sharedSocket] close];
     if (widgetServer){
         [widgetServer terminate];
@@ -289,49 +282,14 @@ int const PORT = 41416;
 - (void)screensChanged:(NSDictionary*)screens
 {
     if (widgetsController) {
-        [self renderOnScreens:screens];
+        [windowsController
+            updateWindows:screens
+            baseUrl: [self serverUrl: @"http"]
+            interactionEnabled:preferences.enableInteraction
+            forceRefresh: needsRefresh
+        ];
+        needsRefresh = NO;
     }
-}
-
-- (void)renderOnScreens:(NSDictionary*)screens
-{
-    NSMutableArray* obsoleteScreens = [[windows allKeys] mutableCopy];
-    UBWindow* window;
-    
-    for(NSNumber* screenId in screens) {
-        if (![windows objectForKey:screenId]) {
-            window = [[UBWindow alloc] init];
-            [windows setObject:window forKey:screenId];
-            
-            [window loadUrl:[
-                [self serverUrl:@"http"]
-                    URLByAppendingPathComponent:[NSString
-                        stringWithFormat:@"%@",
-                        screenId
-                    ]
-                ]
-            ];
-        } else {
-            window = windows[screenId];
-            if (needsRefresh) {
-                [window reload];
-            }
-        }
-        
-        [window setFrame:[screensController screenRect:screenId] display:YES];
-        [window setInteractionEnabled: preferences.enableInteraction];
-        [window orderFront:self];
-        
-        [obsoleteScreens removeObject:screenId];
-    }
-    
-    for (NSNumber* screenId in obsoleteScreens) {
-        [windows[screenId] close];
-        [windows removeObjectForKey:screenId];
-    }
-    
-    needsRefresh = NO;
-    NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 
 #
@@ -351,9 +309,7 @@ int const PORT = 41416;
 
 - (void)interactionDidChange
 {
-    for (NSNumber* screenId in windows) {
-        [windows[screenId] setInteractionEnabled: preferences.enableInteraction];
-    }
+    [windowsController setInteractionEnabled: preferences.enableInteraction];
 }
 
 - (IBAction)showPreferences:(id)sender
@@ -387,37 +343,7 @@ int const PORT = 41416;
         deviceDescription
     ][@"NSScreenNumber"];
     
-    
-    NSWindow* window = windows[currentScreen];
-    WKPageRef page = NULL;
-    SEL pageForTesting = @selector(_pageForTesting);
-    
-    if ([window.contentView.subviews[0] isKindOfClass:[WKView class]]) {
-        WKView* webview = window.contentView.subviews[0];
-        page = webview.pageRef;
-    } else if ([window.contentView respondsToSelector:pageForTesting]) {
-        page = (__bridge WKPageRef)([window.contentView
-            performSelector: pageForTesting
-        ]);
-    }
-    
-    if (page) {
-        WKInspectorRef inspector = WKPageGetInspector(page);
-
-        [NSApp activateIgnoringOtherApps:YES];
-        
-        WKInspectorShowConsole(inspector);
-        [self
-            performSelector: @selector(detachInspector:)
-            withObject: (__bridge id)(inspector)
-            afterDelay: 0
-        ];
-    }
-}
-
-- (void)detachInspector:(WKInspectorRef)inspector
-{
-     WKInspectorDetach(inspector);
+    [windowsController showDebugConsoleForScreen:currentScreen];
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
@@ -428,24 +354,17 @@ int const PORT = 41416;
 
 - (void)wakeFromSleep:(NSNotification *)notification
 {
-     for (NSNumber* screenId in windows) {
-        UBWindow* window = windows[screenId];
-        [window reload];
-    }
+    [windowsController reloadAll];
 }
 
 - (void)workspaceChanged:(NSNotification *)notification
 {
-    for (NSNumber* screenId in windows) {
-        [windows[screenId] workspaceChanged];
-    }
+    [windowsController workspaceChanged];
 }
 
 - (void)wallpaperChanged:(NSNotification *)notification
 {
-    for (NSNumber* screenId in windows) {
-        [windows[screenId] wallpaperChanged];
-    }
+    [windowsController wallpaperChanged];
 }
 
 - (void)loginSessionBecameActive:(NSNotification *)notification
