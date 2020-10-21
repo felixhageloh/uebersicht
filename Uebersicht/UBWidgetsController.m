@@ -11,10 +11,12 @@
 #import "UBScreensController.h"
 #import "UBDispatcher.h"
 #import "UBWidgetForScripting.h"
+#import "UBPreferencesController.h"
 
 @implementation UBWidgetsController {
     UBWidgetsStore* widgets;
     UBScreensController* screensController;
+    UBPreferencesController* preferences;
     NSMenu* mainMenu;
     NSInteger currentIndex;
     NSImage* statusIconVisible;
@@ -27,6 +29,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
 - (id)initWithMenu:(NSMenu*)menu
            widgets:(UBWidgetsStore*)theWidgets
            screens:(UBScreensController*)screens
+       preferences:(UBPreferencesController*)prefs
 {
     self = [super init];
     
@@ -36,6 +39,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
         mainMenu = menu;
         widgets = theWidgets;
         screensController = screens;
+        preferences = prefs;
         
         currentIndex = [self indexOfWidgetMenuItems:menu];
         [menu insertItem:[NSMenuItem separatorItem] atIndex:currentIndex];
@@ -101,6 +105,7 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     
     
     NSMenu* widgetMenu = [[NSMenu alloc] init];
+    [widgetMenu setAutoenablesItems: NO];
     [widgetMenu insertItem:[NSMenuItem separatorItem] atIndex:0];
     [self addHideOptionToMenu:widgetMenu forWidget:widgetId];
     [self addBackgroundOptionToMenu:widgetMenu forWidget:widgetId];
@@ -206,7 +211,11 @@ static NSInteger const WIDGET_MENU_ITEM_TAG = 42;
     NSDictionary* settings = [widgets getSettings:widgetId];
     [item setTarget:self];
     [item setRepresentedObject:widgetId];
-    [item setState:[settings[@"inBackground"] boolValue]];
+    [item setState: preferences.enableInteraction
+        ? [settings[@"inBackground"] boolValue]
+        : YES
+    ];
+    [item setEnabled: preferences.enableInteraction];
     [menu insertItem:item atIndex:0];
 }
 

@@ -61,6 +61,7 @@ int const PORT = 41416;
         initWithMenu: statusBarMenu
         widgets: widgetsStore
         screens: screensController
+        preferences: preferences
     ];
     [widgetsStore onChange: ^(NSDictionary* widgets) {
         [self->widgetsController render];
