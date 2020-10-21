@@ -10,9 +10,16 @@
 #import "UBLocation.h"
 #import "UBWebView.h"
 
+typedef NS_ENUM(NSInteger, UBWindowLevel) {
+        UBWindowLevelAgnostic,
+        UBWindowLevelBackground,
+        UBWindowLevelForeground
+};
+
+
 @implementation UBWebViewController {
     NSURL* url;
-    BOOL isBackground;
+    UBWindowLevel level;
 }
 
 @synthesize view;
@@ -23,7 +30,7 @@
     
      if (self) {
         view = [self buildWebView:frame];
-        isBackground = NO;
+        level = UBWindowLevelAgnostic;
      }
     
      return self;
@@ -54,7 +61,19 @@
 - (void)makeBackground
 {
     [self makeBackground:(WKWebView *)view];
-    isBackground = YES;
+    level = UBWindowLevelBackground;
+}
+
+- (void)makeForeground
+{
+    [self makeForeground:(WKWebView *)view];
+    level = UBWindowLevelForeground;
+}
+
+- (void)makeAgnostic
+{
+    [self makeForeground:(WKWebView *)view];
+    level = UBWindowLevelAgnostic;
 }
 
 - (WKWebView*)buildWebView:(NSRect)frame
@@ -154,21 +173,40 @@
      ];
 }
 
+- (void)makeForeground:(WKWebView*)webView
+{
+    [webView
+         evaluateJavaScript: @"window.isBackground = false;"
+         completionHandler:NULL
+     ];
+}
+
+- (void)makeAgnostic:(WKWebView*)webView
+{
+    [webView
+         evaluateJavaScript: @"window.isBackground = undefined;"
+         completionHandler:NULL
+     ];
+}
+
 - (void)webView:(WKWebView *)webView
     didFinishNavigation:(WKNavigation*)navigation
 {
-    NSLog(
-        @"loaded %@ %@",
-        webView.URL,
-        isBackground ? @"background" : @"foreground"
-    );
-
-    [webView
-         evaluateJavaScript: isBackground
-            ? @"window.isBackground = true;"
-            : @"window.isBackground = false;"
-         completionHandler:NULL
-    ];
+    NSLog(@"loaded %@ %zd", webView.URL, (long) level);
+    
+    switch (level) {
+        case UBWindowLevelBackground:
+            [self makeBackground: webView];
+            break;
+        case UBWindowLevelForeground:
+            [self makeForeground: webView];
+            break;
+        case UBWindowLevelAgnostic:
+            [self makeAgnostic: webView];
+            break;
+        default:
+            break;
+    }
 }
 
 - (void)webView:(WKWebView *)sender

@@ -21,11 +21,13 @@
         foreground = [[UBWindow alloc] init];
         [foreground orderFront:self];
         [foreground setInteractionEnabled:YES];
+        [foreground makeForegroundWindow];
         
         background = [[UBWindow alloc] init];
         [background makeBackgroundWindow];
         [background orderFront:self];
         [background setInteractionEnabled:NO];
+        [foreground makeBackgroundWindow];
     }
     return self;
 }
@@ -59,10 +61,15 @@
     if (!interactionEnabled) {
         [foreground close];
         foreground = nil;
-    } else if (!foreground) {
-        foreground = [[UBWindow alloc] init];
-        [foreground setInteractionEnabled:YES];
-        [foreground orderFront:self];
+        [background makeAgnosticWindow];
+    } else  {
+        if (!foreground) {
+            foreground = [[UBWindow alloc] init];
+            [foreground setInteractionEnabled:YES];
+            [foreground orderFront:self];
+        }
+        [background makeBackgroundWindow];
+        [foreground makeForegroundWindow];
     }
 }
 

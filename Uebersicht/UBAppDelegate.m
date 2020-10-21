@@ -285,7 +285,7 @@ int const PORT = 41416;
         [windowsController
             updateWindows:screens
             baseUrl: [self serverUrl: @"http"]
-            interactionEnabled:preferences.enableInteraction
+            interactionEnabled: preferences.enableInteraction
             forceRefresh: needsRefresh
         ];
         needsRefresh = NO;
@@ -309,7 +309,9 @@ int const PORT = 41416;
 
 - (void)interactionDidChange
 {
-    [windowsController setInteractionEnabled: preferences.enableInteraction];
+    [windowsController closeAll];
+    needsRefresh = YES;
+    [screensController syncScreens:self];
 }
 
 - (IBAction)showPreferences:(id)sender

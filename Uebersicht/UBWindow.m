@@ -78,6 +78,16 @@
 }
 
 
+- (void)makeForegroundWindow
+{
+    [webViewController makeForeground];
+}
+
+- (void)makeAgnosticWindow
+{
+    [webViewController makeAgnostic];
+}
+
 #
 #pragma mark tracking area
 #

@@ -21,5 +21,7 @@
 - (void)workspaceChanged;
 - (void)wallpaperChanged;
 - (void)makeBackgroundWindow;
+- (void)makeForegroundWindow;
+- (void)makeAgnosticWindow;
 
 @end

@@ -20,5 +20,7 @@
 - (void)destroy;
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
 - (void)makeBackground;
+- (void)makeForeground;
+- (void)makeAgnostic;
 
 @end

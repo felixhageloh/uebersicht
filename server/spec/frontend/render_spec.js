@@ -173,7 +173,23 @@ test('rendering background widgets', (t) => {
     'it renders them if window.background is true',
   );
 
-  window.isBackground = undefined;
+  window.isBackground = false;
 
+  var state = {
+    widgets: {
+      foo: buildWidget('foo'),
+    },
+    settings: {foo: {showOnAllScreens: true}},
+    screens: ['123'],
+  };
+
+  render(state, '123', domEl);
+  t.equal(
+    domEl.childNodes.length,
+    1,
+    'it renders them in foreground if setting is undefined',
+  );
+
+  window.isBackground = undefined;
   t.end();
 });

@@ -103,7 +103,9 @@
 - (void)showDebugConsoleForScreen:(NSNumber*)screenId
 {
     
-    NSWindow* window = [(UBWindowGroup*)windows[screenId] foreground];
+    NSWindow* window = [(UBWindowGroup*)windows[screenId] foreground] == nil
+        ? [(UBWindowGroup*)windows[screenId] background]
+        : [(UBWindowGroup*)windows[screenId] foreground];
     WKPageRef page = NULL;
     SEL pageForTesting = @selector(_pageForTesting);
     
