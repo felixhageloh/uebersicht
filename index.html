@@ -117,9 +117,27 @@
         If a sponsorship is not your thing you can also consider making a one-time
         donation
       </p>
-      <p>
-        <a id='donate' class='button' href='https://bunq.me/uebersicht'>Buy me a coffee!</a>
-      </p>
+      <div id='donations'>
+        <form action="https://www.paypal.com/donate" method="post" target="_top">
+          <input type="hidden" name="cmd" value="_donations" />
+          <input type="hidden" name="business" value="TG7S3R2UUJKU4" />
+          <input type="hidden" name="item_name" value="Support the development and maintenance of Uebersicht" />
+          <input type="hidden" name="currency_code" value="USD" />
+          <input type="hidden" name="locale.x" value="en_US" />
+          <input
+            type="image"
+            src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif"
+            border="0"
+            name="submit"
+            title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button"
+          />
+          <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+          in <b>USD $</b> using PayPal
+        </form>
+        <div>
+          <a id='donate' class='button' title="Donate via bunq" href='https://bunq.me/uebersicht'>Donate</a> in <b>EUR €</b> using bunq
+        </div>
+      </div>
       <em>Thank you!</em>
     </section>
 
