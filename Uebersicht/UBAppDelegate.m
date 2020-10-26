@@ -196,8 +196,7 @@ int const PORT = 41416;
     
     NSImage *image = [[NSBundle mainBundle] imageForResource:@"status-icon"];
     [image setTemplate:YES];
-    [item setImage: image];
-    [item setHighlightMode:YES];
+    [item.button setImage: image];
     [item setMenu:aMenu];
     [item setEnabled:YES];
 
