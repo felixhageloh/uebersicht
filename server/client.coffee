@@ -12,7 +12,7 @@ detectWidgetHover = require './src/detectWidgetHover'
 
 window.onload = ->
   sharedSocket.open("ws://#{window.location.host}")
-  screenId = Number(window.location.pathname.replace(/\//g, ''))
+  screenId = Number(window.location.pathname.split('/')[1])
   contentEl = document.getElementById('uebersicht')
   contentEl.innerHTML = ''
   userCssLink = Array.from(document.querySelectorAll('link'))

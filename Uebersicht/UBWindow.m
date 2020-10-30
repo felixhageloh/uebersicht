@@ -19,10 +19,10 @@
 @implementation UBWindow {
     UBWebViewController* webViewController;
     NSTrackingArea* trackingArea;
-    BOOL interactionEnabled;
+    UBWindowType type;
 }
 
-- (id)init
+- (id)initWithWindowType:(UBWindowType)windowType
 {
     self = [super
         initWithContentRect: NSMakeRect(0, 0, 0, 0)
@@ -32,6 +32,7 @@
     ];
     
     if (self) {
+        type = windowType;
         [self setBackgroundColor:[NSColor clearColor]];
         [self setOpaque:NO];
         [self setCollectionBehavior:(
@@ -44,7 +45,7 @@
         [self disableSnapshotRestoration];
         [self setDisplaysWhenScreenProfileChanges:YES];
         [self setReleasedWhenClosed:NO];
-        [self setIgnoresMouseEvents:YES];
+        [self setWindowType:windowType];
         
         webViewController = [[UBWebViewController alloc]
             initWithFrame: [self frame]
@@ -71,22 +72,6 @@
 //    [webViewController destroy];
 //    [super close];
 //}
-
-- (void)makeBackgroundWindow
-{
-    [webViewController makeBackground];
-}
-
-
-- (void)makeForegroundWindow
-{
-    [webViewController makeForeground];
-}
-
-- (void)makeAgnosticWindow
-{
-    [webViewController makeAgnostic];
-}
 
 #
 #pragma mark tracking area
@@ -137,39 +122,44 @@
 }
 
 #
-#pragma mark interaction
+#pragma mark window type and interaction
 #
 
 
-- (void)setInteractionEnabled:(BOOL)isEnabled
+- (void)setWindowType:(UBWindowType)newType
 {
-    if (isEnabled) {
-        [self setLevel:kCGNormalWindowLevel-1];
-        [self updateTrackingArea];
-        interactionEnabled = YES;
-    } else {
-        [self setLevel:kCGDesktopWindowLevel];
-        if (trackingArea != nil) {
-           [self.contentView removeTrackingArea:trackingArea];
-        }
-        [self setIgnoresMouseEvents:YES];
-        interactionEnabled = NO;
+    switch (newType) {
+        case UBWindowTypeForeground:
+            [self setLevel:kCGNormalWindowLevel-1];
+            [self updateTrackingArea];
+            break;
+        case UBWindowTypeBackground:
+        case UBWindowTypeAgnostic:
+            [self setLevel:kCGDesktopWindowLevel];
+            if (trackingArea != nil) {
+                [self.contentView removeTrackingArea:trackingArea];
+            }
+            [self setIgnoresMouseEvents:YES];
+            break;
+        default:
+            break;
     }
+    type = newType;
 }
 
-- (BOOL)interactionEnabled
+- (UBWindowType)windowType
 {
-    return interactionEnabled;
+    return type;
 }
 
 #
 #pragma mark flags
 #
 
-- (BOOL)isKeyWindow { return interactionEnabled; }
-- (BOOL)canBecomeKeyWindow { return interactionEnabled; }
-- (BOOL)canBecomeMainWindow { return interactionEnabled; }
-- (BOOL)acceptsFirstResponder { return interactionEnabled; }
-- (BOOL)acceptsMouseMovedEvents { return interactionEnabled; }
+- (BOOL)isKeyWindow { return type == UBWindowTypeForeground; }
+- (BOOL)canBecomeKeyWindow { return type == UBWindowTypeForeground; }
+- (BOOL)canBecomeMainWindow { return type == UBWindowTypeForeground; }
+- (BOOL)acceptsFirstResponder { return type == UBWindowTypeForeground; }
+- (BOOL)acceptsMouseMovedEvents { return type == UBWindowTypeForeground;; }
 
 @end

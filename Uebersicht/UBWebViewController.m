@@ -9,17 +9,11 @@
 #import "UBWebViewController.h"
 #import "UBLocation.h"
 #import "UBWebView.h"
-
-typedef NS_ENUM(NSInteger, UBWindowLevel) {
-        UBWindowLevelAgnostic,
-        UBWindowLevelBackground,
-        UBWindowLevelForeground
-};
+#import "UBWindow.h"
 
 
 @implementation UBWebViewController {
     NSURL* url;
-    UBWindowLevel level;
 }
 
 @synthesize view;
@@ -30,7 +24,6 @@ typedef NS_ENUM(NSInteger, UBWindowLevel) {
     
      if (self) {
         view = [self buildWebView:frame];
-        level = UBWindowLevelAgnostic;
      }
     
      return self;
@@ -38,8 +31,20 @@ typedef NS_ENUM(NSInteger, UBWindowLevel) {
 
 - (void)load:(NSURL*)newUrl
 {
-    url = newUrl;
-    [(WKWebView*)view loadRequest:[NSURLRequest requestWithURL: newUrl]];
+    switch (((UBWindow*)self.view.window).windowType) {
+        case UBWindowTypeAgnostic:
+            url = newUrl;
+            break;
+        case UBWindowTypeBackground:
+            url = [newUrl URLByAppendingPathComponent: @"background"];
+            break;
+        case UBWindowTypeForeground:
+            url = [newUrl URLByAppendingPathComponent: @"foreground"];
+            break;
+        default:
+            break;
+    }
+    [(WKWebView*)view loadRequest:[NSURLRequest requestWithURL: url]];
 }
 
 - (void)reload
@@ -56,24 +61,6 @@ typedef NS_ENUM(NSInteger, UBWindowLevel) {
 {
     [self teardownWebview:(WKWebView *)view];
     view = nil;
-}
-
-- (void)makeBackground
-{
-    [self makeBackground:(WKWebView *)view];
-    level = UBWindowLevelBackground;
-}
-
-- (void)makeForeground
-{
-    [self makeForeground:(WKWebView *)view];
-    level = UBWindowLevelForeground;
-}
-
-- (void)makeAgnostic
-{
-    [self makeForeground:(WKWebView *)view];
-    level = UBWindowLevelAgnostic;
 }
 
 - (WKWebView*)buildWebView:(NSRect)frame
@@ -192,16 +179,16 @@ typedef NS_ENUM(NSInteger, UBWindowLevel) {
 - (void)webView:(WKWebView *)webView
     didFinishNavigation:(WKNavigation*)navigation
 {
-    NSLog(@"loaded %@ %zd", webView.URL, (long) level);
+    NSLog(@"loaded %@", webView.URL);
     
-    switch (level) {
-        case UBWindowLevelBackground:
+    switch (((UBWindow*)self.view.window).windowType) {
+        case UBWindowTypeBackground:
             [self makeBackground: webView];
             break;
-        case UBWindowLevelForeground:
+        case UBWindowTypeForeground:
             [self makeForeground: webView];
             break;
-        case UBWindowLevelAgnostic:
+        case UBWindowTypeAgnostic:
             [self makeAgnostic: webView];
             break;
         default:

@@ -12,16 +12,22 @@
 
 #import <Cocoa/Cocoa.h>
 
+
+typedef NS_ENUM(NSInteger, UBWindowType) {
+    UBWindowTypeAgnostic,
+    UBWindowTypeBackground,
+    UBWindowTypeForeground
+};
+
+
 @interface UBWindow : NSWindow
 
-@property BOOL interactionEnabled;
-- (id)init;
+@property UBWindowType windowType;
+
+- (id)initWithWindowType:(UBWindowType)type;
 - (void)loadUrl:(NSURL*)url;
 - (void)reload;
 - (void)workspaceChanged;
 - (void)wallpaperChanged;
-- (void)makeBackgroundWindow;
-- (void)makeForegroundWindow;
-- (void)makeAgnosticWindow;
 
 @end

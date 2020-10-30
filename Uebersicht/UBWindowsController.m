@@ -35,23 +35,23 @@
          forceRefresh:(Boolean)forceRefresh
 {
     NSMutableArray* obsoleteScreens = [[windows allKeys] mutableCopy];
-    UBWindowGroup* window;
+    UBWindowGroup* windowGroup;
     
     for(NSNumber* screenId in screens) {
         if (![windows objectForKey:screenId]) {
-            window = [[UBWindowGroup alloc] init];
-            [windows setObject:window forKey:screenId];
-            [window loadUrl: [self screenUrl:screenId baseUrl:baseUrl]];
+            windowGroup = [[UBWindowGroup alloc]
+                initWithInteractionEnabled: interactionEnabled
+            ];
+            [windows setObject:windowGroup forKey:screenId];
+            [windowGroup loadUrl: [self screenUrl:screenId baseUrl:baseUrl]];
         } else {
-            window = windows[screenId];
+            windowGroup = windows[screenId];
             if (forceRefresh) {
-                [window reload];
+                [windowGroup reload];
             }
         }
         
-        [window setFrame:[self screenRect:screenId] display:YES];
-        [window setInteractionEnabled: interactionEnabled];
-        
+        [windowGroup setFrame:[self screenRect:screenId] display:YES];
         [obsoleteScreens removeObject:screenId];
     }
     

@@ -16,11 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, strong) UBWindow* foreground;
 @property (readonly, strong) UBWindow* background;
 
+- (id)initWithInteractionEnabled:(BOOL)interactionEnabled;
 - (void)loadUrl:(NSURL*)Url;
 - (void)reload;
 - (void)close;
 - (void)setFrame:(NSRect)frame display:(BOOL)flag;
-- (void)setInteractionEnabled:(BOOL)flag;
 - (void)workspaceChanged;
 - (void)wallpaperChanged;
 

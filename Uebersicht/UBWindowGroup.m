@@ -7,6 +7,7 @@
 //
 
 #import "UBWindowGroup.h"
+#import "UBWindow.h"
 
 @implementation UBWindowGroup
 
@@ -14,20 +15,23 @@
 @synthesize background;
 
 
-- (id)init
+- (id)initWithInteractionEnabled:(BOOL)interactionEnabled
 {
     self = [super init];
     if (self) {
-        foreground = [[UBWindow alloc] init];
-        [foreground orderFront:self];
-        [foreground setInteractionEnabled:YES];
-        [foreground makeForegroundWindow];
+        if (interactionEnabled) {
+            foreground = [[UBWindow alloc]
+                initWithWindowType: UBWindowTypeForeground
+            ];
+            [foreground orderFront:self];
+        }
         
-        background = [[UBWindow alloc] init];
-        [background makeBackgroundWindow];
+        background = [[UBWindow alloc]
+            initWithWindowType: interactionEnabled
+                ? UBWindowTypeBackground
+                : UBWindowTypeAgnostic
+        ];
         [background orderFront:self];
-        [background setInteractionEnabled:NO];
-        [foreground makeBackgroundWindow];
     }
     return self;
 }
@@ -46,31 +50,14 @@
 
 - (void)loadUrl:(NSURL*)url
 {
-    [foreground loadUrl:url];
-    [background loadUrl:url];
+    [foreground loadUrl: url];
+    [background loadUrl: url];
 }
 
 - (void)setFrame:(NSRect)frame display:(BOOL)flag
 {
     [foreground setFrame:frame display:flag];
     [background setFrame:frame display:flag];
-}
-
-- (void)setInteractionEnabled:(BOOL)interactionEnabled
-{
-    if (!interactionEnabled) {
-        [foreground close];
-        foreground = nil;
-        [background makeAgnosticWindow];
-    } else  {
-        if (!foreground) {
-            foreground = [[UBWindow alloc] init];
-            [foreground setInteractionEnabled:YES];
-            [foreground orderFront:self];
-        }
-        [background makeBackgroundWindow];
-        [foreground makeForegroundWindow];
-    }
 }
 
 - (void)wallpaperChanged
