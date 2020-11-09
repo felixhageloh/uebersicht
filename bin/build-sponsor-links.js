@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const sponsors = require("../sponsors/September-2020.json");
+const sponsors = require("../sponsors/current.json");
 
 sponsors.forEach((sponsor) => {
   console.log(
