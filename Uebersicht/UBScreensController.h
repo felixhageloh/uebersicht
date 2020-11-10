@@ -15,6 +15,5 @@
 
 - (id)initWithChangeListener:(id)target;
 - (void)syncScreens:(id)sender;
-- (void)showDebugConsoleForScreen:(NSNumber*)screenId;
 
 @end

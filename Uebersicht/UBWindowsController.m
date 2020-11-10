@@ -77,13 +77,6 @@
     return screenRect;
 }
 
-- (void)setInteractionEnabled:(Boolean)isEnabled
-{
-    for (NSNumber* screenId in windows) {
-        [windows[screenId] setInteractionEnabled: isEnabled];
-    }
-}
-
 - (void)reloadAll
 {
     for (NSNumber* screenId in windows) {
@@ -100,12 +93,19 @@
     [windows removeAllObjects];
 }
 
-- (void)showDebugConsoleForScreen:(NSNumber*)screenId
+
+- (void)showDebugConsolesForScreen:(NSNumber*)screenId
 {
+    NSWindow* window;
+    window = [(UBWindowGroup*)windows[screenId] foreground];
+    if (window) [self showDebugConsoleForWindow: window];
     
-    NSWindow* window = [(UBWindowGroup*)windows[screenId] foreground] == nil
-        ? [(UBWindowGroup*)windows[screenId] background]
-        : [(UBWindowGroup*)windows[screenId] foreground];
+    window = [(UBWindowGroup*)windows[screenId] background];
+    if (window) [self showDebugConsoleForWindow: window];
+}
+
+- (void)showDebugConsoleForWindow:(NSWindow*)window
+{
     WKPageRef page = NULL;
     SEL pageForTesting = @selector(_pageForTesting);
     

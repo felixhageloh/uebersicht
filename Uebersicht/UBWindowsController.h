@@ -18,12 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
    interactionEnabled:(Boolean)interactionEnabled
          forceRefresh:(Boolean)forceRefresh;
 
-- (void)setInteractionEnabled:(Boolean)isEnabled;
 - (void)reloadAll;
 - (void)closeAll;
 - (void)workspaceChanged;
 - (void)wallpaperChanged;
-- (void)showDebugConsoleForScreen:(NSNumber*)screenId;
+- (void)showDebugConsolesForScreen:(NSNumber*)screenId;
 
 @end
 

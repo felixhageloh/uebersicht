@@ -345,7 +345,7 @@ int const PORT = 41416;
         deviceDescription
     ][@"NSScreenNumber"];
     
-    [windowsController showDebugConsoleForScreen:currentScreen];
+    [windowsController showDebugConsolesForScreen:currentScreen];
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center
