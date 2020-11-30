@@ -8,7 +8,7 @@
     <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-    <item>
+    <!-- <item>
       <title>Version 1.6.68</title>
       <description>
         <![CDATA[
@@ -39,7 +39,7 @@
           length="74088"
           type="application/octet-stream" />
       <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-    </item>
+    </item> -->
     <item>
       <title>Version 1.6.66</title>
       <description>
