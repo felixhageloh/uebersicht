@@ -46,6 +46,7 @@
         [self setDisplaysWhenScreenProfileChanges:YES];
         [self setReleasedWhenClosed:NO];
         [self setWindowType:windowType];
+        [self setIgnoresMouseEvents:YES];
         
         webViewController = [[UBWebViewController alloc]
             initWithFrame: [self frame]
