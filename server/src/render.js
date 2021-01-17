@@ -55,11 +55,11 @@ function render(state, screen, domEl, dispatch) {
   for (var id in state.widgets) {
     const widget = state.widgets[id];
 
-    if (!isVisibleOnScreen(id, screen, state)) continue;
+    if (!isVisibleOnScreen(id, screen.id, state)) continue;
 
     if (
-      window.isBackground != null &&
-      window.isBackground != isInBackground(id, state)
+      screen.layer &&
+      (screen.layer === 'background') != isInBackground(id, state)
     )
       continue;
 

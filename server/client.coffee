@@ -12,7 +12,10 @@ detectWidgetHover = require './src/detectWidgetHover'
 
 window.onload = ->
   sharedSocket.open("ws://#{window.location.host}")
-  screenId = Number(window.location.pathname.split('/')[1])
+  path = window.location.pathname.split('/')
+  screen =
+    id: Number(path[1])
+    layer: path[2]
   contentEl = document.getElementById('uebersicht')
   contentEl.innerHTML = ''
   userCssLink = Array.from(document.querySelectorAll('link'))
@@ -31,7 +34,7 @@ window.onload = ->
     store.subscribe ->
       nextState = store.getState()
       return if nextState == prevState
-      render(store.getState(), screenId, contentEl, store.dispatch)
+      render(store.getState(), screen, contentEl, store.dispatch)
       prevState = nextState
 
     listenToRemote (action) ->
@@ -47,7 +50,7 @@ window.onload = ->
         reloadUserCSS()
       else
         store.dispatch(action)
-    render(initialState, screenId, contentEl, store.dispatch)
+    render(initialState, screen, contentEl, store.dispatch)
 
 # legacy
 window.uebersicht =

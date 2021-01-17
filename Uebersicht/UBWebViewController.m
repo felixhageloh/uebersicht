@@ -152,48 +152,11 @@
      ];
 }
 
-- (void)makeBackground:(WKWebView*)webView
-{
-    [webView
-         evaluateJavaScript: @"window.isBackground = true;"
-         completionHandler:NULL
-     ];
-}
-
-- (void)makeForeground:(WKWebView*)webView
-{
-    [webView
-         evaluateJavaScript: @"window.isBackground = false;"
-         completionHandler:NULL
-     ];
-}
-
-- (void)makeAgnostic:(WKWebView*)webView
-{
-    [webView
-         evaluateJavaScript: @"window.isBackground = undefined;"
-         completionHandler:NULL
-     ];
-}
 
 - (void)webView:(WKWebView *)webView
     didFinishNavigation:(WKNavigation*)navigation
 {
     NSLog(@"loaded %@", webView.URL);
-    
-    switch (((UBWindow*)self.view.window).windowType) {
-        case UBWindowTypeBackground:
-            [self makeBackground: webView];
-            break;
-        case UBWindowTypeForeground:
-            [self makeForeground: webView];
-            break;
-        case UBWindowTypeAgnostic:
-            [self makeAgnostic: webView];
-            break;
-        default:
-            break;
-    }
 }
 
 - (void)webView:(WKWebView *)sender
