@@ -21,8 +21,10 @@ var state = {
   screens: ['123'],
 };
 
+const screen = {id: '123'};
+
 test('rendering a clean slate', (t) => {
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(domEl.childNodes.length, 2, 'it renders 2 widgets');
   t.ok(!!domEl.querySelector('#foo'), 'it renders widget foo');
   t.ok(!!domEl.querySelector('#bar'), 'it renders widget bar');
@@ -32,7 +34,7 @@ test('rendering a clean slate', (t) => {
 test('rendering new widgets', (t) => {
   state.widgets.baz = buildWidget('baz');
 
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(domEl.childNodes.length, 3, 'it renders 3 widgets');
   t.ok(!!domEl.querySelector('#foo'), 'it renders widget foo');
   t.ok(!!domEl.querySelector('#bar'), 'it renders widget bar');
@@ -43,7 +45,7 @@ test('rendering new widgets', (t) => {
 test('destroying removed widgets', (t) => {
   delete state.widgets.bar;
 
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(domEl.childNodes.length, 2, 'it leaves 2');
   t.ok(!!domEl.querySelector('#foo'), 'it does not remove widget foo');
   t.ok(!!domEl.querySelector('#baz'), 'it does not remove widget baz');
@@ -55,10 +57,11 @@ test('rendering widgets that are visible on all screens', (t) => {
     showOnAllScreens: true,
   };
 
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(domEl.childNodes.length, 2, 'it renders them');
 
-  render(state, '678', domEl);
+  const anotherScreen = {id: '678'};
+  render(state, anotherScreen, domEl);
   t.equal(domEl.childNodes.length, 2, 'it renders them on any screen');
 
   t.end();
@@ -70,14 +73,15 @@ test('rendering widgets that are pinned to the main screen', (t) => {
     showOnMainScreen: true,
   };
 
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(
     domEl.childNodes.length,
     2,
     'it renders them if current screen is main',
   );
 
-  render(state, '156', domEl);
+  const nonMainScreen = {id: '678'};
+  render(state, nonMainScreen, domEl);
   t.equal(
     domEl.childNodes.length,
     1,
@@ -93,7 +97,7 @@ test('rendering widgets that are pinned to selected screens', (t) => {
     showOnSelectedScreens: true,
   };
 
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(
     domEl.childNodes.length,
     1,
@@ -101,7 +105,7 @@ test('rendering widgets that are pinned to selected screens', (t) => {
   );
 
   state.settings.baz.screens = ['567'];
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(
     domEl.childNodes.length,
     1,
@@ -109,7 +113,7 @@ test('rendering widgets that are pinned to selected screens', (t) => {
   );
 
   state.settings.baz.screens = ['567', '123'];
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   t.equal(
     domEl.childNodes.length,
     2,
@@ -121,7 +125,8 @@ test('rendering widgets that are pinned to selected screens', (t) => {
 
 test('performance when re-rendering', (t) => {
   var prevNode = domEl.querySelector('#foo');
-  render(state, '123', domEl);
+  let screen = {id: '123'};
+  render(state, screen, domEl);
   var newNode = domEl.querySelector('#foo');
 
   t.ok(
@@ -133,7 +138,7 @@ test('performance when re-rendering', (t) => {
 
   // new mtime
   state.widgets.foo = buildWidget('foo');
-  render(state, '123', domEl);
+  render(state, screen, domEl);
   newNode = domEl.querySelector('#foo');
 
   t.ok(prevNode !== newNode, 'it does re-render nodes when it has to');
@@ -142,7 +147,7 @@ test('performance when re-rendering', (t) => {
 });
 
 test('rendering background widgets', (t) => {
-  var state = {
+  let state = {
     widgets: {
       foo: buildWidget('foo'),
     },
@@ -150,46 +155,26 @@ test('rendering background widgets', (t) => {
     screens: ['123'],
   };
 
-  render(state, '123', domEl);
-  t.equal(
-    domEl.childNodes.length,
-    1,
-    'it renders them if window.isBackground is not set',
-  );
+  render(state, screen, domEl);
+  t.equal(domEl.childNodes.length, 1, 'it renders them if layer is not set');
+  const undefinedLayer = {id: '123', layer: undefined};
+  render(state, undefinedLayer, domEl);
+  t.equal(domEl.childNodes.length, 1, 'it renders them if layer is undefined');
 
-  window.isBackground = false;
-  render(state, '123', domEl);
+  const foregroundLayer = {id: '123', layer: 'foreground'};
+  render(state, foregroundLayer, domEl);
   t.equal(
     domEl.childNodes.length,
     0,
-    'it does not render them if window.background is false',
+    'it does not render them if layer is "foreground"',
   );
 
-  window.isBackground = true;
-  render(state, '123', domEl);
+  const backgroundLayer = {id: '123', layer: 'background'};
+  render(state, backgroundLayer, domEl);
   t.equal(
     domEl.childNodes.length,
     1,
-    'it renders them if window.background is true',
+    'it renders them if layer is "background"',
   );
-
-  window.isBackground = false;
-
-  var state = {
-    widgets: {
-      foo: buildWidget('foo'),
-    },
-    settings: {foo: {showOnAllScreens: true}},
-    screens: ['123'],
-  };
-
-  render(state, '123', domEl);
-  t.equal(
-    domEl.childNodes.length,
-    1,
-    'it renders them in foreground if setting is undefined',
-  );
-
-  window.isBackground = undefined;
   t.end();
 });
