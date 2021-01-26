@@ -8,8 +8,8 @@
     <link>https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/updates.xml.rss</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-    <!-- <item>
-      <title>Version 1.6.68</title>
+    <item>
+      <title>Version 1.6.69</title>
       <description>
         <![CDATA[
           <h3>What's New</h3>
@@ -19,6 +19,7 @@
               widgets.
             </li>
             <li>Improved compatibility with macOS Big Sur.</li>
+            <li>Support for Apple Silicon.</li>
           </ul>
           <h3>Support Übersicht!</h3>
           <p>
@@ -31,15 +32,15 @@
           <p><em>Thank you!</em></p>
         ]]>
       </description>
-      <pubDate>Mon, Nov 30 2020 09:00:00 +0200</pubDate>
+      <pubDate>Tue, Jan 26 2021 08:45:00 +0200</pubDate>
       <enclosure
-          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.6.68.app.zip"
-          sparkle:version="68"
-          sparkle:shortVersionString="1.6.68"
-          length="74088"
+          url="https://raw.githubusercontent.com/felixhageloh/uebersicht/gh-pages/releases/Uebersicht-1.6.69.app.zip"
+          sparkle:version="69"
+          sparkle:shortVersionString="1.6.69"
+          length="75368"
           type="application/octet-stream" />
       <sparkle:minimumSystemVersion>10.10</sparkle:minimumSystemVersion>
-    </item> -->
+    </item>
     <item>
       <title>Version 1.6.66</title>
       <description>
