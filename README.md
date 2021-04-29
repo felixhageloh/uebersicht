@@ -362,17 +362,17 @@ To build Übersicht you will need to have NodeJS and a few dependencies installe
 Currently, the project supports node 8.
 
 If you already have node, you'll have to
-
-   brew unlink node
-
+```
+brew unlink node
+```
 Now, install node 8 using homebrew
-
-    brew install node@8 && brew link --force node@6
-
+```
+brew install node@8 && brew link --force node@6
+```
 then run
-
-    npm install
-
+```
+npm install
+```
 ### git and unicode characters
 
 Git might not like the umlaut (ü) in some of the path names and will constantly show them as untracked files. To get rid of this issue, I had to use
