@@ -36,6 +36,8 @@
 		DC9296A81C5017CF006E4267 /* widget-status-visible@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */; };
 		DC9296AB1C501D34006E4267 /* widget-status-hidden.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296A91C501D34006E4267 /* widget-status-hidden.png */; };
 		DC9296AC1C501D34006E4267 /* widget-status-hidden@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DC9296AA1C501D34006E4267 /* widget-status-hidden@2x.png */; };
+		DC943A5B264EE89F0018374E /* node-arm64 in Resources */ = {isa = PBXBuildFile; fileRef = DC943A5A264EE89E0018374E /* node-arm64 */; };
+		DC943A5D264EE8B30018374E /* node-x64 in Resources */ = {isa = PBXBuildFile; fileRef = DC943A5C264EE8B30018374E /* node-x64 */; };
 		DC9F7CE31C439CE50014E25B /* UBDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F7CE21C439CE50014E25B /* UBDispatcher.m */; };
 		DCAAAF9618DF0B050097677F /* GettingStarted.jsx in Resources */ = {isa = PBXBuildFile; fileRef = DCAAAF9518DF0B050097677F /* GettingStarted.jsx */; };
 		DCAC78CA1C550B810051E78B /* UBWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAC78C91C550B810051E78B /* UBWebSocket.m */; };
@@ -120,6 +122,8 @@
 		DC9296A61C5017CF006E4267 /* widget-status-visible@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-visible@2x.png"; sourceTree = "<group>"; };
 		DC9296A91C501D34006E4267 /* widget-status-hidden.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-hidden.png"; sourceTree = "<group>"; };
 		DC9296AA1C501D34006E4267 /* widget-status-hidden@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "widget-status-hidden@2x.png"; sourceTree = "<group>"; };
+		DC943A5A264EE89E0018374E /* node-arm64 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "node-arm64"; path = "server/release/node-arm64"; sourceTree = "<group>"; };
+		DC943A5C264EE8B30018374E /* node-x64 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "node-x64"; path = "server/release/node-x64"; sourceTree = "<group>"; };
 		DC99A7C418DC41A600E61222 /* Übersicht.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Übersicht.entitlements"; sourceTree = "<group>"; };
 		DC9F7CE11C439CE50014E25B /* UBDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UBDispatcher.h; sourceTree = "<group>"; };
 		DC9F7CE21C439CE50014E25B /* UBDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UBDispatcher.m; sourceTree = "<group>"; };
@@ -200,6 +204,8 @@
 		DC43AD7317EC2D9500241CC2 = {
 			isa = PBXGroup;
 			children = (
+				DC943A5C264EE8B30018374E /* node-x64 */,
+				DC943A5A264EE89E0018374E /* node-arm64 */,
 				DC43AD8517EC2D9500241CC2 /* Uebersicht */,
 				DCECA1C21893F1C300C0CA32 /* server */,
 				DC43ADA317EC2D9500241CC2 /* UebersichtTests */,
@@ -446,6 +452,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC943A5D264EE8B30018374E /* node-x64 in Resources */,
+				DC943A5B264EE89F0018374E /* node-arm64 in Resources */,
 				DC62CC731E1C0F73004F85B8 /* Uebersicht.sdef in Resources */,
 				DCECA1CF1894008800C0CA32 /* MainMenu.xib in Resources */,
 				DC43AD8A17EC2D9500241CC2 /* InfoPlist.strings in Resources */,
@@ -573,7 +581,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "BUILD=\"${BUILT_PRODUCTS_DIR}\"\n\n# By default, use the configured code signing identity for the project/target\nIDENTITY=\"${CODE_SIGN_IDENTITY}\"\nif [ \"$IDENTITY\" == \"\" ]\nthen\n    # If a code signing identity is not specified, use ad hoc signing\n    IDENTITY=\"-\"\nfi\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$FRAMEWORKS_FOLDER_PATH/Sparkle.framework/Versions/A/Resources/AutoUpdate.app\"\ncodesign --entitlements \"$CODE_SIGN_ENTITLEMENTS\" --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/localnode\"\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/node_modules/fsevents/fsevents.node\"\n";
+			shellScript = "BUILD=\"${BUILT_PRODUCTS_DIR}\"\n\n# By default, use the configured code signing identity for the project/target\nIDENTITY=\"${CODE_SIGN_IDENTITY}\"\nif [ \"$IDENTITY\" == \"\" ]\nthen\n    # If a code signing identity is not specified, use ad hoc signing\n    IDENTITY=\"-\"\nfi\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$FRAMEWORKS_FOLDER_PATH/Sparkle.framework/Versions/A/Resources/AutoUpdate.app\"\ncodesign --entitlements \"$CODE_SIGN_ENTITLEMENTS\" --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/node-arm64\"\ncodesign --entitlements \"$CODE_SIGN_ENTITLEMENTS\" --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/node-x64\"\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$BUILD/$CONTENTS_FOLDER_PATH/Resources/node_modules/fsevents/fsevents.node\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -764,7 +772,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_TEAM = S3P44NRLCW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -799,7 +807,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 69;
+				CURRENT_PROJECT_VERSION = 70;
 				DEVELOPMENT_TEAM = S3P44NRLCW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (

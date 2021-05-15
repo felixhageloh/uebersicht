@@ -47,7 +47,7 @@ int const PORT = 41416;
     // NSTask doesn't terminate when xcode stop is pressed. Other ways of
     // spawning the server, like system() or popen() have the same problem.
     // So, hit em with a hammer :(
-    system("killall localnode");
+    system("killall -m node-");
     
     widgetsStore = [[UBWidgetsStore alloc] init];
 
