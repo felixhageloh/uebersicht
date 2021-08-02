@@ -555,7 +555,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=$PATH:/usr/local/bin\ncd server && npm run-script release\n";
+			shellScript = "export PATH=$PATH:/usr/local/bin:/opt/homebrew/bin\ncd server && npm run-script release\n";
 		};
 		DC92346F23015178009D9E2F /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;

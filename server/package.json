@@ -41,7 +41,7 @@
     "emotion": "^10.0.27",
     "escodegen": "^1.14.3",
     "esprima": "^2.7.3",
-    "fsevents": "^2.1.3",
+    "fsevents": "^2.3",
     "jquery": "^3.5.1",
     "minimist": "^1.2.5",
     "ms": "^2.0.0",
