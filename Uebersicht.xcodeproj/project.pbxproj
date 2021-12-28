@@ -767,7 +767,7 @@
 			baseConfigurationReference = 2B2DEDD7D214E00F6E0F133D /* Pods-Uebersicht.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Uebersicht/Übersicht.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Uebersicht/Uebersicht.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -802,7 +802,7 @@
 			baseConfigurationReference = 1F1AEE7879137369A94611DB /* Pods-Uebersicht.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Uebersicht/Übersicht.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Uebersicht/Uebersicht.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
