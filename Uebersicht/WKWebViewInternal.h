@@ -8,7 +8,7 @@
 
 #include "WKBase.h"
 
-@interface WKWebView
+@interface WKWebView : NSView
 - (WKPageRef)_pageForTesting;
 @end
 #endif
