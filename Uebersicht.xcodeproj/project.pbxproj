@@ -370,7 +370,7 @@
 				DC43AD7917EC2D9500241CC2 /* Frameworks */,
 				DC43AD7A17EC2D9500241CC2 /* Resources */,
 				DC92346F23015178009D9E2F /* Run Script */,
-				408EC9591BE0037CFA86EB7A /* [CP] Embed Pods Frameworks */,
+				BB1627E907380E5C5FB17DDC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -531,7 +531,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		408EC9591BE0037CFA86EB7A /* [CP] Embed Pods Frameworks */ = {
+		BB1627E907380E5C5FB17DDC /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -539,12 +539,10 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Uebersicht/Pods-Uebersicht-frameworks.sh",
 				"${PODS_ROOT}/Sparkle/Sparkle.framework",
-				"${PODS_ROOT}/Sparkle/Sparkle.framework.dSYM",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework",
-				"${DWARF_DSYM_FOLDER_PATH}/Sparkle.framework.dSYM",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -563,7 +561,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=$PATH:/usr/local/bin\ncd server && npm run-script release\n";
+			shellScript = "export PATH=$PATH:/usr/local/bin:/opt/homebrew/bin\ncd server && npm run-script release\n";
 		};
 		DC92346F23015178009D9E2F /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -785,7 +783,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = "@loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MARKETING_VERSION = 1.6;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
@@ -820,7 +818,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Uebersicht/Uebersicht-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[arch=*]" = "@loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MARKETING_VERSION = 1.6;
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = tracesOf.Uebersicht;
