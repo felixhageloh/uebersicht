@@ -20,7 +20,7 @@
     "sinon": "^4.0.1",
     "tap-spec": "^5.0.0",
     "tape": "^4.13.3",
-    "tape-run": "^6.0.1",
+    "tape-run": "^9.0.0",
     "uglify-js": "^3.10.4"
   },
   "dependencies": {
