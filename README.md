@@ -367,7 +367,7 @@ brew unlink node
 ```
 Now, install node 8 using homebrew
 ```
-brew install node@8 && brew link --force node@6
+brew install node@8 && brew link --force node@8
 ```
 then run
 ```
