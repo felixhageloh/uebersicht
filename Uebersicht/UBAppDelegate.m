@@ -19,8 +19,6 @@
 #import "UBWebSocket.h"
 #import "UBWindowsController.h"
 
-int const PORT = 41416;
-
 @implementation UBAppDelegate {
     NSStatusItem* statusBarItem;
     NSTask* widgetServer;
@@ -28,6 +26,7 @@ int const PORT = 41416;
     UBScreensController* screensController;
     UBWindowsController* windowsController;
     BOOL keepServerAlive;
+    int port;
     int portOffset;
     UBWidgetsStore* widgetsStore;
     UBWidgetsController* widgetsController;
@@ -48,7 +47,7 @@ int const PORT = 41416;
     // spawning the server, like system() or popen() have the same problem.
     // So, hit em with a hammer :(
     system("killall -m node-");
-    
+
     widgetsStore = [[UBWidgetsStore alloc] init];
 
     screensController = [[UBScreensController alloc]
@@ -103,6 +102,7 @@ int const PORT = 41416;
     ];
     
     // start server and load webview
+    port = arc4random_uniform(20000) + 41416;
     portOffset = 0;
     [self startUp];
     
@@ -241,7 +241,7 @@ int const PORT = 41416;
     [task setArguments:@[
         serverPath,
         @"-d", widgetPath,
-        @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset],
+        @"-p", [NSString stringWithFormat:@"%d", port + portOffset],
         @"-s", [[self getPreferencesDir] path],
         loginShell ? @"--login-shell" : @""
     ]];
@@ -269,7 +269,7 @@ int const PORT = 41416;
     // trailing slash required for load policy in UBWindow
     return [NSURL
         URLWithString:[NSString
-            stringWithFormat:@"%@://127.0.0.1:%d/", protocol, PORT+portOffset
+            stringWithFormat:@"%@://127.0.0.1:%d/", protocol, port+portOffset
         ]
     ];
 }
