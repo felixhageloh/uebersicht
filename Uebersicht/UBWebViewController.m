@@ -14,6 +14,7 @@
 
 @implementation UBWebViewController {
     NSURL* url;
+    NSString *token;
 }
 
 @synthesize view;
@@ -44,7 +45,14 @@
         default:
             break;
     }
-    [(WKWebView*)view loadRequest:[NSURLRequest requestWithURL: url]];
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
+    [request setValue:@"Übersicht" forHTTPHeaderField:@"Origin"];
+    [(WKWebView*)view loadRequest:request];
+}
+
+- (void)setToken:(NSString*)newToken
+{
+    token = newToken;
 }
 
 - (void)reload
@@ -173,7 +181,6 @@
     [self handleWebviewLoadError:error];
 }
 
-
 - (void)webView: (WKWebView *)theWebView
     decidePolicyForNavigationAction: (WKNavigationAction*)action
     decisionHandler: (void (^)(WKNavigationActionPolicy))handler
@@ -181,7 +188,16 @@
     if (!action.targetFrame.mainFrame) {
         handler(WKNavigationActionPolicyAllow);
     } else if ([action.request.URL isEqual: url]) {
-        handler(WKNavigationActionPolicyAllow);
+        NSHTTPCookie *c = [NSHTTPCookie cookieWithProperties:@{
+            NSHTTPCookieDomain: url.host,
+            NSHTTPCookiePath: @"/",
+            NSHTTPCookieName: @"token",
+            NSHTTPCookieValue: token,
+            @"HttpOnly": @"TRUE",
+        }];
+        [theWebView.configuration.websiteDataStore.httpCookieStore setCookie:c completionHandler:^{
+            handler(WKNavigationActionPolicyAllow);
+        }];
     } else if (action.navigationType == WKNavigationTypeLinkActivated) {
         [[NSWorkspace sharedWorkspace] openURL:action.request.URL];
         handler(WKNavigationActionPolicyCancel);

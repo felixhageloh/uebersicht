@@ -31,6 +31,7 @@
 
 - (void)updateWindows:(NSDictionary*)screens
               baseUrl:(NSURL*)baseUrl
+                token:(NSString*)token
    interactionEnabled:(Boolean)interactionEnabled
          forceRefresh:(Boolean)forceRefresh
 {
@@ -43,6 +44,7 @@
                 initWithInteractionEnabled: interactionEnabled
             ];
             [windows setObject:windowGroup forKey:screenId];
+            [windowGroup setToken:token];
             [windowGroup loadUrl: [self screenUrl:screenId baseUrl:baseUrl]];
         } else {
             windowGroup = windows[screenId];

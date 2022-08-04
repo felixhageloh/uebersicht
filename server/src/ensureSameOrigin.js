@@ -1,6 +1,6 @@
 module.exports = function ensureSameOrgin(origin) {
   const fromSameOrigin = (req) => {
-    return req.method == 'GET' ||
+    return req.method === 'GET' ||
       (req.headers.origin && req.headers.origin === origin);
   }
 

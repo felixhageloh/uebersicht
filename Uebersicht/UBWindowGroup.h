@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)initWithInteractionEnabled:(BOOL)interactionEnabled;
 - (void)loadUrl:(NSURL*)Url;
+- (void)setToken:(NSString*)token;
 - (void)reload;
 - (void)close;
 - (void)setFrame:(NSRect)frame display:(BOOL)flag;

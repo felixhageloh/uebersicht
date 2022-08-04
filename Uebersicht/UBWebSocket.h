@@ -12,7 +12,8 @@
 @interface UBWebSocket : NSObject <SRWebSocketDelegate>
 
 + (id)sharedSocket;
-- (void)open:(NSURL*)aUrl;
+- (void)open:(NSURL*)aUrl
+       token:(NSString*)aToken;
 - (void)close;
 - (void)send:(id)message;
 - (void)listen:(void (^)(id))listener;

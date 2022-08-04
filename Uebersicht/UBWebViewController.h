@@ -15,6 +15,7 @@
 
 - (id)initWithFrame:(NSRect)frame;
 - (void)load:(NSURL*)url;
+- (void)setToken:(NSString*)token;
 - (void)reload;
 - (void)redraw;
 - (void)destroy;

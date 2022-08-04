@@ -20,6 +20,7 @@
 
 - (void)widgetDirDidChange;
 - (void)interactionDidChange;
+- (void)enableSecurityDidChange;
 - (void)screensChanged:(NSDictionary*)screens;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)openWidgetDir:(id)sender;

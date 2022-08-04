@@ -27,8 +27,8 @@ function handleError(err) {
   console.error(err);
 }
 
-exports.open = function open(url) {
-  ws = new WebSocket(url, ['ws'], {origin: 'Übersicht'});
+exports.open = function open(url, token) {
+  ws = new WebSocket(url, ['ws'], {origin: 'Übersicht', headers:{cookie:`token=${token}`}});
 
   if (ws.on) {
     ws.on('open', handleWSOpen);
@@ -63,4 +63,3 @@ exports.onOpen = function onOpen(listener) {
 exports.send = function send(data) {
   ws.send(data);
 };
-

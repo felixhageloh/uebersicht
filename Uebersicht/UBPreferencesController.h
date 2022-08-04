@@ -20,6 +20,7 @@
 @property NSURL* widgetDir;
 @property BOOL loginShell;
 @property BOOL enableInteraction;
+@property BOOL enableSecurity;
 
 - (IBAction)showFilePicker:(id)sender;
 

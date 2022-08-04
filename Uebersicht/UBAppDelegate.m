@@ -33,9 +33,12 @@ int const PORT = 41416;
     UBWidgetsStore* widgetsStore;
     UBWidgetsController* widgetsController;
     BOOL needsRefresh;
+    NSString *token;
 }
 
 @synthesize statusBarMenu;
+
+static const uint kTokenLength256Bits = 32;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -110,33 +113,58 @@ int const PORT = 41416;
     [self listenToWallpaperChanges];
 }
 
-- (NSDictionary*)fetchState
+- (void)fetchState:(void (^)(NSDictionary*))callback
 {
-    [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
+    [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]
+                               token:token];
+
     NSURL *urlPath = [[self serverUrl:@"http"] URLByAppendingPathComponent: @"state/"];
-    NSData *jsonData = [NSData dataWithContentsOfURL:urlPath];
-    NSError *error = nil;
-    NSDictionary *dataDictionary = [NSJSONSerialization
-        JSONObjectWithData: jsonData
-        options: NSJSONReadingMutableContainers
-        error: &error
-    ];
-    if (error) NSLog(@"%@", error);
-    return dataDictionary;
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:urlPath];
+    [request setValue:@"Übersicht" forHTTPHeaderField:@"Origin"];
+    [request setValue:[NSString stringWithFormat:@"token=%@", token] forHTTPHeaderField:@"Cookie"];
+    NSURLSessionDataTask *t = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            NSLog(@"error loading state: %@", error);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback(@{});
+            });
+            return;
+        }
+
+        NSError *jsonError = nil;
+        NSDictionary *dataDictionary = [NSJSONSerialization
+            JSONObjectWithData: data
+            options: NSJSONReadingMutableContainers
+            error: &jsonError
+        ];
+        if (jsonError) {
+            NSLog(@"error parsing state: %@", error);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback(@{});
+            });
+            return;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            callback(dataDictionary);
+        });
+    }];
+    [t resume];
 }
 
 - (void)startUp
 {
 
     NSLog(@"starting server task");
-    
+
     void (^handleData)(NSString*) = ^(NSString* output) {
         // note that these might be called several times
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
-            [self->widgetsStore reset: [self fetchState]];
-            // this will trigger a render
-            [self->screensController syncScreens:self];
-
+            [self fetchState:^(NSDictionary* state) {
+                [self->widgetsStore reset: state];
+                // this will trigger a render
+                [self->screensController syncScreens:self];
+            }];
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             self->portOffset++;
         }
@@ -216,14 +244,27 @@ int const PORT = 41416;
                        onData:(void (^)(NSString*))dataHandler
                        onExit:(void (^)(NSTask*))exitHandler
 {
+    token = generateToken(kTokenLength256Bits);
+
     NSBundle* bundle     = [NSBundle mainBundle];
     NSString* nodePath   = [bundle pathForResource:@"localnode" ofType:nil];
     NSString* serverPath = [bundle pathForResource:@"server" ofType:@"js"];
-    BOOL loginShell = [[NSUserDefaults standardUserDefaults]
-        boolForKey:@"loginShell"
-    ];
 
     NSTask *task = [[NSTask alloc] init];
+
+    NSPipe *inPipe = [NSPipe pipe];
+    NSFileHandle *fh = [inPipe fileHandleForWriting];
+    NSMutableDictionary *secrets = [[NSMutableDictionary alloc] init];
+    secrets[@"token"] = token;
+    NSError *jsonErr = NULL;
+    NSData *stdinData = [NSJSONSerialization dataWithJSONObject:secrets options:0 error:&jsonErr];
+    if (!stdinData) {
+        NSLog(@"[FATAL] %@", jsonErr);
+        return NULL;
+    }
+    [fh writeData:stdinData];
+    [fh closeFile];
+    [task setStandardInput:inPipe];
 
     [task setStandardOutput:[NSPipe pipe]];
     [task.standardOutput fileHandleForReading].readabilityHandler = ^(NSFileHandle *handle) {
@@ -252,7 +293,8 @@ int const PORT = 41416;
         @"-d", widgetPath,
         @"-p", [NSString stringWithFormat:@"%d", PORT + portOffset],
         @"-s", [[self getPreferencesDir] path],
-        loginShell ? @"--login-shell" : @""
+        !preferences.enableSecurity ? @"--disable-token" : @"",
+        preferences.loginShell ? @"--login-shell" : @""
     ]];
     
     [task launch];
@@ -294,6 +336,7 @@ int const PORT = 41416;
         [windowsController
             updateWindows:screens
             baseUrl: [self serverUrl: @"http"]
+            token:token
             interactionEnabled: preferences.enableInteraction
             forceRefresh: needsRefresh
         ];
@@ -321,6 +364,11 @@ int const PORT = 41416;
     [windowsController closeAll];
     needsRefresh = YES;
     [screensController syncScreens:self];
+}
+
+- (void)enableSecurityDidChange
+{
+    [self shutdown:true];
 }
 
 - (IBAction)showPreferences:(id)sender
@@ -451,6 +499,29 @@ void wallpaperSettingsChanged(
             ];
         }
     }
+}
+
+/*!
+    @function generateToken
+
+    @abstract
+    Returns a base64-encoded @p NSString* of specified number of random bytes.
+
+    @param length
+    A reasonably large, non-zero number representing the length in bytes.
+    For example, a value of 32 would generate a 256-bit token.
+
+    @result Returns @p NSString* on success; panics on failure.
+*/
+NSString* generateToken(uint length) {
+    UInt8 buf[length];
+
+    int error = SecRandomCopyBytes(kSecRandomDefault, length, &buf);
+    if (error != errSecSuccess) {
+        panic("failed to generate token");
+    }
+
+    return [[NSData dataWithBytes:buf length:length] base64EncodedStringWithOptions:0];
 }
 
 #
