@@ -27,6 +27,7 @@ int const PORT = 41416;
     UBPreferencesController* preferences;
     UBScreensController* screensController;
     UBWindowsController* windowsController;
+    BOOL shuttingDown;
     BOOL keepServerAlive;
     int portOffset;
     UBWidgetsStore* widgetsStore;
@@ -142,7 +143,9 @@ int const PORT = 41416;
     };
 
     void (^handleExit)(NSTask*) = ^(NSTask* theTask) {
-        [self shutdown];
+        if (!self->shuttingDown) {
+            [self shutdown];
+        }
         if (self->portOffset >= 20) {
             self->keepServerAlive = NO;
             NSLog(@"couldn't find an open port. Giving up...");
@@ -156,6 +159,7 @@ int const PORT = 41416;
         }
     };
     
+    shuttingDown = NO;
     keepServerAlive = YES;
     widgetServer = [self
         launchWidgetServer: [preferences.widgetDir path]
@@ -166,6 +170,11 @@ int const PORT = 41416;
 
 - (void)shutdown:(Boolean)keepAlive
 {
+    if (shuttingDown) {
+        return;
+    }
+    shuttingDown = YES;
+
     keepServerAlive = keepAlive;
     [windowsController closeAll];
     [[UBWebSocket sharedSocket] close];
