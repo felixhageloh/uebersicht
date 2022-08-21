@@ -16,6 +16,8 @@
     LSSharedFileListRef loginItems;
 }
 
+static NSString * const kDefaultsEnableSecurity = @"enableSecurity";
+
 @synthesize filePicker;
 
 - (id)initWithWindowNibName:(NSString *)windowNibName
@@ -26,7 +28,8 @@
         NSData* defaultWidgetDir = [self ensureDefaultsWidgetDir];
         NSDictionary *appDefaults = @{
             @"widgetDirectory": defaultWidgetDir,
-            @"enableInteraction": @YES
+            @"enableInteraction": @YES,
+            kDefaultsEnableSecurity: @YES,
         };
         [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
                 
@@ -194,6 +197,23 @@
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:@(enabled) forKey:@"enableInteraction"];
     [(UBAppDelegate *)[NSApp delegate] interactionDidChange];
+}
+
+#
+#pragma mark Security
+#
+
+- (BOOL)enableSecurity
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [defaults boolForKey:kDefaultsEnableSecurity];
+}
+
+- (void)setEnableSecurity:(BOOL)enabled
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:enabled forKey:kDefaultsEnableSecurity];
+    [(UBAppDelegate *)[NSApp delegate] enableSecurityDidChange];
 }
 
 #

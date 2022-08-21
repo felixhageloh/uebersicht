@@ -26,6 +26,7 @@ typedef NS_ENUM(NSInteger, UBWindowType) {
 
 - (id)initWithWindowType:(UBWindowType)type;
 - (void)loadUrl:(NSURL*)url;
+- (void)setToken:(NSString*)token;
 - (void)reload;
 - (void)workspaceChanged;
 - (void)wallpaperChanged;

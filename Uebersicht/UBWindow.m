@@ -62,6 +62,11 @@
     [webViewController load:url];
 }
 
+- (void)setToken:(NSString*)token
+{
+    [webViewController setToken:token];
+}
+
 - (void)reload
 {
     [webViewController reload];

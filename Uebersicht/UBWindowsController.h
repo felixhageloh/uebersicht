@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)updateWindows:(NSDictionary*)screens
               baseUrl:(NSURL*)baseUrl
+                token:(NSString*)token
    interactionEnabled:(Boolean)interactionEnabled
          forceRefresh:(Boolean)forceRefresh;
 
