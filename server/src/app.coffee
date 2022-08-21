@@ -10,6 +10,7 @@ watchDir = require('./directory_watcher.coffee')
 WidgetBundler = require('./WidgetBundler.js')
 Settings = require('./Settings')
 StateServer = require('./StateServer')
+ensureSameHost = require('./ensureSameHost')
 ensureSameOrigin = require('./ensureSameOrigin')
 disallowIFraming = require('./disallowIFraming')
 CommandServer = require('./command_server.coffee')
@@ -70,9 +71,11 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
   # set up the server
   host = "127.0.0.1"
   messageBus = null
-  allowedOrigin = "http://#{host}:#{port}"
+  allowedHost = "#{host}:#{port}"
+  allowedOrigin = "http://#{allowedHost}"
   middleware = connect()
     .use(disallowIFraming)
+    .use(ensureSameHost(allowedHost))
     .use(ensureSameOrigin(allowedOrigin))
     .use(CommandServer(widgetPath, options.loginShell))
     .use(StateServer(store))
@@ -90,7 +93,7 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
       messageBus = MessageBus(
         server: server,
         verifyClient: (info) ->
-          info.origin == allowedOrigin || info.origin == 'Übersicht'
+          info.req.headers.host == allowedHost && (info.origin == allowedOrigin || info.origin == 'Übersicht')
       )
       sharedSocket.open("ws://#{host}:#{port}")
       callback?()
