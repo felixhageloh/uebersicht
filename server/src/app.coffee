@@ -4,6 +4,7 @@ serveStatic = require 'serve-static'
 path = require 'path'
 fs = require 'fs'
 redux = require 'redux'
+cookieParser = require('cookie-parser')
 
 MessageBus = require('./MessageBus')
 watchDir = require('./directory_watcher.coffee')
@@ -21,11 +22,20 @@ sharedSocket = require('./SharedSocket')
 actions = require('./actions')
 reducer = require('./reducer')
 resolveWidget = require('./resolveWidget')
+authenticateRequest = require('./authenticateRequest')
 
 dispatchToRemote = require('./dispatch')
 listenToRemote = require('./listen')
 
-module.exports = (port, widgetPath, settingsPath, publicPath, options, callback) ->
+module.exports = (
+  port, 
+  authenticationToken, 
+  widgetPath, 
+  settingsPath, 
+  publicPath, 
+  options, 
+  callback
+) ->
   options ||= {}
 
   # global store for app state
@@ -75,8 +85,10 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
   allowedOrigin = "http://#{allowedHost}"
   middleware = connect()
     .use(disallowIFraming)
+    .use(cookieParser())
     .use(ensureSameHost(allowedHost))
     .use(ensureSameOrigin(allowedOrigin))
+    .use(authenticateRequest(authenticationToken))
     .use(CommandServer(widgetPath, options.loginShell))
     .use(StateServer(store))
     .use(serveWidgets(bundler, widgetPath))

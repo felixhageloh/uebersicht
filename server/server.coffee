@@ -2,12 +2,14 @@ parseArgs = require 'minimist'
 UebersichtServer = require './src/app.coffee'
 cors_proxy = require 'cors-anywhere'
 path = require 'path'
+fs = require 'fs'
 
 handleError = (err) ->
   console.log(err.message || err)
   throw err
 
 try
+  authenticationToken = fs.readFileSync(process.stdin.fd, 'utf-8')
   args = parseArgs process.argv.slice(2)
   widgetPath = path.resolve(__dirname, args.d ? args.dir  ? './widgets')
   port = args.p ? args.port ? 41416
@@ -18,6 +20,7 @@ try
 
   server = UebersichtServer(
     Number(port),
+    authenticationToken,
     widgetPath,
     settingsPath,
     publicPath,

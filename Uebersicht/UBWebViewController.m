@@ -76,6 +76,18 @@
     ];
     webView.navigationDelegate = (id<WKNavigationDelegate>)self;
     
+    NSArray* cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
+    for (id cookie in cookies) {
+        if (@available(macOS 10.13, *)) {
+            [webView.configuration.websiteDataStore.httpCookieStore
+                setCookie: cookie
+                completionHandler: nil
+            ];
+        } else {
+            // Fallback on earlier versions
+        }
+    }
+    
     return webView;
 }
 

@@ -19,6 +19,7 @@
 #import "UBWebSocket.h"
 #import "UBWindowsController.h"
 
+uint const kTokenLength256Bits = 32;
 int const PORT = 41416;
 
 @implementation UBAppDelegate {
@@ -33,6 +34,7 @@ int const PORT = 41416;
     UBWidgetsStore* widgetsStore;
     UBWidgetsController* widgetsController;
     BOOL needsRefresh;
+    NSString* authenticationToken;
 }
 
 @synthesize statusBarMenu;
@@ -102,6 +104,16 @@ int const PORT = 41416;
         name: NSWorkspaceSessionDidResignActiveNotification
         object: nil
     ];
+    
+    authenticationToken = generateToken(kTokenLength256Bits);
+    NSHTTPCookie* cookie = [NSHTTPCookie cookieWithProperties:@{
+        NSHTTPCookieDomain: @"127.0.0.1",
+        NSHTTPCookiePath: @"/",
+        NSHTTPCookieName: @"token",
+        NSHTTPCookieValue: authenticationToken,
+    }];
+    
+    [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
     
     // start server and load webview
     portOffset = 0;
@@ -238,6 +250,12 @@ int const PORT = 41416;
             dataHandler(outStr);
         });
     };
+    
+    [task setStandardInput:[NSPipe pipe]];
+    NSFileHandle *fh = [task.standardInput fileHandleForWriting];
+    [fh writeData: [authenticationToken dataUsingEncoding:NSUTF8StringEncoding]];
+    [fh closeFile];
+   
     
     task.terminationHandler = ^(NSTask *theTask) {
         [theTask.standardOutput fileHandleForReading].readabilityHandler = nil;
@@ -470,6 +488,17 @@ void wallpaperSettingsChanged(
 - (void)reloadWidget:(NSString*)widgetId
 {
     [widgetsController reloadWidget:widgetId];
+}
+
+NSString* generateToken(uint length) {
+    UInt8 buf[length];
+
+    int error = SecRandomCopyBytes(kSecRandomDefault, length, &buf);
+    if (error != errSecSuccess) {
+     panic("failed to generate token");
+    }
+
+    return [[NSData dataWithBytes:buf length:length] base64EncodedStringWithOptions:0];
 }
 
 @end
