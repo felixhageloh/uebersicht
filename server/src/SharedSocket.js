@@ -1,8 +1,7 @@
 'use strict';
 
-const WebSocket = typeof window !== 'undefined'
-  ? window.WebSocket
-  : require('ws');
+const WebSocket =
+  typeof window !== 'undefined' ? window.WebSocket : require('ws');
 
 let ws = null;
 let isOpen = false;
@@ -27,8 +26,13 @@ function handleError(err) {
   console.error(err);
 }
 
-exports.open = function open(url) {
-  ws = new WebSocket(url, ['ws'], {origin: 'Übersicht'});
+exports.open = function open(url, authenticationToken) {
+  ws = new WebSocket(url, ['ws'], {
+    origin: 'Übersicht',
+    headers: authenticationToken
+      ? {cookie: `token=${authenticationToken}`}
+      : undefined,
+  });
 
   if (ws.on) {
     ws.on('open', handleWSOpen);
@@ -48,7 +52,7 @@ exports.close = function close() {
   ws = null;
 };
 
-exports.isOpen = function() {
+exports.isOpen = function () {
   return ws && isOpen;
 };
 
@@ -63,4 +67,3 @@ exports.onOpen = function onOpen(listener) {
 exports.send = function send(data) {
   ws.send(data);
 };
-

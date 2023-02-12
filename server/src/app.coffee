@@ -85,9 +85,9 @@ module.exports = (
   allowedOrigin = "http://#{allowedHost}"
   middleware = connect()
     .use(disallowIFraming)
-    .use(cookieParser())
     .use(ensureSameHost(allowedHost))
     .use(ensureSameOrigin(allowedOrigin))
+    .use(cookieParser())
     .use(authenticateRequest(authenticationToken))
     .use(CommandServer(widgetPath, options.loginShell))
     .use(StateServer(store))
@@ -104,10 +104,11 @@ module.exports = (
       return server.emit('error', err) if err
       messageBus = MessageBus(
         server: server,
-        verifyClient: (info) ->
-          info.req.headers.host == allowedHost && (info.origin == allowedOrigin || info.origin == 'Übersicht')
+        allowedOrigin: allowedOrigin,
+        allowedHost: allowedHost,
+        authenticationToken: authenticationToken
       )
-      sharedSocket.open("ws://#{host}:#{port}")
+      sharedSocket.open("ws://#{host}:#{port}", authenticationToken)
       callback?()
     catch e
       server.emit('error', e)

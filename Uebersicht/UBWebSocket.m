@@ -59,6 +59,7 @@
     [request setValue:@"Übersicht" forHTTPHeaderField:@"Origin"];
     ws = [[SRWebSocket alloc] initWithURLRequest: request];
     ws.delegate = self;
+    ws.requestCookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
     [ws open];
 }
 
