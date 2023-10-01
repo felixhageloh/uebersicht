@@ -27,11 +27,12 @@ module.exports = (directoryPath, callback) ->
     )
 
     console.log 'watching', directoryPath
+    api
 
-    findFiles directoryPath, 'directory', registerFile
-    close
+  api.replay = (callback) ->
+    findFiles directoryPath, 'directory', registerFile, callback
 
-  close = ->
+  api.close = ->
     closed = true
     stopWatching?()
 
@@ -51,16 +52,22 @@ module.exports = (directoryPath, callback) ->
 
   # recursively walks the directory tree and calls onFound for every file it
   # finds
-  findFiles = (path, type, onFound) ->
+  findFiles = (path, type, onFound, onDone) ->
     if type == 'file'
       onFound path
+      onDone?()
     else
       fs.readdir path, (err, subPaths) ->
         return console.log err if err
+
+        numPending = subPaths.length
+        onDone?() if numPending == 0
         for subPath in subPaths
           fullPath = paths.join(path, subPath)
-          getPathType fullPath, (p, t) -> findFiles(p, t, onFound)
-
+          getPathType fullPath, (p, t) -> 
+            findFiles p, t, onFound, () ->
+              onDone?() if --numPending == 0
+          
   # get type of path as either 'file' or 'directory'
   # callback gets called with (path, type) where path is the path passed in,
   # for convenience

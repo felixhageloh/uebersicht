@@ -7,7 +7,7 @@ var DirWatcher = require('../../src/directory_watcher.coffee');
 var fixturePath = path.resolve(__dirname, '../test_widgets');
 var newWidgetPath = path.join(fixturePath, 'new-widget.coffee');
 
-var stopWatching;
+var watcher = DirWatcher(fixturePath, (event) => callback(event));
 var callback;
 
 const throwError = (err) => {
@@ -32,15 +32,16 @@ test('files that are already present in the widget dir', (t) => {
     if (idx > -1) {
       expectedWidgets.splice(idx, 1);
     }
-
-    if (expectedWidgets.length === 0) {
-      callback = () => {};
-      t.pass('it emits an event for all widgets already in the folder');
-      t.end();
-    }
   };
 
-  stopWatching = DirWatcher(fixturePath, (event) => callback(event));
+  watcher.replay(() => {
+    if (expectedWidgets.length === 0) {
+      t.pass('it emits an event for all widgets already in the folder');
+    } else {
+      t.fail('did not find these widgets: ' + expectedWidgets.join(', '));
+    }
+    t.end();
+  });
 });
 
 test('adding files', (t) => {
@@ -110,7 +111,7 @@ test('removing folders', (t) => {
 });
 
 test('stopping', (t) => {
-  stopWatching();
+  watcher.close();
   t.pass('it can be stopped');
   t.end();
 });

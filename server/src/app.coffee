@@ -45,7 +45,7 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
 
   bundler = WidgetBundler(widgetPath)
   # TODO: use a stream/generator/promise pattern instead of nested callbacks
-  stopWatchingDir = watchDir(widgetPath, (fileEvent) ->
+  watcher = watchDir(widgetPath, (fileEvent) ->
     if (fileEvent.filePath.replace(fileEvent.rootPath, '') == '/main.css')
       dispatchToRemote({type: 'MASTER_STYLE_CHANGED'})
       return
@@ -56,7 +56,7 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
         dispatchToRemote(action)
     )
   )
-
+  
   # load and replay settings
   settings = Settings(settingsPath)
 
@@ -87,22 +87,23 @@ module.exports = (port, widgetPath, settingsPath, publicPath, options, callback)
 
   server = http.createServer(middleware)
   server.keepAliveTimeout = 35000
-  server.listen port, host, (err) ->
-    try
-      return server.emit('error', err) if err
-      messageBus = MessageBus(
-        server: server,
-        verifyClient: (info) ->
-          info.req.headers.host == allowedHost && (info.origin == allowedOrigin || info.origin == 'Übersicht')
-      )
-      sharedSocket.open("ws://#{host}:#{port}")
-      callback?()
-    catch e
-      server.emit('error', e)
+  watcher.replay ->
+    server.listen port, host, (err) ->
+      try
+        return server.emit('error', err) if err
+        messageBus = MessageBus(
+          server: server,
+          verifyClient: (info) ->
+            info.req.headers.host == allowedHost && (info.origin == allowedOrigin || info.origin == 'Übersicht')
+        )
+        sharedSocket.open("ws://#{host}:#{port}")
+        callback?()
+      catch e
+        server.emit('error', e)
 
   # api
   close: (cb) ->
-    stopWatchingDir()
+    watcher.close()
     bundler.close()
     server.close()
     sharedSocket.close()
