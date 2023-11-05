@@ -14,7 +14,6 @@
     UBListener* listener;
     NSMutableDictionary* widgets;
     NSMutableDictionary* settings;
-    NSArray* sortedWidgets;
     void (^changeHandler)(NSDictionary*);
     NSDictionary* defaultSettings;
 }
@@ -138,16 +137,11 @@
     changeHandler = aChangeHandler;
 }
 
-- (void)reset
-{
-    widgets = [[NSMutableDictionary alloc] init];
-    settings = [[NSMutableDictionary alloc] init];
-}
-
 - (void)reset:(NSDictionary*)state
 {
     widgets = [(NSDictionary*)state[@"widgets"] mutableCopy];
     settings = [(NSDictionary*)state[@"settings"] mutableCopy];
+    [self notifyChange];
 }
 
 - (NSDictionary*)get:(NSString*)widgetId
@@ -172,7 +166,9 @@
 
 - (NSArray*)sortedWidgets
 {
-    return sortedWidgets;
+    return [widgets.allKeys
+        sortedArrayUsingSelector:@selector(compare:)
+    ];;
 }
 
 - (void)notifyChange
@@ -185,13 +181,7 @@
 
 - (NSDictionary*)addWidget:(NSDictionary*)widget
 {
-    BOOL alreadyExists = !!widgets[widget[@"id"]];
     widgets[widget[@"id"]] = widget;
-    if (!alreadyExists) {
-        sortedWidgets = [widgets.allKeys
-            sortedArrayUsingSelector:@selector(compare:)
-        ];
-    }
     
     if (!settings[widget[@"id"]]) {
         settings[widget[@"id"]] = [[NSMutableDictionary alloc]
@@ -216,10 +206,6 @@
 - (void)removeWidget:(NSString*)widgetId
 {
     [widgets removeObjectForKey:widgetId];
-    
-    sortedWidgets = [widgets.allKeys
-        sortedArrayUsingSelector:@selector(compare:)
-    ];
 }
 
 - (void)selectScreen:(NSNumber*)screenId forWidget:(NSString*)widgetId
