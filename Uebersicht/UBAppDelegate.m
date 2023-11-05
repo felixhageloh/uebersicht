@@ -112,7 +112,6 @@ int const PORT = 41416;
 
 - (NSDictionary*)fetchState
 {
-    [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
     NSURL *urlPath = [[self serverUrl:@"http"] URLByAppendingPathComponent: @"state/"];
     NSData *jsonData = [NSData dataWithContentsOfURL:urlPath];
     NSError *error = nil;
@@ -133,6 +132,7 @@ int const PORT = 41416;
     void (^handleData)(NSString*) = ^(NSString* output) {
         // note that these might be called several times
         if ([output rangeOfString:@"server started"].location != NSNotFound) {
+            [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
             [self->widgetsStore reset: [self fetchState]];
             // this will trigger a render
             [self->screensController syncScreens:self];
