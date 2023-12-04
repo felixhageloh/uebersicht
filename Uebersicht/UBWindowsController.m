@@ -65,16 +65,35 @@
 
 - (NSRect)screenRect:(NSNumber*)screenId
 {
-    NSRect screenRect = CGDisplayBounds([screenId unsignedIntValue]);
-    CGRect mainScreenRect = CGDisplayBounds(CGMainDisplayID());
-    int menuBarHeight = [[NSApp mainMenu] menuBarHeight];
-
-    screenRect.origin.y = -1 * (screenRect.origin.y + screenRect.size.height -
-                                mainScreenRect.size.height);
-
-    screenRect.size.height = screenRect.size.height - menuBarHeight;
+    NSScreen* screen = [self getNSScreen:screenId];
     
-    return screenRect;
+    CGFloat auxiliaryHeight = screen.auxiliaryTopLeftArea.size.height;
+    CGFloat windowHeight = screen.visibleFrame.size.height +
+        (screen.visibleFrame.origin.y - screen.frame.origin.y);
+    
+    // If the remaining visible height is exactly the auxiliaryHeight, the menu
+    // bar is hidden. There seems to be no other way to dedect this reliably
+    if (screen.frame.size.height - windowHeight == auxiliaryHeight) {
+        windowHeight = windowHeight + auxiliaryHeight;
+    }
+
+    return NSMakeRect(
+        screen.frame.origin.x,
+        screen.frame.origin.y,
+        screen.frame.size.width,
+        windowHeight
+    );
+}
+
+- (NSScreen*)getNSScreen:(NSNumber*)screenId
+{
+    for (NSScreen* screen in [NSScreen screens]) {
+        if ([screen deviceDescription][@"NSScreenNumber"] == screenId) {
+            return screen;
+        }
+    };
+    
+    return nil;
 }
 
 - (void)reloadAll

@@ -30,7 +30,7 @@ int const MAX_DISPLAYS = 42;
         
         [[NSNotificationCenter defaultCenter]
             addObserver: self
-            selector: @selector(syncScreens:)
+            selector: @selector(handleScreenChange:)
             name: NSApplicationDidChangeScreenParametersNotification
             object: nil
         ];
@@ -47,29 +47,21 @@ int const MAX_DISPLAYS = 42;
         initWithCapacity:MAX_DISPLAYS
     ];
     
-    CGDirectDisplayID displays[MAX_DISPLAYS];
-    uint32_t numDisplays;
-    
-    CGError error = CGGetActiveDisplayList(
-        MAX_DISPLAYS,
-        displays,
-        &numDisplays
-    );
-    
-    if (error || numDisplays == 0) {
-        [self
-            performSelector: @selector(updateScreens)
-            withObject: nil
-            afterDelay: 1
-        ];
-        return;
-    }
-    
     [screens removeAllObjects];
-    NSMutableArray *ids = [[NSMutableArray alloc] initWithCapacity:numDisplays];
+    NSMutableArray *ids = [[NSMutableArray alloc] 
+        initWithCapacity: [NSScreen screens].count
+    ];
     
-    for(int i = 0; i < numDisplays; i++) {
-        name = [self screenNameForDisplay:displays[i]];
+    int i = 0;
+    NSNumber* screenId;
+    for(NSScreen* screen in [NSScreen screens]) {
+        screenId = [screen deviceDescription][@"NSScreenNumber"];
+            
+        if (@available(macOS 10.15, *)) {
+            name = [screen localizedName];
+        } else {
+            name = [self screenNameForDisplay: [screenId intValue]];
+        }
         if (!name)
             name = [NSString stringWithFormat:@"Display %i", i];
         
@@ -83,9 +75,10 @@ int const MAX_DISPLAYS = 42;
             nameList[name] = [NSNumber numberWithInt:1];
         }
     
-        NSNumber* screenId = @(displays[i]);
         screens[screenId] = name;
         [ids addObject: screenId];
+        
+        i++;
     }
     
     sortedScreens = ids;
@@ -96,7 +89,16 @@ int const MAX_DISPLAYS = 42;
     ];
 }
 
-- (void)syncScreens:(id)sender
+- (void)handleScreenChange:(id)sender 
+{
+    [self 
+       performSelector:@selector(syncScreens)
+       withObject:NULL
+       afterDelay:0
+    ];
+}
+
+- (void)syncScreens
 {
     [self updateScreens];
     [listener screensChanged:screens];

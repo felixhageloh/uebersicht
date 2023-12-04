@@ -135,7 +135,7 @@ int const PORT = 41416;
             [[UBWebSocket sharedSocket] open:[self serverUrl:@"ws"]];
             [self->widgetsStore reset: [self fetchState]];
             // this will trigger a render
-            [self->screensController syncScreens:self];
+            [self->screensController syncScreens];
 
         } else if ([output rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
             self->portOffset++;
@@ -320,7 +320,7 @@ int const PORT = 41416;
 {
     [windowsController closeAll];
     needsRefresh = YES;
-    [screensController syncScreens:self];
+    [screensController syncScreens];
 }
 
 - (IBAction)showPreferences:(id)sender
@@ -345,7 +345,7 @@ int const PORT = 41416;
 - (IBAction)refreshWidgets:(id)sender
 {
     needsRefresh = YES;
-    [screensController syncScreens:self];
+    [screensController syncScreens];
 }
 
 - (IBAction)showDebugConsole:(id)sender

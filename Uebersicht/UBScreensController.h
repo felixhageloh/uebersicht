@@ -14,6 +14,7 @@
 @property NSArray* sortedScreens;
 
 - (id)initWithChangeListener:(id)target;
-- (void)syncScreens:(id)sender;
+- (void)handleScreenChange:(id)sender;
+- (void)syncScreens;
 
 @end
