@@ -44,7 +44,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2019 Felix Hageloh. Released under the GNU General Public License v3.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>A widget would like to access your current locatiuon.</string>
+	<string>A widget would like to access your current location.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPhotoLibraryUsageDescription</key>
