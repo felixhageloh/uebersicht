@@ -47,7 +47,7 @@ h3
 .center
   text-align: center
 
-a.button, a.button:link, a.button:visited
+.button, .button:link, .button:visited
   font-size: 14px
   font-weight: 400
   padding: 5px 10px
@@ -126,7 +126,7 @@ main
   text-align: center
   font-size: 0
 
-  a.button, a.button:link, a.button:visited
+  .button, .button:link, .button:visited
     margin-right: 10px
     color: #152033;
     padding: 10px 20px
@@ -206,13 +206,28 @@ main
     justify-content: space-between
     margin-bottom: 20px
 
-  a#donate
+  .donate
     width: 92px
     box-sizing: border-box
     text-align: center
     margin-right: 5px
     border-radius: 20px
     padding: 3px
+    line-height: 1.5em
+    border-color: transparent
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1)
+    cursor: pointer
+    background-color: #152033
+    color: #fff
+  
+    &:hover 
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2)
+  
+  #paypal
+    background: #FFD140
+    color: #003087
+    font-weight: bold
+
 
   input
     vertical-align: middle
