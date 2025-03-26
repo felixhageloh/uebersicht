@@ -1,0 +1,20 @@
+PODS:
+  - SocketRocket (0.5.1)
+  - Sparkle (2.0.0)
+
+DEPENDENCIES:
+  - SocketRocket
+  - Sparkle (~> 2.0.0)
+
+SPEC REPOS:
+  trunk:
+    - SocketRocket
+    - Sparkle
+
+SPEC CHECKSUMS:
+  SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
+  Sparkle: 128c668ddd0780beb08576ce18460d2a37f64f9f
+
+PODFILE CHECKSUM: c89436dc598c346b0a2b1bb710e0acb6c40c705a
+
+COCOAPODS: 1.11.2

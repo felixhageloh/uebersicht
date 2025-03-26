@@ -1,0 +1,15 @@
+os: osx
+language: node_js
+
+# Add new versions to test here
+node_js:
+  - 10
+
+before_install:
+  - cd server
+
+install:
+  - npm install
+
+script:
+  - npm test
