@@ -16,7 +16,8 @@
 typedef NS_ENUM(NSInteger, UBWindowType) {
     UBWindowTypeAgnostic,
     UBWindowTypeBackground,
-    UBWindowTypeForeground
+    UBWindowTypeForeground,
+    UBWindowTypeAlwaysOnTop
 };
 
 

@@ -295,6 +295,7 @@ int const PORT = 41416;
             updateWindows:screens
             baseUrl: [self serverUrl: @"http"]
             interactionEnabled: preferences.enableInteraction
+            alwaysOnTop: preferences.alwaysOnTop
             forceRefresh: needsRefresh
         ];
         needsRefresh = NO;
@@ -317,6 +318,13 @@ int const PORT = 41416;
 }
 
 - (void)interactionDidChange
+{
+    [windowsController closeAll];
+    needsRefresh = YES;
+    [screensController syncScreens];
+}
+
+- (void)alwaysOnTopDidChange
 {
     [windowsController closeAll];
     needsRefresh = YES;

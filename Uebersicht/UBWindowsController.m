@@ -32,15 +32,17 @@
 - (void)updateWindows:(NSDictionary*)screens
               baseUrl:(NSURL*)baseUrl
    interactionEnabled:(Boolean)interactionEnabled
+          alwaysOnTop:(Boolean)alwaysOnTop
          forceRefresh:(Boolean)forceRefresh
 {
     NSMutableArray* obsoleteScreens = [[windows allKeys] mutableCopy];
     UBWindowGroup* windowGroup;
-    
+
     for(NSNumber* screenId in screens) {
         if (![windows objectForKey:screenId]) {
             windowGroup = [[UBWindowGroup alloc]
                 initWithInteractionEnabled: interactionEnabled
+                alwaysOnTop: alwaysOnTop
             ];
             [windows setObject:windowGroup forKey:screenId];
             [windowGroup loadUrl: [self screenUrl:screenId baseUrl:baseUrl]];
@@ -50,16 +52,16 @@
                 [windowGroup reload];
             }
         }
-        
+
         [windowGroup setFrame:[self screenRect:screenId] display:YES];
         [obsoleteScreens removeObject:screenId];
     }
-    
+
     for (NSNumber* screenId in obsoleteScreens) {
         [windows[screenId] close];
         [windows removeObjectForKey:screenId];
     }
-    
+
     NSLog(@"using %lu screens", (unsigned long)[windows count]);
 }
 

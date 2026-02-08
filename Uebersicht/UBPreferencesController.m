@@ -197,6 +197,24 @@
 }
 
 #
+#pragma mark Always On Top
+#
+
+
+- (BOOL)alwaysOnTop
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    return [[defaults valueForKey:@"alwaysOnTop"] boolValue];
+}
+
+- (void)setAlwaysOnTop:(BOOL)enabled
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:@(enabled) forKey:@"alwaysOnTop"];
+    [(UBAppDelegate *)[NSApp delegate] alwaysOnTopDidChange];
+}
+
+#
 #pragma mark Startup
 #
 

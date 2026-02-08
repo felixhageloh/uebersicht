@@ -16,7 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, strong) UBWindow* foreground;
 @property (readonly, strong) UBWindow* background;
 
-- (id)initWithInteractionEnabled:(BOOL)interactionEnabled;
+- (id)initWithInteractionEnabled:(BOOL)interactionEnabled
+                     alwaysOnTop:(BOOL)alwaysOnTop;
 - (void)loadUrl:(NSURL*)Url;
 - (void)reload;
 - (void)close;

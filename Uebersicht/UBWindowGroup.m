@@ -16,16 +16,20 @@
 
 
 - (id)initWithInteractionEnabled:(BOOL)interactionEnabled
+                     alwaysOnTop:(BOOL)alwaysOnTop
 {
     self = [super init];
     if (self) {
-        if (interactionEnabled) {
+        if (interactionEnabled || alwaysOnTop) {
+            UBWindowType foregroundType = alwaysOnTop
+                ? UBWindowTypeAlwaysOnTop
+                : UBWindowTypeForeground;
             foreground = [[UBWindow alloc]
-                initWithWindowType: UBWindowTypeForeground
+                initWithWindowType: foregroundType
             ];
             [foreground orderFront:self];
         }
-        
+
         background = [[UBWindow alloc]
             initWithWindowType: interactionEnabled
                 ? UBWindowTypeBackground

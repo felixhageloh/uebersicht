@@ -134,6 +134,10 @@
             [self setLevel:kCGNormalWindowLevel-1];
             [self updateTrackingArea];
             break;
+        case UBWindowTypeAlwaysOnTop:
+            [self setLevel:kCGFloatingWindowLevel];
+            [self updateTrackingArea];
+            break;
         case UBWindowTypeBackground:
         case UBWindowTypeAgnostic:
             [self setLevel:kCGDesktopWindowLevel];
@@ -157,10 +161,10 @@
 #pragma mark flags
 #
 
-- (BOOL)isKeyWindow { return type == UBWindowTypeForeground; }
-- (BOOL)canBecomeKeyWindow { return type == UBWindowTypeForeground; }
-- (BOOL)canBecomeMainWindow { return type == UBWindowTypeForeground; }
-- (BOOL)acceptsFirstResponder { return type == UBWindowTypeForeground; }
-- (BOOL)acceptsMouseMovedEvents { return type == UBWindowTypeForeground;; }
+- (BOOL)isKeyWindow { return type == UBWindowTypeForeground || type == UBWindowTypeAlwaysOnTop; }
+- (BOOL)canBecomeKeyWindow { return type == UBWindowTypeForeground || type == UBWindowTypeAlwaysOnTop; }
+- (BOOL)canBecomeMainWindow { return type == UBWindowTypeForeground || type == UBWindowTypeAlwaysOnTop; }
+- (BOOL)acceptsFirstResponder { return type == UBWindowTypeForeground || type == UBWindowTypeAlwaysOnTop; }
+- (BOOL)acceptsMouseMovedEvents { return type == UBWindowTypeForeground || type == UBWindowTypeAlwaysOnTop; }
 
 @end

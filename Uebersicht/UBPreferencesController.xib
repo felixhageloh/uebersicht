@@ -17,16 +17,16 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="472" y="636" width="580" height="236"/>
+            <rect key="contentRect" x="472" y="636" width="580" height="280"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
-            <value key="minSize" type="size" width="580" height="236"/>
-            <value key="maxSize" type="size" width="580" height="236"/>
+            <value key="minSize" type="size" width="580" height="280"/>
+            <value key="maxSize" type="size" width="580" height="280"/>
             <view key="contentView" autoresizesSubviews="NO" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="580" height="236"/>
+                <rect key="frame" x="0.0" y="0.0" width="580" height="280"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5">
-                        <rect key="frame" x="116" y="170" width="100" height="16"/>
+                        <rect key="frame" x="116" y="214" width="100" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Widgets Folder:" id="8">
                             <font key="font" metaFont="system"/>
@@ -35,7 +35,7 @@
                         </textFieldCell>
                     </textField>
                     <popUpButton autoresizesSubviews="NO" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="43">
-                        <rect key="frame" x="220" y="164" width="286" height="25"/>
+                        <rect key="frame" x="220" y="208" width="286" height="25"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" id="44">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -55,7 +55,7 @@
                         </popUpButtonCell>
                     </popUpButton>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="178">
-                        <rect key="frame" x="220" y="198" width="205" height="18"/>
+                        <rect key="frame" x="220" y="242" width="205" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Launch Übersicht when I login" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="179">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -66,7 +66,7 @@
                         </connections>
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="255">
-                        <rect key="frame" x="163" y="200" width="53" height="16"/>
+                        <rect key="frame" x="163" y="244" width="53" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Startup:" id="256">
                             <font key="font" metaFont="system"/>
@@ -84,7 +84,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="R1C-8t-EyM">
-                        <rect key="frame" x="145" y="137" width="126" height="17"/>
+                        <rect key="frame" x="145" y="181" width="126" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Interaction:" id="8lm-M5-ekh">
                             <font key="font" metaFont="system"/>
@@ -93,7 +93,7 @@
                         </textFieldCell>
                     </textField>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jHv-DY-0s5">
-                        <rect key="frame" x="220" y="136" width="132" height="18"/>
+                        <rect key="frame" x="220" y="180" width="132" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Enable interaction" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="7vp-gG-U0H">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -101,6 +101,26 @@
                         </buttonCell>
                         <connections>
                             <binding destination="-2" name="value" keyPath="enableInteraction" id="all-KL-ihA"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aot-label">
+                        <rect key="frame" x="119" y="137" width="97" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Window Level:" id="aot-label-cell">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aot-checkbox">
+                        <rect key="frame" x="220" y="136" width="132" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Always on top" bezelStyle="regularSquare" imagePosition="left" inset="2" id="aot-checkbox-cell">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <binding destination="-2" name="value" keyPath="alwaysOnTop" id="aot-binding"/>
                         </connections>
                     </button>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JRx-iq-tIq">
@@ -125,9 +145,9 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" preferredMaxLayoutWidth="268" translatesAutoresizingMaskIntoConstraints="NO" id="VVJ-Cl-FSt">
-                        <rect key="frame" x="239" y="88" width="312" height="42"/>
+                        <rect key="frame" x="239" y="88" width="312" height="56"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Disable if you don't want widgets to be clickable and always stay behind items on your desktop." id="GmJ-aJ-oHW">
+                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Disable interaction if you don't want widgets to be clickable. Enable Always on top to keep widgets visible above other windows." id="GmJ-aJ-oHW">
                             <font key="font" metaFont="label" size="11"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
