@@ -99,3 +99,31 @@ widget format still supported for backward compatibility.
   (code signing, CocoaPods without a workspace, Unicode normalization
   in `Übersicht`'s own name tripping up shell scripts, etc.) hit while
   building that tooling.
+
+## Known issues
+
+- **"Widgets Folder" popup in Preferences doesn't persist on recent
+  macOS (reported on macOS 16 "Tahoe" / Darwin 25, app build 82,
+  compiled against an older SDK).** Picking a folder from the
+  "Widgets Folder:" popup button appears to do nothing: the embedded
+  server never starts and "Open Widgets Folder" in the menu bar is a
+  no-op. In this checkout's source, the picked path is meant to be
+  written to `NSUserDefaults` under the key **`widgetDirectory`**, as
+  an `NSKeyedArchiver`-archived `NSURL` (`UBPreferencesController.m`,
+  `setWidgetDir:` / `widgetDir`) — plausibly the `_popUpItemAction:`
+  handler that's supposed to call `setWidgetDir:` silently fails to
+  fire or persist on newer macOS versions.
+
+  A workaround reported for this: fully quit and relaunch the app
+  (`killall Übersicht && open /Applications/Übersicht.app`), which
+  falls back to the *registered default* widget directory
+  (`~/Library/Application Support/Übersicht/widgets`, set via
+  `registerDefaults` in `UBPreferencesController`'s init) rather than
+  whatever was picked in the popup. A `defaults write` command has
+  also been floated as a fix, but note it needs to target the
+  **`widgetDirectory`** key with archived `NSURL` data to match what
+  this code actually reads — a plain-string write to a differently
+  named key (e.g. `widgetDir`) isn't read by any code path here, so
+  if that appeared to work, the restart (and its fallback to the
+  registered default) was very likely doing the actual work, not the
+  `defaults write` itself. Not yet root-caused or fixed upstream.
