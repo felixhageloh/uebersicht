@@ -3,7 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var execSync = require('child_process').execSync;
 
-var DirWatcher = require('../../src/directory_watcher.coffee');
+var DirWatcher = require('../../src/directory_watcher');
 var fixturePath = path.resolve(__dirname, '../test_widgets');
 var newWidgetPath = path.join(fixturePath, 'new-widget.coffee');
 

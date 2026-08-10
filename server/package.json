@@ -2,12 +2,12 @@
   "name": "uebersicht-server",
   "version": "0.0.0",
   "description": "Node.js backend for Übersicht",
-  "main": "server.coffee",
+  "main": "server.js",
   "scripts": {
     "test": "npm run-script test-local && npm run-script test-browser",
-    "test-local": "tape -r coffee-script/register spec/backend/**/* | tap-spec",
+    "test-local": "tape spec/backend/**/* | tap-spec",
     "test-browser": "browserify -t coffeeify  spec/frontend/*.*  | tape-run | tap-spec",
-    "start": "coffee server.coffee",
+    "start": "node server.js",
     "release": "npm run-script build-client && npm run-script build-server",
     "build-client": "node scripts/build-client.js",
     "build-server": "node scripts/build-server.js && cd release && npm prune --production && npm install --production --no-progress"
@@ -16,7 +16,6 @@
   "license": "GPL v3 <http://www.gnu.org/licenses/>",
   "private": true,
   "devDependencies": {
-    "coffee-script": "^1.12.7",
     "esbuild": "^0.28.2",
     "sinon": "^4.0.1",
     "tap-spec": "^5.0.0",
@@ -28,6 +27,7 @@
     "@emotion/styled": "^10.0.27",
     "browserify": "^16.5.2",
     "byline": "^5.0.0",
+    "coffee-script": "^1.12.7",
     "coffeeify": "^2.1.0",
     "connect": "^3.6.5",
     "convert-source-map": "^1.7.0",

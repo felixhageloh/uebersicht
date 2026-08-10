@@ -4,7 +4,7 @@ var path = require('path');
 
 var httpGet = require('../helpers/httpGet');
 var httpPost = require('../helpers/httpPost');
-var commandServer = require('../../src/command_server.coffee');
+var commandServer = require('../../src/command_server');
 
 var workingDir = path.resolve(__dirname, path.join('..', 'test_widgets'));
 var server = connect().use(commandServer(workingDir)).listen(8887);

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Server-only smoke test for the Übersicht Node/CoffeeScript backend (server/).
-# Launches server/server.coffee against a throwaway widget+settings dir,
+# Server-only smoke test for the Übersicht Node backend (server/).
+# Launches server/server.js against a throwaway widget+settings dir,
 # drives it purely with curl (the same requests client.js issues from the
 # browser), and asserts a full widget round trip: bundle -> state -> run.
 #
@@ -14,9 +14,8 @@ BASE="http://127.0.0.1:$PORT"
 
 SCRATCH="$(mktemp -d)"
 mkdir -p "$SCRATCH/widgets" "$SCRATCH/settings"
-# `$!` below is only the subshell that execs coffee; it does not forward
-# signals to the node process it spawns (which ends up reparented to
-# launchd). Killing the port's listener is what actually frees it.
+# Killing the port's listener (rather than relying on `$!`/a PID) keeps
+# this robust regardless of how the process ends up backgrounded.
 trap 'lsof -ti:"$PORT" -sTCP:LISTEN | xargs -r kill 2>/dev/null || true; rm -rf "$SCRATCH"' EXIT
 
 cat > "$SCRATCH/widgets/smoke.jsx" <<'EOF'
@@ -26,7 +25,7 @@ export const render = ({ output }) => <div id="smoke">{output}</div>;
 EOF
 
 echo "== starting server on port $PORT =="
-( cd "$SERVER_DIR" && node_modules/.bin/coffee server.coffee -d "$SCRATCH/widgets" -p "$PORT" -s "$SCRATCH/settings" ) \
+( cd "$SERVER_DIR" && node server.js -d "$SCRATCH/widgets" -p "$PORT" -s "$SCRATCH/settings" ) \
   > "$SCRATCH/server.log" 2>&1 &
 
 for i in $(seq 1 30); do

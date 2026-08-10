@@ -41,7 +41,7 @@ an old version.
 
 ## Run (agent path): server only
 
-`smoke.sh` starts `server/server.coffee` against a throwaway widget +
+`smoke.sh` starts `server/server.js` against a throwaway widget +
 settings directory, then drives it purely with `curl` — the same
 requests the browser client (`client.js`) issues: fetch the widget
 bundle, read `/state/`, `POST /run/` to execute the widget's shell
@@ -54,9 +54,8 @@ Xcode.
 
 Exits 0 and prints `ALL PASSED` on success. It always cleans up its
 server process and temp directories on exit, even on failure (via an
-EXIT trap that kills the port's listener directly — `$!` after
-`coffee server.coffee &` is only the `coffee` wrapper's PID and does not
-forward signals to the actual node process it execs).
+EXIT trap that kills the port's listener directly, which is robust
+regardless of how the backgrounded `node server.js` ends up parented).
 
 ### Optional: visual proof in a real (headless) browser
 
@@ -68,7 +67,7 @@ machine):
 
 ```bash
 cd server && npm run build-client   # writes release/public/client.js (gitignored, not built by default)
-node_modules/.bin/coffee server.coffee -d /path/to/widgets -p 41426 -s /path/to/settings &
+node server.js -d /path/to/widgets -p 41426 -s /path/to/settings &
 ```
 
 ```js
@@ -175,6 +174,13 @@ triggers or fixes.
   gets SIGKILLed immediately on launch. `native-driver.sh build` does
   this re-signing automatically as its last step.
 
+- **`codesign` on the ~80MB `node-x64` binary intermittently fails with
+  `"internal error in Code Signing subsystem"`** when run immediately
+  after Xcode's own build-phase signing just touched the same file --
+  a transient `securityd` contention, not a real problem with the file
+  (a delayed retry always succeeds). `native-driver.sh build` retries
+  each `codesign` call up to 5 times with a 2s delay.
+
 - **The app doesn't actually retry across ports the way it looks like it
   should.** `UBAppDelegate.m`'s `handleExit` block calls `[self
   shutdown]` (no keep-alive) on *any* task exit before checking whether
@@ -245,7 +251,7 @@ triggers or fixes.
   `log show --predicate 'processID == <pid>' --last 2m | grep "different Team IDs"`.
   Re-sign as `native-driver.sh build` does.
 
-- **`EADDRINUSE` running `coffee server.coffee` standalone on the
+- **`EADDRINUSE` running `node server.js` standalone on the
   default port**: a real installed Übersicht.app is very likely already
   running and bound to `41416` — pass a different `-p` (that's why
   `smoke.sh` defaults to `41426`).

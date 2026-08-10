@@ -1,4 +1,4 @@
-var ClassicWidget = require('./ClassicWidget.coffee');
+var ClassicWidget = require('./ClassicWidget');
 var VirtualDomWidget = require('./VirtualDomWidget');
 
 module.exports = function Widget(widget) {

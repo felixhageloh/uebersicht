@@ -63,10 +63,24 @@ do_build() {
   # ad hoc *without* hardened runtime so validation is skipped entirely.
   # (Apple Silicon requires *some* signature to exec at all -- a plain
   # --remove-signature makes node-arm64 get SIGKILLed on launch.)
-  codesign --force --sign - "$app/Contents/Resources/node-arm64"
+  #
+  # `codesign` immediately after Xcode's own build-phase signing
+  # sometimes hits "internal error in Code Signing subsystem" on the
+  # ~80MB node-x64 binary -- a transient securityd contention, not
+  # anything wrong with the file (a delayed retry always succeeds).
+  codesign_retry() {
+    local file="$1" i
+    for i in 1 2 3 4 5; do
+      codesign --force --sign - "$file" 2>&1 && return 0
+      echo "  codesign attempt $i failed, retrying..." >&2
+      sleep 2
+    done
+    return 1
+  }
+  codesign_retry "$app/Contents/Resources/node-arm64"
   [ -f "$app/Contents/Resources/node-x64" ] && \
-    codesign --force --sign - "$app/Contents/Resources/node-x64"
-  codesign --force --sign - "$app/Contents/Resources/node_modules/fsevents/fsevents.node"
+    codesign_retry "$app/Contents/Resources/node-x64"
+  codesign_retry "$app/Contents/Resources/node_modules/fsevents/fsevents.node"
 
   echo "== built: $app =="
 }

@@ -387,8 +387,8 @@ The code base consists of two parts, a cocoa app and a NodeJS app inside `server
 
 The node app can be run standalone using
 
-```coffeescript
-coffee server/server.coffee -d <path/to/widget/dir> -p <port>
+```
+node server/server.js -d <path/to/widget/dir> -p <port>
 ```
 
 # Building in Xcode

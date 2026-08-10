@@ -27,7 +27,7 @@ function runWidgetify(filePath, id, src) {
 // resolves through to whatever `require` is already on the page (set up
 // by client.js), falling back through any previously-loaded widget
 // bundles in between. This mirrors browserify's "multiple bundles
-// sharing one `require`" pattern, which client.coffee's dynamic
+// sharing one `require`" pattern, which client.js's dynamic
 // `<script src="/widgets/<id>">` loading depends on: `require = expr`
 // is itself an expression that evaluates to `expr`'s value, and the
 // entry module runs (for its cache-populating side effect) while the

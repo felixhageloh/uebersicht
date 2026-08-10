@@ -35,12 +35,14 @@ The project is two halves that run as one app:
   screen/wallpaper changes and re-syncs windows accordingly, and ships
   Sparkle for auto-updates.
 
-- **`server/`** — a Node.js backend, written in CoffeeScript with some
-  plain JS, structured as Connect middleware (`server/src/app.coffee`
-  wires it all together). Responsibilities:
-  - Watches the widget directory (`directory_watcher.coffee`) and
-    rebundles a widget with esbuild whenever its file (or a local file
-    it imports) changes, pushing the update to connected clients over
+- **`server/`** — a Node.js backend, plain JS (its own source was
+  originally CoffeeScript; converted to JS — CoffeeScript survives only
+  as an optional *widget-authoring* format, see below), structured as
+  Connect middleware (`server/src/app.js` wires it all together).
+  Responsibilities:
+  - Watches the widget directory (`directory_watcher.js`) and rebundles
+    a widget with esbuild whenever its file (or a local file it
+    imports) changes, pushing the update to connected clients over
     WebSocket (`WidgetBundler.js`, `bundleWidget.js`, `MessageBus.js`).
     Widget bundles share one `require` registry with `client.js` at
     runtime (a hand-rolled version of browserify's classic
@@ -49,7 +51,7 @@ The project is two halves that run as one app:
     bundling it themselves.
   - Serves the widget bundle to the browser client on request
     (`serveWidgets.js`).
-  - `POST /run/` (`command_server.coffee`) spawns `bash` and streams
+  - `POST /run/` (`command_server.js`) spawns `bash` and streams
     stdout/stderr back — this is what actually executes a widget's
     `command` string on each refresh.
   - `GET /state/` (`StateServer.js`) returns the current Redux-style
@@ -57,7 +59,7 @@ The project is two halves that run as one app:
   - Persists widget settings (position, visibility, screen assignment)
     to disk (`Settings.js`, `WidgetSettings.json`) and reloads them on
     boot.
-  - A small `client.coffee` bundle (built separately, see below) runs
+  - A small `client.js` bundle (built separately, see below) runs
     *inside* the WKWebView: it connects back over WebSocket, requests
     each widget's bundle, runs `command` on `refreshFrequency` by
     POSTing to `/run/`, and re-renders via React on each response.
