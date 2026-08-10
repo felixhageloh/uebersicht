@@ -10,8 +10,10 @@ test('bundling coffeescript widgets', (t) => {
 
   t.plan(2);
   t.ok(
-    bundle.constructor.name === 'Browserify',
-    'it returns a browserify bundle',
+    typeof bundle.bundle === 'function' &&
+      typeof bundle.close === 'function' &&
+      typeof bundle.on === 'function',
+    'it returns a bundle (bundle/close/on)',
   );
   bundle.bundle((err, src) => {
     t.ok(
@@ -28,8 +30,10 @@ test('bundling javascript widgets', (t) => {
 
   t.plan(2);
   t.ok(
-    bundle.constructor.name === 'Browserify',
-    'it returns a browserify bundle',
+    typeof bundle.bundle === 'function' &&
+      typeof bundle.close === 'function' &&
+      typeof bundle.on === 'function',
+    'it returns a bundle (bundle/close/on)',
   );
   bundle.bundle((err, src) => {
     t.ok(
@@ -46,8 +50,10 @@ test('bundling jsx widgets', (t) => {
 
   t.plan(2);
   t.ok(
-    bundle.constructor.name === 'Browserify',
-    'it returns a browserify bundle',
+    typeof bundle.bundle === 'function' &&
+      typeof bundle.close === 'function' &&
+      typeof bundle.on === 'function',
+    'it returns a bundle (bundle/close/on)',
   );
   bundle.bundle((err, src) => {
     t.ok(
@@ -64,8 +70,10 @@ test('bundling widgets with syntax errors', (t) => {
 
   t.plan(2);
   t.ok(
-    bundle.constructor.name === 'Browserify',
-    'it returns a browserify bundle',
+    typeof bundle.bundle === 'function' &&
+      typeof bundle.close === 'function' &&
+      typeof bundle.on === 'function',
+    'it returns a bundle (bundle/close/on)',
   );
   bundle.bundle((err, src) => {
     t.equal(

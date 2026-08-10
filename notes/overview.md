@@ -19,7 +19,7 @@ The project is two halves that run as one app:
 │                               │◄───────►│                              │
 │  • Draws borderless windows   │  HTTP/  │  • Watches the widget dir    │
 │    at desktop-icon window     │  WS on  │  • Bundles each widget with  │
-│    level, one per screen      │ 127.0.0.1│    browserify (JSX/coffee)  │
+│    level, one per screen      │ 127.0.0.1│    esbuild (JSX/coffee)     │
 │  • Embeds a WKWebView that    │  :41416  │  • Serves /state/ (current  │
 │    loads the server's page    │         │    widgets+settings)         │
 │  • Menu bar item, prefs,      │         │  • POST /run/ executes a     │
@@ -39,9 +39,14 @@ The project is two halves that run as one app:
   plain JS, structured as Connect middleware (`server/src/app.coffee`
   wires it all together). Responsibilities:
   - Watches the widget directory (`directory_watcher.coffee`) and
-    rebundles a widget with browserify whenever its file changes,
-    pushing the update to connected clients over WebSocket
-    (`WidgetBundler.js`, `MessageBus.js`).
+    rebundles a widget with esbuild whenever its file (or a local file
+    it imports) changes, pushing the update to connected clients over
+    WebSocket (`WidgetBundler.js`, `bundleWidget.js`, `MessageBus.js`).
+    Widget bundles share one `require` registry with `client.js` at
+    runtime (a hand-rolled version of browserify's classic
+    "multiple bundles, one `require`" pattern) so they can pull in the
+    `uebersicht` module (`React`/`css`/`run`/`request`) without
+    bundling it themselves.
   - Serves the widget bundle to the browser client on request
     (`serveWidgets.js`).
   - `POST /run/` (`command_server.coffee`) spawns `bash` and streams
@@ -88,10 +93,15 @@ widget format still supported for backward compatibility.
   (`SocketRocket` for WebSockets from the native side, `Sparkle` for
   updates) are vendored directly under `Pods/` in this checkout rather
   than resolved via a `.xcworkspace` + `pod install`.
-- The Node backend is bundled for distribution via `browserify`
-  (`npm run release` in `server/`), and that release build is what
-  Xcode embeds into the app bundle's `Resources/` as `server.js` plus
-  a matching `node-arm64`/`node-x64` binary.
+- The Node backend is bundled for distribution via `esbuild`
+  (`npm run release` in `server/`, see `server/scripts/build-*.js`), and
+  that release build is what Xcode embeds into the app bundle's
+  `Resources/` as `server.js` plus a matching `node-arm64`/`node-x64`
+  binary. `server/spec/frontend`'s browser test suite (`npm run
+  test-browser`) still uses the old `browserify`+`coffeeify` pipeline
+  and a headless-Electron test runner — untouched so far, and currently
+  non-functional in sandboxed environments where `electron`'s postinstall
+  can't download its binary.
 - Both halves can be exercised independently of a full Xcode build —
   see [`.claude/skills/run-uebersicht/SKILL.md`](../.claude/skills/run-uebersicht/SKILL.md)
   for a from-source build/run/screenshot workflow for both the server
